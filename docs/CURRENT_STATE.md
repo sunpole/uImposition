@@ -11,13 +11,13 @@ Last updated: **24 July 2026**
 
 ### Версия и ветки
 
-- кандидат в `main`: **`0.3.0-alpha`**;
+- `main`: **`0.3.0-alpha`**, M3 объединён через PR №4;
 - завершённые этапы: M0, M1, M2, M3;
-- рабочая ветка релиз-кандидата: `m3/0.3.0-alpha`;
-- активная следующая задача после объединения: M4;
+- merge commit M3: `cd15a3a0719e4ddab7d4531d1427270c772dc7b9`;
+- активная следующая задача: M4;
 - следующая версия: `0.4.0-alpha`;
-- точки отката: `release/v0.1.0-alpha`, `release/v0.2.0-alpha`;
-- после объединения M3 создаётся `release/v0.3.0-alpha`.
+- точки отката: `release/v0.1.0-alpha`, `release/v0.2.0-alpha`, `release/v0.3.0-alpha`;
+- функциональная ветка M3 сохранена как история разработки, но источником истины является `main`.
 
 ### Что реально работает
 
@@ -107,13 +107,13 @@ Last updated: **24 July 2026**
 
 ### Version and branches
 
-- candidate for `main`: **`0.3.0-alpha`**;
+- `main`: **`0.3.0-alpha`**, M3 merged through PR #4;
 - completed milestones: M0, M1, M2, M3;
-- release-candidate branch: `m3/0.3.0-alpha`;
-- next active task after merge: M4;
+- M3 merge commit: `cd15a3a0719e4ddab7d4531d1427270c772dc7b9`;
+- next active task: M4;
 - next version: `0.4.0-alpha`;
-- rollback points: `release/v0.1.0-alpha`, `release/v0.2.0-alpha`;
-- `release/v0.3.0-alpha` is created after the M3 merge.
+- rollback points: `release/v0.1.0-alpha`, `release/v0.2.0-alpha`, `release/v0.3.0-alpha`;
+- the M3 feature branch remains as development history, while `main` is the source of truth.
 
 ### What actually works
 
