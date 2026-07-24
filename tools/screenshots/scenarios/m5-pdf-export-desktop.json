@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1200 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.4.0-alpha" },
+    { "selector": ".brand", "text": "v0.5.0-alpha" },
     { "selector": "#impositionStatus", "text": "4 лица" },
     { "selector": "#productionStatus", "text": "Недопечатки нет" },
     { "selector": "#pdfExportPanel", "text": "Экспорт в PDF" },
@@ -15,12 +15,12 @@
   "download": {
     "selector": "#exportSchemesPdf",
     "fileName": "uImposition-schemes.pdf",
-    "artifact": "uimposition-m5-control-schemes.pdf",
+    "artifact": "uimposition-v0-5-0-alpha-control-schemes.pdf",
     "expectedPages": 8
   },
   "afterDownloadAssertions": [
     { "selector": "#pdfExportStatus", "text": "PDF схем создан: 8 страниц" }
   ],
-  "screenshot": "uimposition-v0-4-0-alpha-m5-pdf-export-desktop.png",
+  "screenshot": "uimposition-v0-5-0-alpha-m5-pdf-export-desktop.png",
   "fullPage": true
 }
