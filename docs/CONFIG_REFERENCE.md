@@ -2,87 +2,89 @@
 
 ## Основной принцип / Core principle
 
-Все изменяемые производственные параметры и интерфейсные значения находятся в `src/config.js`. Расчётные модули не должны содержать скрытые производственные значения.
+Все изменяемые производственные параметры находятся в `src/config.js` или в явных входных данных. Расчётные модули не содержат скрытых производственных значений.
 
-All editable production and interface values live in `src/config.js`. Calculation modules must not contain hidden production constants.
+All editable production parameters live in `src/config.js` or explicit input data. Calculation modules contain no hidden production values.
 
-## Реализованные группы M3 / Implemented M3 groups
+## Действующие группы / Active groups
 
 | Группа | Назначение / Purpose |
 |---|---|
 | `app` | название, язык, единицы / name, language, units |
-| `sheetPresets` | реальные размеры после зачистки / real post-trim sheet sizes |
+| `sheetPresets` | реальные размеры после зачистки / post-trim sheet sizes |
 | `productPresets` | A4, A5, A6 / finished-product presets |
-| `bleedPresetsMm` | быстрые значения 0, 2, 5 мм / quick bleed values |
-| `defaults` | значения первого запуска / initial UI defaults |
-| `limits` | допустимые диапазоны и лимиты отображения / ranges and display limits |
-| `storage` | ключи браузерного хранения / browser-storage keys |
-| `demo` | контрольный заказ и контрольные монтажи / control order and control impositions |
-| `i18n` | русские и английские подписи / Russian and English labels |
+| `bleedPresetsMm` | быстрые выпуски / quick bleed values |
+| `defaults` | первый запуск / initial state |
+| `limits` | допустимые диапазоны / allowed ranges |
+| `storage` | ключи браузерного хранения / browser storage keys |
+| `demo` | контрольный заказ и монтажи / control order and impositions |
+| `i18n` | подписи интерфейса / interface labels |
 
-## Контрольные источники M3 / M3 control sources
+## Контрольные источники M4 / M4 control sources
 
-В группе `demo` используются два независимых источника:
+- `controlCaseUrl` → `data/control-case.json`: лист, изделие, режим оборота, 20 заказов и ожидаемые производственные суммы;
+- `controlLayoutUrl` → `data/control-layout-m3.json`: четыре явных лицевых монтажа и их ручные тиражи;
+- оборот не хранится отдельно: он всегда строится из лица;
+- производственный отчёт вычисляется из пар страниц и проверенных схем.
 
-- `controlCaseUrl` → `data/control-case.json` — лист, изделие и 20 заказов;
-- `controlLayoutUrl` → `data/control-layout-m3.json` — четыре ручные раскладки лицевых позиций.
+The control case provides the orders, duplex mode, and expected totals. The layout file provides four explicit fronts and manual run lengths. Backs and production totals are derived at runtime.
 
-The `demo` group uses two independent sources: the control order and the four manual front-layout assignments. The back layouts are never stored independently; they are derived from the fronts at runtime.
+Ручные тиражи `1500`, `1100`, `450`, `345` не являются настройкой по умолчанию и не должны использоваться вне контрольного примера как скрытая константа.
 
-Ручные тиражи `1500`, `1100`, `450`, `345` являются контрольными значениями для M3 и не должны восприниматься как результат оптимизатора.
-
-## Геометрия листа / Sheet geometry
-
-- `beforeTrim`: значения зачистки вычитаются;
-- `afterTrim`: размер уже дан после зачистки и не уменьшается повторно;
-- непечатные поля вычитаются только после определения фактического листа.
-
-- `beforeTrim`: trim values are subtracted;
-- `afterTrim`: the size is already post-trim and is not reduced again;
-- non-printable press margins are subtracted only after the physical sheet is established.
-
-## Геометрия изделия / Product geometry
-
-`productPresets` содержит готовые размеры без выпуска. Поддерживаются:
-
-- `width`, `height` — готовый формат;
-- `bleed` — выпуск с каждой стороны;
-- `spacingMode: commonCut` — общий рез, допускается только при выпуске `0`;
-- `spacingMode: separated` — раздельный рез;
-- `gap` — дополнительное расстояние между внешними границами выпусков.
-
-Занимаемый размер одного изделия:
+## Геометрия / Geometry
 
 ```text
-occupied width  = finished width  + 2 × bleed
-occupied height = finished height + 2 × bleed
-```
-
-Для раздельного режима дополнительный `gap` применяется только между соседними занимаемыми прямоугольниками, а не после последнего изделия.
-
-## Подсчёт сетки / Grid count
-
-Для каждой ориентации `0°` и `90°`:
-
-```text
+post-trim width  = source width  − left trim − right trim
+post-trim height = source height − top trim  − bottom trim
+printable width  = post-trim width  − left margin − right margin
+printable height = post-trim height − top margin  − bottom margin
+occupied width   = finished width  + 2 × bleed
+occupied height  = finished height + 2 × bleed
 columns = floor((printable width  + gap) / (cell width  + gap))
 rows    = floor((printable height + gap) / (cell height + gap))
 positions = columns × rows
 ```
 
-Сначала выбирается максимальное число позиций. При равенстве используется меньшая неиспользованная площадь ограничивающего прямоугольника, затем меньший остаток по краям, затем стабильное предпочтение `0°`.
+`afterTrim` не уменьшается повторно. `commonCut` допускается только при нулевом выпуске.
 
-Maximum position count is the first selector. Ties use the smaller unused bounding area, then smaller combined edge waste, then stable preference for `0°`.
+## Лицо и оборот / Front and back
 
-## M3: лицо и оборот / M3: front and back
+- блоки лица заполняются row-major;
+- `rotation: 0` → `up`, `rotation: 90` → `right`;
+- горизонтальный переворот зеркалит колонки;
+- `right` превращается в `left`;
+- `backPage: null` отображается знаком `-` только на обороте.
 
-- лицо заполняется блоками из `data/control-layout-m3.json` в порядке row-major;
-- `rotation: 0` создаёт направление `up`, `rotation: 90` — `right`;
-- оборот не хранится в конфигурации и не группируется отдельно;
-- горизонтальный переворот зеркалит колонки и преобразует `right` в `left`;
-- знак `-` является только отображением `backPage: null`.
+## M4: производственные метрики / M4 production metrics
 
-## Значения по умолчанию / Defaults
+Для пары `i` и монтажа `m`:
+
+```text
+produced_i = Σ(positionCount_i,m × runLength_m)
+underproduction_i = max(0, required_i − produced_i)
+overrun_i = max(0, produced_i − required_i)
+```
+
+Для готового файла:
+
+```text
+completeProduced = min(produced quantity of every file pair)
+fileOverrun = max(0, completeProduced − required file quantity)
+```
+
+Для `duplexMode: separateFrontBackForms`:
+
+```text
+physicalSheets = Σ(runLength_m)
+frontForms = impositionCount
+backForms = impositionCount
+forms = frontForms + backForms
+pressPasses = 2 × physicalSheets
+```
+
+Другие способы оборота пока отклоняются как неподдерживаемые, а не рассчитываются предположительно.
+
+## Значения первого запуска / Initial defaults
 
 - язык / language: `ru`;
 - исходный лист / source sheet: `620 × 450`;
@@ -90,6 +92,6 @@ Maximum position count is the first selector. Ties use the smaller unused boundi
 - поля / margins: `4 / 4 / 2 / 13` мм;
 - изделие / product: `A6`, `105 × 148`;
 - выпуск / bleed: `0`;
-- режим / mode: `commonCut`;
-- дополнительный зазор / additional gap: `0`;
-- панель настроек после загрузки / settings panel after reload: open.
+- режим / spacing mode: `commonCut`;
+- дополнительный зазор / gap: `0`;
+- панель настроек / settings panel: open.
