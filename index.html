@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="uImposition — расчёт сложных офсетных монтажей / offset imposition planning">
+  <title>uImposition</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav" aria-label="Основная навигация">
+      <strong>uImposition</strong>
+      <button id="languageButton" type="button" aria-label="Switch language">EN</button>
+    </nav>
+
+    <div class="hero__content" data-lang="ru">
+      <p class="eyebrow">Проектирование офсетных монтажей</p>
+      <h1>Проверяемая раскладка лица и оборота</h1>
+      <p>Будущий браузерный инструмент для расчёта бумаги, форм, перетиража и точных схем с номером файла, страницей и стрелкой ориентации.</p>
+    </div>
+
+    <div class="hero__content" data-lang="en" hidden>
+      <p class="eyebrow">Offset imposition planning</p>
+      <h1>Verifiable front and back placement schemes</h1>
+      <p>A planned browser tool for paper, plate, overrun and exact cell-level scheme calculation with file, page and head-direction data.</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel" data-lang="ru">
+      <h2>Что будет выдавать программа</h2>
+      <div class="scheme-preview">
+        <div class="scheme-preview__title">ЛИСТ-1_ЛИЦО · 1500 листов</div>
+        <div class="grid">
+          <div>33,1 →</div><div>33,1 →</div><div>33,3 →</div><div>70,1 →</div>
+          <div>25,1 →</div><div>25,3 →</div><div>97,1 →</div><div>97,3 →</div>
+        </div>
+      </div>
+      <p>На сайте каждая схема будет отдельной карточкой с рамкой. В PDF каждая схема будет занимать отдельную страницу.</p>
+    </section>
+
+    <section class="panel" data-lang="en" hidden>
+      <h2>Planned output</h2>
+      <div class="scheme-preview">
+        <div class="scheme-preview__title">SHEET-1_FRONT · 1500 sheets</div>
+        <div class="grid">
+          <div>33,1 →</div><div>33,1 →</div><div>33,3 →</div><div>70,1 →</div>
+          <div>25,1 →</div><div>25,3 →</div><div>97,1 →</div><div>97,3 →</div>
+        </div>
+      </div>
+      <p>Each browser scheme will be a bordered screenshot-ready card. Each PDF page will contain exactly one scheme.</p>
+    </section>
+
+    <section class="panel links">
+      <h2 data-lang="ru">Документация</h2>
+      <h2 data-lang="en" hidden>Documentation</h2>
+      <a href="https://github.com/sunpole/uImposition/blob/main/docs/TECHNICAL_SPECIFICATION_RU.md">Техническое задание — RU</a>
+      <a href="https://github.com/sunpole/uImposition/blob/main/docs/TECHNICAL_SPECIFICATION_EN.md">Technical specification — EN</a>
+      <a href="https://github.com/sunpole/uImposition">GitHub repository</a>
+    </section>
+
+    <section class="panel status">
+      <h2 data-lang="ru">Текущий этап</h2>
+      <h2 data-lang="en" hidden>Current stage</h2>
+      <p data-lang="ru"><strong>0.0.1-docs:</strong> техническое задание и архитектура. Рабочий калькулятор ещё не реализован.</p>
+      <p data-lang="en" hidden><strong>0.0.1-docs:</strong> specification and architecture. The production calculator is not implemented yet.</p>
+    </section>
+  </main>
+
+  <footer>uImposition · 2026</footer>
+  <script type="module" src="site.js"></script>
+</body>
+</html>
