@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="uImposition — профессиональный расчёт офсетных монтажей / professional offset imposition planning">
-  <title>uImposition · v0.2.0-alpha</title>
+  <title>uImposition · v0.3.0-alpha</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,21 +12,21 @@
     <nav class="nav" aria-label="Основная навигация">
       <a class="brand" href="./" aria-label="uImposition — главная страница">
         <span class="brand__name">uImposition</span>
-        <span class="brand__version">v<span data-project-version>0.2.0-alpha</span></span>
+        <span class="brand__version">v<span data-project-version>0.3.0-alpha</span></span>
       </a>
       <button id="languageButton" class="language-button" type="button" aria-label="Switch to English">EN</button>
     </nav>
 
     <div class="hero__content" data-lang="ru">
       <p class="eyebrow">Проектирование офсетных монтажей</p>
-      <h1>Лист, изделие и реальная вместимость.</h1>
-      <p>M2 сравнивает размещение без поворота и с поворотом на 90°, показывает обе сетки, выбирает максимальную вместимость и раскрывает точные пары страниц каждого файла.</p>
+      <h1>Лицо, страницы и зеркальный оборот.</h1>
+      <p>M3 заполняет лицевые позиции сплошными блоками, автоматически получает зеркальный оборот и проверяет файл, пару страниц и направление каждой позиции.</p>
     </div>
 
     <div class="hero__content" data-lang="en" hidden>
       <p class="eyebrow">Offset imposition planning</p>
-      <h1>Sheet, product and actual capacity.</h1>
-      <p>M2 compares unrotated and 90-degree placement, displays both grids, selects maximum capacity and expands every source file into exact front/back page pairs.</p>
+      <h1>Front, pages, and mirrored back.</h1>
+      <p>M3 fills front positions in contiguous blocks, derives every mirrored back automatically, and validates the file, page pair, and direction of every position.</p>
     </div>
   </header>
 
@@ -205,7 +205,7 @@
       </div>
 
       <p id="placementError" class="error-box" hidden></p>
-      <div class="formula-card"><p data-lang="ru"><strong>Сейчас:</strong> программа честно сравнивает две однородные сетки — 0° и 90°. Смешивание поворотов внутри одного листа будет отдельным последующим алгоритмом.</p><p data-lang="en" hidden><strong>Current scope:</strong> the application compares two uniform grids, 0° and 90°. Mixed rotations within one sheet will be a separate later algorithm.</p></div>
+      <div class="formula-card"><p data-lang="ru"><strong>Граница M2:</strong> здесь сравниваются две однородные сетки — 0° и 90°. Смешивание поворотов внутри одного листа остаётся отдельным последующим алгоритмом.</p><p data-lang="en" hidden><strong>M2 boundary:</strong> this section compares two uniform grids, 0° and 90°. Mixed rotations within one sheet remain a separate later algorithm.</p></div>
     </section>
 
     <section class="panel orders-panel">
@@ -242,16 +242,16 @@
     </section>
 
     <section class="panel roadmap-panel">
-      <h2 data-lang="ru">Текущая граница M2</h2><h2 data-lang="en" hidden>Current M2 boundary</h2>
+      <h2 data-lang="ru">Текущая граница M3</h2><h2 data-lang="en" hidden>Current M3 boundary</h2>
       <div class="two-column-copy">
-        <div data-lang="ru"><p><strong>Работает:</strong> геометрия листа, формат изделия, выпуск, дополнительный зазор, сетки 0°/90°, выбор максимальной вместимости и точные пары страниц.</p><p><strong>Следом:</strong> заполнение позиций файлами, сплошные блоки повторов, лицо и автоматически зеркальный оборот.</p></div>
-        <div data-lang="en" hidden><p><strong>Working:</strong> sheet geometry, product size, bleed, additional gap, 0°/90° grids, maximum-capacity selection and exact page pairs.</p><p><strong>Next:</strong> assign files to positions in contiguous blocks, build the front and derive the mirrored back automatically.</p></div>
+        <div data-lang="ru"><p><strong>Работает:</strong> геометрия, вместимость, точные пары страниц, лицо сплошными блоками, автоматически зеркальный оборот, стрелки и независимая проверка восьми контрольных схем.</p><p><strong>Следом, M4:</strong> напечатанное количество, недопечатка, перетираж, формы, бумага, листопрогоны и производственный отчёт.</p></div>
+        <div data-lang="en" hidden><p><strong>Working:</strong> geometry, capacity, exact page pairs, contiguous front blocks, automatically mirrored backs, direction arrows, and independent validation of eight control schemes.</p><p><strong>Next, M4:</strong> produced quantity, underproduction, overrun, plates, paper, press passes, and a production report.</p></div>
       </div>
     </section>
   </main>
 
   <div id="toast" class="toast" role="status" hidden></div>
-  <footer><a href="./" class="footer-brand">uImposition · v<span data-project-version>0.2.0-alpha</span></a><span>© 2026 Anton Magomedov</span></footer>
+  <footer><a href="./" class="footer-brand">uImposition · v<span data-project-version>0.3.0-alpha</span></a><span>© 2026 Anton Magomedov</span></footer>
   <script type="module" src="src/app.js"></script>
   <script type="module" src="src/m3-demo.js"></script>
 </body>
