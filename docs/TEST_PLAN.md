@@ -4,92 +4,124 @@
 <tr>
 <td width="50%" valign="top">
 
-<h2>Русская версия</h2>
+## Русская версия
 
-<h3>Уровни</h3>
-<ol>
-<li>модульные тесты;</li>
-<li>интеграционные тесты расчёта;</li>
-<li>визуальные проверки схем;</li>
-<li>ручная производственная проверка;</li>
-<li>PDF-проверка.</li>
-</ol>
+### Уровни
 
-<h3>Обязательные сценарии</h3>
-<ul>
-<li>620 × 450 с зачисткой 2 мм превращается в 616 × 446;</li>
-<li>пресет 616 × 446 со стадией <code>afterTrim</code> не уменьшается повторно;</li>
-<li>поддерживаются разные значения зачистки по сторонам и отключённая зачистка;</li>
-<li>отрицательная рабочая область блокируется;</li>
-<li>2, 3, 4 и 5 страниц образуют правильные пары;</li>
-<li>знак <code>-</code> появляется только на обороте;</li>
-<li>зеркало разворачивает столбцы, но не строки;</li>
-<li><code>→</code> на лице превращается в <code>←</code> на обороте;</li>
-<li>кандидат с недопечаткой отклоняется;</li>
-<li>перетираж считается по каждой паре;</li>
-<li>изменение приоритетов меняет рекомендуемый вариант;</li>
-<li>PDF содержит ровно одну схему на странице;</li>
-<li>русский и английский интерфейс показывают одинаковые числа.</li>
-</ul>
+1. модульные тесты;
+2. интеграционные тесты расчёта;
+3. визуальные проверки схем и отчёта;
+4. проверка браузерного скачивания;
+5. структурная PDF-проверка;
+6. полный Poppler-render;
+7. ручная проверка всех страниц.
 
-<h3>M4: производственный отчёт</h3>
-<ul>
-<li>вклад пары равен числу её позиций, умноженному на тираж монтажа;</li>
-<li>сумма вкладов равна напечатанному количеству пары;</li>
-<li>недопечатка любой пары делает весь отчёт неготовым;</li>
-<li>перетираж пары равен <code>max(0, напечатано − требуется)</code>;</li>
-<li>готовый тираж файла равен минимальному напечатанному тиражу среди его пар;</li>
-<li>перетираж файла и суммарный перетираж его пар показываются отдельно;</li>
-<li>физическая бумага равна сумме тиражей монтажей;</li>
-<li>при чужом обороте число форм равно удвоенному числу монтажей;</li>
-<li>листопрогоны равны удвоенному количеству физических листов;</li>
-<li>неизвестная пара, повреждённое лицо/оборот и повторный ID монтажа блокируются.</li>
-</ul>
+### Базовые сценарии
+
+- `620 × 450` с зачисткой 2 мм превращается в `616 × 446`;
+- `afterTrim` не уменьшается повторно;
+- 2, 3, 4 и 5 страниц образуют правильные пары;
+- знак `-` появляется только на обороте;
+- зеркало меняет столбцы, но не строки;
+- `→` превращается в `←`;
+- недопечатка блокирует готовность;
+- русский и английский режимы сохраняют одинаковые числа.
+
+### M4: производственный отчёт
+
+- вклад пары = число позиций × тираж монтажа;
+- сумма вкладов = напечатанное количество пары;
+- перетираж = `max(0, напечатано − требуется)`;
+- готовый тираж файла = минимум среди его пар;
+- перетираж файла и пар показывается отдельно;
+- бумага = сумма тиражей монтажей;
+- формы = лицо + оборот;
+- листопрогоны = 2 × физические листы;
+- неизвестные пары и повреждённые схемы блокируются.
+
+### M5: модель PDF
+
+- четыре монтажа создают ровно `8` логических страниц схем;
+- порядок: `1 лицо`, `1 оборот`, `2 лицо`, `2 оборот` и далее;
+- каждая страница содержит одну схему;
+- русский и английский заголовки не меняют порядок;
+- основной PDF и отчёт имеют разные имена файлов;
+- invalid imposition и invalid production report не экспортируются;
+- A4 = `210 × 297 мм`;
+- пропорциональный режим сохраняет отношение `616 / 446`;
+- custom-режим отклоняет нулевые и отрицательные размеры.
+
+### M5: бинарный PDF
+
+- файл начинается `%PDF-1.4` и заканчивается `%%EOF`;
+- число `/Type /Page` совпадает с ожидаемым;
+- каждый JPEG использует `/DCTDecode`;
+- присутствуют Catalog, Pages, xref, trailer и startxref;
+- A4 MediaBox соответствует примерно `595.276 × 841.89 pt`;
+- повреждённый JPEG отклоняется до создания PDF.
+
+### M5: PDF схем
+
+- Chromium скачивает `uImposition-schemes.pdf`;
+- документ содержит ровно `8` страниц;
+- `pdfinfo` успешно читает документ;
+- Poppler создаёт ровно `8` PNG;
+- на каждой странице есть заголовок, тираж, сетка и 16 ячеек;
+- нет обрезки, искажения пропорций, чёрных квадратов и сломанной кириллицы;
+- стрелки и знак `-` читаются корректно.
+
+### M5: PDF отчёта
+
+- Chromium скачивает отдельный `uImposition-production-report.pdf`;
+- документ содержит ровно `6` страниц A4;
+- порядок: сводка, 2 страницы файлов, 3 страницы пар;
+- Poppler создаёт ровно `6` PNG;
+- итоговые значения `3395 / 8 / 6790 / 0 / 1450 / 930` читаются;
+- таблицы содержат 20 файлов и 35 пар;
+- длинные строки вкладов не выходят за ячейки;
+- заголовок не пересекается с номером страницы;
+- неполные последние страницы сохраняют нормальную высоту строк.
 
 </td>
 <td width="50%" valign="top">
 
-<h2>English version</h2>
+## English version
 
-<h3>Test levels</h3>
-<ol>
-<li>unit tests;</li>
-<li>calculation integration tests;</li>
-<li>visual scheme checks;</li>
-<li>manual production review;</li>
-<li>PDF verification.</li>
-</ol>
+### Test levels
 
-<h3>Required scenarios</h3>
-<ul>
-<li>a 620 × 450 source sheet with 2 mm removed from every edge becomes 616 × 446;</li>
-<li>an <code>afterTrim</code> 616 × 446 preset is not trimmed twice;</li>
-<li>independent edge values and disabled trimming are supported;</li>
-<li>negative usable area is rejected;</li>
-<li>2-, 3-, 4- and 5-page files produce correct print pairs;</li>
-<li><code>-</code> appears only on back schemes;</li>
-<li>horizontal mirroring reverses columns but preserves rows;</li>
-<li><code>→</code> becomes <code>←</code> on the back;</li>
-<li>underproducing candidates are rejected;</li>
-<li>overrun is calculated per print pair;</li>
-<li>reordering priorities changes the recommendation;</li>
-<li>each PDF page contains exactly one scheme;</li>
-<li>Russian and English views preserve identical numbers.</li>
-</ul>
+1. unit tests;
+2. calculation integration tests;
+3. scheme/report visual checks;
+4. browser download verification;
+5. structural PDF checks;
+6. complete Poppler rendering;
+7. manual review of every page.
 
-<h3>M4: production report</h3>
-<ul>
-<li>a pair contribution equals its position count multiplied by the imposition run length;</li>
-<li>the sum of contributions equals the pair's produced quantity;</li>
-<li>underproduction of any pair makes the complete report unready;</li>
-<li>pair overrun equals <code>max(0, produced − required)</code>;</li>
-<li>complete-file production is the minimum produced quantity across its pairs;</li>
-<li>complete-file overrun and summed pair overrun are reported separately;</li>
-<li>physical sheets equal the sum of imposition run lengths;</li>
-<li>separate front/back forms use two forms per imposition;</li>
-<li>press passes equal twice the physical-sheet count;</li>
-<li>unknown pairs, damaged front/back layouts, and duplicate imposition IDs are rejected.</li>
-</ul>
+### M5: PDF model
+
+- four impositions create exactly eight scheme pages;
+- order is front/back for each imposition;
+- each page contains one scheme;
+- language changes labels but not ordering;
+- scheme and report documents use different file names;
+- invalid impositions and reports cannot be exported;
+- A4, proportional, and custom page modes validate explicitly.
+
+### M5: PDF binary
+
+- `%PDF-1.4`, `%%EOF`, Catalog, Pages, xref, trailer, and startxref exist;
+- Page-object count matches the expected count;
+- every JPEG uses `/DCTDecode`;
+- A4 MediaBox is approximately `595.276 × 841.89 pt`;
+- malformed JPEG data is rejected.
+
+### M5: scheme PDF
+
+Chromium downloads an eight-page PDF, `pdfinfo` reads it, Poppler renders eight PNG files, and manual review confirms correct order, Cyrillic, arrows, aspect ratio, and no clipping or broken glyphs.
+
+### M5: report PDF
+
+Chromium downloads a separate six-page A4 report. It contains a summary, two file pages, and three pair pages. Poppler renders all pages, all control totals are readable, long contribution rows fit, and headers never overlap page numbers.
 
 </td>
 </tr>
@@ -102,13 +134,14 @@
 - 20 файлов / files;
 - 35 печатных пар / print pairs;
 - 4 монтажа / impositions;
-- 8 форм / plates/forms;
+- 8 форм / forms;
 - 3395 физических листов / physical sheets;
 - 6790 листопрогонов / press passes;
 - недопечатка / underproduction: 0;
-- ручной перетираж по парам / manual-reference pair overrun: 1450;
-- перетираж готовых файлов / complete-file overrun: 930.
+- перетираж пар / pair overrun: 1450;
+- перетираж файлов / complete-file overrun: 930;
+- PDF схем / scheme PDF: 8 pages;
+- PDF отчёта / report PDF: 6 pages;
+- всего проверенных PDF-страниц / total verified PDF pages: 14.
 
-Программный результат может быть лучше ручного ориентира, но не может нарушать жёсткие ограничения.
-
-The optimizer may improve the manual reference, but it must never violate a hard constraint.
+Программный оптимизатор может улучшить ручной ориентир, но не может нарушать жёсткие ограничения.
