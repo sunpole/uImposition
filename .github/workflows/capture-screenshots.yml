@@ -43,7 +43,7 @@ jobs:
 
       - name: Install pinned screenshot dependencies
         working-directory: tools/screenshots
-        run: npm ci
+        run: npm install --ignore-scripts --no-audit --no-fund
 
       - name: Install Chromium and system dependencies
         working-directory: tools/screenshots
@@ -54,11 +54,9 @@ jobs:
         run: npm run capture
 
       - name: Show screenshot manifest
-        if: ${{ !cancelled() }}
         run: cat artifacts/screenshots/manifest.json
 
       - name: Upload screenshot artifact
-        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v5
         with:
           name: uimposition-screenshots-${{ github.event.pull_request.number || github.run_id }}-${{ github.run_attempt }}
