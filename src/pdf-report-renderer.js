@@ -146,13 +146,20 @@ function drawPageHeader(ctx, canvas, title, pageNumber, pageCount, text, px) {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "#111111";
-  ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
-  setFont(ctx, "700", px(7));
-  ctx.fillText(title, margin, margin + px(7));
 
   const pageLabel = `${text.page} ${pageNumber} / ${pageCount}`;
-  setFont(ctx, "700", px(3.2));
+  const pageLabelSize = px(3.2);
+  setFont(ctx, "700", pageLabelSize);
+  const pageLabelWidth = ctx.measureText(pageLabel).width;
+  const titleMaxWidth = canvas.width - margin * 2 - pageLabelWidth - px(8);
+  const titleSize = fitText(ctx, title, titleMaxWidth, px(7), px(4), "700");
+
+  setFont(ctx, "700", titleSize);
+  ctx.textAlign = "left";
+  ctx.fillText(title, margin, margin + px(7));
+
+  setFont(ctx, "700", pageLabelSize);
   ctx.textAlign = "right";
   ctx.fillText(pageLabel, canvas.width - margin, margin + px(5));
   ctx.textAlign = "left";
@@ -236,6 +243,7 @@ function drawTablePage({
   headers,
   widths,
   rowValues,
+  rowCapacity,
   text,
   px,
 }) {
@@ -245,7 +253,7 @@ function drawTablePage({
   const tableWidth = canvas.width - margin * 2;
   const headerHeight = px(11);
   const footerSpace = px(18);
-  const rowHeight = (canvas.height - tableTop - footerSpace - headerHeight) / Math.max(1, page.rows.length);
+  const rowHeight = (canvas.height - tableTop - footerSpace - headerHeight) / rowCapacity;
 
   let x = margin;
   ctx.fillStyle = "#111111";
@@ -350,6 +358,7 @@ export async function renderProductionReportPdfBytes(documentModel, {
           formatNumber(metric.pairOverrun, documentModel.language),
           statusText(metric, text),
         ],
+        rowCapacity: FILE_ROWS_PER_PAGE,
         text,
         px,
       });
@@ -372,6 +381,7 @@ export async function renderProductionReportPdfBytes(documentModel, {
           formatNumber(metric.overrun, documentModel.language),
           contributionsText(metric, documentModel.language),
         ],
+        rowCapacity: PAIR_ROWS_PER_PAGE,
         text,
         px,
       });
