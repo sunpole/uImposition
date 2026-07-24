@@ -1,7 +1,7 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.3.0-alpha</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.4.0-alpha</strong></p>
 <p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
 
 <table>
@@ -14,7 +14,7 @@
 
 uImposition — браузерный инструмент для расчёта сложных сборных офсетных монтажей.
 
-### Уже работает в M3
+### Уже работает в M4
 
 - реальные и произвольные форматы листов;
 - зачистка и непечатные поля как отдельные этапы;
@@ -26,19 +26,20 @@ uImposition — браузерный инструмент для расчёта 
 - `ЛИСТ-N_ЛИЦО` и автоматически зеркальный `ЛИСТ-N_ОБОРОТ`;
 - точные страницы и стрелки направления головы;
 - независимая проверка лица и оборота;
-- четыре контрольных лица и четыре оборота по 16 позиций;
+- напечатанное количество по 35 парам;
+- недопечатка и перетираж по парам и файлам;
+- физическая бумага, формы и листопрогоны;
+- адаптивный производственный отчёт;
 - реальные desktop/mobile Chromium-скриншоты и очередь uNews.
 
 ### Следующий этап
 
-M4 / `0.4.0-alpha`:
+M5 / `0.5.0-alpha`:
 
-- напечатанное количество по каждому файлу и паре;
-- недопечатка и перетираж;
-- количество форм;
-- физическая бумага;
-- листопрогоны;
-- понятный производственный отчёт.
+- одна схема на одну PDF-страницу;
+- A4 и пропорциональный режим;
+- отдельный PDF производственного отчёта;
+- проверка количества и порядка PDF-страниц.
 
 ### Цель проекта
 
@@ -57,7 +58,7 @@ M4 / `0.4.0-alpha`:
 
 uImposition is a browser-based tool for planning complex gang-run offset impositions.
 
-### Working in M3
+### Working in M4
 
 - real and custom sheet sizes;
 - separate sheet-trim and press-margin stages;
@@ -69,19 +70,20 @@ uImposition is a browser-based tool for planning complex gang-run offset imposit
 - `SHEET-N_FRONT` and automatically mirrored `SHEET-N_BACK`;
 - exact pages and head-direction arrows;
 - independent front/back validation;
-- four control fronts and four backs with 16 positions each;
+- produced quantity for all 35 print pairs;
+- underproduction and overrun by pair and file;
+- physical sheets, forms, and press passes;
+- a responsive production report;
 - factual desktop/mobile Chromium screenshots and the uNews queue.
 
 ### Next milestone
 
-M4 / `0.4.0-alpha`:
+M5 / `0.5.0-alpha`:
 
-- produced quantity per file and pair;
-- underproduction and overrun;
-- plate/form count;
-- physical paper;
-- press passes;
-- a clear production report.
+- one imposition scheme per PDF page;
+- A4 and proportional modes;
+- a separate production-report PDF;
+- page-count and ordering verification.
 
 ### Project goal
 
@@ -109,6 +111,7 @@ M4 / `0.4.0-alpha`:
 | Русский | English |
 |---|---|
 | [GitHub-only разработка](docs/GITHUB_ONLY_DEVELOPMENT.md) | GitHub-only development — bilingual |
+| [План M4](docs/M4_IMPLEMENTATION_PLAN.md) | M4 implementation plan — bilingual |
 | [План M3](docs/M3_IMPLEMENTATION_PLAN.md) | M3 implementation plan — bilingual |
 | [Алгоритм и оптимизация](docs/ALGORITHM_AND_OPTIMIZATION.md) | Algorithm and optimization — bilingual |
 | [Архитектура](docs/ARCHITECTURE.md) | Architecture — bilingual |
@@ -157,7 +160,7 @@ Sheet trimming and non-printable press margins are separate stages. An `afterTri
 npm run check
 ```
 
-## Контрольный результат M3 / M3 control result
+## Контрольный результат M4 / M4 control result
 
 `data/control-case.json` и `data/control-layout-m3.json`:
 
@@ -166,13 +169,17 @@ npm run check
 - выбранная сетка `4×4 = 16`, поворот `90°`;
 - 20 файлов → 35 точных пар страниц;
 - четыре лица и четыре автоматически зеркальных оборота;
-- ручные контрольные тиражи монтажей: `1500`, `1100`, `450`, `345`;
-- файл 119 сохраняет пары `1/2` и `3/4`;
-- все восемь схем проходят автоматическую проверку.
+- ручные тиражи монтажей: `1500`, `1100`, `450`, `345`;
+- физическая бумага: `3395`;
+- формы: `8`;
+- листопрогоны: `6790`;
+- недопечатка: `0`;
+- суммарный перетираж пар: `1450`;
+- перетираж готовых файлов: `930`.
 
-Контрольная раскладка не считается доказанным глобальным минимумом. Оптимизация начинается на более позднем этапе.
+Тиражи монтажей являются ручным проверочным входом. Автоматическая оптимизация начинается на более позднем этапе.
 
-The control layout is not treated as a proven global minimum. Optimization starts in a later milestone.
+The imposition run lengths are verified manual input. Automatic optimization starts in a later milestone.
 
 ## Коммерческое направление / Commercial direction
 
