@@ -55,8 +55,12 @@ jobs:
         if: steps.marker.outputs.exists == 'true'
         shell: bash
         run: |
-          echo "SCREENSHOT_SCENARIOS=$(node --input-type=module -e \"import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('news/.prepare-release.json','utf8')); process.stdout.write(m.scenario)\")" >> "$GITHUB_ENV"
-          echo "RELEASE_VERSION=$(node --input-type=module -e \"import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('news/.prepare-release.json','utf8')); process.stdout.write(m.version)\")" >> "$GITHUB_ENV"
+          node --input-type=module <<'NODE' >> "$GITHUB_ENV"
+          import fs from 'node:fs';
+          const marker = JSON.parse(fs.readFileSync('news/.prepare-release.json', 'utf8'));
+          console.log(`SCREENSHOT_SCENARIOS=${marker.scenario}`);
+          console.log(`RELEASE_VERSION=${marker.version}`);
+          NODE
 
       - name: Install pinned screenshot tooling
         if: steps.marker.outputs.exists == 'true'
