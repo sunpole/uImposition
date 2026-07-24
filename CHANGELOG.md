@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.0.2-docs — 2026-07-24
+
+### Added
+
+- machine-readable `VERSION.json`;
+- bilingual human-readable `VERSION.md`;
+- bilingual versioning policy in `docs/VERSIONING.md`;
+- explicit current milestone, next milestone and production-readiness fields;
+- mandatory version synchronization rules for development agents.
+
+### Changed
+
+- current documentation version raised from `0.0.1-docs` to `0.0.2-docs`;
+- `AGENTS.md` now treats `VERSION.json`, `VERSION.md` and `CHANGELOG.md` as synchronized version sources;
+- next functional target fixed as `0.1.0-alpha` / M1.
+
 ## 0.0.1-docs — 2026-07-24
 
 ### Added
@@ -22,4 +38,4 @@
 
 ### Changed
 
-- GitHub Pages deployment now uses the configured `main` branch directly instead of a redundant Actions workflow.
+- GitHub Pages deployment uses the configured `main` branch directly instead of a redundant Actions workflow.
