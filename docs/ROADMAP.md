@@ -25,7 +25,7 @@
 Лицо сплошными блоками, автоматически зеркальный оборот, направления, независимая проверка и восемь адаптивных схем.  
 Точка отката: `release/v0.3.0-alpha`.
 
-### M4 — `0.4.0-alpha`, завершён в PR №6
+### M4 — `0.4.0-alpha`, завершён
 
 - напечатанное количество каждой пары;
 - объяснимые вклады монтажей;
@@ -36,11 +36,13 @@
 - листопрогоны;
 - независимая проверка производственного отчёта;
 - сводка, таблица 20 файлов и детализация 35 пар;
-- Node-тесты и desktop/mobile Chromium.
+- Node-тесты, desktop/mobile Chromium и uNews.
 
 Контроль: `3395` листов, `8` форм, `6790` листопрогонов, недопечатка `0`, перетираж пар `1450`, файлов `930`.
 
-После merge создаётся `release/v0.4.0-alpha`. Подробный план: `docs/M4_IMPLEMENTATION_PLAN.md`.
+PR: `#6`. Merge commit: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`.  
+Точка отката: `release/v0.4.0-alpha`.  
+Подробности: `docs/M4_IMPLEMENTATION_PLAN.md`, `docs/M4_RELEASE_EVIDENCE.md`.
 
 ### M5 — `0.5.0-alpha`, следующий активный этап
 
@@ -88,13 +90,14 @@ Rollback: `release/v0.2.0-alpha`.
 Contiguous fronts, automatically mirrored backs, directions, independent validation, and eight responsive schemes.  
 Rollback: `release/v0.3.0-alpha`.
 
-### M4 — `0.4.0-alpha`, complete in PR #6
+### M4 — `0.4.0-alpha`, complete
 
-Pair production, explainable contributions, hard underproduction rejection, pair/file overrun, physical sheets, front/back forms, press passes, independent report validation, responsive tables, Node tests, and desktop/mobile Chromium.
+Pair production, explainable contributions, hard underproduction rejection, pair/file overrun, physical sheets, front/back forms, press passes, independent report validation, responsive tables, Node tests, Chromium, and uNews.
 
 Control totals: `3395` sheets, `8` forms, `6790` press passes, `0` underproduction, `1450` pair overrun, and `930` complete-file overrun.
 
-`release/v0.4.0-alpha` is created after merge. Detailed plan: `docs/M4_IMPLEMENTATION_PLAN.md`.
+PR: `#6`. Merge commit: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`.  
+Rollback: `release/v0.4.0-alpha`.
 
 ### M5 — `0.5.0-alpha`, next active milestone
 
