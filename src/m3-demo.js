@@ -3,20 +3,25 @@ import { expandPagePairs } from "./orders.js";
 import { createFrontLayout } from "./front-layout.js";
 import { createBackLayout } from "./back-layout.js";
 import { validateImposition } from "./imposition-validation.js";
+import { buildProductionReport } from "./production-report.js";
 import { renderSchemePairs } from "./scheme-renderer.js";
+import {
+  renderProductionReport,
+  renderProductionReportEmpty,
+} from "./production-report-renderer.js";
 
-const state = { records: null, loadSequence: 0 };
+const state = { records: null, report: null, loadSequence: 0 };
 
 function language() {
   return document.documentElement.lang === "en" ? "en" : "ru";
 }
 
-function ensureStylesheet() {
-  if (document.querySelector('link[data-m3-styles]')) return;
+function ensureStylesheet(href, dataAttribute) {
+  if (document.querySelector(`link[${dataAttribute}]`)) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "m3.css";
-  link.dataset.m3Styles = "";
+  link.href = href;
+  link.setAttribute(dataAttribute, "");
   document.head.append(link);
 }
 
@@ -53,14 +58,27 @@ function ensurePanel() {
   return panel;
 }
 
+function ensureProductionPanel(impositionPanel) {
+  const existing = document.querySelector("#productionReport");
+  if (existing) return existing;
+  const panel = document.createElement("section");
+  panel.id = "productionReport";
+  panel.className = "panel production-report-panel";
+  impositionPanel.after(panel);
+  return panel;
+}
+
 const panel = ensurePanel();
-ensureStylesheet();
+const productionPanel = ensureProductionPanel(panel);
+ensureStylesheet("m3.css", "data-m3-styles");
+ensureStylesheet("m4.css", "data-m4-styles");
 
 const ui = {
   status: panel.querySelector("#impositionStatus"),
   empty: panel.querySelector("#impositionEmpty"),
   error: panel.querySelector("#impositionError"),
   schemes: panel.querySelector("#impositionSchemes"),
+  production: productionPanel,
   loadControlCase: document.querySelector("#loadControlCase"),
   clearOrders: document.querySelector("#clearOrders"),
   ordersInput: document.querySelector("#ordersInput"),
@@ -76,20 +94,31 @@ function syncLanguageContent() {
     renderSchemePairs(ui.schemes, state.records, { language: current });
     ui.status.textContent = current === "ru" ? "4 лица · 4 оборота · проверено" : "4 fronts · 4 backs · validated";
   } else if (!ui.error.hidden) {
-    ui.status.textContent = current === "ru" ? "Ошибка M3" : "M3 error";
+    ui.status.textContent = current === "ru" ? "Ошибка M3/M4" : "M3/M4 error";
   } else {
     ui.status.textContent = current === "ru" ? "Загрузите контрольный заказ" : "Load the control dataset";
     ui.empty.textContent = current === "ru"
       ? "Схемы появятся после загрузки контрольного заказа."
       : "Schemes appear after loading the control dataset.";
   }
+
+  if (state.report) {
+    renderProductionReport(ui.production, state.report, { language: current });
+  } else {
+    renderProductionReportEmpty(ui.production, {
+      language: current,
+      error: ui.error.hidden ? "" : ui.error.textContent,
+    });
+  }
 }
 
 function clearControlLayouts() {
   state.loadSequence += 1;
   state.records = null;
+  state.report = null;
   ui.schemes.replaceChildren();
   ui.error.hidden = true;
+  ui.error.textContent = "";
   syncLanguageContent();
 }
 
@@ -118,9 +147,11 @@ function buildRecords(layoutData, pagePairs) {
 async function loadControlLayouts() {
   const sequence = ++state.loadSequence;
   const current = language();
-  ui.status.textContent = current === "ru" ? "Проверка схем…" : "Validating schemes…";
+  ui.status.textContent = current === "ru" ? "Проверка схем и отчёта…" : "Validating schemes and report…";
   ui.empty.textContent = "";
   ui.error.hidden = true;
+  ui.error.textContent = "";
+  renderProductionReportEmpty(ui.production, { language: current });
 
   try {
     const [controlCase, layoutData] = await Promise.all([
@@ -129,19 +160,28 @@ async function loadControlLayouts() {
     ]);
     const pagePairs = expandPagePairs(controlCase.orders ?? []);
     const records = buildRecords(layoutData, pagePairs);
+    const report = buildProductionReport({
+      pagePairs,
+      impositions: records,
+      duplexMode: controlCase.duplexMode,
+    });
     if (sequence !== state.loadSequence) return;
 
     state.records = records;
+    state.report = report;
     renderSchemePairs(ui.schemes, records, { language: current });
+    renderProductionReport(ui.production, report, { language: current });
     ui.status.textContent = current === "ru" ? "4 лица · 4 оборота · проверено" : "4 fronts · 4 backs · validated";
   } catch (error) {
     if (sequence !== state.loadSequence) return;
     console.error(error);
     state.records = null;
+    state.report = null;
     ui.schemes.replaceChildren();
-    ui.status.textContent = current === "ru" ? "Ошибка M3" : "M3 error";
+    ui.status.textContent = current === "ru" ? "Ошибка M3/M4" : "M3/M4 error";
     ui.error.textContent = error.message;
     ui.error.hidden = false;
+    renderProductionReportEmpty(ui.production, { language: current, error: error.message });
   }
 }
 

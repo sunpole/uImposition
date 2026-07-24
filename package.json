@@ -1,12 +1,12 @@
 {
   "name": "uimposition",
-  "version": "0.3.0-alpha.0",
+  "version": "0.4.0-alpha.0",
   "private": true,
   "type": "module",
   "description": "Browser-based offset imposition planner.",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "check:source": "node --check src/config.js && node --check src/geometry.js && node --check src/orders.js && node --check src/orientation.js && node --check src/front-layout.js && node --check src/back-layout.js && node --check src/imposition-validation.js && node --check src/scheme-renderer.js && node --check src/m3-demo.js && node --check src/app.js",
+    "check:source": "node --check src/config.js && node --check src/geometry.js && node --check src/orders.js && node --check src/orientation.js && node --check src/front-layout.js && node --check src/back-layout.js && node --check src/imposition-validation.js && node --check src/production-metrics.js && node --check src/production-validation.js && node --check src/production-report.js && node --check src/production-report-renderer.js && node --check src/scheme-renderer.js && node --check src/m3-demo.js && node --check src/app.js",
     "check": "npm run check:source && npm test"
   },
   "engines": {

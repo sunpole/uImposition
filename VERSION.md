@@ -8,49 +8,53 @@
 
 ### Текущая версия
 
-**`0.3.0-alpha`**  
+**`0.4.0-alpha`**  
 Дата: **24 июля 2026**  
-Этап: **M3 — лицо и зеркальный оборот**
+Этап: **M4 — производственные итоги и отчёт**
 
 ### Что работает
 
-- весь проверенный функционал M1 и M2;
-- заполнение лицевых позиций сплошными блоками слева направо и сверху вниз;
-- запрет пустых лицевых позиций, чётных страниц и знака `-` на лице;
-- автоматическое зеркалирование колонок для оборота без перестановки строк;
-- точное соответствие `1 → 2`, `3 → 4`, а для отсутствующей последней страницы — `null`;
-- преобразование направления головы `→` в `←` при перевороте слева направо;
-- независимая проверка файла, пары, страницы, координат и направления;
-- четыре контрольных лица и четыре автоматически полученных оборота по `4 × 4 = 16` позиций;
-- рамочные desktop/mobile схемы `файл,страница стрелка`;
-- знак `-` только при отображении отсутствующей оборотной страницы.
+- весь проверенный функционал M1–M3;
+- чистый расчёт напечатанного количества каждой из 35 печатных пар;
+- объяснимые вклады: число позиций пары × тираж конкретного монтажа;
+- недопечатка и перетираж по каждой паре;
+- жёсткая блокировка производственной готовности при любой недопечатке;
+- готовый тираж и перетираж по каждому файлу;
+- отдельное отображение суммарного перетиража пар и перетиража готовых файлов;
+- физическая бумага как сумма тиражей монтажей;
+- отдельные лицевые и оборотные формы для чужого оборота;
+- листопрогоны как два прохода каждого физического листа;
+- независимая арифметическая проверка итогового отчёта;
+- адаптивная сводка, таблица 20 файлов и детализация 35 пар.
 
-### Проверенный контрольный результат M3
+### Проверенный контрольный результат M4
 
-- контрольный заказ: `20` файлов и `35` пар страниц;
-- сетка каждого монтажа: `4 × 4`, поворот `90°`;
-- формы: `4` лица и `4` оборота;
+- контрольный заказ: `20` файлов и `35` печатных пар;
+- заданные монтажи: `4` лица и `4` оборота;
 - тиражи ручной контрольной раскладки: `1500`, `1100`, `450`, `345`;
-- каждый оборот построен только из соответствующего лица;
-- файл `119` сохраняет полные пары `1/2` и `3/4`;
-- все восемь схем проходят автоматическую валидацию.
+- физическая бумага: `3395` листов;
+- формы: `4` лица + `4` оборота = `8`;
+- листопрогоны: `6790`;
+- недопечатка: `0`;
+- суммарный перетираж по парам: `1450`;
+- перетираж готовых файлов: `930`;
+- отчёт проходит Node-тесты и desktop/mobile Chromium-проверку.
 
-Контрольные тиражи являются ручным проверочным примером, а не результатом оптимизатора и не доказанным глобальным минимумом бумаги.
+Тиражи четырёх монтажей являются ручным проверочным входом. M4 не заявляет автоматический подбор тиражей или доказанный минимум бумаги.
 
 ### Ещё не реализовано
 
-- автоматический расчёт тиражей монтажей;
-- напечатанное количество, недопечатка и перетираж;
-- формы, бумага и листопрогоны;
-- автоматический оптимизатор;
+- автоматический подбор тиражей монтажей;
+- автоматический оптимизатор и сравнение альтернатив;
 - смешанные ориентации внутри одной сетки;
-- PDF-экспорт.
+- PDF-экспорт;
+- импорт/экспорт полного проекта и постоянное хранение отчёта.
 
 ### Следующая целевая версия
 
-**`0.4.0-alpha` — M4**
+**`0.5.0-alpha` — M5**
 
-Расчёт производственных итогов для явных монтажей: напечатано, недопечатка, перетираж, формы, бумага и листопрогоны.
+Одна схема на PDF-страницу и отдельный PDF производственного отчёта.
 
 </td>
 <td width="50%" valign="top">
@@ -59,49 +63,53 @@
 
 ### Current version
 
-**`0.3.0-alpha`**  
+**`0.4.0-alpha`**  
 Date: **24 July 2026**  
-Stage: **M3 — front and mirrored back**
+Stage: **M4 — production totals and report**
 
 ### Working now
 
-- all verified M1 and M2 functionality;
-- contiguous front-position blocks expanded left-to-right and top-to-bottom;
-- rejection of empty fronts, even front pages, and dash identifiers;
-- automatic back derivation by mirroring columns without reordering rows;
-- exact `1 → 2`, `3 → 4`, and unmatched-final-page `null` mapping;
-- head-direction transformation from `→` to `←` for a left-to-right sheet turn;
-- independent file, pair, page, coordinate, and direction validation;
-- four control fronts and four automatically derived backs, each using `4 × 4 = 16` positions;
-- bordered desktop/mobile `file,page arrow` schemes;
-- dash-only rendering exclusively for missing back pages.
+- all verified M1–M3 functionality;
+- pure produced-quantity calculation for all 35 print pairs;
+- explainable contributions: pair position count × explicit imposition run length;
+- underproduction and overrun for every pair;
+- hard rejection of production readiness when any pair underproduces;
+- complete produced quantity and overrun for every file;
+- separate pair-overrun and complete-file-overrun reporting;
+- physical sheets as the sum of imposition run lengths;
+- separate front and back forms for the current duplex mode;
+- press passes as two passes per physical sheet;
+- independent arithmetic validation of the complete report;
+- responsive summary, 20-file table, and 35-pair detail table.
 
-### Verified M3 control result
+### Verified M4 control result
 
-- control dataset: `20` files and `35` page pairs;
-- every imposition uses a `4 × 4` grid at `90°`;
-- forms: `4` fronts and `4` backs;
+- control dataset: `20` files and `35` print pairs;
+- explicit impositions: `4` fronts and `4` backs;
 - manual control run lengths: `1500`, `1100`, `450`, `345`;
-- every back is derived only from its corresponding front;
-- file `119` preserves complete `1/2` and `3/4` pairs;
-- all eight schemes pass automatic validation.
+- physical sheets: `3395`;
+- forms: `4` front + `4` back = `8`;
+- press passes: `6790`;
+- underproduction: `0`;
+- total pair overrun: `1450`;
+- complete-file overrun: `930`;
+- the report passes Node tests and desktop/mobile Chromium verification.
 
-The control run lengths are a verified manual reference, not optimizer output or a proven global paper minimum.
+The four imposition run lengths are verified manual input. M4 does not claim automatic run assignment or a proven global paper minimum.
 
 ### Not implemented yet
 
-- automatic imposition run calculation;
-- produced quantity, underproduction, and overrun;
-- plates, paper, and press passes;
-- automatic optimization;
-- mixed orientations within one grid;
-- PDF export.
+- automatic imposition run assignment;
+- automatic optimization and alternative comparison;
+- mixed orientations inside one grid;
+- PDF export;
+- complete-project import/export and persistent report storage.
 
 ### Next target version
 
-**`0.4.0-alpha` — M4**
+**`0.5.0-alpha` — M5**
 
-Calculate production totals for explicit impositions: produced quantity, underproduction, overrun, plates, paper, and press passes.
+One scheme per PDF page and a separate production-report PDF.
 
 </td>
 </tr>
@@ -116,4 +124,4 @@ Calculate production totals for explicit impositions: produced quantity, underpr
 
 ## Релизы и откат / Releases and rollback
 
-Alpha-веха `0.3.0-alpha` получает recovery-ветку `release/v0.3.0-alpha` после объединения и проверки GitHub Pages. Настоящий GitHub Release обязателен после признания версии стабильной production-версией; alpha-версия стабильной не называется.
+После объединения и проверки GitHub Pages alpha-веха `0.4.0-alpha` получает recovery-ветку `release/v0.4.0-alpha`. Настоящий GitHub Release обязателен только после признания версии стабильной production-версией.

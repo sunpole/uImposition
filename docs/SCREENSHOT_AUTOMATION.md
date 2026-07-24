@@ -1,70 +1,59 @@
 # Скриншоты для релизов / Release screenshot automation
 
-## Цель
+## Цель / Goal
 
-Каждый заметный релиз uImposition должен иметь новый скриншот, который показывает реальное изменение на точном commit проекта.
+Каждый заметный пользовательский релиз получает новый фактический скриншот точного commit. AI-изображение или старый PNG не являются доказательством функции.
 
-Every user-visible release must have a new factual screenshot captured from the exact project commit.
+Every user-visible release receives a new factual screenshot of the exact commit. AI imagery and reused screenshots are not functional evidence.
 
-## Источники изображения
-
-- `playwright` — предпочтительный источник для интерфейса сайта;
-- `manual-browser` — допустимый ручной снимок настоящего сайта;
-- `github-ui` — Issue, Pull Request, Release или Actions;
-- `document-render` — фактическая документация из точного commit.
-
-## Постоянный workflow
+## Workflow
 
 ```text
 .github/workflows/capture-screenshots.yml
 ```
 
-Он:
+Workflow имеет только `contents: read`, устанавливает закреплённый Playwright/Chromium, запускает точный checkout через локальный HTTP-сервер, выполняет утверждения, создаёт desktop/mobile PNG, сохраняет provenance и загружает artifact.
 
-- имеет только `contents: read`;
-- не коммитит и не пушит;
-- устанавливает зафиксированную версию Playwright;
-- запускает точный checkout локальным HTTP-сервером;
-- выполняет проверяемые сценарии;
-- создаёт desktop и mobile PNG;
-- сохраняет provenance в `entries/*.json` и `manifest.json`;
-- загружает результат как GitHub Actions artifact.
-
-## Сценарии M3 / M3 scenarios
+## Сценарии M4 / M4 scenarios
 
 ```text
-tools/screenshots/scenarios/m3-imposition-desktop.json
-tools/screenshots/scenarios/m3-imposition-mobile.json
+tools/screenshots/scenarios/m4-production-report-desktop.json
+tools/screenshots/scenarios/m4-production-report-mobile.json
 ```
 
-Оба сценария открывают `/?demo=control` и подтверждают:
+Они открывают `/?demo=control` и подтверждают:
 
-- видимую версию `0.3.0-alpha`;
-- печатную область и сетку `4 × 4`;
-- 35 точных пар страниц;
-- статус четырёх лиц и четырёх оборотов;
-- конкретные данные на лицевых и зеркальных оборотных схемах;
-- присутствие полной пары `119,4` на обороте.
+- видимую версию `0.4.0-alpha`;
+- печатную область `608 × 431` и сетку `4 × 4`;
+- 35 пар страниц и восемь корректных схем;
+- наличие полной оборотной страницы `119,4`;
+- статус «Недопечатки нет»;
+- физическую бумагу `3395`;
+- формы `8`;
+- листопрогоны `6790`;
+- недопечатку `0`;
+- перетираж пар `1450`;
+- перетираж готовых файлов `930`;
+- контрольные строки файлов 33 и 119.
 
-Both scenarios assert the version, control geometry, pair count, validated eight-scheme status, and specific front/back cell content. A successful screenshot therefore proves the M3 feature rather than only the surrounding page.
+The scenarios verify the exact M4 version, M3 scheme integrity, all six production totals, and representative file rows. A successful PNG therefore proves the report rather than only the surrounding page.
 
-## Перед публикацией
+## Перед публикацией / Before publishing
 
-1. Запустить workflow или получить artifact из Pull Request.
-2. Открыть `manifest.json`.
-3. Проверить exact commit.
-4. Открыть desktop и mobile PNG.
-5. Убедиться, что кадр показывает заявленную функцию.
-6. Проверить отсутствие секретов, cookies, приватных путей и старого кеша.
-7. Скопировать только выбранный новый PNG в `news/`.
-8. Перенести commit и UTC-время в front matter патчноута.
-9. Прогнать проверки проекта и dry-run uNews.
+1. Получить artifact точного release-candidate commit.
+2. Открыть `manifest.json` и проверить SHA.
+3. Открыть desktop и mobile PNG.
+4. Проверить заявленные числа, читаемость и мобильную прокрутку таблиц.
+5. Убедиться, что нет secrets, cookies, приватных данных и локальных путей.
+6. Скопировать только новый выбранный PNG в `news/`.
+7. Перенести commit и UTC-время в front matter патчноута.
+8. Выполнить Quality checks и dry-run uNews.
 
-## Имена
+## Имена / Naming
 
 ```text
 news/YYYY-MM-DD-uimposition-vX-Y-Z-short-title.md
 news/YYYY-MM-DD-uimposition-vX-Y-Z-short-title.png
 ```
 
-Каждый PDF- или интерфейсный релиз должен показывать наиболее важную пользовательскую новинку, а не общий декоративный баннер.
+Скриншот должен показывать главную пользовательскую новинку релиза, а не декоративный баннер.

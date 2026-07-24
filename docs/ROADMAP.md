@@ -8,91 +8,61 @@
 
 ### M0 — завершён
 
-- репозиторий и GitHub Pages;
-- двуязычное ТЗ;
-- лицензия и коммерческое направление;
-- версия и контрольный набор.
+Репозиторий, GitHub Pages, двуязычное ТЗ, лицензия, версия и контрольный набор.
 
 ### M1 — `0.1.0-alpha`, завершён
 
-- центральный `config.js`;
-- панель настроек;
-- реальные пресеты;
-- зачистка и поля;
-- ввод заказов;
-- подсчёт печатных пар;
-- RU/EN;
-- тесты;
-- реальные release screenshots;
-- интеграция uNews.
-
+Конфигурация, лист, зачистка, поля, ввод заказов, пары страниц, RU/EN, тесты, Chromium и uNews.  
 Точка отката: `release/v0.1.0-alpha`.
 
 ### M2 — `0.2.0-alpha`, завершён
 
-- формат изделия и выпуск;
-- зазор/общий рез;
-- размещение 0° и 90°;
-- строки, столбцы и число позиций;
-- выбор лучшей сетки;
-- нумерованная схема вместимости;
-- точные пары исходных страниц;
-- GitHub Actions, Chromium screenshots и uNews.
-
+Формат изделия, выпуск, общий/раздельный рез, сетки 0°/90°, вместимость и точные пары страниц.  
 Точка отката: `release/v0.2.0-alpha`.
 
 ### M3 — `0.3.0-alpha`, завершён
 
-- чистое модульное заполнение лица сплошными блоками;
-- автоматическое зеркало оборота без независимой группировки;
-- преобразование стрелок при перевороте листа;
-- независимая проверка файла, pair-id, страниц, координат и направлений;
-- схемы `ЛИСТ-N_ЛИЦО` и `ЛИСТ-N_ОБОРОТ`;
-- рамочные desktop/mobile карточки;
-- 4 лица и 4 оборота контрольного примера;
-- отдельные контрольные данные и тесты;
-- реальные Chromium screenshots и патчноут uNews.
+Лицо сплошными блоками, автоматически зеркальный оборот, направления, независимая проверка и восемь адаптивных схем.  
+Точка отката: `release/v0.3.0-alpha`.
 
-После объединения создаётся точка отката: `release/v0.3.0-alpha`.
+### M4 — `0.4.0-alpha`, завершён в PR №6
 
-Подробный план и критерии: `docs/M3_IMPLEMENTATION_PLAN.md`.
-
-### M4 — `0.4.0-alpha`, следующий активный этап
-
-- напечатанное количество по каждой паре страниц;
+- напечатанное количество каждой пары;
+- объяснимые вклады монтажей;
 - недопечатка как недопустимый результат;
-- перетираж по файлам и парам;
-- количество лицевых и оборотных форм;
+- перетираж пар и готовых файлов;
 - физическая бумага;
+- лицевые и оборотные формы;
 - листопрогоны;
-- проверяемый производственный отчёт;
-- чистые расчётные модули и Node-тесты до подключения UI.
+- независимая проверка производственного отчёта;
+- сводка, таблица 20 файлов и детализация 35 пар;
+- Node-тесты и desktop/mobile Chromium.
 
-### M5 — PDF
+Контроль: `3395` листов, `8` форм, `6790` листопрогонов, недопечатка `0`, перетираж пар `1450`, файлов `930`.
 
-- одна схема на страницу;
+После merge создаётся `release/v0.4.0-alpha`. Подробный план: `docs/M4_IMPLEMENTATION_PLAN.md`.
+
+### M5 — `0.5.0-alpha`, следующий активный этап
+
+- чистая модель PDF-документа;
+- одна схема на одну страницу;
+- детерминированный порядок четырёх лиц и четырёх оборотов;
 - A4 и пропорциональный режим;
-- отдельный PDF отчёта.
+- отдельный PDF производственного отчёта;
+- тесты числа, порядка и содержимого страниц;
+- браузерная загрузка готового PDF.
 
 ### M6 — минимум бумаги
 
-- генерация кандидатов;
-- подбор тиражей;
-- объяснение разделённых заказов.
+Генерация кандидатов, автоматический подбор тиражей и объяснение разделённых заказов.
 
 ### M7 — несколько целей
 
-- минимум форм;
-- минимум перетиража;
-- иерархия пользователя;
-- набор Парето.
+Минимум форм, минимум перетиража, пользовательская иерархия и набор Парето.
 
 ### M8 — production `1.0.0`
 
-- реальные производственные проверки;
-- граничные случаи;
-- руководство;
-- стабильный GitHub Release.
+Реальные производственные проверки, граничные случаи, руководство и стабильный GitHub Release.
 
 </td>
 <td width="50%" valign="top">
@@ -101,91 +71,46 @@
 
 ### M0 — complete
 
-- repository and GitHub Pages;
-- bilingual specification;
-- licensing and commercial direction;
-- versioning and control dataset.
+Repository, GitHub Pages, bilingual specification, licensing, versioning, and control dataset.
 
 ### M1 — `0.1.0-alpha`, complete
 
-- central `config.js`;
-- settings panel;
-- real presets;
-- trim and margins;
-- order input;
-- print-pair totals;
-- RU/EN;
-- tests;
-- factual release screenshots;
-- uNews integration.
-
-Rollback checkpoint: `release/v0.1.0-alpha`.
+Configuration, sheet geometry, trim, margins, order input, page pairs, RU/EN, tests, Chromium, and uNews.  
+Rollback: `release/v0.1.0-alpha`.
 
 ### M2 — `0.2.0-alpha`, complete
 
-- finished size and bleed;
-- gap/common cut;
-- 0° and 90° placement;
-- rows, columns, and position count;
-- best-grid selection;
-- numbered capacity scheme;
-- exact source-page pairs;
-- GitHub Actions, Chromium screenshots, and uNews.
-
-Rollback checkpoint: `release/v0.2.0-alpha`.
+Finished size, bleed, cutting modes, 0°/90° capacity, and exact page pairs.  
+Rollback: `release/v0.2.0-alpha`.
 
 ### M3 — `0.3.0-alpha`, complete
 
-- pure contiguous front-block assignment;
-- automatic mirrored back with no independent grouping;
-- direction transformation for the sheet turn;
-- independent file, pair-id, page, coordinate, and direction validation;
-- `SHEET-N_FRONT` and `SHEET-N_BACK` schemes;
-- bordered desktop/mobile cards;
-- four control fronts and four backs;
-- dedicated control data and tests;
-- factual Chromium screenshots and a uNews patchnote.
+Contiguous fronts, automatically mirrored backs, directions, independent validation, and eight responsive schemes.  
+Rollback: `release/v0.3.0-alpha`.
 
-Rollback checkpoint created after merge: `release/v0.3.0-alpha`.
+### M4 — `0.4.0-alpha`, complete in PR #6
 
-Detailed plan and criteria: `docs/M3_IMPLEMENTATION_PLAN.md`.
+Pair production, explainable contributions, hard underproduction rejection, pair/file overrun, physical sheets, front/back forms, press passes, independent report validation, responsive tables, Node tests, and desktop/mobile Chromium.
 
-### M4 — `0.4.0-alpha`, next active milestone
+Control totals: `3395` sheets, `8` forms, `6790` press passes, `0` underproduction, `1450` pair overrun, and `930` complete-file overrun.
 
-- produced quantity for every page pair;
-- underproduction as an invalid result;
-- overrun by file and pair;
-- front and back plate/form counts;
-- physical paper;
-- press passes;
-- a validated production report;
-- pure calculation modules and Node tests before UI integration.
+`release/v0.4.0-alpha` is created after merge. Detailed plan: `docs/M4_IMPLEMENTATION_PLAN.md`.
 
-### M5 — PDF
+### M5 — `0.5.0-alpha`, next active milestone
 
-- one scheme per page;
-- A4 and proportional modes;
-- separate report PDF.
+A pure PDF document model, one scheme per page, deterministic ordering of four fronts and four backs, A4/proportional modes, a separate production-report PDF, page-count/content tests, and browser download.
 
 ### M6 — paper minimisation
 
-- candidate generation;
-- run assignment;
-- split-job explanations.
+Candidate generation, automatic run assignment, and split-order explanations.
 
 ### M7 — multiple objectives
 
-- minimum plates;
-- minimum overrun;
-- user hierarchy;
-- Pareto set.
+Minimum forms, minimum overrun, user-defined hierarchy, and Pareto alternatives.
 
 ### M8 — production `1.0.0`
 
-- real production validation;
-- edge cases;
-- user guide;
-- stable GitHub Release.
+Real production validation, edge cases, user guide, and a stable GitHub Release.
 
 </td>
 </tr>

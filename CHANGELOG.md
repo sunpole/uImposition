@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.4.0-alpha — 2026-07-24
+
+### Added
+
+- `production-metrics`, `production-validation`, and `production-report` pure calculation modules;
+- produced quantity and explainable imposition contributions for every print pair;
+- underproduction and overrun metrics for all 35 control pairs;
+- complete-file production based on the minimum produced quantity across a file's pairs;
+- separate pair-overrun and complete-file-overrun totals;
+- physical-sheet, front-form, back-form, total-form, and press-pass metrics;
+- hard production-readiness rejection when any pair underproduces;
+- responsive production summary with a 20-file table and collapsible 35-pair details;
+- `docs/M4_IMPLEMENTATION_PLAN.md` with approved formulas and acceptance criteria;
+- M4 integration tests for the complete control dataset and invalid inputs.
+
+### Changed
+
+- the control demo now builds a validated production report after the four front/back impositions;
+- source checks include every M4 calculation and rendering module;
+- the test plan records complete-file overrun separately from summed pair overrun;
+- desktop and mobile Chromium scenarios verify the production report;
+- the visible site, package metadata, screenshot tooling, documentation, and version manifest are synchronized to `0.4.0-alpha`;
+- M5 PDF export is now the next active milestone.
+
+### Verified
+
+- 20 files expand into 35 pair metrics;
+- physical sheets: `3395`;
+- forms: `4` front + `4` back = `8`;
+- press passes: `6790`;
+- underproduction: `0`;
+- total pair overrun: `1450`;
+- complete-file overrun: `930`;
+- unknown pairs, damaged impositions, duplicate definitions, unsupported duplex modes, and underproduction are rejected;
+- desktop and mobile Chromium screenshots show the report and exact control totals.
+
+The four imposition run lengths remain verified manual input rather than optimizer output or a proven global minimum.
+
 ## 0.3.0-alpha — 2026-07-24
 
 ### Added
