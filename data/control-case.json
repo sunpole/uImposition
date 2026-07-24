@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "name": "Control case — 20 files / Контрольный набор — 20 файлов",
+  "sheet": {
+    "width": 620,
+    "height": 450,
+    "sizeStage": "beforeTrim",
+    "trim": {
+      "enabled": true,
+      "left": 2,
+      "right": 2,
+      "top": 2,
+      "bottom": 2
+    },
+    "pressMargins": {
+      "left": 4,
+      "right": 4,
+      "top": 2,
+      "bottom": 13
+    }
+  },
+  "product": {
+    "width": 105,
+    "height": 148,
+    "bleed": 0,
+    "gap": 0,
+    "orientation": "portrait"
+  },
+  "turnMode": "horizontalLeftToRight",
+  "duplexMode": "separateFrontBackForms",
+  "orders": [
+    { "file": "70", "quantity": 3500, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "25", "quantity": 1500, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "41", "quantity": 1100, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "8", "quantity": 395, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "99", "quantity": 2100, "pages": 2, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "72", "quantity": 300, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "69", "quantity": 300, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "67", "quantity": 1100, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "62", "quantity": 160, "pages": 2, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "75", "quantity": 345, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "84", "quantity": 300, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "126", "quantity": 1100, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "36", "quantity": 440, "pages": 2, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "97", "quantity": 1325, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "111", "quantity": 680, "pages": 2, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "43", "quantity": 280, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "33", "quantity": 9650, "pages": 3, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "40", "quantity": 2200, "pages": 2, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "119", "quantity": 350, "pages": 4, "width": 105, "height": 148, "bleed": 0 },
+    { "file": "20", "quantity": 2100, "pages": 3, "width": 105, "height": 148, "bleed": 0 }
+  ],
+  "manualReference": {
+    "printPairs": 35,
+    "impositions": 4,
+    "plates": 8,
+    "physicalSheets": 3395,
+    "pressPasses": 6790,
+    "underproduction": 0,
+    "totalOverrun": 1450,
+    "status": "manual reference, not proven global optimum"
+  }
+}
