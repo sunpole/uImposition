@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
   "project": "uImposition",
-  "version": "0.4.0-alpha",
-  "semverCore": "0.4.0",
+  "version": "0.5.0-alpha",
+  "semverCore": "0.5.0",
   "channel": "alpha",
-  "versionSequence": 6,
+  "versionSequence": 7,
   "releaseDate": "2026-07-24",
-  "status": "m4-production-report-alpha",
-  "milestone": "M4",
-  "nextMilestone": "M5",
+  "status": "m5-pdf-export-alpha",
+  "milestone": "M5",
+  "nextMilestone": "M6",
   "productionReady": false,
   "publicDemoReady": true,
   "capacityImplemented": true,
@@ -18,16 +18,19 @@
   "controlLayoutsImplemented": true,
   "impositionRunCalculationImplemented": true,
   "productionReportImplemented": true,
+  "pdfExportImplemented": true,
+  "schemePdfImplemented": true,
+  "productionReportPdfImplemented": true,
   "optimizerImplemented": false,
   "summary": {
-    "ru": "Для явных проверенных монтажей рассчитываются напечатанные тиражи 35 пар, недопечатка, перетираж по парам и файлам, физическая бумага, формы и листопрогоны; результат показывается в проверяемом производственном отчёте.",
-    "en": "For explicit validated impositions, the application calculates production for 35 print pairs, underproduction, pair and file overrun, physical sheets, forms, and press passes, then displays a validated production report."
+    "ru": "Проверенные схемы экспортируются в отдельный восьмистраничный PDF по одной схеме на страницу, а производственный отчёт — в отдельный шестистраничный PDF с итогами, файлами и печатными парами.",
+    "en": "Validated schemes export to a separate eight-page PDF with one scheme per page, while the production report exports to a separate six-page PDF containing totals, files, and print pairs."
   },
   "nextTarget": {
-    "version": "0.5.0-alpha",
-    "milestone": "M5",
-    "ru": "Экспортировать каждую схему на отдельную PDF-страницу и сформировать отдельный PDF производственного отчёта.",
-    "en": "Export every scheme to its own PDF page and create a separate production-report PDF."
+    "version": "0.6.0-alpha",
+    "milestone": "M6",
+    "ru": "Генерировать альтернативные монтажи, автоматически подбирать их тиражи и минимизировать физическую бумагу без недопечатки.",
+    "en": "Generate alternative impositions, assign their run lengths automatically, and minimise physical paper without underproduction."
   },
   "versionSources": { "machine": "VERSION.json", "human": "VERSION.md", "history": "CHANGELOG.md", "policy": "docs/VERSIONING.md" },
   "releasePolicy": { "stableCheckpointBranch": "release/v{version}", "githubReleaseRequiredForStable": true, "rollbackPurpose": true },
