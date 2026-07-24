@@ -17,13 +17,14 @@ GitHub является единственным источником истин
 
 - репозиторий: `sunpole/uImposition`;
 - сайт: `https://sunpole.github.io/uImposition/`;
-- релиз-кандидат: ветка `m4/0.4.0-alpha`, PR №6;
-- версия кандидата: **`0.4.0-alpha`**;
-- завершённый функциональный этап: **M4 — производственные итоги и отчёт**;
-- следующая версия после объединения: **`0.5.0-alpha`**;
+- основная ветка: `main`;
+- текущая версия: **`0.4.0-alpha`**;
+- M4 объединён через PR №6;
+- merge commit M4: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`;
+- завершённый этап: **M4 — производственные итоги и отчёт**;
+- следующая версия: **`0.5.0-alpha`**;
 - следующий этап: **M5 — PDF-экспорт**;
-- текущая точка отката в `main`: `release/v0.3.0-alpha`;
-- после объединения M4 создаётся `release/v0.4.0-alpha`.
+- точка отката M4: `release/v0.4.0-alpha`.
 
 ### Что обязательно прочитать
 
@@ -35,20 +36,19 @@ GitHub является единственным источником истин
 6. `docs/TECHNICAL_SPECIFICATION_RU.md`;
 7. `docs/ARCHITECTURE.md`;
 8. `docs/M4_IMPLEMENTATION_PLAN.md`;
-9. `data/control-case.json`;
-10. `data/control-layout-m3.json`;
-11. последние Pull Request и GitHub Actions.
+9. `docs/M4_RELEASE_EVIDENCE.md`;
+10. `data/control-case.json`;
+11. `data/control-layout-m3.json`;
+12. последние Pull Request и GitHub Actions.
 
 ### Что реализовано в M4
 
-- `src/production-metrics.js` — напечатано, недопечатка, перетираж, бумага, формы и листопрогоны;
-- `src/production-validation.js` — независимая проверка арифметики и жёстких ограничений;
-- `src/production-report.js` — проверяемая модель производственного отчёта;
-- `src/production-report-renderer.js` — DOM-отрисовка готового отчёта;
-- сводка из шести метрик;
-- таблица по 20 файлам;
-- детализация по 35 печатным парам;
-- desktop/mobile Chromium-проверки.
+- чистая производственная арифметика и независимая валидация;
+- напечатано, недопечатка и перетираж по 35 парам;
+- готовые тиражи и перетираж по 20 файлам;
+- физическая бумага, формы и листопрогоны;
+- адаптивный производственный отчёт;
+- новый фактический PNG и патчноут uNews.
 
 ### Проверенный контрольный результат
 
@@ -64,54 +64,45 @@ GitHub является единственным источником истин
 ### Главные правила
 
 - сначала читать GitHub, а не историю чата;
-- не менять функциональный milestone напрямую в `main`;
+- функциональный milestone не писать напрямую в `main`;
 - формулы держать в чистых модулях, UI использовать только для отображения;
 - оборот всегда выводить из лица;
 - недопечатку считать недопустимой;
-- не называть ручной вариант глобальным минимумом;
+- ручной вариант не называть глобальным минимумом;
 - версию завершать только после Actions, Chromium, uNews и проверки результата;
-- alpha-вехе создавать recovery-ветку, но не настоящий GitHub Release.
+- alpha-вехе создавать recovery-ветку без настоящего GitHub Release.
 
 ### Точная точка продолжения
 
-После объединения PR №6 начать M5 в новой ветке `m5/0.5.0-alpha` от проверенного `main`.
+Начать M5 в отдельной ветке `m5/0.5.0-alpha` от проверенного `main`.
 
-Первый безопасный шаг M5: спроектировать DOM-независимую модель PDF-документа и тесты, которые гарантируют одну схему на страницу, правильный порядок восьми схем и отдельный производственный отчёт. Только после этого подключать библиотеку или браузерную генерацию PDF.
+Первый безопасный шаг: спроектировать DOM-независимую модель PDF-документа и тесты, которые гарантируют одну схему на страницу, правильный порядок восьми схем и отдельный производственный отчёт. Только после этого подключать генерацию PDF.
 
 </td>
 <td width="50%" valign="top">
 
 ## English
 
-### Development model
-
-GitHub is the single source of truth. Development uses feature branches and Pull Requests, with GitHub Actions, factual Chromium screenshots, and GitHub Pages as verification. A local terminal is optional.
-
 ### Current state
 
 - repository: `sunpole/uImposition`;
 - website: `https://sunpole.github.io/uImposition/`;
-- release candidate: branch `m4/0.4.0-alpha`, PR #6;
-- candidate version: **`0.4.0-alpha`**;
-- completed functional milestone: **M4 — production totals and report**;
-- next version after merge: **`0.5.0-alpha`**;
+- default branch: `main`;
+- current version: **`0.4.0-alpha`**;
+- M4 merged through PR #6;
+- M4 merge commit: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`;
+- completed milestone: **M4 — production totals and report**;
+- next version: **`0.5.0-alpha`**;
 - next milestone: **M5 — PDF export**;
-- current rollback point in `main`: `release/v0.3.0-alpha`;
-- `release/v0.4.0-alpha` is created after the M4 merge.
+- M4 rollback point: `release/v0.4.0-alpha`.
 
 ### Implemented in M4
 
-Pure production metrics, independent validation, a DOM-free report model, a DOM-only renderer, six summary metrics, a 20-file table, 35-pair details, and desktop/mobile Chromium verification.
-
-### Verified control result
-
-Physical sheets `3395`; forms `8`; press passes `6790`; underproduction `0`; pair overrun `1450`; complete-file overrun `930`.
-
-The four run lengths remain verified manual input, not optimizer output or a proven global minimum.
+Pure production arithmetic and independent validation, pair/file totals, physical sheets, forms, press passes, a responsive production report, factual Chromium evidence, and a validated uNews patchnote.
 
 ### Exact continuation point
 
-After PR #6 is merged, start M5 in `m5/0.5.0-alpha` from verified `main`. First design a DOM-independent PDF document model and tests for one scheme per page, correct ordering of all eight schemes, and a separate production report. Integrate PDF generation only after those tests pass.
+Start M5 in `m5/0.5.0-alpha` from verified `main`. First design and test a DOM-independent PDF document model with one scheme per page, deterministic ordering of all eight schemes, and a separate production report. Integrate PDF generation afterward.
 
 </td>
 </tr>
@@ -122,9 +113,8 @@ After PR #6 is merged, start M5 in `m5/0.5.0-alpha` from verified `main`. First 
 ```text
 Открой репозиторий sunpole/uImposition через GitHub.
 
-Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/ROADMAP.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/M4_IMPLEMENTATION_PLAN.md, data/control-case.json и data/control-layout-m3.json. Проверь последние PR и GitHub Actions.
+Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/ROADMAP.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/M4_IMPLEMENTATION_PLAN.md, docs/M4_RELEASE_EVIDENCE.md, data/control-case.json и data/control-layout-m3.json. Проверь последние PR и GitHub Actions.
 
 GitHub — единственный источник истины. Не требуй локальный клон.
-Если PR №6 ещё открыт — заверши его проверки, uNews, merge и recovery-ветку release/v0.4.0-alpha.
-Если M4 уже объединён — начни M5 в ветке m5/0.5.0-alpha: сначала чистая модель PDF и тесты, затем генерация, UI, Chromium, uNews и recovery-ветка.
+Начни M5 в ветке m5/0.5.0-alpha: сначала чистая модель PDF и тесты порядка/страниц, затем генерация, UI, Chromium, uNews и recovery-ветка после merge.
 ```
