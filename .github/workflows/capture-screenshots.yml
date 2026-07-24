@@ -45,7 +45,7 @@ jobs:
 
       - name: Install Chromium and system dependencies
         working-directory: tools/screenshots
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
 
       - name: Capture factual screenshots
         working-directory: tools/screenshots
