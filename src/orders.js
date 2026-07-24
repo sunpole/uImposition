@@ -13,6 +13,27 @@ export function splitOrderLine(line) {
     .filter((part, index, items) => part !== "" || index < items.length - 1);
 }
 
+export function buildPagePairs(order) {
+  const pairs = [];
+  for (let pairIndex = 0; pairIndex < Math.ceil(order.pages / 2); pairIndex += 1) {
+    const frontPage = pairIndex * 2 + 1;
+    const backPage = frontPage + 1 <= order.pages ? frontPage + 1 : null;
+    pairs.push({
+      file: order.file,
+      quantity: order.quantity,
+      pairIndex: pairIndex + 1,
+      frontPage,
+      backPage,
+      note: order.note ?? "",
+    });
+  }
+  return pairs;
+}
+
+export function expandPagePairs(orders) {
+  return orders.flatMap(buildPagePairs);
+}
+
 export function parseOrders(text, limits) {
   const rows = String(text ?? "").split(/\r?\n/);
   const orders = [];
@@ -24,11 +45,7 @@ export function parseOrders(text, limits) {
 
     const parts = splitOrderLine(line);
     if (parts.length < 3) {
-      errors.push({
-        line: index + 1,
-        message: "Expected: file | quantity | pages",
-        source: rawLine,
-      });
+      errors.push({ line: index + 1, message: "Expected: file | quantity | pages", source: rawLine });
       return;
     }
 
@@ -41,29 +58,20 @@ export function parseOrders(text, limits) {
     try {
       const quantity = parsePositiveInteger(quantityValue, "quantity", limits.maxQuantity);
       const pages = parsePositiveInteger(pagesValue, "pages", limits.maxPagesPerFile);
-      orders.push({
-        file,
-        quantity,
-        pages,
-        printPairs: Math.ceil(pages / 2),
-        note,
-      });
+      orders.push({ file, quantity, pages, printPairs: Math.ceil(pages / 2), note });
     } catch (error) {
       errors.push({ line: index + 1, message: error.message, source: rawLine });
     }
   });
 
   if (orders.length > limits.maxOrders) {
-    errors.push({
-      line: 0,
-      message: `Order count exceeds the configured limit of ${limits.maxOrders}`,
-      source: "",
-    });
+    errors.push({ line: 0, message: `Order count exceeds the configured limit of ${limits.maxOrders}`, source: "" });
   }
 
   return {
     orders,
     errors,
+    pagePairs: expandPagePairs(orders),
     summary: {
       orderCount: orders.length,
       printPairCount: orders.reduce((sum, order) => sum + order.printPairs, 0),

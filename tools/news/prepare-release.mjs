@@ -10,14 +10,15 @@ const manifestPath = path.join(root, "artifacts/screenshots/manifest.json");
 const marker = JSON.parse(await readFile(markerPath, "utf8"));
 const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
 const entry = manifest.entries.find((item) => item.scenario === marker.scenario);
+const expectedCommit = process.env.SCREENSHOT_COMMIT || process.env.GITHUB_SHA;
 
 if (!entry) throw new Error(`Screenshot scenario not found: ${marker.scenario}`);
-if (!entry.commit || entry.commit !== process.env.GITHUB_SHA) {
-  throw new Error(`Screenshot commit ${entry.commit} does not match GITHUB_SHA ${process.env.GITHUB_SHA}`);
+if (!expectedCommit) throw new Error("Expected screenshot commit is not available");
+if (!entry.commit || entry.commit !== expectedCommit) {
+  throw new Error(`Screenshot commit ${entry.commit} does not match expected commit ${expectedCommit}`);
 }
 
-const now = new Date();
-const queuedAt = now.toISOString().replace(/\.\d{3}Z$/, "Z");
+const queuedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 const date = queuedAt.slice(0, 10);
 const safeVersion = marker.version.replace(/[^0-9A-Za-z]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
 const baseName = `${date}-uimposition-v${safeVersion}-${marker.slug}`;
@@ -26,6 +27,10 @@ const patchnoteName = `${baseName}.md`;
 const sourceImage = path.join(root, "artifacts/screenshots", entry.screenshot);
 const targetImage = path.join(root, "news", imageName);
 const targetPatchnote = path.join(root, "news", patchnoteName);
+
+function bulletList(items) {
+  return items.map((item) => `- ${item};`).join("\n").replace(/;$/, ".");
+}
 
 await mkdir(path.join(root, "news"), { recursive: true });
 await copyFile(sourceImage, targetImage);
@@ -51,38 +56,21 @@ const body = `${frontMatter}
 
 # ${marker.title}
 
-uImposition получил первую рабочую браузерную версию.
+${marker.summary}
 
-Что уже работает:
+Что добавлено:
 
-- реальные форматы печатных листов;
-- произвольный размер листа;
-- зачистка одинаково или отдельно по сторонам;
-- защита от повторной зачистки готового пресета;
-- непечатные поля печатной машины;
-- расчёт исходного, фактического и печатного размера;
-- ввод списка заказов;
-- подсчёт файлов и печатных пар;
-- русский и английский интерфейс;
-- версия возле названия-ссылки на главную страницу.
+${bulletList(marker.features)}
 
-На реальном контрольном наборе сайт показывает:
+Проверенный контрольный результат:
 
-- исходный лист: 620 × 450 мм;
-- после зачистки: 616 × 446 мм;
-- печатная область: 608 × 431 мм;
-- 20 файлов;
-- 35 печатных пар.
+${bulletList(marker.controlFacts)}
 
-Следующий этап — расчёт вместимости изделий на листе в двух ориентациях.
+${marker.nextStep}
 
 Короткий текст для Telegram:
 
-🖨 uImposition 0.1.0-alpha — первая рабочая версия.
-
-Сайт уже считает зачистку листа, защищает готовые форматы от повторного уменьшения, учитывает непечатные поля и разбирает список заказов. На контрольном примере: 620×450 → 616×446 → печатная область 608×431, 20 файлов и 35 печатных пар.
-
-Следующий шаг — автоматический расчёт вместимости изделий на листе.
+${marker.telegramText}
 `;
 
 await writeFile(targetPatchnote, body, "utf8");

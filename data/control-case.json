@@ -1,28 +1,19 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Control case — 20 files / Контрольный набор — 20 файлов",
   "sheet": {
     "width": 620,
     "height": 450,
     "sizeStage": "beforeTrim",
-    "trim": {
-      "enabled": true,
-      "left": 2,
-      "right": 2,
-      "top": 2,
-      "bottom": 2
-    },
-    "pressMargins": {
-      "left": 4,
-      "right": 4,
-      "top": 2,
-      "bottom": 13
-    }
+    "trim": { "enabled": true, "left": 2, "right": 2, "top": 2, "bottom": 2 },
+    "pressMargins": { "left": 4, "right": 4, "top": 2, "bottom": 13 }
   },
   "product": {
+    "presetId": "A6",
     "width": 105,
     "height": 148,
     "bleed": 0,
+    "spacingMode": "commonCut",
     "gap": 0,
     "orientation": "portrait"
   },
@@ -50,6 +41,16 @@
     { "file": "119", "quantity": 350, "pages": 4, "width": 105, "height": 148, "bleed": 0 },
     { "file": "20", "quantity": 2100, "pages": 3, "width": 105, "height": 148, "bleed": 0 }
   ],
+  "verifiedM2": {
+    "sourceSheet": { "width": 620, "height": 450 },
+    "postTrimSheet": { "width": 616, "height": 446 },
+    "printableArea": { "width": 608, "height": 431 },
+    "orientation0": { "columns": 5, "rows": 2, "positions": 10 },
+    "orientation90": { "columns": 4, "rows": 4, "positions": 16 },
+    "bestRotation": 90,
+    "bestPositions": 16,
+    "printPairs": 35
+  },
   "manualReference": {
     "printPairs": 35,
     "impositions": 4,
