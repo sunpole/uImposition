@@ -20,29 +20,24 @@ const scenarioFiles = (await readdir(scenarioDir))
 const scenarios = [];
 for (const fileName of scenarioFiles) {
   const scenario = JSON.parse(await readFile(path.join(scenarioDir, fileName), "utf8"));
-  if (scenarioFilter.size === 0 || scenarioFilter.has(scenario.id)) {
-    scenarios.push(scenario);
-  }
+  if (scenarioFilter.size === 0 || scenarioFilter.has(scenario.id)) scenarios.push(scenario);
 }
 
-if (scenarios.length === 0) {
-  throw new Error("No screenshot scenarios selected");
-}
+if (scenarios.length === 0) throw new Error("No screenshot scenarios selected");
 
 for (const scenario of scenarios) {
   test(`capture ${scenario.id}`, async ({ page }) => {
     await page.setViewportSize(scenario.viewport);
     await page.goto(scenario.path, { waitUntil: "networkidle" });
 
-    for (const expectedText of scenario.expectedTexts) {
-      await expect(page.getByText(expectedText, { exact: false }).first()).toBeVisible();
+    for (const assertion of scenario.assertions) {
+      const locator = page.locator(assertion.selector);
+      await expect(locator).toBeVisible();
+      await expect(locator).toContainText(assertion.text);
     }
 
     const screenshotPath = path.join(outputDir, scenario.screenshot);
-    await page.screenshot({
-      path: screenshotPath,
-      fullPage: Boolean(scenario.fullPage),
-    });
+    await page.screenshot({ path: screenshotPath, fullPage: Boolean(scenario.fullPage) });
 
     const entry = {
       scenario: scenario.id,
@@ -51,6 +46,7 @@ for (const scenario of scenarios) {
       url: page.url(),
       viewport: scenario.viewport,
       screenshot: scenario.screenshot,
+      assertions: scenario.assertions,
     };
 
     await writeFile(
@@ -66,11 +62,8 @@ test.afterAll(async () => {
     .filter((name) => name.endsWith(".json"))
     .sort();
   const entries = [];
-
   for (const fileName of entryFiles) {
-    entries.push(
-      JSON.parse(await readFile(path.join(outputDir, "entries", fileName), "utf8")),
-    );
+    entries.push(JSON.parse(await readFile(path.join(outputDir, "entries", fileName), "utf8")));
   }
 
   const manifest = {
