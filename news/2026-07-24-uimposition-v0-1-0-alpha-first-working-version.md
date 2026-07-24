@@ -4,7 +4,7 @@ project: uImposition
 series: uimposition
 title: Первая рабочая версия
 version: 0.1.0-alpha
-queued_at: 2026-07-24T12:46:58.471Z
+queued_at: 2026-07-24T12:46:58Z
 repo_url: https://github.com/sunpole/uImposition
 web_url: https://sunpole.github.io/uImposition/
 image: 2026-07-24-uimposition-v0-1-0-alpha-first-working-version.png

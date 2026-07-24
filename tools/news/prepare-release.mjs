@@ -17,7 +17,7 @@ if (!entry.commit || entry.commit !== process.env.GITHUB_SHA) {
 }
 
 const now = new Date();
-const queuedAt = now.toISOString();
+const queuedAt = now.toISOString().replace(/\.\d{3}Z$/, "Z");
 const date = queuedAt.slice(0, 10);
 const safeVersion = marker.version.replace(/[^0-9A-Za-z]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
 const baseName = `${date}-uimposition-v${safeVersion}-${marker.slug}`;
