@@ -1,8 +1,0 @@
-{
-  "type": "feature",
-  "title": "Первая рабочая версия",
-  "version": "0.1.0-alpha",
-  "slug": "first-working-version",
-  "scenario": "m1-trim-desktop",
-  "imageText": "uImposition 0.1.0-alpha: реальный интерфейс расчёта зачистки листа, печатной области и контрольного заказа без приватных данных"
-}
