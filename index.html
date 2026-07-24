@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="uImposition — профессиональный расчёт офсетных монтажей / professional offset imposition planning">
-  <title>uImposition · v0.3.0-alpha</title>
+  <title>uImposition · v0.4.0-alpha</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,21 +12,21 @@
     <nav class="nav" aria-label="Основная навигация">
       <a class="brand" href="./" aria-label="uImposition — главная страница">
         <span class="brand__name">uImposition</span>
-        <span class="brand__version">v<span data-project-version>0.3.0-alpha</span></span>
+        <span class="brand__version">v<span data-project-version>0.4.0-alpha</span></span>
       </a>
       <button id="languageButton" class="language-button" type="button" aria-label="Switch to English">EN</button>
     </nav>
 
     <div class="hero__content" data-lang="ru">
       <p class="eyebrow">Проектирование офсетных монтажей</p>
-      <h1>Лицо, страницы и зеркальный оборот.</h1>
-      <p>M3 заполняет лицевые позиции сплошными блоками, автоматически получает зеркальный оборот и проверяет файл, пару страниц и направление каждой позиции.</p>
+      <h1>От схемы к производственному отчёту.</h1>
+      <p>M4 рассчитывает напечатанное количество, недопечатку, перетираж, физическую бумагу, формы и листопрогоны для каждого проверенного монтажа.</p>
     </div>
 
     <div class="hero__content" data-lang="en" hidden>
       <p class="eyebrow">Offset imposition planning</p>
-      <h1>Front, pages, and mirrored back.</h1>
-      <p>M3 fills front positions in contiguous blocks, derives every mirrored back automatically, and validates the file, page pair, and direction of every position.</p>
+      <h1>From imposition schemes to production totals.</h1>
+      <p>M4 calculates produced quantity, underproduction, overrun, physical sheets, forms, and press passes for every validated imposition.</p>
     </div>
   </header>
 
@@ -242,16 +242,16 @@
     </section>
 
     <section class="panel roadmap-panel">
-      <h2 data-lang="ru">Текущая граница M3</h2><h2 data-lang="en" hidden>Current M3 boundary</h2>
+      <h2 data-lang="ru">Текущая граница M4</h2><h2 data-lang="en" hidden>Current M4 boundary</h2>
       <div class="two-column-copy">
-        <div data-lang="ru"><p><strong>Работает:</strong> геометрия, вместимость, точные пары страниц, лицо сплошными блоками, автоматически зеркальный оборот, стрелки и независимая проверка восьми контрольных схем.</p><p><strong>Следом, M4:</strong> напечатанное количество, недопечатка, перетираж, формы, бумага, листопрогоны и производственный отчёт.</p></div>
-        <div data-lang="en" hidden><p><strong>Working:</strong> geometry, capacity, exact page pairs, contiguous front blocks, automatically mirrored backs, direction arrows, and independent validation of eight control schemes.</p><p><strong>Next, M4:</strong> produced quantity, underproduction, overrun, plates, paper, press passes, and a production report.</p></div>
+        <div data-lang="ru"><p><strong>Работает:</strong> геометрия, вместимость, точные пары страниц, лицо и зеркальный оборот, напечатанное количество, недопечатка, перетираж, формы, физическая бумага, листопрогоны и проверяемый производственный отчёт.</p><p><strong>Следом, M5:</strong> одна схема на PDF-страницу и отдельный PDF производственного отчёта.</p></div>
+        <div data-lang="en" hidden><p><strong>Working:</strong> geometry, capacity, exact page pairs, front and mirrored back, produced quantity, underproduction, overrun, forms, physical sheets, press passes, and a validated production report.</p><p><strong>Next, M5:</strong> one scheme per PDF page and a separate production-report PDF.</p></div>
       </div>
     </section>
   </main>
 
   <div id="toast" class="toast" role="status" hidden></div>
-  <footer><a href="./" class="footer-brand">uImposition · v<span data-project-version>0.3.0-alpha</span></a><span>© 2026 Anton Magomedov</span></footer>
+  <footer><a href="./" class="footer-brand">uImposition · v<span data-project-version>0.4.0-alpha</span></a><span>© 2026 Anton Magomedov</span></footer>
   <script type="module" src="src/app.js"></script>
   <script type="module" src="src/m3-demo.js"></script>
 </body>
