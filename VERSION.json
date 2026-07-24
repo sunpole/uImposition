@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "project": "uImposition",
+  "version": "0.0.2-docs",
+  "semverCore": "0.0.2",
+  "channel": "docs",
+  "versionSequence": 2,
+  "releaseDate": "2026-07-24",
+  "status": "documentation-bootstrap",
+  "milestone": "M0",
+  "nextMilestone": "M1",
+  "productionReady": false,
+  "publicDemoReady": true,
+  "optimizerImplemented": false,
+  "summary": {
+    "ru": "Созданы и оформлены публичный репозиторий, двуязычное техническое задание, документация, централизованная модель конфигурации, контрольный набор и правила версионирования.",
+    "en": "The public repository, bilingual technical specification, documentation, centralized configuration model, control dataset and versioning rules have been established."
+  },
+  "nextTarget": {
+    "version": "0.1.0-alpha",
+    "milestone": "M1",
+    "ru": "Центральный config.js, интерфейс ввода заказов и расчёт размера листа после зачистки.",
+    "en": "Central config.js, order-entry interface and post-trim sheet-size calculation."
+  },
+  "versionSources": {
+    "machine": "VERSION.json",
+    "human": "VERSION.md",
+    "history": "CHANGELOG.md",
+    "policy": "docs/VERSIONING.md"
+  },
+  "synchronizationRule": "When the project version changes, VERSION.json, VERSION.md and CHANGELOG.md must be updated in the same patch."
+}
