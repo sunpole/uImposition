@@ -1,7 +1,7 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.2.0-alpha</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.3.0-alpha</strong></p>
 <p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
 
 <table>
@@ -14,28 +14,31 @@
 
 uImposition — браузерный инструмент для расчёта сложных сборных офсетных монтажей.
 
-### Уже работает в M2
+### Уже работает в M3
 
 - реальные и произвольные форматы листов;
 - зачистка и непечатные поля как отдельные этапы;
 - A4, A5, A6 и произвольный формат изделия;
 - выпуск, общий рез и дополнительный зазор;
-- сравнение сеток 0° и 90°;
-- выбор максимального количества позиций;
-- визуальная схема вместимости;
+- сравнение сеток 0° и 90° и выбор максимальной вместимости;
 - точные пары исходных страниц;
-- контрольный заказ из 20 файлов и 35 пар;
-- реальные скриншоты для Telegram через uNews.
+- заполнение лицевых позиций сплошными блоками;
+- `ЛИСТ-N_ЛИЦО` и автоматически зеркальный `ЛИСТ-N_ОБОРОТ`;
+- точные страницы и стрелки направления головы;
+- независимая проверка лица и оборота;
+- четыре контрольных лица и четыре оборота по 16 позиций;
+- реальные desktop/mobile Chromium-скриншоты и очередь uNews.
 
 ### Следующий этап
 
-M3 / `0.3.0-alpha`:
+M4 / `0.4.0-alpha`:
 
-- заполнение лицевых позиций сплошными блоками;
-- `ЛИСТ-N_ЛИЦО`;
-- автоматически зеркальный `ЛИСТ-N_ОБОРОТ`;
-- точные страницы и стрелки;
-- рамочные схемы для скриншотов.
+- напечатанное количество по каждому файлу и паре;
+- недопечатка и перетираж;
+- количество форм;
+- физическая бумага;
+- листопрогоны;
+- понятный производственный отчёт.
 
 ### Цель проекта
 
@@ -54,28 +57,31 @@ M3 / `0.3.0-alpha`:
 
 uImposition is a browser-based tool for planning complex gang-run offset impositions.
 
-### Working in M2
+### Working in M3
 
 - real and custom sheet sizes;
 - separate sheet-trim and press-margin stages;
 - A4, A5, A6 and custom finished-product sizes;
 - bleed, common cut and additional gap;
-- comparison of 0° and 90° grids;
-- maximum-position selection;
-- visual capacity scheme;
+- 0°/90° grid comparison and maximum-capacity selection;
 - exact source page pairs;
-- 20-file / 35-pair control dataset;
-- factual Telegram screenshots through uNews.
+- contiguous front-position blocks;
+- `SHEET-N_FRONT` and automatically mirrored `SHEET-N_BACK`;
+- exact pages and head-direction arrows;
+- independent front/back validation;
+- four control fronts and four backs with 16 positions each;
+- factual desktop/mobile Chromium screenshots and the uNews queue.
 
 ### Next milestone
 
-M3 / `0.3.0-alpha`:
+M4 / `0.4.0-alpha`:
 
-- contiguous front-position blocks;
-- `SHEET-N_FRONT`;
-- automatically mirrored `SHEET-N_BACK`;
-- exact pages and direction arrows;
-- bordered screenshot-ready schemes.
+- produced quantity per file and pair;
+- underproduction and overrun;
+- plate/form count;
+- physical paper;
+- press passes;
+- a clear production report.
 
 ### Project goal
 
@@ -119,8 +125,6 @@ GitHub — единственный источник истины. Основн�
 
 GitHub is the single source of truth. Primary development uses branches, Pull Requests, and GitHub Actions. A terminal, local clone, and local computer are optional and may only be used by the owner for additional verification.
 
-Основной цикл / Primary cycle:
-
 ```text
 GitHub audit
 → feature branch
@@ -147,37 +151,28 @@ Sheet trimming and non-printable press margins are separate stages. An `afterTri
 
 ## Проверка / Verification
 
-Основная проверка выполняется автоматически в GitHub Actions. Локальные команды являются необязательными и не должны быть условием продолжения разработки.
-
-Primary verification runs in GitHub Actions. Local commands are optional and must not be a prerequisite for continued development.
-
-Необязательная локальная проверка / Optional local verification:
+Основная проверка выполняется автоматически в GitHub Actions. Локальные команды являются необязательными.
 
 ```bash
 npm run check
 ```
 
-Необязательные локальные скриншоты / Optional local screenshots:
+## Контрольный результат M3 / M3 control result
 
-```bash
-cd tools/screenshots
-npm install --package-lock=false --ignore-scripts --no-audit --no-fund
-npx playwright install --with-deps chromium
-npm run capture
-```
+`data/control-case.json` и `data/control-layout-m3.json`:
 
-## Контрольный результат M2 / M2 control result
+- печатная область `608×431`;
+- A6 `105×148`, выпуск `0`, общий рез;
+- выбранная сетка `4×4 = 16`, поворот `90°`;
+- 20 файлов → 35 точных пар страниц;
+- четыре лица и четыре автоматически зеркальных оборота;
+- ручные контрольные тиражи монтажей: `1500`, `1100`, `450`, `345`;
+- файл 119 сохраняет пары `1/2` и `3/4`;
+- все восемь схем проходят автоматическую проверку.
 
-`data/control-case.json`: печатная область `608×431`, A6 `105×148`, выпуск `0`, общий рез.
+Контрольная раскладка не считается доказанным глобальным минимумом. Оптимизация начинается на более позднем этапе.
 
-- 0° → `5×2 = 10`;
-- 90° → `4×4 = 16`;
-- выбран вариант 90°;
-- 20 файлов → 35 точных пар страниц.
-
-Ручной ориентир будущего оптимизатора остаётся отдельным и ещё не считается доказанным глобальным минимумом.
-
-The manual future-optimizer reference remains separate and is not treated as a proven global optimum.
+The control layout is not treated as a proven global minimum. Optimization starts in a later milestone.
 
 ## Коммерческое направление / Commercial direction
 
