@@ -38,12 +38,10 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: "22"
-          cache: npm
-          cache-dependency-path: tools/screenshots/package-lock.json
 
       - name: Install pinned screenshot dependencies
         working-directory: tools/screenshots
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm install --package-lock=false --ignore-scripts --no-audit --no-fund
 
       - name: Install Chromium and system dependencies
         working-directory: tools/screenshots
