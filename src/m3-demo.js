@@ -9,8 +9,14 @@ import {
   renderProductionReport,
   renderProductionReportEmpty,
 } from "./production-report-renderer.js";
+import { createPdfExportController } from "./pdf-export-ui.js";
 
-const state = { records: null, report: null, loadSequence: 0 };
+const state = {
+  records: null,
+  report: null,
+  controlCase: null,
+  loadSequence: 0,
+};
 
 function language() {
   return document.documentElement.lang === "en" ? "en" : "ru";
@@ -72,6 +78,7 @@ const panel = ensurePanel();
 const productionPanel = ensureProductionPanel(panel);
 ensureStylesheet("m3.css", "data-m3-styles");
 ensureStylesheet("m4.css", "data-m4-styles");
+ensureStylesheet("m5.css", "data-m5-styles");
 
 const ui = {
   status: panel.querySelector("#impositionStatus"),
@@ -85,6 +92,16 @@ const ui = {
   settingsPanel: document.querySelector("#settingsPanel"),
 };
 
+const pdfExport = createPdfExportController({
+  anchor: productionPanel,
+  getRecords: () => state.records,
+  getSheetSize: () => {
+    const size = state.controlCase?.verifiedM2?.postTrimSheet;
+    return size ? { widthMm: size.width, heightMm: size.height } : null;
+  },
+  getLanguage: language,
+});
+
 function syncLanguageContent() {
   const current = language();
   panel.querySelectorAll("[data-lang]").forEach((element) => {
@@ -94,7 +111,7 @@ function syncLanguageContent() {
     renderSchemePairs(ui.schemes, state.records, { language: current });
     ui.status.textContent = current === "ru" ? "4 лица · 4 оборота · проверено" : "4 fronts · 4 backs · validated";
   } else if (!ui.error.hidden) {
-    ui.status.textContent = current === "ru" ? "Ошибка M3/M4" : "M3/M4 error";
+    ui.status.textContent = current === "ru" ? "Ошибка M3/M4/M5" : "M3/M4/M5 error";
   } else {
     ui.status.textContent = current === "ru" ? "Загрузите контрольный заказ" : "Load the control dataset";
     ui.empty.textContent = current === "ru"
@@ -110,12 +127,14 @@ function syncLanguageContent() {
       error: ui.error.hidden ? "" : ui.error.textContent,
     });
   }
+  pdfExport.sync();
 }
 
 function clearControlLayouts() {
   state.loadSequence += 1;
   state.records = null;
   state.report = null;
+  state.controlCase = null;
   ui.schemes.replaceChildren();
   ui.error.hidden = true;
   ui.error.textContent = "";
@@ -169,19 +188,23 @@ async function loadControlLayouts() {
 
     state.records = records;
     state.report = report;
+    state.controlCase = controlCase;
     renderSchemePairs(ui.schemes, records, { language: current });
     renderProductionReport(ui.production, report, { language: current });
     ui.status.textContent = current === "ru" ? "4 лица · 4 оборота · проверено" : "4 fronts · 4 backs · validated";
+    pdfExport.sync();
   } catch (error) {
     if (sequence !== state.loadSequence) return;
     console.error(error);
     state.records = null;
     state.report = null;
+    state.controlCase = null;
     ui.schemes.replaceChildren();
-    ui.status.textContent = current === "ru" ? "Ошибка M3/M4" : "M3/M4 error";
+    ui.status.textContent = current === "ru" ? "Ошибка M3/M4/M5" : "M3/M4/M5 error";
     ui.error.textContent = error.message;
     ui.error.hidden = false;
     renderProductionReportEmpty(ui.production, { language: current, error: error.message });
+    pdfExport.sync();
   }
 }
 
