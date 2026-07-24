@@ -1,7 +1,7 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.4.0-alpha</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.5.0-alpha</strong></p>
 <p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
 
 <table>
@@ -10,88 +10,58 @@
 
 ## Русский
 
-<p><strong>Основной язык проекта — русский.</strong></p>
+uImposition — статический браузерный инструмент для расчёта сложных сборных офсетных монтажей.
 
-uImposition — браузерный инструмент для расчёта сложных сборных офсетных монтажей.
-
-### Уже работает в M4
+### Уже работает в M5
 
 - реальные и произвольные форматы листов;
 - зачистка и непечатные поля как отдельные этапы;
 - A4, A5, A6 и произвольный формат изделия;
 - выпуск, общий рез и дополнительный зазор;
-- сравнение сеток 0° и 90° и выбор максимальной вместимости;
-- точные пары исходных страниц;
-- заполнение лицевых позиций сплошными блоками;
-- `ЛИСТ-N_ЛИЦО` и автоматически зеркальный `ЛИСТ-N_ОБОРОТ`;
-- точные страницы и стрелки направления головы;
-- независимая проверка лица и оборота;
-- напечатанное количество по 35 парам;
-- недопечатка и перетираж по парам и файлам;
+- сетки 0°/90° и выбор максимальной вместимости;
+- точные пары страниц;
+- четыре лица и четыре автоматически зеркальных оборота;
+- файл, страница и направление головы в каждой позиции;
+- напечатанное количество, недопечатка и перетираж;
 - физическая бумага, формы и листопрогоны;
-- адаптивный производственный отчёт;
-- реальные desktop/mobile Chromium-скриншоты и очередь uNews.
+- производственный отчёт по 20 файлам и 35 парам;
+- отдельный PDF схем: 8 страниц, одна схема на страницу;
+- отдельный PDF отчёта: 6 страниц A4;
+- A4, пропорциональный и пользовательский режимы страниц схем;
+- проверка PDF через Chromium, `pdfinfo` и Poppler.
 
 ### Следующий этап
 
-M5 / `0.5.0-alpha`:
+M6 / `0.6.0-alpha`:
 
-- одна схема на одну PDF-страницу;
-- A4 и пропорциональный режим;
-- отдельный PDF производственного отчёта;
-- проверка количества и порядка PDF-страниц.
-
-### Цель проекта
-
-- рассчитывать бумагу, формы, перетираж и листопрогоны;
-- строить точное лицо и зеркальный оборот;
-- показывать файл, исходную страницу и направление головы;
-- сравнивать варианты по приоритетам пользователя;
-- экспортировать схемы: одна страница PDF — одна схема.
+- генерация альтернативных монтажей;
+- автоматический подбор тиражей;
+- минимум физической бумаги без недопечатки;
+- объяснение разделённых заказов и выбранного варианта.
 
 </td>
 <td width="50%" valign="top">
 
 ## English
 
-<p><strong>Russian is the primary project language.</strong></p>
+uImposition is a static browser tool for planning complex gang-run offset impositions.
 
-uImposition is a browser-based tool for planning complex gang-run offset impositions.
+### Working in M5
 
-### Working in M4
-
-- real and custom sheet sizes;
-- separate sheet-trim and press-margin stages;
-- A4, A5, A6 and custom finished-product sizes;
-- bleed, common cut and additional gap;
-- 0°/90° grid comparison and maximum-capacity selection;
-- exact source page pairs;
-- contiguous front-position blocks;
-- `SHEET-N_FRONT` and automatically mirrored `SHEET-N_BACK`;
-- exact pages and head-direction arrows;
-- independent front/back validation;
-- produced quantity for all 35 print pairs;
-- underproduction and overrun by pair and file;
-- physical sheets, forms, and press passes;
-- a responsive production report;
-- factual desktop/mobile Chromium screenshots and the uNews queue.
+- real/custom sheet and product sizes;
+- separate trim and press-margin stages;
+- 0°/90° capacity and exact page pairs;
+- four validated fronts and automatically mirrored backs;
+- produced quantity, underproduction, overrun, paper, forms, and press passes;
+- a production report for 20 files and 35 pairs;
+- a separate eight-page scheme PDF, one scheme per page;
+- a separate six-page A4 report PDF;
+- A4, proportional, and custom scheme page modes;
+- Chromium, `pdfinfo`, and Poppler verification.
 
 ### Next milestone
 
-M5 / `0.5.0-alpha`:
-
-- one imposition scheme per PDF page;
-- A4 and proportional modes;
-- a separate production-report PDF;
-- page-count and ordering verification.
-
-### Project goal
-
-- calculate paper, plates/forms, overrun and press passes;
-- generate exact fronts and mirrored backs;
-- show file, source page and head direction;
-- compare alternatives using user priorities;
-- export one imposition scheme per PDF page.
+M6 / `0.6.0-alpha`: generate alternatives, assign run lengths automatically, and minimise physical paper without underproduction.
 
 </td>
 </tr>
@@ -108,25 +78,17 @@ M5 / `0.5.0-alpha`:
 
 ## Документация / Documentation
 
-| Русский | English |
-|---|---|
-| [GitHub-only разработка](docs/GITHUB_ONLY_DEVELOPMENT.md) | GitHub-only development — bilingual |
-| [План M4](docs/M4_IMPLEMENTATION_PLAN.md) | M4 implementation plan — bilingual |
-| [План M3](docs/M3_IMPLEMENTATION_PLAN.md) | M3 implementation plan — bilingual |
-| [Алгоритм и оптимизация](docs/ALGORITHM_AND_OPTIMIZATION.md) | Algorithm and optimization — bilingual |
-| [Архитектура](docs/ARCHITECTURE.md) | Architecture — bilingual |
-| [Справочник конфигурации](docs/CONFIG_REFERENCE.md) | Configuration reference — bilingual |
-| [План тестирования](docs/TEST_PLAN.md) | Test plan — bilingual |
-| [Дорожная карта](docs/ROADMAP.md) | Roadmap — bilingual |
-| [Публикация через uNews](docs/NEWS_PUBLISHING.md) | uNews publishing — bilingual |
-| [Автоматизация скриншотов](docs/SCREENSHOT_AUTOMATION.md) | Screenshot automation — bilingual |
-| [Монетизация](docs/BUSINESS_MODEL.md) | Monetization — bilingual |
+- [План M5 / M5 implementation plan](docs/M5_IMPLEMENTATION_PLAN.md)
+- [План M4 / M4 implementation plan](docs/M4_IMPLEMENTATION_PLAN.md)
+- [Архитектура / Architecture](docs/ARCHITECTURE.md)
+- [Справочник конфигурации / Configuration](docs/CONFIG_REFERENCE.md)
+- [План тестирования / Test plan](docs/TEST_PLAN.md)
+- [Дорожная карта / Roadmap](docs/ROADMAP.md)
+- [Автоматизация скриншотов и PDF / Screenshot and PDF verification](docs/SCREENSHOT_AUTOMATION.md)
 
-## Как ведётся разработка / Development model
+## Разработка / Development model
 
-GitHub — единственный источник истины. Основная разработка выполняется через ветки, Pull Request и GitHub Actions. Терминал, локальный clone и локальный ПК не обязательны и используются только для дополнительной проверки владельцем.
-
-GitHub is the single source of truth. Primary development uses branches, Pull Requests, and GitHub Actions. A terminal, local clone, and local computer are optional and may only be used by the owner for additional verification.
+GitHub — единственный источник истины. Основной цикл:
 
 ```text
 GitHub audit
@@ -135,57 +97,32 @@ GitHub audit
 → UI integration
 → draft Pull Request
 → GitHub Actions
-→ factual Chromium screenshots
+→ Chromium downloads
+→ PDF structural check and Poppler rendering
 → uNews validation
 → merge to main
-→ Pages verification
 → recovery branch
 ```
 
-Подробно / Details: [`docs/GITHUB_ONLY_DEVELOPMENT.md`](docs/GITHUB_ONLY_DEVELOPMENT.md)
+Локальный терминал необязателен и не является источником истины.
 
-## Рабочие форматы после зачистки / Current post-trim presets
+## Контрольный результат / Control result
 
-`616×446` · `616×466` · `636×448` · `646×466` · `650×313` · `716×326` · `716×336` · `716×516` мм
-
-Зачистка и непечатные поля считаются отдельными этапами. Пресет `afterTrim` нельзя уменьшать повторно.
-
-Sheet trimming and non-printable press margins are separate stages. An `afterTrim` preset must never be trimmed twice.
-
-## Проверка / Verification
-
-Основная проверка выполняется автоматически в GitHub Actions. Локальные команды являются необязательными.
-
-```bash
-npm run check
-```
-
-## Контрольный результат M4 / M4 control result
-
-`data/control-case.json` и `data/control-layout-m3.json`:
-
-- печатная область `608×431`;
-- A6 `105×148`, выпуск `0`, общий рез;
-- выбранная сетка `4×4 = 16`, поворот `90°`;
-- 20 файлов → 35 точных пар страниц;
-- четыре лица и четыре автоматически зеркальных оборота;
-- ручные тиражи монтажей: `1500`, `1100`, `450`, `345`;
+- печатная область: `608×431`;
+- изделие: A6 `105×148`, выпуск `0`, общий рез;
+- 20 файлов → 35 пар;
+- 4 лица + 4 оборота;
 - физическая бумага: `3395`;
 - формы: `8`;
 - листопрогоны: `6790`;
 - недопечатка: `0`;
-- суммарный перетираж пар: `1450`;
-- перетираж готовых файлов: `930`.
+- перетираж пар: `1450`;
+- перетираж готовых файлов: `930`;
+- PDF схем: `8` страниц;
+- PDF отчёта: `6` страниц;
+- Poppler успешно рендерит все `14` страниц.
 
-Тиражи монтажей являются ручным проверочным входом. Автоматическая оптимизация начинается на более позднем этапе.
-
-The imposition run lengths are verified manual input. Automatic optimization starts in a later milestone.
-
-## Коммерческое направление / Commercial direction
-
-Проект нацелен на будущую монетизацию: публичная демонстрация, Pro-версия, лицензии для типографий, индивидуальное внедрение и поддержка. Точность расчёта никогда не должна зависеть от тарифа.
-
-The project targets future monetisation through a public demo, a Pro edition, print-shop licensing, custom deployment, and support. Calculation correctness must never depend on the pricing tier.
+Тиражи монтажей `1500`, `1100`, `450`, `345` — ручной контрольный вход, не результат оптимизатора.
 
 ## Лицензия / License
 
