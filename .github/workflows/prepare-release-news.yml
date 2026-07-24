@@ -9,6 +9,12 @@ on:
       - tools/news/prepare-release.mjs
       - tools/screenshots/**
       - .github/workflows/prepare-release-news.yml
+  pull_request:
+    paths:
+      - news/.prepare-release.json
+      - tools/news/prepare-release.mjs
+      - tools/screenshots/**
+      - .github/workflows/prepare-release-news.yml
 
 permissions:
   contents: write
@@ -19,46 +25,64 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      SCREENSHOT_COMMIT: ${{ github.sha }}
+      SCREENSHOT_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+      TARGET_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
     steps:
       - name: Checkout exact feature branch
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ env.TARGET_BRANCH }}
           persist-credentials: true
 
+      - name: Stop when marker is already consumed
+        id: marker
+        shell: bash
+        run: |
+          if [ -f news/.prepare-release.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node.js
+        if: steps.marker.outputs.exists == 'true'
         uses: actions/setup-node@v6
         with:
           node-version: "22"
 
       - name: Read release marker
+        if: steps.marker.outputs.exists == 'true'
         shell: bash
         run: |
           echo "SCREENSHOT_SCENARIOS=$(node --input-type=module -e \"import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('news/.prepare-release.json','utf8')); process.stdout.write(m.scenario)\")" >> "$GITHUB_ENV"
           echo "RELEASE_VERSION=$(node --input-type=module -e \"import fs from 'node:fs'; const m=JSON.parse(fs.readFileSync('news/.prepare-release.json','utf8')); process.stdout.write(m.version)\")" >> "$GITHUB_ENV"
 
       - name: Install pinned screenshot tooling
+        if: steps.marker.outputs.exists == 'true'
         working-directory: tools/screenshots
         run: npm install --package-lock=false --ignore-scripts --no-audit --no-fund
 
       - name: Install Chromium
+        if: steps.marker.outputs.exists == 'true'
         working-directory: tools/screenshots
         run: npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
 
       - name: Capture exact release screenshot
+        if: steps.marker.outputs.exists == 'true'
         working-directory: tools/screenshots
         run: npm run capture
 
       - name: Create patchnote and copy selected PNG
+        if: steps.marker.outputs.exists == 'true'
         run: node tools/news/prepare-release.mjs
 
       - name: Commit prepared news to feature branch
+        if: steps.marker.outputs.exists == 'true'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add news/
           git commit -m "news: prepare uImposition ${RELEASE_VERSION} patchnote"
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin HEAD:${TARGET_BRANCH}
