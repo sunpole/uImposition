@@ -1,0 +1,27 @@
+.production-report-panel > p { max-width: 960px; }
+.production-summary { margin-top: 20px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.production-summary .metric { min-height: 108px; }
+.production-metric-hint { display: block; margin-top: 6px; color: #666; font-size: .72rem; }
+.production-details { margin-top: 18px; border: 1px solid #b7b7b7; border-radius: 14px; background: #fafafa; overflow: hidden; }
+.production-details > summary { cursor: pointer; padding: 14px 16px; font-weight: 800; background: #f0f0f0; }
+.production-details[open] > summary { border-bottom: 1px solid #b7b7b7; }
+.production-details .table-wrap { margin: 0; border: 0; border-radius: 0; }
+.production-table { min-width: 760px; }
+.production-table--pairs { min-width: 1120px; }
+.production-table td,
+.production-table th { vertical-align: top; }
+.production-contributions { min-width: 300px; font-size: .78rem; line-height: 1.4; }
+.production-table .is-error,
+#productionStatus.is-error { font-weight: 900; }
+.production-report-panel .formula-card { margin-top: 20px; }
+
+@media (max-width: 820px) {
+  .production-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .production-summary .metric { min-height: 96px; }
+  .production-details > summary { padding: 12px; }
+}
+
+@media (max-width: 460px) {
+  .production-summary { grid-template-columns: 1fr; }
+  .production-summary .metric { min-height: auto; }
+}
