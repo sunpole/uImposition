@@ -25,6 +25,13 @@ for (const fileName of scenarioFiles) {
 
 if (scenarios.length === 0) throw new Error("No screenshot scenarios selected");
 
+function countPdfPages(bytes) {
+  const text = Buffer.from(bytes).toString("latin1");
+  if (!text.startsWith("%PDF-")) throw new Error("Downloaded file is not a PDF");
+  if (!text.includes("%%EOF")) throw new Error("Downloaded PDF has no EOF marker");
+  return (text.match(/\/Type\s*\/Page\b/g) ?? []).length;
+}
+
 for (const scenario of scenarios) {
   test(`capture ${scenario.id}`, async ({ page }) => {
     await page.setViewportSize(scenario.viewport);
@@ -34,6 +41,39 @@ for (const scenario of scenarios) {
       const locator = page.locator(assertion.selector);
       await expect(locator).toBeVisible();
       await expect(locator).toContainText(assertion.text);
+    }
+
+    let downloadEntry = null;
+    if (scenario.download) {
+      const [download] = await Promise.all([
+        page.waitForEvent("download", { timeout: 120000 }),
+        page.locator(scenario.download.selector).click(),
+      ]);
+      const failure = await download.failure();
+      if (failure) throw new Error(`Download failed: ${failure}`);
+
+      const suggestedFileName = download.suggestedFilename();
+      expect(suggestedFileName).toBe(scenario.download.fileName);
+      const artifactFileName = scenario.download.artifact || suggestedFileName;
+      const artifactPath = path.join(outputDir, artifactFileName);
+      await download.saveAs(artifactPath);
+
+      const bytes = await readFile(artifactPath);
+      const pageCount = countPdfPages(bytes);
+      expect(pageCount).toBe(scenario.download.expectedPages);
+
+      downloadEntry = {
+        suggestedFileName,
+        artifact: artifactFileName,
+        sizeBytes: bytes.length,
+        pageCount,
+      };
+
+      for (const assertion of scenario.afterDownloadAssertions ?? []) {
+        const locator = page.locator(assertion.selector);
+        await expect(locator).toBeVisible();
+        await expect(locator).toContainText(assertion.text);
+      }
     }
 
     const screenshotPath = path.join(outputDir, scenario.screenshot);
@@ -47,6 +87,7 @@ for (const scenario of scenarios) {
       viewport: scenario.viewport,
       screenshot: scenario.screenshot,
       assertions: scenario.assertions,
+      download: downloadEntry,
     };
 
     await writeFile(
