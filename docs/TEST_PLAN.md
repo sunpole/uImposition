@@ -32,6 +32,20 @@
 <li>русский и английский интерфейс показывают одинаковые числа.</li>
 </ul>
 
+<h3>M4: производственный отчёт</h3>
+<ul>
+<li>вклад пары равен числу её позиций, умноженному на тираж монтажа;</li>
+<li>сумма вкладов равна напечатанному количеству пары;</li>
+<li>недопечатка любой пары делает весь отчёт неготовым;</li>
+<li>перетираж пары равен <code>max(0, напечатано − требуется)</code>;</li>
+<li>готовый тираж файла равен минимальному напечатанному тиражу среди его пар;</li>
+<li>перетираж файла и суммарный перетираж его пар показываются отдельно;</li>
+<li>физическая бумага равна сумме тиражей монтажей;</li>
+<li>при чужом обороте число форм равно удвоенному числу монтажей;</li>
+<li>листопрогоны равны удвоенному количеству физических листов;</li>
+<li>неизвестная пара, повреждённое лицо/оборот и повторный ID монтажа блокируются.</li>
+</ul>
+
 </td>
 <td width="50%" valign="top">
 
@@ -63,6 +77,20 @@
 <li>Russian and English views preserve identical numbers.</li>
 </ul>
 
+<h3>M4: production report</h3>
+<ul>
+<li>a pair contribution equals its position count multiplied by the imposition run length;</li>
+<li>the sum of contributions equals the pair's produced quantity;</li>
+<li>underproduction of any pair makes the complete report unready;</li>
+<li>pair overrun equals <code>max(0, produced − required)</code>;</li>
+<li>complete-file production is the minimum produced quantity across its pairs;</li>
+<li>complete-file overrun and summed pair overrun are reported separately;</li>
+<li>physical sheets equal the sum of imposition run lengths;</li>
+<li>separate front/back forms use two forms per imposition;</li>
+<li>press passes equal twice the physical-sheet count;</li>
+<li>unknown pairs, damaged front/back layouts, and duplicate imposition IDs are rejected.</li>
+</ul>
+
 </td>
 </tr>
 </table>
@@ -78,7 +106,8 @@
 - 3395 физических листов / physical sheets;
 - 6790 листопрогонов / press passes;
 - недопечатка / underproduction: 0;
-- ручной перетираж / manual-reference overrun: 1450.
+- ручной перетираж по парам / manual-reference pair overrun: 1450;
+- перетираж готовых файлов / complete-file overrun: 930.
 
 Программный результат может быть лучше ручного ориентира, но не может нарушать жёсткие ограничения.
 
