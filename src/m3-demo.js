@@ -95,6 +95,7 @@ const ui = {
 const pdfExport = createPdfExportController({
   anchor: productionPanel,
   getRecords: () => state.records,
+  getReport: () => state.report,
   getSheetSize: () => {
     const size = state.controlCase?.verifiedM2?.postTrimSheet;
     return size ? { widthMm: size.width, heightMm: size.height } : null;
