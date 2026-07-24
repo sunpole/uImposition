@@ -2,6 +2,7 @@
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
 <p align="center"><strong>Текущая версия / Current version: 0.2.0-alpha</strong></p>
+<p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
 
 <table>
 <tr>
@@ -25,6 +26,16 @@ uImposition — браузерный инструмент для расчёта 
 - точные пары исходных страниц;
 - контрольный заказ из 20 файлов и 35 пар;
 - реальные скриншоты для Telegram через uNews.
+
+### Следующий этап
+
+M3 / `0.3.0-alpha`:
+
+- заполнение лицевых позиций сплошными блоками;
+- `ЛИСТ-N_ЛИЦО`;
+- автоматически зеркальный `ЛИСТ-N_ОБОРОТ`;
+- точные страницы и стрелки;
+- рамочные схемы для скриншотов.
 
 ### Цель проекта
 
@@ -56,6 +67,16 @@ uImposition is a browser-based tool for planning complex gang-run offset imposit
 - 20-file / 35-pair control dataset;
 - factual Telegram screenshots through uNews.
 
+### Next milestone
+
+M3 / `0.3.0-alpha`:
+
+- contiguous front-position blocks;
+- `SHEET-N_FRONT`;
+- automatically mirrored `SHEET-N_BACK`;
+- exact pages and direction arrows;
+- bordered screenshot-ready schemes.
+
 ### Project goal
 
 - calculate paper, plates/forms, overrun and press passes;
@@ -71,6 +92,8 @@ uImposition is a browser-based tool for planning complex gang-run offset imposit
 ## Открыть / Open
 
 - GitHub Pages: `https://sunpole.github.io/uImposition/`
+- [Начать или продолжить разработку / Start or continue development](START_HERE.md)
+- [Текущее состояние / Current state](docs/CURRENT_STATE.md)
 - [Текущая версия / Current version](VERSION.md)
 - [Полное ТЗ RU](docs/TECHNICAL_SPECIFICATION_RU.md)
 - [Full specification EN](docs/TECHNICAL_SPECIFICATION_EN.md)
@@ -79,6 +102,8 @@ uImposition is a browser-based tool for planning complex gang-run offset imposit
 
 | Русский | English |
 |---|---|
+| [GitHub-only разработка](docs/GITHUB_ONLY_DEVELOPMENT.md) | GitHub-only development — bilingual |
+| [План M3](docs/M3_IMPLEMENTATION_PLAN.md) | M3 implementation plan — bilingual |
 | [Алгоритм и оптимизация](docs/ALGORITHM_AND_OPTIMIZATION.md) | Algorithm and optimization — bilingual |
 | [Архитектура](docs/ARCHITECTURE.md) | Architecture — bilingual |
 | [Справочник конфигурации](docs/CONFIG_REFERENCE.md) | Configuration reference — bilingual |
@@ -88,6 +113,30 @@ uImposition is a browser-based tool for planning complex gang-run offset imposit
 | [Автоматизация скриншотов](docs/SCREENSHOT_AUTOMATION.md) | Screenshot automation — bilingual |
 | [Монетизация](docs/BUSINESS_MODEL.md) | Monetization — bilingual |
 
+## Как ведётся разработка / Development model
+
+GitHub — единственный источник истины. Основная разработка выполняется через ветки, Pull Request и GitHub Actions. Терминал, локальный clone и локальный ПК не обязательны и используются только для дополнительной проверки владельцем.
+
+GitHub is the single source of truth. Primary development uses branches, Pull Requests, and GitHub Actions. A terminal, local clone, and local computer are optional and may only be used by the owner for additional verification.
+
+Основной цикл / Primary cycle:
+
+```text
+GitHub audit
+→ feature branch
+→ pure modules and tests
+→ UI integration
+→ draft Pull Request
+→ GitHub Actions
+→ factual Chromium screenshots
+→ uNews validation
+→ merge to main
+→ Pages verification
+→ recovery branch
+```
+
+Подробно / Details: [`docs/GITHUB_ONLY_DEVELOPMENT.md`](docs/GITHUB_ONLY_DEVELOPMENT.md)
+
 ## Рабочие форматы после зачистки / Current post-trim presets
 
 `616×446` · `616×466` · `636×448` · `646×466` · `650×313` · `716×326` · `716×336` · `716×516` мм
@@ -96,13 +145,19 @@ uImposition is a browser-based tool for planning complex gang-run offset imposit
 
 Sheet trimming and non-printable press margins are separate stages. An `afterTrim` preset must never be trimmed twice.
 
-## Проверка / Checks
+## Проверка / Verification
+
+Основная проверка выполняется автоматически в GitHub Actions. Локальные команды являются необязательными и не должны быть условием продолжения разработки.
+
+Primary verification runs in GitHub Actions. Local commands are optional and must not be a prerequisite for continued development.
+
+Необязательная локальная проверка / Optional local verification:
 
 ```bash
 npm run check
 ```
 
-Скриншоты:
+Необязательные локальные скриншоты / Optional local screenshots:
 
 ```bash
 cd tools/screenshots
@@ -122,9 +177,13 @@ npm run capture
 
 Ручной ориентир будущего оптимизатора остаётся отдельным и ещё не считается доказанным глобальным минимумом.
 
+The manual future-optimizer reference remains separate and is not treated as a proven global optimum.
+
 ## Коммерческое направление / Commercial direction
 
 Проект нацелен на будущую монетизацию: публичная демонстрация, Pro-версия, лицензии для типографий, индивидуальное внедрение и поддержка. Точность расчёта никогда не должна зависеть от тарифа.
+
+The project targets future monetisation through a public demo, a Pro edition, print-shop licensing, custom deployment, and support. Calculation correctness must never depend on the pricing tier.
 
 ## Лицензия / License
 
