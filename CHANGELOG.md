@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased — documentation handoff
+
+### Added
+
+- root `START_HERE.md` entry point for a new ChatGPT conversation or device;
+- exact current-state record in `docs/CURRENT_STATE.md`;
+- GitHub-only development workflow that does not depend on a local clone or terminal;
+- modular M3 implementation plan with explicit module boundaries, control layouts, and acceptance tests;
+- copy-ready prompt for continuing development from a new chat using GitHub only.
+
+### Changed
+
+- `AGENTS.md` now requires GitHub-first auditing and prohibits relying on chat memory or local files;
+- README now exposes the continuation entry point and distinguishes primary GitHub Actions verification from optional local checks;
+- roadmap now marks M2 complete and M3 as the active next milestone.
+
+### Version
+
+- project runtime version remains `0.2.0-alpha`;
+- this documentation patch does not claim M3 functionality or change the product version.
+
 ## 0.2.0-alpha — 2026-07-24
 
 ### Added
