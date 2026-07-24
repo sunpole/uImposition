@@ -87,6 +87,8 @@
 | [Справочник конфигурации](docs/CONFIG_REFERENCE.md) | Configuration reference — bilingual document |
 | [План тестирования](docs/TEST_PLAN.md) | Test plan — two-column document |
 | [Дорожная карта](docs/ROADMAP.md) | Roadmap — two-column document |
+| [Монетизация](docs/BUSINESS_MODEL.md) | Monetization — two-column document |
+| [Оформление репозитория](docs/REPOSITORY_SETUP.md) | Repository metadata — two-column document |
 | [GitHub Pages](docs/GITHUB_PAGES.md) | GitHub Pages — two-column document |
 
 ## Рабочие форматы после зачистки / Current post-trim presets
@@ -109,10 +111,22 @@ All editable values must come from a central `src/config.js`. The initial model 
 
 [`data/control-case.json`](data/control-case.json): 20 files, 35 print pairs, manual reference of 4 impositions / 8 plates / 3395 physical sheets / zero underproduction.
 
+## Коммерческое направление / Commercial direction
+
+Проект нацелен на будущую монетизацию: публичная демонстрация, Pro-версия, лицензии для типографий, индивидуальное внедрение и поддержка. Точность расчёта никогда не должна зависеть от тарифа.
+
+The project is intended for future commercialization through a public demonstration, Pro edition, print-shop licensing, custom implementation and support. Calculation correctness must never depend on the selected plan.
+
 ## GitHub Pages
 
 `https://sunpole.github.io/uImposition/`
 
+Источник публикации: `main` → `/(root)`.
+
+Publication source: `main` → `/(root)`.
+
 ## Лицензия / License
 
-Copyright © 2026 Anton Magomedov. All rights reserved. См. [`LICENSE.md`](LICENSE.md).
+**Proprietary / All rights reserved.** Коммерческое использование требует отдельного письменного разрешения. См. [`LICENSE.md`](LICENSE.md).
+
+Commercial use requires a separate written agreement. See [`LICENSE.md`](LICENSE.md).
