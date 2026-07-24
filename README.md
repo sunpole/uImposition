@@ -73,9 +73,11 @@
 
 ## Текущий статус / Current status
 
-**0.0.1-docs** — репозиторий, двуязычное ТЗ, архитектура, конфигурационная модель, контрольный набор и стартовая страница GitHub Pages. Рабочий оптимизатор ещё не реализован.
+**`0.0.2-docs` — M0.** Репозиторий, двуязычное ТЗ, архитектура, конфигурационная модель, контрольный набор, правила версионирования и стартовая страница GitHub Pages готовы. Рабочий оптимизатор ещё не реализован.
 
-**0.0.1-docs** — repository bootstrap, bilingual specification, architecture, configuration model, control dataset and initial GitHub Pages landing page. The production optimizer is not implemented yet.
+**`0.0.2-docs` — M0.** Repository bootstrap, bilingual specification, architecture, configuration model, control dataset, versioning rules and initial GitHub Pages landing page are complete. The production optimizer is not implemented yet.
+
+Следующая цель / Next target: **`0.1.0-alpha` — M1**.
 
 ## Документация / Documentation
 
@@ -87,9 +89,18 @@
 | [Справочник конфигурации](docs/CONFIG_REFERENCE.md) | Configuration reference — bilingual document |
 | [План тестирования](docs/TEST_PLAN.md) | Test plan — two-column document |
 | [Дорожная карта](docs/ROADMAP.md) | Roadmap — two-column document |
+| [Версия проекта](VERSION.md) | Human-readable version status |
+| [Правила версионирования](docs/VERSIONING.md) | Versioning policy — two-column document |
 | [Монетизация](docs/BUSINESS_MODEL.md) | Monetization — two-column document |
 | [Оформление репозитория](docs/REPOSITORY_SETUP.md) | Repository metadata — two-column document |
 | [GitHub Pages](docs/GITHUB_PAGES.md) | GitHub Pages — two-column document |
+
+## Система версии / Version system
+
+- [`VERSION.json`](VERSION.json) — машинный источник текущей версии;
+- [`VERSION.md`](VERSION.md) — понятное состояние проекта;
+- [`CHANGELOG.md`](CHANGELOG.md) — история изменений;
+- [`docs/VERSIONING.md`](docs/VERSIONING.md) — правила повышения и синхронизации версии.
 
 ## Рабочие форматы после зачистки / Current post-trim presets
 
