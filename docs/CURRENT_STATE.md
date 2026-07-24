@@ -11,64 +11,60 @@ Last updated: **24 July 2026**
 
 ### Версия и ветки
 
-- `main`: **`0.4.0-alpha`**;
-- M4 объединён через PR №6;
-- merge commit: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`;
-- завершённые этапы: M0–M4;
-- следующая задача: M5;
-- следующая версия: `0.5.0-alpha`;
-- точки отката: `release/v0.1.0-alpha`, `release/v0.2.0-alpha`, `release/v0.3.0-alpha`, `release/v0.4.0-alpha`.
+- `main`: `0.4.0-alpha`, стабильная точка M4;
+- релиз-кандидат: `m5/0.5.0-alpha`, PR №8;
+- версия кандидата: **`0.5.0-alpha`**;
+- завершённые функциональные этапы в кандидате: M0–M5;
+- следующая задача после merge: M6;
+- следующая версия: `0.6.0-alpha`;
+- существующие точки отката заканчиваются `release/v0.4.0-alpha`;
+- после merge создаётся `release/v0.5.0-alpha`.
 
-### Что реально работает
+### Что реально работает в кандидате M5
 
-1. Геометрия листа, зачистка и непечатные поля.
-2. Формат изделия, выпуск, общий и раздельный рез.
-3. Сетки 0°/90° и максимальная вместимость.
-4. Ввод 20 заказов и 35 точных пар страниц.
-5. Четыре лица и четыре автоматически зеркальных оборота.
-6. Проверка файла, pair-id, страниц, координат и направлений.
-7. Напечатанное количество каждой пары и объяснимые вклады монтажей.
-8. Недопечатка и перетираж каждой пары.
-9. Готовый тираж и перетираж каждого файла.
-10. Отдельные суммы перетиража пар и готовых файлов.
-11. Физическая бумага, лицевые/оборотные формы и листопрогоны.
-12. Независимая проверка всего производственного отчёта.
-13. Адаптивная сводка, таблица 20 файлов и детализация 35 пар.
-14. Node-тесты, desktop/mobile Chromium, новый PNG и патчноут uNews.
+1. Весь проверенный функционал M1–M4.
+2. Чистая модель страниц схем и отдельного отчёта.
+3. Детерминированный порядок `ЛИЦО → ОБОРОТ` для каждого монтажа.
+4. Четыре монтажа дают ровно восемь страниц схем.
+5. A4, пропорциональный и пользовательский режимы страниц схем.
+6. Отдельный шестистраничный PDF производственного отчёта.
+7. Canvas-отрисовка кириллицы, стрелок, метрик и таблиц.
+8. Собственный PDF 1.4 writer без внешних runtime-зависимостей.
+9. Прямое скачивание двух PDF из браузера.
+10. Playwright проверяет имя, заголовок, EOF и число Page-объектов.
+11. `pdfinfo` проверяет документ, Poppler рендерит каждую страницу в PNG.
+12. Ручная визуальная проверка всех 14 страниц.
 
-### Проверенный результат M4
+### Проверенный результат M5
 
-- монтажи: `4`, тиражи `1500`, `1100`, `450`, `345`;
-- физическая бумага: `3395`;
-- формы: `4 + 4 = 8`;
-- листопрогоны: `6790`;
-- недопечатка: `0`;
-- требуемое/напечатанное по парам: `52870 / 54320`;
-- перетираж пар: `1450`;
-- требуемое/полностью собранное по файлам: `29225 / 30155`;
-- перетираж готовых файлов: `930`.
+- `uImposition-schemes.pdf`: A4, `8` страниц, одна схема на страницу;
+- порядок страниц: 1 лицо, 1 оборот, 2 лицо, 2 оборот и далее;
+- `uImposition-production-report.pdf`: A4, `6` страниц;
+- отчёт: 1 сводка, 2 страницы файлов, 3 страницы пар;
+- все 14 страниц прочитаны и отрендерены Poppler;
+- кириллица, стрелки, номера страниц и длинные вклады читаются;
+- обрезка, наложение заголовков, чёрные квадраты и сломанные глифы отсутствуют.
 
-Тиражи монтажей являются ручным контрольным входом. Автоматическая оптимизация ещё не реализована.
+### Архитектура M5
 
-### Архитектура
-
-- `production-metrics.js` — чистая производственная арифметика;
-- `production-validation.js` — независимая проверка и запрет недопечатки;
-- `production-report.js` — готовая модель отчёта;
-- `production-report-renderer.js` — только DOM-отображение;
-- `docs/M4_RELEASE_EVIDENCE.md` — provenance скриншотов и uNews.
+- `pdf-document-model.js` — чистая логическая модель документов;
+- `pdf-binary.js` — dependency-free PDF-контейнер;
+- `pdf-scheme-renderer.js` — Canvas-renderer схем;
+- `pdf-report-renderer.js` — Canvas-renderer отчёта и пагинация;
+- `pdf-export-ui.js` — только браузерные контролы и скачивание;
+- `.github/workflows/capture-screenshots.yml` — Chromium, `pdfinfo`, Poppler и artifact.
 
 ### Чего ещё нет
 
-- автоматического подбора тиражей монтажей;
+- автоматического подбора тиражей;
 - генерации и сравнения альтернатив;
+- доказанного минимума бумаги;
 - смешанных ориентаций;
-- PDF-экспорта;
 - постоянного хранения полного проекта.
 
-### Следующий безопасный шаг — M5
+### Следующий безопасный шаг — M6
 
-Создать ветку `m5/0.5.0-alpha`. Сначала чистая модель PDF и тесты: одна схема на страницу, детерминированный порядок восьми схем и отдельный производственный отчёт. Затем генерация PDF и UI.
+После завершения PR №8 создать `m6/0.6.0-alpha`. Начать с чистой модели кандидата монтажа и расчёта минимального допустимого тиража без недопечатки. Затем генерировать альтернативы и сравнивать физическую бумагу.
 
 </td>
 <td width="50%" valign="top">
@@ -77,27 +73,21 @@ Last updated: **24 July 2026**
 
 ### Version and branches
 
-- `main`: **`0.4.0-alpha`**;
-- M4 merged through PR #6;
-- merge commit: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`;
-- completed milestones: M0–M4;
-- next milestone: M5;
-- next version: `0.5.0-alpha`;
-- rollback points include `release/v0.4.0-alpha`.
+- `main`: `0.4.0-alpha`, verified M4 checkpoint;
+- release candidate: `m5/0.5.0-alpha`, PR #8;
+- candidate version: **`0.5.0-alpha`**;
+- completed functional milestones in the candidate: M0–M5;
+- next milestone after merge: M6;
+- next version: `0.6.0-alpha`;
+- `release/v0.5.0-alpha` is created after merge.
 
-### What actually works
+### What actually works in M5
 
-Sheet/product geometry, exact page pairs, four validated fronts and mirrored backs, pair/file production totals, hard underproduction rejection, separate pair/file overrun, physical sheets, front/back forms, press passes, independent report validation, responsive reporting, Node tests, factual Chromium evidence, and uNews assets.
+A pure PDF document model, deterministic eight-page scheme output, a separate six-page report, A4/proportional/custom scheme modes, Canvas rasterisation, a dependency-free PDF writer, browser downloads, Playwright structure checks, `pdfinfo`, Poppler page rendering, and manual review of all fourteen pages.
 
-### Verified M4 result
+### Next safe step — M6
 
-Physical sheets `3395`; forms `8`; press passes `6790`; underproduction `0`; pair overrun `1450`; complete-file overrun `930`.
-
-The explicit run lengths remain manual control input. Automatic optimization is not implemented.
-
-### Next safe step — M5
-
-Create `m5/0.5.0-alpha`. First implement a pure PDF-page model and tests for one scheme per page, deterministic ordering of all eight schemes, and a separate production report. Integrate PDF generation afterward.
+After PR #8, create `m6/0.6.0-alpha`. Start with a pure candidate model and minimum valid run-length calculation, then generate alternatives and compare physical paper.
 
 </td>
 </tr>
