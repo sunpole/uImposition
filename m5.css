@@ -1,18 +1,19 @@
 .pdf-export-panel > p { max-width: 900px; }
-.pdf-export-controls { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(260px, 1fr) auto; gap: 16px; align-items: end; margin-top: 20px; }
+.pdf-export-controls { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(260px, 1fr) minmax(220px, .9fr); gap: 16px; align-items: end; margin-top: 20px; }
 .pdf-export-controls > .field { margin: 0; }
 .pdf-custom-size { margin: 0; }
 .pdf-custom-size[hidden] { display: none; }
-.pdf-export-panel .button { min-height: 44px; }
+.pdf-export-actions { display: grid; gap: 10px; }
+.pdf-export-panel .button { min-height: 44px; width: 100%; }
 .pdf-export-panel .formula-card { margin-top: 20px; }
 
 @media (max-width: 900px) {
   .pdf-export-controls { grid-template-columns: 1fr 1fr; }
-  .pdf-export-controls .button { grid-column: 1 / -1; }
+  .pdf-export-actions { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 560px) {
   .pdf-export-controls { grid-template-columns: 1fr; }
   .pdf-custom-size { grid-template-columns: 1fr 1fr; }
-  .pdf-export-controls .button { grid-column: auto; width: 100%; }
+  .pdf-export-actions { grid-column: auto; grid-template-columns: 1fr; }
 }
