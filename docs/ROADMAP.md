@@ -4,66 +4,154 @@
 <tr>
 <td width="50%" valign="top">
 
-<h2>Русский</h2>
+## Русский
 
-<h3>M0 — Репозиторий и ТЗ</h3>
-<ul><li>двуязычная документация;</li><li>GitHub Pages;</li><li>контрольный набор;</li><li>единая конфигурационная модель.</li></ul>
+### M0 — завершён
 
-<h3>M1 — Конфигурация и ввод</h3>
-<ul><li><code>config.js</code>;</li><li>панель настроек;</li><li>ввод заказов;</li><li>JSON import/export;</li><li>RU/EN интерфейс.</li></ul>
+- репозиторий и GitHub Pages;
+- двуязычное ТЗ;
+- лицензия и коммерческое направление;
+- версия и контрольный набор.
 
-<h3>M2 — Геометрия и пары страниц</h3>
-<ul><li>зачистка;</li><li>поля;</li><li>вместимость;</li><li>поворот;</li><li>печатные пары;</li><li>модульные тесты.</li></ul>
+### M1 — `0.1.0-alpha`, рабочая версия
 
-<h3>M3 — Лицо и оборот</h3>
-<ul><li>модель лица;</li><li>автоматическое зеркало;</li><li>стрелки;</li><li>проверки;</li><li>схемы в рамках.</li></ul>
+- центральный `config.js`;
+- панель настроек;
+- реальные пресеты;
+- зачистка и поля;
+- ввод заказов;
+- подсчёт печатных пар;
+- RU/EN;
+- тесты;
+- реальные release screenshots;
+- интеграция uNews.
 
-<h3>M4 — Тиражи и отчёт</h3>
-<ul><li>напечатано;</li><li>недопечатка;</li><li>перетираж;</li><li>формы;</li><li>бумага;</li><li>листопрогоны.</li></ul>
+### M2 — вместимость изделия
 
-<h3>M5 — PDF</h3>
-<ul><li>одна схема на страницу;</li><li>A4 и пропорциональный режим;</li><li>отдельный PDF отчёта.</li></ul>
+- формат изделия и выпуск;
+- зазор/общий рез;
+- размещение 0° и 90°;
+- строки, столбцы и число позиций;
+- выбор лучшей сетки.
 
-<h3>M6 — Минимум бумаги</h3>
-<ul><li>генерация кандидатов;</li><li>подбор тиражей;</li><li>объяснение разделённых заказов.</li></ul>
+### M3 — страницы, лицо и оборот
 
-<h3>M7 — Несколько целей</h3>
-<ul><li>минимум форм;</li><li>минимум перетиража;</li><li>иерархия пользователя;</li><li>набор Парето.</li></ul>
+- пары `1/2`, `3/4`, `5/-`;
+- заполнение лица;
+- автоматическое зеркало;
+- стрелки;
+- схемы с рамками.
 
-<h3>M8 — Производственный релиз</h3>
-<ul><li>реальные проверки;</li><li>граничные случаи;</li><li>руководство пользователя;</li><li>релиз 1.0.0.</li></ul>
+### M4 — тиражи и отчёт
+
+- напечатано;
+- недопечатка;
+- перетираж;
+- формы;
+- бумага;
+- листопрогоны.
+
+### M5 — PDF
+
+- одна схема на страницу;
+- A4 и пропорциональный режим;
+- отдельный PDF отчёта.
+
+### M6 — минимум бумаги
+
+- генерация кандидатов;
+- подбор тиражей;
+- объяснение разделённых заказов.
+
+### M7 — несколько целей
+
+- минимум форм;
+- минимум перетиража;
+- иерархия пользователя;
+- набор Парето.
+
+### M8 — production `1.0.0`
+
+- реальные производственные проверки;
+- граничные случаи;
+- руководство;
+- стабильный GitHub Release.
 
 </td>
 <td width="50%" valign="top">
 
-<h2>English</h2>
+## English
 
-<h3>M0 — Repository and specification</h3>
-<ul><li>bilingual documentation;</li><li>GitHub Pages;</li><li>control dataset;</li><li>central configuration model.</li></ul>
+### M0 — complete
 
-<h3>M1 — Configuration and input</h3>
-<ul><li><code>config.js</code>;</li><li>settings panel;</li><li>job entry;</li><li>JSON import/export;</li><li>RU/EN interface.</li></ul>
+- repository and GitHub Pages;
+- bilingual specification;
+- licensing and commercial direction;
+- versioning and control dataset.
 
-<h3>M2 — Geometry and page pairs</h3>
-<ul><li>sheet trim;</li><li>press margins;</li><li>capacity;</li><li>rotation;</li><li>print pairs;</li><li>unit tests.</li></ul>
+### M1 — `0.1.0-alpha`, working
 
-<h3>M3 — Front and back</h3>
-<ul><li>front model;</li><li>automatic mirroring;</li><li>arrows;</li><li>validation;</li><li>bordered schemes.</li></ul>
+- central `config.js`;
+- settings panel;
+- real presets;
+- trim and margins;
+- order input;
+- print-pair totals;
+- RU/EN;
+- tests;
+- factual release screenshots;
+- uNews integration.
 
-<h3>M4 — Runs and reporting</h3>
-<ul><li>produced quantity;</li><li>underproduction;</li><li>overrun;</li><li>plates;</li><li>paper;</li><li>press passes.</li></ul>
+### M2 — product capacity
 
-<h3>M5 — PDF</h3>
-<ul><li>one scheme per page;</li><li>A4 and proportional modes;</li><li>separate report PDF.</li></ul>
+- finished size and bleed;
+- gap/common cut;
+- 0° and 90° placement;
+- rows, columns and position count;
+- best-grid selection.
 
-<h3>M6 — Paper minimization</h3>
-<ul><li>candidate generation;</li><li>run-length assignment;</li><li>split-job explanations.</li></ul>
+### M3 — pages, front and back
 
-<h3>M7 — Multiple objectives</h3>
-<ul><li>minimum plates;</li><li>minimum overrun;</li><li>user hierarchy;</li><li>Pareto set.</li></ul>
+- `1/2`, `3/4`, `5/-` pairs;
+- front filling;
+- automatic mirror;
+- head-direction arrows;
+- bordered schemes.
 
-<h3>M8 — Production release</h3>
-<ul><li>real-job review;</li><li>edge cases;</li><li>user guide;</li><li>1.0.0 release.</li></ul>
+### M4 — runs and reporting
+
+- produced quantity;
+- underproduction;
+- overrun;
+- plates;
+- paper;
+- press passes.
+
+### M5 — PDF
+
+- one scheme per page;
+- A4 and proportional modes;
+- separate report PDF.
+
+### M6 — paper minimization
+
+- candidate generation;
+- run assignment;
+- split-job explanations.
+
+### M7 — multiple objectives
+
+- minimum plates;
+- minimum overrun;
+- user hierarchy;
+- Pareto set.
+
+### M8 — production `1.0.0`
+
+- real production validation;
+- edge cases;
+- user guide;
+- stable GitHub Release.
 
 </td>
 </tr>

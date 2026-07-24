@@ -1,0 +1,67 @@
+name: Capture uImposition screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenarios:
+        description: Optional comma-separated scenario IDs; empty runs all scenarios
+        required: false
+        type: string
+  pull_request:
+    paths:
+      - index.html
+      - styles.css
+      - VERSION.json
+      - src/**
+      - data/**
+      - tools/screenshots/**
+      - .github/workflows/capture-screenshots.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    name: Real Chromium screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      SCREENSHOT_SCENARIOS: ${{ inputs.scenarios || '' }}
+      SCREENSHOT_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tools/screenshots/package-lock.json
+
+      - name: Install pinned screenshot dependencies
+        working-directory: tools/screenshots
+        run: npm ci
+
+      - name: Install Chromium and system dependencies
+        working-directory: tools/screenshots
+        run: npx playwright install --with-deps chromium
+
+      - name: Capture factual screenshots
+        working-directory: tools/screenshots
+        run: npm run capture
+
+      - name: Show screenshot manifest
+        if: ${{ !cancelled() }}
+        run: cat artifacts/screenshots/manifest.json
+
+      - name: Upload screenshot artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: uimposition-screenshots-${{ github.event.pull_request.number || github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/screenshots/
+          if-no-files-found: error
+          retention-days: 30

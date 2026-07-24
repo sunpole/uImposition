@@ -1,0 +1,13 @@
+{
+  "id": "m1-trim-mobile",
+  "path": "/?demo=control",
+  "viewport": { "width": 430, "height": 932 },
+  "expectedTexts": [
+    "uImposition",
+    "v0.1.0-alpha",
+    "После зачистки",
+    "616 × 446 mm"
+  ],
+  "screenshot": "uimposition-v0-1-0-alpha-m1-mobile.png",
+  "fullPage": true
+}

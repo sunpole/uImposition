@@ -1,0 +1,17 @@
+{
+  "id": "m1-trim-desktop",
+  "path": "/?demo=control",
+  "viewport": { "width": 1440, "height": 1050 },
+  "expectedTexts": [
+    "uImposition",
+    "v0.1.0-alpha",
+    "После зачистки",
+    "616 × 446 mm",
+    "Печатная область",
+    "608 × 431 mm",
+    "20",
+    "35"
+  ],
+  "screenshot": "uimposition-v0-1-0-alpha-m1-desktop.png",
+  "fullPage": true
+}
