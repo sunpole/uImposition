@@ -6,142 +6,94 @@
 
 ## Русский
 
-### Назначение
-
-Система версий должна в любой момент ясно отвечать на четыре вопроса:
-
-1. какая версия является текущей;
-2. что в ней уже работает;
-3. что ещё не реализовано;
-4. какой этап разрабатывается следующим.
-
 ### Источники истины
 
-- `VERSION.json` — машинный источник текущей версии и статуса;
-- `VERSION.md` — краткое понятное человеку описание;
-- `CHANGELOG.md` — полная история изменений;
-- Git-тег — зафиксированный публичный релиз.
+- `VERSION.json` — машинная версия и статус;
+- `VERSION.md` — состояние для человека;
+- `CHANGELOG.md` — история;
+- `package.json` — техническая версия JavaScript-проекта;
+- recovery-ветка `release/v{version}` — точка отката;
+- GitHub Release и tag — публичная стабильная версия.
 
-### Формат версии
-
-Используется формат:
+### Формат
 
 `MAJOR.MINOR.PATCH[-CHANNEL]`
 
-Примеры:
-
-- `0.0.2-docs` — документационная подготовка;
-- `0.1.0-alpha` — первая неполная рабочая версия;
-- `0.1.0-beta` — функциональность собрана, продолжается проверка;
-- `0.1.0-rc.1` — кандидат в релиз;
-- `1.0.0` — первый стабильный производственный релиз.
-
-### Когда повышать номер
-
-- `PATCH` — исправления, документация и небольшие совместимые улучшения;
-- `MINOR` — новый законченный функциональный этап;
-- `MAJOR` — несовместимое изменение формата данных, расчётов или публичного API.
-
-Исправление опечатки без изменения смысла может не повышать версию, но должно попасть в историю коммитов. Изменение требований, алгоритма, структуры данных или пользовательского поведения требует повышения версии.
-
-### Каналы
-
-- `docs` — ТЗ и подготовка проекта без рабочего продукта;
-- `alpha` — функциональность неполная и может изменяться;
-- `beta` — основная функциональность готова, требуется широкая проверка;
-- `rc.N` — кандидат на стабильный релиз;
+- `docs` — документация без рабочего продукта;
+- `alpha` — работающая, но неполная версия;
+- `beta` — основная функциональность собрана;
+- `rc.N` — кандидат;
 - без суффикса — стабильный релиз.
 
 ### Обязательная синхронизация
 
-При каждом изменении версии один патч должен обновить:
+При изменении версии один патч обновляет:
 
 1. `VERSION.json`;
 2. `VERSION.md`;
 3. `CHANGELOG.md`;
-4. видимую версию сайта, когда она появится;
-5. `package.json`, если он будет добавлен;
-6. релиз и тег, если версия публикуется как релиз.
+4. `package.json`;
+5. видимую версию сайта.
 
-### Проверка перед завершением патча
+### Стабильная точка
 
-- версии во всех файлах совпадают;
-- дата и этап совпадают;
-- `VERSION.md` не обещает неготовую функцию;
-- `CHANGELOG.md` описывает фактические изменения;
-- `VERSION.json` является корректным JSON;
-- следующая целевая версия указана явно.
+Каждая версия, признанная стабильной для отката, получает:
+
+1. успешные тесты;
+2. ручную проверку сайта;
+3. новый реальный screenshot;
+4. recovery-ветку `release/v{version}`;
+5. tag `v{version}`;
+6. GitHub Release с кратким описанием и ссылкой на патчноут.
+
+Создание ветки не равно созданию Release. Нельзя сообщать о релизе, пока GitHub Release фактически не существует.
 
 </td>
 <td width="50%" valign="top">
 
 ## English
 
-### Purpose
-
-The versioning system must always answer four questions clearly:
-
-1. which version is current;
-2. what already works;
-3. what is not implemented yet;
-4. which milestone comes next.
-
 ### Sources of truth
 
-- `VERSION.json` — machine-readable current version and status;
-- `VERSION.md` — concise human-readable project state;
-- `CHANGELOG.md` — complete version history;
-- Git tag — immutable public release marker.
+- `VERSION.json` — machine-readable version and status;
+- `VERSION.md` — human-readable state;
+- `CHANGELOG.md` — history;
+- `package.json` — JavaScript package version;
+- `release/v{version}` — rollback branch;
+- GitHub Release and tag — public stable release.
 
-### Version format
-
-The project uses:
+### Format
 
 `MAJOR.MINOR.PATCH[-CHANNEL]`
 
-Examples:
-
-- `0.0.2-docs` — documentation bootstrap;
-- `0.1.0-alpha` — first incomplete working version;
-- `0.1.0-beta` — feature-complete milestone under validation;
-- `0.1.0-rc.1` — release candidate;
-- `1.0.0` — first stable production release.
-
-### Version increments
-
-- `PATCH` — fixes, documentation and small compatible improvements;
-- `MINOR` — a completed new functional milestone;
-- `MAJOR` — incompatible changes to data formats, calculation rules or public API.
-
-A wording-only typo correction may keep the same version, but remains visible in commit history. Changes to requirements, algorithms, data structures or user-visible behavior require a version increment.
-
-### Channels
-
-- `docs` — specification and setup without a working product;
-- `alpha` — incomplete and changeable functionality;
-- `beta` — core functionality complete but still under broad validation;
+- `docs` — documentation-only setup;
+- `alpha` — working but incomplete;
+- `beta` — core functionality assembled;
 - `rc.N` — release candidate;
 - no suffix — stable release.
 
 ### Mandatory synchronization
 
-Whenever the version changes, one patch must update:
+A version change updates in one patch:
 
 1. `VERSION.json`;
 2. `VERSION.md`;
 3. `CHANGELOG.md`;
-4. the visible website version once implemented;
-5. `package.json` if introduced;
-6. the release and tag when publishing a formal release.
+4. `package.json`;
+5. the visible website version.
 
-### Patch completion check
+### Stable checkpoint
 
-- all version values match;
-- date and milestone match;
-- `VERSION.md` does not claim unfinished functionality;
-- `CHANGELOG.md` describes actual changes;
-- `VERSION.json` is valid JSON;
-- the next target version is explicit.
+Every version accepted as a rollback-safe stable checkpoint receives:
+
+1. passing tests;
+2. manual website review;
+3. a new factual screenshot;
+4. `release/v{version}` recovery branch;
+5. `v{version}` tag;
+6. GitHub Release with concise notes and patchnote link.
+
+A branch is not a GitHub Release. Never report a release as created until it actually exists.
 
 </td>
 </tr>

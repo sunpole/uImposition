@@ -1,0 +1,53 @@
+name: Validate uNews patchnotes
+
+on:
+  pull_request:
+    paths:
+      - news/**
+      - .github/workflows/validate-unews.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout uImposition
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Checkout current uNews validator
+        uses: actions/checkout@v5
+        with:
+          repository: sunpole/uNews
+          path: .unews-validator
+          persist-credentials: false
+
+      - name: Run uNews tests
+        working-directory: .unews-validator
+        run: npm test
+
+      - name: Dry-run every prepared uImposition patchnote
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(news/*.md)
+          checked=0
+          for file in "${files[@]}"; do
+            if [ "$(basename "$file")" = "README.md" ]; then
+              continue
+            fi
+            node .unews-validator/scripts/publish-from-projects.js "$file" --check
+            checked=$((checked + 1))
+          done
+          if [ "$checked" -eq 0 ]; then
+            echo "No uImposition patchnotes found" >&2
+            exit 1
+          fi
+          echo "Validated $checked uImposition patchnote(s) with current uNews"

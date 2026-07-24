@@ -1,0 +1,17 @@
+{
+  "name": "uimposition-screenshot-tools",
+  "version": "0.1.0-alpha.0",
+  "private": true,
+  "type": "module",
+  "description": "Isolated Playwright tooling for factual uImposition release screenshots.",
+  "scripts": {
+    "capture": "node prepare-artifacts.mjs && playwright test --config=playwright.config.mjs",
+    "capture:list": "playwright test --config=playwright.config.mjs --list"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

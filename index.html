@@ -3,73 +3,220 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="uImposition — расчёт сложных офсетных монтажей / offset imposition planning">
-  <title>uImposition</title>
+  <meta name="description" content="uImposition — профессиональный расчёт офсетных монтажей / professional offset imposition planning">
+  <title>uImposition · v0.1.0-alpha</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="hero">
     <nav class="nav" aria-label="Основная навигация">
-      <strong>uImposition</strong>
-      <button id="languageButton" type="button" aria-label="Switch language">EN</button>
+      <a class="brand" href="./" aria-label="uImposition — главная страница">
+        <span class="brand__name">uImposition</span>
+        <span class="brand__version">v<span data-project-version>0.1.0-alpha</span></span>
+      </a>
+      <button id="languageButton" class="language-button" type="button" aria-label="Switch to English">EN</button>
     </nav>
 
     <div class="hero__content" data-lang="ru">
       <p class="eyebrow">Проектирование офсетных монтажей</p>
-      <h1>Проверяемая раскладка лица и оборота</h1>
-      <p>Будущий браузерный инструмент для расчёта бумаги, форм, перетиража и точных схем с номером файла, страницей и стрелкой ориентации.</p>
+      <h1>Сначала точный лист. Затем — оптимальная раскладка.</h1>
+      <p>Первая рабочая версия считает зачистку листа, непечатные поля и структуру заказов. Следующие этапы добавят монтажи, обороты, варианты оптимизации и PDF.</p>
     </div>
 
     <div class="hero__content" data-lang="en" hidden>
       <p class="eyebrow">Offset imposition planning</p>
-      <h1>Verifiable front and back placement schemes</h1>
-      <p>A planned browser tool for paper, plate, overrun and exact cell-level scheme calculation with file, page and head-direction data.</p>
+      <h1>First, establish the exact sheet. Then optimize the imposition.</h1>
+      <p>The first working version calculates sheet trim, non-printable press margins and order structure. Later stages will add impositions, backs, optimization alternatives and PDF output.</p>
     </div>
   </header>
 
-  <main>
-    <section class="panel" data-lang="ru">
-      <h2>Что будет выдавать программа</h2>
-      <div class="scheme-preview">
-        <div class="scheme-preview__title">ЛИСТ-1_ЛИЦО · 1500 листов</div>
-        <div class="grid">
-          <div>33,1 →</div><div>33,1 →</div><div>33,3 →</div><div>70,1 →</div>
-          <div>25,1 →</div><div>25,3 →</div><div>97,1 →</div><div>97,3 →</div>
+  <aside id="settingsPanel" class="settings-panel" aria-label="Настройки листа">
+    <button id="settingsToggle" class="settings-toggle" type="button" aria-expanded="true" title="Свернуть или открыть настройки">
+      <span aria-hidden="true">◉</span>
+      <span class="settings-toggle__text" data-lang="ru">Настройки листа</span>
+      <span class="settings-toggle__text" data-lang="en" hidden>Sheet settings</span>
+    </button>
+
+    <div class="settings-panel__content">
+      <label class="field">
+        <span data-lang="ru">Формат</span>
+        <span data-lang="en" hidden>Preset</span>
+        <select id="sheetPreset"></select>
+      </label>
+
+      <div class="field-grid">
+        <label class="field">
+          <span data-lang="ru">Ширина, мм</span>
+          <span data-lang="en" hidden>Width, mm</span>
+          <input id="sheetWidth" type="number" min="1" max="2000" step="0.1">
+        </label>
+        <label class="field">
+          <span data-lang="ru">Высота, мм</span>
+          <span data-lang="en" hidden>Height, mm</span>
+          <input id="sheetHeight" type="number" min="1" max="2000" step="0.1">
+        </label>
+      </div>
+
+      <label class="field">
+        <span data-lang="ru">Стадия размера</span>
+        <span data-lang="en" hidden>Size stage</span>
+        <select id="sizeStage">
+          <option value="beforeTrim">До зачистки / Before trim</option>
+          <option value="afterTrim">После зачистки / After trim</option>
+        </select>
+      </label>
+      <p id="stageHint" class="hint"></p>
+
+      <label class="check-row">
+        <input id="trimEnabled" type="checkbox">
+        <span data-lang="ru">Использовать зачистку</span>
+        <span data-lang="en" hidden>Apply sheet trim</span>
+      </label>
+
+      <label class="check-row">
+        <input id="trimUniform" type="checkbox">
+        <span data-lang="ru">Одинаково со всех сторон</span>
+        <span data-lang="en" hidden>Same value on all sides</span>
+      </label>
+
+      <label class="field">
+        <span data-lang="ru">Зачистка со всех сторон, мм</span>
+        <span data-lang="en" hidden>Uniform sheet trim, mm</span>
+        <input id="trimUniformMm" type="number" min="0" max="50" step="0.1">
+      </label>
+
+      <details>
+        <summary>
+          <span data-lang="ru">Разные значения по сторонам</span>
+          <span data-lang="en" hidden>Individual side values</span>
+        </summary>
+        <div class="four-sides">
+          <label>← <input id="trimLeft" type="number" min="0" max="50" step="0.1"></label>
+          <label>→ <input id="trimRight" type="number" min="0" max="50" step="0.1"></label>
+          <label>↑ <input id="trimTop" type="number" min="0" max="50" step="0.1"></label>
+          <label>↓ <input id="trimBottom" type="number" min="0" max="50" step="0.1"></label>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span data-lang="ru">Непечатные поля машины</span>
+          <span data-lang="en" hidden>Non-printable press margins</span>
+        </summary>
+        <div class="four-sides">
+          <label>← <input id="marginLeft" type="number" min="0" max="100" step="0.1"></label>
+          <label>→ <input id="marginRight" type="number" min="0" max="100" step="0.1"></label>
+          <label>↑ <input id="marginTop" type="number" min="0" max="100" step="0.1"></label>
+          <label>↓ <input id="marginBottom" type="number" min="0" max="100" step="0.1"></label>
+        </div>
+      </details>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <section id="geometryResults" class="panel result-panel">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">M1</p>
+          <h2 data-lang="ru">Геометрия печатного листа</h2>
+          <h2 data-lang="en" hidden>Printing-sheet geometry</h2>
+        </div>
+        <span id="trimStatus" class="status-chip"></span>
+      </div>
+
+      <div class="result-grid">
+        <article class="metric">
+          <span data-lang="ru">Исходный лист</span>
+          <span data-lang="en" hidden>Source sheet</span>
+          <strong id="sourceResult">620 × 450 mm</strong>
+        </article>
+        <article class="metric metric--accent">
+          <span data-lang="ru">После зачистки</span>
+          <span data-lang="en" hidden>Post-trim sheet</span>
+          <strong id="trimmedResult">616 × 446 mm</strong>
+        </article>
+        <article class="metric">
+          <span data-lang="ru">Печатная область</span>
+          <span data-lang="en" hidden>Printable area</span>
+          <strong id="printableResult">608 × 431 mm</strong>
+        </article>
+      </div>
+      <p id="geometryError" class="error-box" hidden></p>
+
+      <div class="formula-card">
+        <p data-lang="ru"><strong>Порядок расчёта:</strong> исходный лист − зачистка = фактический лист; фактический лист − непечатные поля = печатная область.</p>
+        <p data-lang="en" hidden><strong>Calculation order:</strong> source sheet − sheet trim = physical sheet; physical sheet − non-printable press margins = printable area.</p>
+      </div>
+    </section>
+
+    <section class="panel orders-panel">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">INPUT</p>
+          <h2 data-lang="ru">Заказы</h2>
+          <h2 data-lang="en" hidden>Orders</h2>
+        </div>
+        <div class="button-row">
+          <button id="loadControlCase" class="button" type="button">
+            <span data-lang="ru">Загрузить контрольный заказ</span>
+            <span data-lang="en" hidden>Load control dataset</span>
+          </button>
+          <button id="clearOrders" class="button button--quiet" type="button">
+            <span data-lang="ru">Очистить</span>
+            <span data-lang="en" hidden>Clear</span>
+          </button>
         </div>
       </div>
-      <p>На сайте каждая схема будет отдельной карточкой с рамкой. В PDF каждая схема будет занимать отдельную страницу.</p>
+
+      <label class="field">
+        <span data-lang="ru">Одна строка: файл | тираж | страниц | примечание</span>
+        <span data-lang="en" hidden>One line: file | quantity | pages | note</span>
+        <textarea id="ordersInput" rows="10" spellcheck="false" placeholder="70 | 3500 | 3&#10;25 | 1500 | 3&#10;99 | 2100 | 2"></textarea>
+      </label>
+      <pre id="ordersError" class="error-box" hidden></pre>
+
+      <div class="result-grid result-grid--orders">
+        <article class="metric">
+          <span data-lang="ru">Файлов</span>
+          <span data-lang="en" hidden>Files</span>
+          <strong id="orderCount">0</strong>
+        </article>
+        <article class="metric">
+          <span data-lang="ru">Печатных пар</span>
+          <span data-lang="en" hidden>Print pairs</span>
+          <strong id="printPairCount">0</strong>
+        </article>
+        <article class="metric">
+          <span data-lang="ru">Сумма тиражей</span>
+          <span data-lang="en" hidden>Total run length</span>
+          <strong id="totalQuantity">0</strong>
+        </article>
+      </div>
     </section>
 
-    <section class="panel" data-lang="en" hidden>
-      <h2>Planned output</h2>
-      <div class="scheme-preview">
-        <div class="scheme-preview__title">SHEET-1_FRONT · 1500 sheets</div>
-        <div class="grid">
-          <div>33,1 →</div><div>33,1 →</div><div>33,3 →</div><div>70,1 →</div>
-          <div>25,1 →</div><div>25,3 →</div><div>97,1 →</div><div>97,3 →</div>
+    <section class="panel roadmap-panel">
+      <h2 data-lang="ru">Что уже работает и что дальше</h2>
+      <h2 data-lang="en" hidden>What works now and what comes next</h2>
+      <div class="two-column-copy">
+        <div data-lang="ru">
+          <p><strong>Работает:</strong> реальные форматы листов, режим до/после зачистки, одинаковая или раздельная зачистка, непечатные поля, разбор заказов и число печатных пар.</p>
+          <p><strong>Следом:</strong> вместимость изделия, пары страниц, лицо, зеркальный оборот, проверка тиражей и варианты оптимизации.</p>
+        </div>
+        <div data-lang="en" hidden>
+          <p><strong>Working:</strong> real sheet presets, pre/post-trim modes, uniform or per-side trim, press margins, order parsing and print-pair totals.</p>
+          <p><strong>Next:</strong> product capacity, page pairs, front scheme, mirrored back, run verification and optimization alternatives.</p>
         </div>
       </div>
-      <p>Each browser scheme will be a bordered screenshot-ready card. Each PDF page will contain exactly one scheme.</p>
-    </section>
-
-    <section class="panel links">
-      <h2 data-lang="ru">Документация</h2>
-      <h2 data-lang="en" hidden>Documentation</h2>
-      <a href="https://github.com/sunpole/uImposition/blob/main/docs/TECHNICAL_SPECIFICATION_RU.md">Техническое задание — RU</a>
-      <a href="https://github.com/sunpole/uImposition/blob/main/docs/TECHNICAL_SPECIFICATION_EN.md">Technical specification — EN</a>
-      <a href="https://github.com/sunpole/uImposition/blob/main/VERSION.md">Version status</a>
-      <a href="https://github.com/sunpole/uImposition">GitHub repository</a>
-    </section>
-
-    <section class="panel status">
-      <h2 data-lang="ru">Текущий этап</h2>
-      <h2 data-lang="en" hidden>Current stage</h2>
-      <p data-lang="ru"><strong data-project-version>0.0.2-docs</strong>: техническое задание, архитектура и система версий. Рабочий калькулятор ещё не реализован.</p>
-      <p data-lang="en" hidden><strong data-project-version>0.0.2-docs</strong>: specification, architecture and versioning system. The production calculator is not implemented yet.</p>
     </section>
   </main>
 
-  <footer>uImposition · 2026</footer>
-  <script type="module" src="site.js"></script>
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <footer>
+    <a href="./" class="footer-brand">uImposition · v<span data-project-version>0.1.0-alpha</span></a>
+    <span>© 2026 Anton Magomedov</span>
+  </footer>
+
+  <script type="module" src="src/app.js"></script>
 </body>
 </html>

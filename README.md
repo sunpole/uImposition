@@ -1,143 +1,124 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.1.0-alpha</strong></p>
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-<h2>Русский</h2>
+## Русский
 
 <p><strong>Основной язык проекта — русский.</strong></p>
 
-<p>uImposition — будущий браузерный инструмент для расчёта сложных сборных офсетных монтажей.</p>
+uImposition — браузерный инструмент для расчёта сложных сборных офсетных монтажей.
 
-<h3>Программа должна</h3>
-<ul>
-<li>принимать файлы, тиражи, страницы и форматы;</li>
-<li>рассчитывать геометрию размещения;</li>
-<li>формировать лица и зеркальные обороты;</li>
-<li>показывать номер файла, страницу и стрелку в каждой ячейке;</li>
-<li>не допускать недопечатку;</li>
-<li>сравнивать варианты по бумаге, формам, перетиражу и листопрогонам;</li>
-<li>выводить схемы с рамками для скриншотов;</li>
-<li>экспортировать PDF: одна страница — одна схема.</li>
-</ul>
+### Уже работает в M1
 
-<h3>Основные правила</h3>
-<ul>
-<li>основной режим — чужой оборот;</li>
-<li>переворот по умолчанию — слева направо;</li>
-<li>лицо заполняется построчно;</li>
-<li>оборот строится только из утверждённого лица;</li>
-<li>знак <code>-</code> разрешён только на обороте;</li>
-<li>пользователь задаёт иерархию оптимизации;</li>
-<li>по умолчанию важнее всего минимум бумаги.</li>
-</ul>
+- выбор реального формата листа;
+- произвольный размер;
+- зачистка одинаково или отдельно по сторонам;
+- защита от двойной зачистки;
+- непечатные поля;
+- фактический и печатный размер;
+- ввод заказов;
+- подсчёт печатных пар;
+- контрольный заказ;
+- реальные скриншоты для Telegram через uNews.
+
+### Цель проекта
+
+- рассчитывать бумагу, формы, перетираж и листопрогоны;
+- строить точное лицо и зеркальный оборот;
+- показывать файл, страницу и направление головы;
+- сравнивать варианты по приоритетам пользователя;
+- экспортировать схемы: одна страница PDF — одна схема.
 
 </td>
 <td width="50%" valign="top">
 
-<h2>English</h2>
+## English
 
 <p><strong>Russian is the primary project language.</strong></p>
 
-<p>uImposition is a planned browser-based tool for calculating complex gang-run offset impositions.</p>
+uImposition is a browser-based tool for planning complex gang-run offset impositions.
 
-<h3>The application will</h3>
-<ul>
-<li>accept files, run lengths, page counts and sizes;</li>
-<li>calculate placement geometry;</li>
-<li>generate front forms and mirrored back forms;</li>
-<li>show file, source page and head-direction arrow in every cell;</li>
-<li>reject all underproducing solutions;</li>
-<li>compare paper, plates/forms, overrun and press passes;</li>
-<li>render bordered screenshot-ready schemes;</li>
-<li>export PDF with exactly one scheme per page.</li>
-</ul>
+### Working in M1
 
-<h3>Core rules</h3>
-<ul>
-<li>separate front/back forms are the primary mode;</li>
-<li>the default sheet turn is left-to-right;</li>
-<li>front cells use row-major filling;</li>
-<li>the back is derived only from the approved front;</li>
-<li><code>-</code> is allowed only on back schemes;</li>
-<li>the user controls the optimization hierarchy;</li>
-<li>minimum physical paper is the default top priority.</li>
-</ul>
+- real sheet presets;
+- custom size;
+- uniform or per-side sheet trim;
+- duplicate-trim protection;
+- non-printable press margins;
+- physical and printable dimensions;
+- order input;
+- print-pair totals;
+- control dataset;
+- factual Telegram screenshots through uNews.
+
+### Project goal
+
+- calculate paper, plates/forms, overrun and press passes;
+- generate exact fronts and mirrored backs;
+- show file, source page and head direction;
+- compare alternatives using user priorities;
+- export one imposition scheme per PDF page.
 
 </td>
 </tr>
 </table>
 
-## Текущий статус / Current status
+## Открыть / Open
 
-**`0.0.2-docs` — M0.** Репозиторий, двуязычное ТЗ, архитектура, конфигурационная модель, контрольный набор, правила версионирования и стартовая страница GitHub Pages готовы. Рабочий оптимизатор ещё не реализован.
-
-**`0.0.2-docs` — M0.** Repository bootstrap, bilingual specification, architecture, configuration model, control dataset, versioning rules and initial GitHub Pages landing page are complete. The production optimizer is not implemented yet.
-
-Следующая цель / Next target: **`0.1.0-alpha` — M1**.
+- GitHub Pages: `https://sunpole.github.io/uImposition/`
+- [Текущая версия / Current version](VERSION.md)
+- [Полное ТЗ RU](docs/TECHNICAL_SPECIFICATION_RU.md)
+- [Full specification EN](docs/TECHNICAL_SPECIFICATION_EN.md)
 
 ## Документация / Documentation
 
 | Русский | English |
 |---|---|
-| [Полное техническое задание](docs/TECHNICAL_SPECIFICATION_RU.md) | [Full technical specification](docs/TECHNICAL_SPECIFICATION_EN.md) |
-| [Алгоритм и оптимизация](docs/ALGORITHM_AND_OPTIMIZATION.md) | Algorithm and optimization — bilingual document |
-| [Архитектура](docs/ARCHITECTURE.md) | Architecture — bilingual document |
-| [Справочник конфигурации](docs/CONFIG_REFERENCE.md) | Configuration reference — bilingual document |
-| [План тестирования](docs/TEST_PLAN.md) | Test plan — two-column document |
-| [Дорожная карта](docs/ROADMAP.md) | Roadmap — two-column document |
-| [Версия проекта](VERSION.md) | Human-readable version status |
-| [Правила версионирования](docs/VERSIONING.md) | Versioning policy — two-column document |
-| [Монетизация](docs/BUSINESS_MODEL.md) | Monetization — two-column document |
-| [Оформление репозитория](docs/REPOSITORY_SETUP.md) | Repository metadata — two-column document |
-| [GitHub Pages](docs/GITHUB_PAGES.md) | GitHub Pages — two-column document |
-
-## Система версии / Version system
-
-- [`VERSION.json`](VERSION.json) — машинный источник текущей версии;
-- [`VERSION.md`](VERSION.md) — понятное состояние проекта;
-- [`CHANGELOG.md`](CHANGELOG.md) — история изменений;
-- [`docs/VERSIONING.md`](docs/VERSIONING.md) — правила повышения и синхронизации версии.
+| [Алгоритм и оптимизация](docs/ALGORITHM_AND_OPTIMIZATION.md) | Algorithm and optimization — bilingual |
+| [Архитектура](docs/ARCHITECTURE.md) | Architecture — bilingual |
+| [Справочник конфигурации](docs/CONFIG_REFERENCE.md) | Configuration reference — bilingual |
+| [План тестирования](docs/TEST_PLAN.md) | Test plan — bilingual |
+| [Дорожная карта](docs/ROADMAP.md) | Roadmap — bilingual |
+| [Публикация через uNews](docs/NEWS_PUBLISHING.md) | uNews publishing — bilingual |
+| [Автоматизация скриншотов](docs/SCREENSHOT_AUTOMATION.md) | Screenshot automation — bilingual |
+| [Монетизация](docs/BUSINESS_MODEL.md) | Monetization — bilingual |
 
 ## Рабочие форматы после зачистки / Current post-trim presets
 
 `616×446` · `616×466` · `636×448` · `646×466` · `650×313` · `716×326` · `716×336` · `716×516` мм
 
-Зачистка и непечатные поля считаются отдельными этапами. Пресет со стадией `afterTrim` нельзя уменьшать повторно.
+Зачистка и непечатные поля считаются отдельными этапами. Пресет `afterTrim` нельзя уменьшать повторно.
 
 Sheet trimming and non-printable press margins are separate stages. An `afterTrim` preset must never be trimmed twice.
 
-## Конфигурация / Configuration
+## Проверка / Checks
 
-Все изменяемые значения должны поступать из единого `src/config.js`. Стартовая модель находится в [`src/config.example.js`](src/config.example.js).
+```bash
+npm run check
+```
 
-All editable values must come from a central `src/config.js`. The initial model is documented in [`src/config.example.js`](src/config.example.js).
+Скриншоты:
+
+```bash
+cd tools/screenshots
+npm ci
+npx playwright install --with-deps chromium
+npm run capture
+```
 
 ## Контрольный набор / Control dataset
 
-[`data/control-case.json`](data/control-case.json): 20 файлов, 35 печатных пар, ручной ориентир 4 монтажа / 8 форм / 3395 физических листов / 0 недопечатки.
-
-[`data/control-case.json`](data/control-case.json): 20 files, 35 print pairs, manual reference of 4 impositions / 8 plates / 3395 physical sheets / zero underproduction.
+`data/control-case.json`: 20 файлов, 35 печатных пар, ручной ориентир будущего оптимизатора — 4 монтажа / 8 форм / 3395 физических листов / 0 недопечатки.
 
 ## Коммерческое направление / Commercial direction
 
 Проект нацелен на будущую монетизацию: публичная демонстрация, Pro-версия, лицензии для типографий, индивидуальное внедрение и поддержка. Точность расчёта никогда не должна зависеть от тарифа.
 
-The project is intended for future commercialization through a public demonstration, Pro edition, print-shop licensing, custom implementation and support. Calculation correctness must never depend on the selected plan.
-
-## GitHub Pages
-
-`https://sunpole.github.io/uImposition/`
-
-Источник публикации: `main` → `/(root)`.
-
-Publication source: `main` → `/(root)`.
-
 ## Лицензия / License
 
 **Proprietary / All rights reserved.** Коммерческое использование требует отдельного письменного разрешения. См. [`LICENSE.md`](LICENSE.md).
-
-Commercial use requires a separate written agreement. See [`LICENSE.md`](LICENSE.md).

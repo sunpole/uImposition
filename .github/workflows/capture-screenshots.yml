@@ -1,0 +1,94 @@
+name: Capture uImposition screenshots
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenarios:
+        description: Optional comma-separated scenario IDs; empty runs all scenarios
+        required: false
+        type: string
+  pull_request:
+    paths:
+      - index.html
+      - styles.css
+      - VERSION.json
+      - src/**
+      - data/**
+      - tools/screenshots/**
+      - .github/workflows/capture-screenshots.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    name: Real Chromium screenshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      SCREENSHOT_SCENARIOS: ${{ inputs.scenarios || '' }}
+      SCREENSHOT_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Install pinned screenshot dependencies
+        working-directory: tools/screenshots
+        run: npm install --package-lock=false --ignore-scripts --no-audit --no-fund
+
+      - name: Install Chromium and system dependencies
+        working-directory: tools/screenshots
+        run: npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
+
+      - name: Capture factual screenshots
+        id: capture
+        continue-on-error: true
+        working-directory: tools/screenshots
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run capture 2>&1 | tee ../../capture.log
+
+      - name: Upload screenshot and diagnostic artifact
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: uimposition-screenshots-${{ github.event.pull_request.number || github.run_id }}-${{ github.run_attempt }}
+          path: |
+            capture.log
+            artifacts/screenshots/
+            tools/screenshots/test-results/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Fail on capture error
+        if: steps.capture.outcome != 'success'
+        run: exit 1
+
+  diagnostics:
+    name: Screenshot diagnostic summary
+    if: always()
+    needs: capture
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download diagnostic artifact
+        uses: actions/download-artifact@v5
+        with:
+          pattern: uimposition-screenshots-*
+          merge-multiple: true
+
+      - name: Show concise Playwright result
+        shell: bash
+        run: |
+          if [ -f capture.log ]; then
+            tail -n 100 capture.log
+          else
+            echo "capture.log was not produced"
+          fi
