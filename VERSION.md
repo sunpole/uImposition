@@ -8,53 +8,48 @@
 
 ### Текущая версия
 
-**`0.4.0-alpha`**  
+**`0.5.0-alpha`**  
 Дата: **24 июля 2026**  
-Этап: **M4 — производственные итоги и отчёт**
+Этап: **M5 — PDF-экспорт**
 
 ### Что работает
 
-- весь проверенный функционал M1–M3;
-- чистый расчёт напечатанного количества каждой из 35 печатных пар;
-- объяснимые вклады: число позиций пары × тираж конкретного монтажа;
-- недопечатка и перетираж по каждой паре;
-- жёсткая блокировка производственной готовности при любой недопечатке;
-- готовый тираж и перетираж по каждому файлу;
-- отдельное отображение суммарного перетиража пар и перетиража готовых файлов;
-- физическая бумага как сумма тиражей монтажей;
-- отдельные лицевые и оборотные формы для чужого оборота;
-- листопрогоны как два прохода каждого физического листа;
-- независимая арифметическая проверка итогового отчёта;
-- адаптивная сводка, таблица 20 файлов и детализация 35 пар.
+- весь проверенный функционал M1–M4;
+- отдельный PDF схем: `8` страниц, одна схема на страницу;
+- порядок: лицо, оборот для каждого из четырёх монтажей;
+- безопасный файл `uImposition-schemes.pdf`;
+- режимы страниц схем: A4, пропорции фактического листа и пользовательский формат;
+- отдельный PDF производственного отчёта: `6` страниц A4;
+- страницы отчёта: сводка, две страницы файлов и три страницы печатных пар;
+- кириллица и стрелки отрисовываются браузером в Canvas до помещения в PDF;
+- собственный dependency-free PDF writer без CDN и runtime-зависимостей;
+- структурная проверка PDF, `pdfinfo` и рендер всех страниц через Poppler;
+- скачивание обоих документов непосредственно из браузера.
 
-### Проверенный контрольный результат M4
+### Проверенный контрольный результат M5
 
-- контрольный заказ: `20` файлов и `35` печатных пар;
-- заданные монтажи: `4` лица и `4` оборота;
-- тиражи ручной контрольной раскладки: `1500`, `1100`, `450`, `345`;
-- физическая бумага: `3395` листов;
-- формы: `4` лица + `4` оборота = `8`;
-- листопрогоны: `6790`;
-- недопечатка: `0`;
-- суммарный перетираж по парам: `1450`;
-- перетираж готовых файлов: `930`;
-- отчёт проходит Node-тесты и desktop/mobile Chromium-проверку.
-
-Тиражи четырёх монтажей являются ручным проверочным входом. M4 не заявляет автоматический подбор тиражей или доказанный минимум бумаги.
+- четыре монтажа → `8` страниц схем;
+- основной PDF содержит только схемы;
+- отчёт не добавляется девятой страницей и создаётся отдельным файлом;
+- отдельный отчёт содержит `6` страниц;
+- Poppler успешно прочитал и отрендерил все `14` страниц двух документов;
+- A4-схемы не обрезаны, пропорции сохранены;
+- в отчёте читаются итоговые метрики, 20 файлов, 35 пар и вклады монтажей;
+- заголовки, номера страниц, кириллица и длинные строки не пересекаются.
 
 ### Ещё не реализовано
 
 - автоматический подбор тиражей монтажей;
-- автоматический оптимизатор и сравнение альтернатив;
-- смешанные ориентации внутри одной сетки;
-- PDF-экспорт;
-- импорт/экспорт полного проекта и постоянное хранение отчёта.
+- генерация и сравнение альтернатив;
+- доказанный минимум физической бумаги;
+- смешанные ориентации внутри сетки;
+- импорт/экспорт полного проекта и постоянное хранение.
 
 ### Следующая целевая версия
 
-**`0.5.0-alpha` — M5**
+**`0.6.0-alpha` — M6**
 
-Одна схема на PDF-страницу и отдельный PDF производственного отчёта.
+Автоматическая генерация альтернатив, подбор тиражей и минимум физической бумаги без недопечатки.
 
 </td>
 <td width="50%" valign="top">
@@ -63,53 +58,35 @@
 
 ### Current version
 
-**`0.4.0-alpha`**  
+**`0.5.0-alpha`**  
 Date: **24 July 2026**  
-Stage: **M4 — production totals and report**
+Stage: **M5 — PDF export**
 
 ### Working now
 
-- all verified M1–M3 functionality;
-- pure produced-quantity calculation for all 35 print pairs;
-- explainable contributions: pair position count × explicit imposition run length;
-- underproduction and overrun for every pair;
-- hard rejection of production readiness when any pair underproduces;
-- complete produced quantity and overrun for every file;
-- separate pair-overrun and complete-file-overrun reporting;
-- physical sheets as the sum of imposition run lengths;
-- separate front and back forms for the current duplex mode;
-- press passes as two passes per physical sheet;
-- independent arithmetic validation of the complete report;
-- responsive summary, 20-file table, and 35-pair detail table.
+- all verified M1–M4 functionality;
+- a separate eight-page scheme PDF with one scheme per page;
+- deterministic front/back order for four impositions;
+- A4, sheet-proportional, and custom scheme page modes;
+- a separate six-page A4 production-report PDF;
+- browser Canvas rasterisation for Cyrillic text and arrows;
+- a dependency-free PDF writer with no CDN or runtime packages;
+- structural checks, `pdfinfo`, and Poppler rendering of every page;
+- direct browser download of both documents.
 
-### Verified M4 control result
+### Verified M5 result
 
-- control dataset: `20` files and `35` print pairs;
-- explicit impositions: `4` fronts and `4` backs;
-- manual control run lengths: `1500`, `1100`, `450`, `345`;
-- physical sheets: `3395`;
-- forms: `4` front + `4` back = `8`;
-- press passes: `6790`;
-- underproduction: `0`;
-- total pair overrun: `1450`;
-- complete-file overrun: `930`;
-- the report passes Node tests and desktop/mobile Chromium verification.
-
-The four imposition run lengths are verified manual input. M4 does not claim automatic run assignment or a proven global paper minimum.
+Four impositions produce eight scheme pages. The report remains a separate six-page document. Poppler successfully reads and renders all fourteen pages; no clipping, broken glyphs, overlapping headers, or black squares were found.
 
 ### Not implemented yet
 
-- automatic imposition run assignment;
-- automatic optimization and alternative comparison;
-- mixed orientations inside one grid;
-- PDF export;
-- complete-project import/export and persistent report storage.
+Automatic run assignment, alternative generation, proven paper minimisation, mixed orientations, and complete-project persistence.
 
 ### Next target version
 
-**`0.5.0-alpha` — M5**
+**`0.6.0-alpha` — M6**
 
-One scheme per PDF page and a separate production-report PDF.
+Generate alternatives, assign imposition run lengths automatically, and minimise physical paper without underproduction.
 
 </td>
 </tr>
@@ -118,10 +95,10 @@ One scheme per PDF page and a separate production-report PDF.
 ## Источники версии / Version sources
 
 - `VERSION.json` — машинный источник;
-- `VERSION.md` — понятное состояние проекта;
+- `VERSION.md` — понятное состояние;
 - `CHANGELOG.md` — история;
 - `docs/VERSIONING.md` — правила.
 
 ## Релизы и откат / Releases and rollback
 
-После объединения и проверки GitHub Pages alpha-веха `0.4.0-alpha` получает recovery-ветку `release/v0.4.0-alpha`. Настоящий GitHub Release обязателен только после признания версии стабильной production-версией.
+После объединения и проверки alpha-веха `0.5.0-alpha` получает recovery-ветку `release/v0.5.0-alpha`. Настоящий GitHub Release создаётся только для стабильной production-версии.
