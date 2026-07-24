@@ -1,32 +1,37 @@
 {
   "schemaVersion": 1,
   "project": "uImposition",
-  "version": "0.0.2-docs",
-  "semverCore": "0.0.2",
-  "channel": "docs",
-  "versionSequence": 2,
+  "version": "0.1.0-alpha",
+  "semverCore": "0.1.0",
+  "channel": "alpha",
+  "versionSequence": 3,
   "releaseDate": "2026-07-24",
-  "status": "documentation-bootstrap",
-  "milestone": "M0",
-  "nextMilestone": "M1",
+  "status": "m1-working-alpha",
+  "milestone": "M1",
+  "nextMilestone": "M2",
   "productionReady": false,
   "publicDemoReady": true,
   "optimizerImplemented": false,
   "summary": {
-    "ru": "Созданы и оформлены публичный репозиторий, двуязычное техническое задание, документация, централизованная модель конфигурации, контрольный набор и правила версионирования.",
-    "en": "The public repository, bilingual technical specification, documentation, centralized configuration model, control dataset and versioning rules have been established."
+    "ru": "Первая рабочая версия: центральный config.js, реальные форматы листов, зачистка до/после, непечатные поля, ввод заказов, подсчёт печатных пар и реальные Chromium-скриншоты для uNews.",
+    "en": "First working version: central config.js, real sheet presets, pre/post-trim logic, non-printable press margins, order input, print-pair totals and factual Chromium screenshots for uNews."
   },
   "nextTarget": {
-    "version": "0.1.0-alpha",
-    "milestone": "M1",
-    "ru": "Центральный config.js, интерфейс ввода заказов и расчёт размера листа после зачистки.",
-    "en": "Central config.js, order-entry interface and post-trim sheet-size calculation."
+    "version": "0.2.0-alpha",
+    "milestone": "M2",
+    "ru": "Расчёт вместимости изделия на листе в двух ориентациях и выбор лучшей сетки.",
+    "en": "Product capacity calculation in both orientations and selection of the best grid."
   },
   "versionSources": {
     "machine": "VERSION.json",
     "human": "VERSION.md",
     "history": "CHANGELOG.md",
     "policy": "docs/VERSIONING.md"
+  },
+  "releasePolicy": {
+    "stableCheckpointBranch": "release/v{version}",
+    "githubReleaseRequiredForStable": true,
+    "rollbackPurpose": true
   },
   "synchronizationRule": "When the project version changes, VERSION.json, VERSION.md and CHANGELOG.md must be updated in the same patch."
 }

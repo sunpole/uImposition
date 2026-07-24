@@ -1,21 +1,50 @@
 # Changelog
 
+## 0.1.0-alpha — 2026-07-24
+
+### Added
+
+- first working browser calculator stage;
+- central runtime configuration in `src/config.js`;
+- real current post-trim sheet presets;
+- custom pre-trim sheet input with 2 mm per-side default;
+- uniform and individual sheet-trim controls;
+- non-printable press-margin controls;
+- source, post-trim and printable-area calculation;
+- order parser for `file | quantity | pages | note`;
+- file, run-length and print-pair summaries;
+- control-dataset loading;
+- Node built-in tests for sheet geometry and order parsing;
+- isolated Playwright screenshot tooling;
+- read-only GitHub Actions screenshot workflow;
+- uNews publication and screenshot-provenance documentation;
+- `news/` queue contract.
+
+### Changed
+
+- GitHub Pages landing page is now the first working M1 interface;
+- `uImposition · v{version}` is a clickable home-page logo;
+- the visible page title and logo version load from `VERSION.json`;
+- the settings panel opens by default and can collapse to an eye-style emblem.
+
+### Verified
+
+- `620 × 450` before trim becomes `616 × 446`;
+- `616 × 446` post-trim preset is not trimmed twice;
+- default press margins produce `608 × 431`;
+- the 20-file control dataset produces 35 print pairs;
+- zero runtime dependencies are required for the calculator.
+
 ## 0.0.2-docs — 2026-07-24
 
 ### Added
 
-- machine-readable `VERSION.json`;
-- bilingual human-readable `VERSION.md`;
-- bilingual versioning policy in `docs/VERSIONING.md`;
-- explicit current milestone, next milestone and production-readiness fields;
-- mandatory version synchronization rules for development agents.
+- synchronized `VERSION.json`, `VERSION.md`, `CHANGELOG.md` and versioning policy;
+- dynamic version display on GitHub Pages.
 
 ### Changed
 
-- current documentation version raised from `0.0.1-docs` to `0.0.2-docs`;
-- `AGENTS.md` now treats `VERSION.json`, `VERSION.md` and `CHANGELOG.md` as synchronized version sources;
-- GitHub Pages now reads the visible version from `VERSION.json` and keeps an HTML fallback value;
-- next functional target fixed as `0.1.0-alpha` / M1.
+- repository state updated after complete public project setup.
 
 ## 0.0.1-docs — 2026-07-24
 
@@ -36,7 +65,3 @@
 - GitHub Pages landing page published from `main` / root;
 - centralized configuration example;
 - `.gitignore` and `.nojekyll`.
-
-### Changed
-
-- GitHub Pages deployment uses the configured `main` branch directly instead of a redundant Actions workflow.
