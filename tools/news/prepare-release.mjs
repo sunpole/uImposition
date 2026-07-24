@@ -10,10 +10,12 @@ const manifestPath = path.join(root, "artifacts/screenshots/manifest.json");
 const marker = JSON.parse(await readFile(markerPath, "utf8"));
 const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
 const entry = manifest.entries.find((item) => item.scenario === marker.scenario);
+const expectedCommit = process.env.SCREENSHOT_COMMIT || process.env.GITHUB_SHA;
 
 if (!entry) throw new Error(`Screenshot scenario not found: ${marker.scenario}`);
-if (!entry.commit || entry.commit !== process.env.GITHUB_SHA) {
-  throw new Error(`Screenshot commit ${entry.commit} does not match GITHUB_SHA ${process.env.GITHUB_SHA}`);
+if (!expectedCommit) throw new Error("Expected screenshot commit is not available");
+if (!entry.commit || entry.commit !== expectedCommit) {
+  throw new Error(`Screenshot commit ${entry.commit} does not match expected commit ${expectedCommit}`);
 }
 
 const queuedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
