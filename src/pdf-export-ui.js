@@ -1,47 +1,55 @@
 import { CONFIG } from "./config.js";
 import {
   PDF_PAGE_MODES,
+  createProductionReportPdfDocument,
   createSchemePdfDocument,
 } from "./pdf-document-model.js";
 import {
   downloadPdfBytes,
   renderSchemePdfBytes,
 } from "./pdf-scheme-renderer.js";
+import { renderProductionReportPdfBytes } from "./pdf-report-renderer.js";
 
 const TEXT = Object.freeze({
   ru: {
-    title: "Экспорт схем в PDF",
-    intro: "Каждая проверенная схема будет помещена на отдельную страницу в порядке лицо → оборот.",
-    pageMode: "Режим страницы",
+    title: "Экспорт в PDF",
+    intro: "Схемы и производственный отчёт создаются как два независимых документа.",
+    pageMode: "Режим страниц схем",
     a4: "Вписать в A4",
     proportional: "Сохранить пропорции листа",
     custom: "Пользовательский формат",
     width: "Ширина, мм",
     height: "Высота, мм",
-    export: "Скачать PDF схем",
+    exportSchemes: "Скачать PDF схем",
+    exportReport: "Скачать PDF отчёта (A4)",
     waiting: "Сначала загрузите контрольный заказ",
-    ready: "Готово к экспорту: 8 страниц",
-    building: "Создание PDF…",
-    complete: "PDF создан: 8 страниц",
+    ready: "Готово: схемы 8 стр. · отчёт 6 стр.",
+    buildingSchemes: "Создание PDF схем…",
+    buildingReport: "Создание PDF отчёта…",
+    schemesComplete: "PDF схем создан: 8 страниц",
+    reportComplete: "PDF отчёта создан: 6 страниц",
     failed: "Не удалось создать PDF",
-    note: "Производственный отчёт будет отдельным PDF и не добавляется девятой страницей.",
+    note: "Основной PDF содержит ровно восемь схем — по одной на страницу. Производственный отчёт формируется отдельным шестистраничным PDF формата A4.",
   },
   en: {
-    title: "Export schemes to PDF",
-    intro: "Every validated scheme is placed on its own page in front → back order.",
-    pageMode: "Page mode",
+    title: "PDF export",
+    intro: "Scheme pages and the production report are generated as two independent documents.",
+    pageMode: "Scheme page mode",
     a4: "Fit to A4",
     proportional: "Preserve sheet proportions",
     custom: "Custom page size",
     width: "Width, mm",
     height: "Height, mm",
-    export: "Download scheme PDF",
+    exportSchemes: "Download scheme PDF",
+    exportReport: "Download report PDF (A4)",
     waiting: "Load the control dataset first",
-    ready: "Ready to export: 8 pages",
-    building: "Building PDF…",
-    complete: "PDF created: 8 pages",
+    ready: "Ready: 8 scheme pages · 6 report pages",
+    buildingSchemes: "Building scheme PDF…",
+    buildingReport: "Building report PDF…",
+    schemesComplete: "Scheme PDF created: 8 pages",
+    reportComplete: "Report PDF created: 6 pages",
     failed: "Could not create PDF",
-    note: "The production report remains a separate PDF and is not added as a ninth page.",
+    note: "The primary PDF contains exactly eight schemes, one per page. The production report is a separate six-page A4 PDF.",
   },
 });
 
@@ -76,11 +84,17 @@ function numberInput(id) {
 export function createPdfExportController({
   anchor,
   getRecords,
+  getReport,
   getSheetSize,
   getLanguage,
 }) {
-  if (typeof getRecords !== "function" || typeof getSheetSize !== "function" || typeof getLanguage !== "function") {
-    throw new TypeError("PDF export controller requires record, sheet-size, and language getters");
+  if (
+    typeof getRecords !== "function"
+    || typeof getReport !== "function"
+    || typeof getSheetSize !== "function"
+    || typeof getLanguage !== "function"
+  ) {
+    throw new TypeError("PDF export controller requires record, report, sheet-size, and language getters");
   }
 
   const panel = createPanel(anchor);
@@ -89,32 +103,37 @@ export function createPdfExportController({
     customWrap: createElement("div", "field-grid pdf-custom-size"),
     width: numberInput("pdfCustomWidth"),
     height: numberInput("pdfCustomHeight"),
-    exportButton: createElement("button", "button", ""),
+    schemeButton: createElement("button", "button", ""),
+    reportButton: createElement("button", "button button--quiet", ""),
     status: createElement("span", "status-chip", ""),
   };
   ui.mode.id = "pdfPageMode";
-  ui.exportButton.id = "exportSchemesPdf";
-  ui.exportButton.type = "button";
+  ui.schemeButton.id = "exportSchemesPdf";
+  ui.schemeButton.type = "button";
+  ui.reportButton.id = "exportReportPdf";
+  ui.reportButton.type = "button";
   ui.status.id = "pdfExportStatus";
 
   ui.width.value = "320";
   ui.height.value = "220";
 
-  const optionValues = [
-    PDF_PAGE_MODES.A4,
-    PDF_PAGE_MODES.SHEET_PROPORTIONAL,
-    PDF_PAGE_MODES.CUSTOM,
-  ];
-  optionValues.forEach((value) => {
-    const option = document.createElement("option");
-    option.value = value;
-    ui.mode.append(option);
-  });
+  [PDF_PAGE_MODES.A4, PDF_PAGE_MODES.SHEET_PROPORTIONAL, PDF_PAGE_MODES.CUSTOM]
+    .forEach((value) => {
+      const option = document.createElement("option");
+      option.value = value;
+      ui.mode.append(option);
+    });
+
+  const setBusy = (busy) => {
+    ui.schemeButton.disabled = busy || !Array.isArray(getRecords()) || getRecords().length === 0;
+    ui.reportButton.disabled = busy || getReport()?.valid !== true;
+  };
 
   const render = () => {
     const language = getLanguage();
     const text = TEXT[language] ?? TEXT.ru;
     const records = getRecords();
+    const report = getReport();
     panel.replaceChildren();
 
     const heading = createElement("div", "section-heading");
@@ -138,12 +157,16 @@ export function createPdfExportController({
     ui.customWrap.replaceChildren(widthLabel, heightLabel);
     ui.customWrap.hidden = ui.mode.value !== PDF_PAGE_MODES.CUSTOM;
 
-    ui.exportButton.textContent = text.export;
-    ui.exportButton.disabled = !Array.isArray(records) || records.length === 0;
-    ui.status.textContent = ui.exportButton.disabled ? text.waiting : text.ready;
+    ui.schemeButton.textContent = text.exportSchemes;
+    ui.reportButton.textContent = text.exportReport;
+    const ready = Array.isArray(records) && records.length > 0 && report?.valid === true;
+    setBusy(false);
+    ui.status.textContent = ready ? text.ready : text.waiting;
 
+    const actions = createElement("div", "pdf-export-actions");
+    actions.append(ui.schemeButton, ui.reportButton);
     const controls = createElement("div", "pdf-export-controls");
-    controls.append(modeLabel, ui.customWrap, ui.exportButton);
+    controls.append(modeLabel, ui.customWrap, actions);
     const note = createElement("div", "formula-card");
     note.append(createElement("p", "", text.note));
 
@@ -151,7 +174,7 @@ export function createPdfExportController({
   };
 
   ui.mode.addEventListener("change", render);
-  ui.exportButton.addEventListener("click", async () => {
+  ui.schemeButton.addEventListener("click", async () => {
     const language = getLanguage();
     const text = TEXT[language] ?? TEXT.ru;
     const records = getRecords();
@@ -160,8 +183,8 @@ export function createPdfExportController({
       return;
     }
 
-    ui.exportButton.disabled = true;
-    ui.status.textContent = text.building;
+    setBusy(true);
+    ui.status.textContent = text.buildingSchemes;
     try {
       const mode = ui.mode.value;
       const sheetSize = getSheetSize();
@@ -177,18 +200,43 @@ export function createPdfExportController({
       });
       const bytes = await renderSchemePdfBytes(documentModel);
       downloadPdfBytes(bytes, documentModel.fileName);
-      ui.status.textContent = text.complete;
+      ui.status.textContent = text.schemesComplete;
     } catch (error) {
       console.error(error);
       ui.status.textContent = `${text.failed}: ${error.message}`;
     } finally {
-      ui.exportButton.disabled = false;
+      setBusy(false);
+    }
+  });
+
+  ui.reportButton.addEventListener("click", async () => {
+    const language = getLanguage();
+    const text = TEXT[language] ?? TEXT.ru;
+    const report = getReport();
+    if (report?.valid !== true) {
+      render();
+      return;
+    }
+
+    setBusy(true);
+    ui.status.textContent = text.buildingReport;
+    try {
+      const documentModel = createProductionReportPdfDocument({
+        report,
+        language,
+        pageMode: PDF_PAGE_MODES.A4,
+      });
+      const bytes = await renderProductionReportPdfBytes(documentModel);
+      downloadPdfBytes(bytes, documentModel.fileName);
+      ui.status.textContent = text.reportComplete;
+    } catch (error) {
+      console.error(error);
+      ui.status.textContent = `${text.failed}: ${error.message}`;
+    } finally {
+      setBusy(false);
     }
   });
 
   render();
-  return Object.freeze({
-    panel,
-    sync: render,
-  });
+  return Object.freeze({ panel, sync: render });
 }
