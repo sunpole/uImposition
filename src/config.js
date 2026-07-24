@@ -79,6 +79,7 @@ export const CONFIG = Object.freeze({
   demo: {
     queryParameter: "demo",
     controlCaseUrl: "./data/control-case.json",
+    controlLayoutUrl: "./data/control-layout-m3.json",
   },
 
   i18n: {
