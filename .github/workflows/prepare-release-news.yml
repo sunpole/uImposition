@@ -1,0 +1,59 @@
+name: Prepare uImposition release news
+
+on:
+  push:
+    branches:
+      - m1/0.1.0-alpha
+    paths:
+      - news/.prepare-release.json
+      - tools/news/prepare-release.mjs
+      - tools/screenshots/**
+      - .github/workflows/prepare-release-news.yml
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SCREENSHOT_COMMIT: ${{ github.sha }}
+      SCREENSHOT_SCENARIOS: m1-trim-desktop
+
+    steps:
+      - name: Checkout exact feature branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Install pinned screenshot tooling
+        working-directory: tools/screenshots
+        run: npm install --package-lock=false --ignore-scripts --no-audit --no-fund
+
+      - name: Install Chromium
+        working-directory: tools/screenshots
+        run: npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
+
+      - name: Capture exact release screenshot
+        working-directory: tools/screenshots
+        run: npm run capture
+
+      - name: Create patchnote and copy selected PNG
+        run: node tools/news/prepare-release.mjs
+
+      - name: Commit prepared news to feature branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add news/
+          git commit -m "news: prepare uImposition 0.1.0-alpha patchnote"
+          git push origin HEAD:${{ github.ref_name }}
