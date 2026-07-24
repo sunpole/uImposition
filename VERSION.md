@@ -8,48 +8,49 @@
 
 ### Текущая версия
 
-**`0.2.0-alpha`**  
+**`0.3.0-alpha`**  
 Дата: **24 июля 2026**  
-Этап: **M2 — вместимость и пары страниц**
+Этап: **M3 — лицо и зеркальный оборот**
 
 ### Что работает
 
-- весь проверенный функционал M1;
-- готовые форматы A4, A5, A6 и произвольный формат изделия;
-- отдельные ширина и высота готового изделия;
-- выпуск за обрез;
-- режим общего реза при выпуске 0 мм;
-- раздельный рез с дополнительным зазором между границами выпусков;
-- расчёт занимаемого размера изделия;
-- сравнение однородных сеток без поворота и с поворотом на 90°;
-- выбор варианта с максимальным количеством позиций;
-- точные размеры использованной и свободной части печатной области;
-- схематичная сетка всех позиций;
-- раскрытие каждого файла в пары `1/2`, `3/4`, `5/-` и далее;
-- сохранение порядка исходных файлов и тиражей.
+- весь проверенный функционал M1 и M2;
+- заполнение лицевых позиций сплошными блоками слева направо и сверху вниз;
+- запрет пустых лицевых позиций, чётных страниц и знака `-` на лице;
+- автоматическое зеркалирование колонок для оборота без перестановки строк;
+- точное соответствие `1 → 2`, `3 → 4`, а для отсутствующей последней страницы — `null`;
+- преобразование направления головы `→` в `←` при перевороте слева направо;
+- независимая проверка файла, пары, страницы, координат и направления;
+- четыре контрольных лица и четыре автоматически полученных оборота по `4 × 4 = 16` позиций;
+- рамочные desktop/mobile схемы `файл,страница стрелка`;
+- знак `-` только при отображении отсутствующей оборотной страницы.
 
-### Проверенный контрольный результат
+### Проверенный контрольный результат M3
 
-Для печатной области `608 × 431 мм` и A6 `105 × 148 мм`, выпуск `0`, общий рез:
+- контрольный заказ: `20` файлов и `35` пар страниц;
+- сетка каждого монтажа: `4 × 4`, поворот `90°`;
+- формы: `4` лица и `4` оборота;
+- тиражи ручной контрольной раскладки: `1500`, `1100`, `450`, `345`;
+- каждый оборот построен только из соответствующего лица;
+- файл `119` сохраняет полные пары `1/2` и `3/4`;
+- все восемь схем проходят автоматическую валидацию.
 
-- `0°`: `5 × 2 = 10` позиций;
-- `90°`: `4 × 4 = 16` позиций;
-- выбран вариант `90°`;
-- контрольные 20 файлов дают 35 точных печатных пар.
+Контрольные тиражи являются ручным проверочным примером, а не результатом оптимизатора и не доказанным глобальным минимумом бумаги.
 
 ### Ещё не реализовано
 
+- автоматический расчёт тиражей монтажей;
+- напечатанное количество, недопечатка и перетираж;
+- формы, бумага и листопрогоны;
+- автоматический оптимизатор;
 - смешанные ориентации внутри одной сетки;
-- распределение файлов по позициям;
-- лицо и зеркальный оборот;
-- расчёт тиражей монтажей;
-- оптимизатор и PDF.
+- PDF-экспорт.
 
 ### Следующая целевая версия
 
-**`0.3.0-alpha` — M3**
+**`0.4.0-alpha` — M4**
 
-Заполнение позиций сплошными блоками, построение лица и автоматическое получение зеркального оборота с точными страницами и направлениями.
+Расчёт производственных итогов для явных монтажей: напечатано, недопечатка, перетираж, формы, бумага и листопрогоны.
 
 </td>
 <td width="50%" valign="top">
@@ -58,48 +59,49 @@
 
 ### Current version
 
-**`0.2.0-alpha`**  
+**`0.3.0-alpha`**  
 Date: **24 July 2026**  
-Stage: **M2 — capacity and page pairs**
+Stage: **M3 — front and mirrored back**
 
 ### Working now
 
-- all verified M1 functionality;
-- A4, A5, A6 and custom finished-product sizes;
-- independent finished width and height;
-- bleed input;
-- common-cut mode with zero bleed;
-- separated-cut mode with an additional gap between bleed boundaries;
-- occupied product-size calculation;
-- comparison of uniform unrotated and 90-degree grids;
-- selection of maximum position count;
-- exact used and unused printable-area dimensions;
-- schematic position grid;
-- exact source-page expansion into `1/2`, `3/4`, `5/-` and later pairs;
-- preserved source-file order and quantities.
+- all verified M1 and M2 functionality;
+- contiguous front-position blocks expanded left-to-right and top-to-bottom;
+- rejection of empty fronts, even front pages, and dash identifiers;
+- automatic back derivation by mirroring columns without reordering rows;
+- exact `1 → 2`, `3 → 4`, and unmatched-final-page `null` mapping;
+- head-direction transformation from `→` to `←` for a left-to-right sheet turn;
+- independent file, pair, page, coordinate, and direction validation;
+- four control fronts and four automatically derived backs, each using `4 × 4 = 16` positions;
+- bordered desktop/mobile `file,page arrow` schemes;
+- dash-only rendering exclusively for missing back pages.
 
-### Verified control result
+### Verified M3 control result
 
-For a `608 × 431 mm` printable area and A6 `105 × 148 mm`, zero bleed and common cut:
+- control dataset: `20` files and `35` page pairs;
+- every imposition uses a `4 × 4` grid at `90°`;
+- forms: `4` fronts and `4` backs;
+- manual control run lengths: `1500`, `1100`, `450`, `345`;
+- every back is derived only from its corresponding front;
+- file `119` preserves complete `1/2` and `3/4` pairs;
+- all eight schemes pass automatic validation.
 
-- `0°`: `5 × 2 = 10` positions;
-- `90°`: `4 × 4 = 16` positions;
-- the `90°` option is selected;
-- the 20-file control dataset expands to 35 exact print pairs.
+The control run lengths are a verified manual reference, not optimizer output or a proven global paper minimum.
 
 ### Not implemented yet
 
+- automatic imposition run calculation;
+- produced quantity, underproduction, and overrun;
+- plates, paper, and press passes;
+- automatic optimization;
 - mixed orientations within one grid;
-- assigning jobs to positions;
-- front and mirrored-back schemes;
-- imposition run-length calculation;
-- optimizer and PDF export.
+- PDF export.
 
 ### Next target version
 
-**`0.3.0-alpha` — M3**
+**`0.4.0-alpha` — M4**
 
-Assign positions in contiguous blocks, build the front and derive the mirrored back with exact pages and directions.
+Calculate production totals for explicit impositions: produced quantity, underproduction, overrun, plates, paper, and press passes.
 
 </td>
 </tr>
@@ -114,4 +116,4 @@ Assign positions in contiguous blocks, build the front and derive the mirrored b
 
 ## Релизы и откат / Releases and rollback
 
-Каждая достигнутая стабильная версия должна иметь синхронизированные источники версии, recovery-ветку `release/v{version}`, проверенный сайт и настоящий GitHub Release с тем же тегом. Alpha-этапы получают проверяемую рабочую ветку, но не называются стабильными production-релизами.
+Alpha-веха `0.3.0-alpha` получает recovery-ветку `release/v0.3.0-alpha` после объединения и проверки GitHub Pages. Настоящий GitHub Release обязателен после признания версии стабильной production-версией; alpha-версия стабильной не называется.
