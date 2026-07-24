@@ -1,0 +1,15 @@
+{
+  "id": "m2-capacity-mobile",
+  "path": "/?demo=control",
+  "viewport": { "width": 430, "height": 932 },
+  "assertions": [
+    { "selector": ".brand", "text": "v0.2.0-alpha" },
+    { "selector": "#printableResult", "text": "608 × 431 mm" },
+    { "selector": "#bestGridResult", "text": "4 × 4" },
+    { "selector": "#bestPositionsResult", "text": "16" },
+    { "selector": "#bestRotationResult", "text": "90°" },
+    { "selector": "#printPairCount", "text": "35" }
+  ],
+  "screenshot": "uimposition-v0-2-0-alpha-m2-capacity-mobile.png",
+  "fullPage": true
+}

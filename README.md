@@ -1,7 +1,7 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.1.0-alpha</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.2.0-alpha</strong></p>
 
 <table>
 <tr>
@@ -13,24 +13,24 @@
 
 uImposition — браузерный инструмент для расчёта сложных сборных офсетных монтажей.
 
-### Уже работает в M1
+### Уже работает в M2
 
-- выбор реального формата листа;
-- произвольный размер;
-- зачистка одинаково или отдельно по сторонам;
-- защита от двойной зачистки;
-- непечатные поля;
-- фактический и печатный размер;
-- ввод заказов;
-- подсчёт печатных пар;
-- контрольный заказ;
+- реальные и произвольные форматы листов;
+- зачистка и непечатные поля как отдельные этапы;
+- A4, A5, A6 и произвольный формат изделия;
+- выпуск, общий рез и дополнительный зазор;
+- сравнение сеток 0° и 90°;
+- выбор максимального количества позиций;
+- визуальная схема вместимости;
+- точные пары исходных страниц;
+- контрольный заказ из 20 файлов и 35 пар;
 - реальные скриншоты для Telegram через uNews.
 
 ### Цель проекта
 
 - рассчитывать бумагу, формы, перетираж и листопрогоны;
 - строить точное лицо и зеркальный оборот;
-- показывать файл, страницу и направление головы;
+- показывать файл, исходную страницу и направление головы;
 - сравнивать варианты по приоритетам пользователя;
 - экспортировать схемы: одна страница PDF — одна схема.
 
@@ -43,17 +43,17 @@ uImposition — браузерный инструмент для расчёта 
 
 uImposition is a browser-based tool for planning complex gang-run offset impositions.
 
-### Working in M1
+### Working in M2
 
-- real sheet presets;
-- custom size;
-- uniform or per-side sheet trim;
-- duplicate-trim protection;
-- non-printable press margins;
-- physical and printable dimensions;
-- order input;
-- print-pair totals;
-- control dataset;
+- real and custom sheet sizes;
+- separate sheet-trim and press-margin stages;
+- A4, A5, A6 and custom finished-product sizes;
+- bleed, common cut and additional gap;
+- comparison of 0° and 90° grids;
+- maximum-position selection;
+- visual capacity scheme;
+- exact source page pairs;
+- 20-file / 35-pair control dataset;
 - factual Telegram screenshots through uNews.
 
 ### Project goal
@@ -106,14 +106,21 @@ npm run check
 
 ```bash
 cd tools/screenshots
-npm ci
+npm install --package-lock=false --ignore-scripts --no-audit --no-fund
 npx playwright install --with-deps chromium
 npm run capture
 ```
 
-## Контрольный набор / Control dataset
+## Контрольный результат M2 / M2 control result
 
-`data/control-case.json`: 20 файлов, 35 печатных пар, ручной ориентир будущего оптимизатора — 4 монтажа / 8 форм / 3395 физических листов / 0 недопечатки.
+`data/control-case.json`: печатная область `608×431`, A6 `105×148`, выпуск `0`, общий рез.
+
+- 0° → `5×2 = 10`;
+- 90° → `4×4 = 16`;
+- выбран вариант 90°;
+- 20 файлов → 35 точных пар страниц.
+
+Ручной ориентир будущего оптимизатора остаётся отдельным и ещё не считается доказанным глобальным минимумом.
 
 ## Коммерческое направление / Commercial direction
 

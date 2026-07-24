@@ -1,0 +1,19 @@
+{
+  "id": "m2-capacity-desktop",
+  "path": "/?demo=control",
+  "viewport": { "width": 1440, "height": 1200 },
+  "assertions": [
+    { "selector": ".brand", "text": "v0.2.0-alpha" },
+    { "selector": "#printableResult", "text": "608 × 431 mm" },
+    { "selector": "#productFinishedResult", "text": "105 × 148 mm" },
+    { "selector": "#bestGridResult", "text": "4 × 4" },
+    { "selector": "#bestPositionsResult", "text": "16" },
+    { "selector": "#bestRotationResult", "text": "90°" },
+    { "selector": "#candidate0Positions", "text": "10" },
+    { "selector": "#candidate90Positions", "text": "16" },
+    { "selector": "#printPairCount", "text": "35" },
+    { "selector": "#pagePairsBody", "text": "33" }
+  ],
+  "screenshot": "uimposition-v0-2-0-alpha-m2-capacity-desktop.png",
+  "fullPage": true
+}

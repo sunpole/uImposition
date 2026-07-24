@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="uImposition — профессиональный расчёт офсетных монтажей / professional offset imposition planning">
-  <title>uImposition · v0.1.0-alpha</title>
+  <title>uImposition · v0.2.0-alpha</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,32 +12,35 @@
     <nav class="nav" aria-label="Основная навигация">
       <a class="brand" href="./" aria-label="uImposition — главная страница">
         <span class="brand__name">uImposition</span>
-        <span class="brand__version">v<span data-project-version>0.1.0-alpha</span></span>
+        <span class="brand__version">v<span data-project-version>0.2.0-alpha</span></span>
       </a>
       <button id="languageButton" class="language-button" type="button" aria-label="Switch to English">EN</button>
     </nav>
 
     <div class="hero__content" data-lang="ru">
       <p class="eyebrow">Проектирование офсетных монтажей</p>
-      <h1>Сначала точный лист. Затем — оптимальная раскладка.</h1>
-      <p>Первая рабочая версия считает зачистку листа, непечатные поля и структуру заказов. Следующие этапы добавят монтажи, обороты, варианты оптимизации и PDF.</p>
+      <h1>Лист, изделие и реальная вместимость.</h1>
+      <p>M2 сравнивает размещение без поворота и с поворотом на 90°, показывает обе сетки, выбирает максимальную вместимость и раскрывает точные пары страниц каждого файла.</p>
     </div>
 
     <div class="hero__content" data-lang="en" hidden>
       <p class="eyebrow">Offset imposition planning</p>
-      <h1>First, establish the exact sheet. Then optimize the imposition.</h1>
-      <p>The first working version calculates sheet trim, non-printable press margins and order structure. Later stages will add impositions, backs, optimization alternatives and PDF output.</p>
+      <h1>Sheet, product and actual capacity.</h1>
+      <p>M2 compares unrotated and 90-degree placement, displays both grids, selects maximum capacity and expands every source file into exact front/back page pairs.</p>
     </div>
   </header>
 
-  <aside id="settingsPanel" class="settings-panel" aria-label="Настройки листа">
+  <aside id="settingsPanel" class="settings-panel" aria-label="Настройки листа и изделия">
     <button id="settingsToggle" class="settings-toggle" type="button" aria-expanded="true" title="Свернуть или открыть настройки">
       <span aria-hidden="true">◉</span>
-      <span class="settings-toggle__text" data-lang="ru">Настройки листа</span>
-      <span class="settings-toggle__text" data-lang="en" hidden>Sheet settings</span>
+      <span class="settings-toggle__text" data-lang="ru">Настройки</span>
+      <span class="settings-toggle__text" data-lang="en" hidden>Settings</span>
     </button>
 
     <div class="settings-panel__content">
+      <h2 class="settings-section-title" data-lang="ru">Печатный лист</h2>
+      <h2 class="settings-section-title" data-lang="en" hidden>Printing sheet</h2>
+
       <label class="field">
         <span data-lang="ru">Формат</span>
         <span data-lang="en" hidden>Preset</span>
@@ -86,10 +89,7 @@
       </label>
 
       <details>
-        <summary>
-          <span data-lang="ru">Разные значения по сторонам</span>
-          <span data-lang="en" hidden>Individual side values</span>
-        </summary>
+        <summary><span data-lang="ru">Разные значения по сторонам</span><span data-lang="en" hidden>Individual side values</span></summary>
         <div class="four-sides">
           <label>← <input id="trimLeft" type="number" min="0" max="50" step="0.1"></label>
           <label>→ <input id="trimRight" type="number" min="0" max="50" step="0.1"></label>
@@ -99,10 +99,7 @@
       </details>
 
       <details>
-        <summary>
-          <span data-lang="ru">Непечатные поля машины</span>
-          <span data-lang="en" hidden>Non-printable press margins</span>
-        </summary>
+        <summary><span data-lang="ru">Непечатные поля машины</span><span data-lang="en" hidden>Non-printable press margins</span></summary>
         <div class="four-sides">
           <label>← <input id="marginLeft" type="number" min="0" max="100" step="0.1"></label>
           <label>→ <input id="marginRight" type="number" min="0" max="100" step="0.1"></label>
@@ -110,113 +107,151 @@
           <label>↓ <input id="marginBottom" type="number" min="0" max="100" step="0.1"></label>
         </div>
       </details>
+
+      <div class="settings-divider"></div>
+      <h2 class="settings-section-title" data-lang="ru">Изделие</h2>
+      <h2 class="settings-section-title" data-lang="en" hidden>Product</h2>
+
+      <label class="field">
+        <span data-lang="ru">Готовый формат</span>
+        <span data-lang="en" hidden>Finished-size preset</span>
+        <select id="productPreset"></select>
+      </label>
+
+      <div class="field-grid">
+        <label class="field">
+          <span data-lang="ru">Ширина, мм</span>
+          <span data-lang="en" hidden>Width, mm</span>
+          <input id="productWidth" type="number" min="1" max="1000" step="0.1">
+        </label>
+        <label class="field">
+          <span data-lang="ru">Высота, мм</span>
+          <span data-lang="en" hidden>Height, mm</span>
+          <input id="productHeight" type="number" min="1" max="1000" step="0.1">
+        </label>
+      </div>
+
+      <label class="field">
+        <span data-lang="ru">Выпуск за обрез, мм</span>
+        <span data-lang="en" hidden>Bleed, mm</span>
+        <input id="productBleed" type="number" min="0" max="20" step="0.1" list="bleedPresets">
+        <datalist id="bleedPresets"><option value="0"></option><option value="2"></option><option value="5"></option></datalist>
+      </label>
+
+      <label class="field">
+        <span data-lang="ru">Режим размещения</span>
+        <span data-lang="en" hidden>Placement spacing mode</span>
+        <select id="spacingMode">
+          <option value="commonCut">Общий рез / Common cut</option>
+          <option value="separated">Раздельный рез / Separated</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span data-lang="ru">Дополнительный зазор, мм</span>
+        <span data-lang="en" hidden>Additional gap, mm</span>
+        <input id="productGap" type="number" min="0" max="100" step="0.1">
+      </label>
+      <p id="spacingHint" class="hint"></p>
     </div>
   </aside>
 
   <main class="workspace">
     <section id="geometryResults" class="panel result-panel">
       <div class="section-heading">
-        <div>
-          <p class="section-kicker">M1</p>
-          <h2 data-lang="ru">Геометрия печатного листа</h2>
-          <h2 data-lang="en" hidden>Printing-sheet geometry</h2>
-        </div>
+        <div><p class="section-kicker">SHEET</p><h2 data-lang="ru">Геометрия печатного листа</h2><h2 data-lang="en" hidden>Printing-sheet geometry</h2></div>
         <span id="trimStatus" class="status-chip"></span>
       </div>
 
       <div class="result-grid">
-        <article class="metric">
-          <span data-lang="ru">Исходный лист</span>
-          <span data-lang="en" hidden>Source sheet</span>
-          <strong id="sourceResult">620 × 450 mm</strong>
-        </article>
-        <article class="metric metric--accent">
-          <span data-lang="ru">После зачистки</span>
-          <span data-lang="en" hidden>Post-trim sheet</span>
-          <strong id="trimmedResult">616 × 446 mm</strong>
-        </article>
-        <article class="metric">
-          <span data-lang="ru">Печатная область</span>
-          <span data-lang="en" hidden>Printable area</span>
-          <strong id="printableResult">608 × 431 mm</strong>
-        </article>
+        <article class="metric"><span data-lang="ru">Исходный лист</span><span data-lang="en" hidden>Source sheet</span><strong id="sourceResult">620 × 450 mm</strong></article>
+        <article class="metric metric--accent"><span data-lang="ru">После зачистки</span><span data-lang="en" hidden>Post-trim sheet</span><strong id="trimmedResult">616 × 446 mm</strong></article>
+        <article class="metric"><span data-lang="ru">Печатная область</span><span data-lang="en" hidden>Printable area</span><strong id="printableResult">608 × 431 mm</strong></article>
       </div>
       <p id="geometryError" class="error-box" hidden></p>
+      <div class="formula-card"><p data-lang="ru"><strong>Порядок:</strong> исходный лист − зачистка = фактический лист; фактический лист − непечатные поля = печатная область.</p><p data-lang="en" hidden><strong>Order:</strong> source sheet − sheet trim = physical sheet; physical sheet − non-printable press margins = printable area.</p></div>
+    </section>
 
-      <div class="formula-card">
-        <p data-lang="ru"><strong>Порядок расчёта:</strong> исходный лист − зачистка = фактический лист; фактический лист − непечатные поля = печатная область.</p>
-        <p data-lang="en" hidden><strong>Calculation order:</strong> source sheet − sheet trim = physical sheet; physical sheet − non-printable press margins = printable area.</p>
+    <section id="placementResults" class="panel placement-panel">
+      <div class="section-heading">
+        <div><p class="section-kicker">M2</p><h2 data-lang="ru">Вместимость изделия</h2><h2 data-lang="en" hidden>Product capacity</h2></div>
+        <span id="placementStatus" class="status-chip">Изделие помещается</span>
       </div>
+
+      <div class="result-grid result-grid--capacity">
+        <article class="metric"><span data-lang="ru">Готовый формат</span><span data-lang="en" hidden>Finished size</span><strong id="productFinishedResult">105 × 148 mm</strong></article>
+        <article class="metric"><span data-lang="ru">Занимаемый размер с выпуском</span><span data-lang="en" hidden>Occupied size with bleed</span><strong id="productOccupiedResult">105 × 148 mm</strong></article>
+        <article class="metric metric--accent"><span data-lang="ru">Лучшая сетка</span><span data-lang="en" hidden>Best grid</span><strong id="bestGridResult">4 × 4</strong></article>
+        <article class="metric metric--accent"><span data-lang="ru">Позиций на листе</span><span data-lang="en" hidden>Positions per sheet</span><strong id="bestPositionsResult">16</strong></article>
+        <article class="metric"><span data-lang="ru">Поворот изделия</span><span data-lang="en" hidden>Product rotation</span><strong id="bestRotationResult" data-rotation="90">90° →</strong></article>
+      </div>
+
+      <div class="candidate-grid">
+        <article id="candidate0Card" class="candidate-card">
+          <div><span class="candidate-card__label">0° ↑</span><strong id="candidate0Grid">5 × 2</strong></div>
+          <p id="candidate0Positions">10 позиций</p>
+          <small><span data-lang="ru">Свободно по краям:</span><span data-lang="en" hidden>Unused edges:</span> <span id="candidate0Unused">83 × 135 mm</span></small>
+        </article>
+        <article id="candidate90Card" class="candidate-card is-best">
+          <div><span class="candidate-card__label">90° →</span><strong id="candidate90Grid">4 × 4</strong></div>
+          <p id="candidate90Positions">16 позиций</p>
+          <small><span data-lang="ru">Свободно по краям:</span><span data-lang="en" hidden>Unused edges:</span> <span id="candidate90Unused">16 × 11 mm</span></small>
+        </article>
+      </div>
+
+      <div class="placement-preview-wrap">
+        <div class="preview-heading"><h3 data-lang="ru">Схема вместимости</h3><h3 data-lang="en" hidden>Capacity scheme</h3><p id="placementPreviewNote"></p></div>
+        <div id="placementPreview" class="placement-preview" aria-label="Сетка размещения"></div>
+      </div>
+
+      <p id="placementError" class="error-box" hidden></p>
+      <div class="formula-card"><p data-lang="ru"><strong>Сейчас:</strong> программа честно сравнивает две однородные сетки — 0° и 90°. Смешивание поворотов внутри одного листа будет отдельным последующим алгоритмом.</p><p data-lang="en" hidden><strong>Current scope:</strong> the application compares two uniform grids, 0° and 90°. Mixed rotations within one sheet will be a separate later algorithm.</p></div>
     </section>
 
     <section class="panel orders-panel">
       <div class="section-heading">
-        <div>
-          <p class="section-kicker">INPUT</p>
-          <h2 data-lang="ru">Заказы</h2>
-          <h2 data-lang="en" hidden>Orders</h2>
-        </div>
+        <div><p class="section-kicker">INPUT</p><h2 data-lang="ru">Заказы</h2><h2 data-lang="en" hidden>Orders</h2></div>
         <div class="button-row">
-          <button id="loadControlCase" class="button" type="button">
-            <span data-lang="ru">Загрузить контрольный заказ</span>
-            <span data-lang="en" hidden>Load control dataset</span>
-          </button>
-          <button id="clearOrders" class="button button--quiet" type="button">
-            <span data-lang="ru">Очистить</span>
-            <span data-lang="en" hidden>Clear</span>
-          </button>
+          <button id="loadControlCase" class="button" type="button"><span data-lang="ru">Загрузить контрольный заказ</span><span data-lang="en" hidden>Load control dataset</span></button>
+          <button id="clearOrders" class="button button--quiet" type="button"><span data-lang="ru">Очистить</span><span data-lang="en" hidden>Clear</span></button>
         </div>
       </div>
 
-      <label class="field">
-        <span data-lang="ru">Одна строка: файл | тираж | страниц | примечание</span>
-        <span data-lang="en" hidden>One line: file | quantity | pages | note</span>
-        <textarea id="ordersInput" rows="10" spellcheck="false" placeholder="70 | 3500 | 3&#10;25 | 1500 | 3&#10;99 | 2100 | 2"></textarea>
-      </label>
+      <label class="field"><span data-lang="ru">Одна строка: файл | тираж | страниц | примечание</span><span data-lang="en" hidden>One line: file | quantity | pages | note</span><textarea id="ordersInput" rows="10" spellcheck="false" placeholder="70 | 3500 | 3&#10;25 | 1500 | 3&#10;99 | 2100 | 2"></textarea></label>
       <pre id="ordersError" class="error-box" hidden></pre>
 
       <div class="result-grid result-grid--orders">
-        <article class="metric">
-          <span data-lang="ru">Файлов</span>
-          <span data-lang="en" hidden>Files</span>
-          <strong id="orderCount">0</strong>
-        </article>
-        <article class="metric">
-          <span data-lang="ru">Печатных пар</span>
-          <span data-lang="en" hidden>Print pairs</span>
-          <strong id="printPairCount">0</strong>
-        </article>
-        <article class="metric">
-          <span data-lang="ru">Сумма тиражей</span>
-          <span data-lang="en" hidden>Total run length</span>
-          <strong id="totalQuantity">0</strong>
-        </article>
+        <article class="metric"><span data-lang="ru">Файлов</span><span data-lang="en" hidden>Files</span><strong id="orderCount">0</strong></article>
+        <article class="metric"><span data-lang="ru">Печатных пар</span><span data-lang="en" hidden>Print pairs</span><strong id="printPairCount">0</strong></article>
+        <article class="metric"><span data-lang="ru">Сумма тиражей</span><span data-lang="en" hidden>Total run length</span><strong id="totalQuantity">0</strong></article>
       </div>
     </section>
 
+    <section class="panel page-pairs-panel">
+      <div class="section-heading"><div><p class="section-kicker">PAGES</p><h2 data-lang="ru">Точные пары страниц</h2><h2 data-lang="en" hidden>Exact page pairs</h2></div></div>
+      <p data-lang="ru">Каждая строка — одно готовое изделие: нечётная страница идёт на лицо, следующая чётная — на оборот. Для последней нечётной страницы оборот обозначается только знаком «-».</p>
+      <p data-lang="en" hidden>Each row is one finished product: the odd source page is the front and the following even page is the back. An unmatched final odd page receives a dash-only back.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th><span data-lang="ru">Файл</span><span data-lang="en" hidden>File</span></th><th><span data-lang="ru">Пара</span><span data-lang="en" hidden>Pair</span></th><th><span data-lang="ru">Лицо</span><span data-lang="en" hidden>Front</span></th><th><span data-lang="ru">Оборот</span><span data-lang="en" hidden>Back</span></th><th><span data-lang="ru">Тираж</span><span data-lang="en" hidden>Quantity</span></th></tr></thead>
+          <tbody id="pagePairsBody"></tbody>
+        </table>
+      </div>
+      <p id="pagePairsEmpty" class="empty-state"></p>
+      <p id="pagePairsNotice" class="hint" hidden></p>
+    </section>
+
     <section class="panel roadmap-panel">
-      <h2 data-lang="ru">Что уже работает и что дальше</h2>
-      <h2 data-lang="en" hidden>What works now and what comes next</h2>
+      <h2 data-lang="ru">Текущая граница M2</h2><h2 data-lang="en" hidden>Current M2 boundary</h2>
       <div class="two-column-copy">
-        <div data-lang="ru">
-          <p><strong>Работает:</strong> реальные форматы листов, режим до/после зачистки, одинаковая или раздельная зачистка, непечатные поля, разбор заказов и число печатных пар.</p>
-          <p><strong>Следом:</strong> вместимость изделия, пары страниц, лицо, зеркальный оборот, проверка тиражей и варианты оптимизации.</p>
-        </div>
-        <div data-lang="en" hidden>
-          <p><strong>Working:</strong> real sheet presets, pre/post-trim modes, uniform or per-side trim, press margins, order parsing and print-pair totals.</p>
-          <p><strong>Next:</strong> product capacity, page pairs, front scheme, mirrored back, run verification and optimization alternatives.</p>
-        </div>
+        <div data-lang="ru"><p><strong>Работает:</strong> геометрия листа, формат изделия, выпуск, дополнительный зазор, сетки 0°/90°, выбор максимальной вместимости и точные пары страниц.</p><p><strong>Следом:</strong> заполнение позиций файлами, сплошные блоки повторов, лицо и автоматически зеркальный оборот.</p></div>
+        <div data-lang="en" hidden><p><strong>Working:</strong> sheet geometry, product size, bleed, additional gap, 0°/90° grids, maximum-capacity selection and exact page pairs.</p><p><strong>Next:</strong> assign files to positions in contiguous blocks, build the front and derive the mirrored back automatically.</p></div>
       </div>
     </section>
   </main>
 
   <div id="toast" class="toast" role="status" hidden></div>
-
-  <footer>
-    <a href="./" class="footer-brand">uImposition · v<span data-project-version>0.1.0-alpha</span></a>
-    <span>© 2026 Anton Magomedov</span>
-  </footer>
-
+  <footer><a href="./" class="footer-brand">uImposition · v<span data-project-version>0.2.0-alpha</span></a><span>© 2026 Anton Magomedov</span></footer>
   <script type="module" src="src/app.js"></script>
 </body>
 </html>
