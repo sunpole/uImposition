@@ -7,7 +7,8 @@ const TEXT = Object.freeze({
     empty: "Производственный отчёт появится после загрузки контрольного заказа.",
     physicalSheets: "Физическая бумага",
     forms: "Печатные формы",
-    formsHint: "лицо + оборот",
+    frontFormLabel: "лица",
+    backFormLabel: "оборота",
     pressPasses: "Листопрогоны",
     underproduction: "Недопечатка",
     pairOverrun: "Перетираж пар",
@@ -37,7 +38,8 @@ const TEXT = Object.freeze({
     empty: "The production report appears after loading the control dataset.",
     physicalSheets: "Physical sheets",
     forms: "Printing forms",
-    formsHint: "front + back",
+    frontFormLabel: "front",
+    backFormLabel: "back",
     pressPasses: "Press passes",
     underproduction: "Underproduction",
     pairOverrun: "Pair overrun",
@@ -196,9 +198,10 @@ export function renderProductionReport(panel, report, { language = "ru" } = {}) 
   heading.append(titleWrap, status);
 
   const summary = element("div", "result-grid production-summary");
+  const formsHint = `${report.totals.frontForms} ${text.frontFormLabel} + ${report.totals.backForms} ${text.backFormLabel}`;
   summary.append(
     metricCard(text.physicalSheets, report.totals.physicalSheets, "productionPhysicalSheets", language),
-    metricCard(text.forms, report.totals.forms, "productionForms", language, `${report.totals.frontForms} + ${report.totals.backForms} ${text.formsHint}`),
+    metricCard(text.forms, report.totals.forms, "productionForms", language, formsHint),
     metricCard(text.pressPasses, report.totals.pressPasses, "productionPressPasses", language),
     metricCard(text.underproduction, report.totals.underproduction, "productionUnderproduction", language),
     metricCard(text.pairOverrun, report.totals.overrun, "productionPairOverrun", language),
