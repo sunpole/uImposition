@@ -13,7 +13,7 @@
 - лицензия и коммерческое направление;
 - версия и контрольный набор.
 
-### M1 — `0.1.0-alpha`, рабочая версия
+### M1 — `0.1.0-alpha`, завершён
 
 - центральный `config.js`;
 - панель настроек;
@@ -26,21 +26,34 @@
 - реальные release screenshots;
 - интеграция uNews.
 
-### M2 — вместимость изделия
+Точка отката: `release/v0.1.0-alpha`.
+
+### M2 — `0.2.0-alpha`, завершён
 
 - формат изделия и выпуск;
 - зазор/общий рез;
 - размещение 0° и 90°;
 - строки, столбцы и число позиций;
-- выбор лучшей сетки.
+- выбор лучшей сетки;
+- нумерованная схема вместимости;
+- точные пары исходных страниц;
+- GitHub Actions, Chromium screenshots и uNews.
 
-### M3 — страницы, лицо и оборот
+Точка отката: `release/v0.2.0-alpha`.
 
-- пары `1/2`, `3/4`, `5/-`;
-- заполнение лица;
-- автоматическое зеркало;
-- стрелки;
-- схемы с рамками.
+### M3 — `0.3.0-alpha`, следующий активный этап
+
+Рабочая ветка: `m3/0.3.0-alpha`.
+
+- модульное заполнение лица сплошными блоками;
+- автоматическое зеркало оборота;
+- преобразование стрелок;
+- независимая проверка лица и оборота;
+- схемы `ЛИСТ-N_ЛИЦО` и `ЛИСТ-N_ОБОРОТ`;
+- рамочные карточки, пригодные для скриншотов;
+- 4 лица и 4 оборота контрольного примера.
+
+Подробный план: `docs/M3_IMPLEMENTATION_PLAN.md`.
 
 ### M4 — тиражи и отчёт
 
@@ -89,7 +102,7 @@
 - licensing and commercial direction;
 - versioning and control dataset.
 
-### M1 — `0.1.0-alpha`, working
+### M1 — `0.1.0-alpha`, complete
 
 - central `config.js`;
 - settings panel;
@@ -102,21 +115,34 @@
 - factual release screenshots;
 - uNews integration.
 
-### M2 — product capacity
+Rollback checkpoint: `release/v0.1.0-alpha`.
+
+### M2 — `0.2.0-alpha`, complete
 
 - finished size and bleed;
 - gap/common cut;
 - 0° and 90° placement;
-- rows, columns and position count;
-- best-grid selection.
+- rows, columns, and position count;
+- best-grid selection;
+- numbered capacity scheme;
+- exact source-page pairs;
+- GitHub Actions, Chromium screenshots, and uNews.
 
-### M3 — pages, front and back
+Rollback checkpoint: `release/v0.2.0-alpha`.
 
-- `1/2`, `3/4`, `5/-` pairs;
-- front filling;
-- automatic mirror;
-- head-direction arrows;
-- bordered schemes.
+### M3 — `0.3.0-alpha`, next active milestone
+
+Working branch: `m3/0.3.0-alpha`.
+
+- modular contiguous front blocks;
+- automatic mirrored back;
+- direction transformation;
+- independent front/back validation;
+- `SHEET-N_FRONT` and `SHEET-N_BACK` schemes;
+- bordered screenshot-ready cards;
+- four fronts and four backs for the control example.
+
+Detailed plan: `docs/M3_IMPLEMENTATION_PLAN.md`.
 
 ### M4 — runs and reporting
 
@@ -133,7 +159,7 @@
 - A4 and proportional modes;
 - separate report PDF.
 
-### M6 — paper minimization
+### M6 — paper minimisation
 
 - candidate generation;
 - run assignment;
