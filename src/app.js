@@ -2,260 +2,230 @@ import { CONFIG } from "./config.js";
 import { calculateSheetGeometry } from "./geometry.js";
 import { ordersToText, parseOrders } from "./orders.js";
 
-const elements = {
-  languageButton: document.querySelector("#languageButton"),
-  brandVersion: document.querySelectorAll("[data-project-version]"),
-  settingsPanel: document.querySelector("#settingsPanel"),
-  settingsToggle: document.querySelector("#settingsToggle"),
-  sheetPreset: document.querySelector("#sheetPreset"),
-  sizeStage: document.querySelector("#sizeStage"),
-  sheetWidth: document.querySelector("#sheetWidth"),
-  sheetHeight: document.querySelector("#sheetHeight"),
-  trimEnabled: document.querySelector("#trimEnabled"),
-  trimUniform: document.querySelector("#trimUniform"),
-  trimUniformMm: document.querySelector("#trimUniformMm"),
-  trimSides: {
-    left: document.querySelector("#trimLeft"),
-    right: document.querySelector("#trimRight"),
-    top: document.querySelector("#trimTop"),
-    bottom: document.querySelector("#trimBottom"),
-  },
-  pressMargins: {
-    left: document.querySelector("#marginLeft"),
-    right: document.querySelector("#marginRight"),
-    top: document.querySelector("#marginTop"),
-    bottom: document.querySelector("#marginBottom"),
-  },
-  stageHint: document.querySelector("#stageHint"),
-  sourceResult: document.querySelector("#sourceResult"),
-  trimmedResult: document.querySelector("#trimmedResult"),
-  printableResult: document.querySelector("#printableResult"),
-  trimStatus: document.querySelector("#trimStatus"),
-  geometryError: document.querySelector("#geometryError"),
-  ordersInput: document.querySelector("#ordersInput"),
-  ordersError: document.querySelector("#ordersError"),
-  orderCount: document.querySelector("#orderCount"),
-  printPairCount: document.querySelector("#printPairCount"),
-  totalQuantity: document.querySelector("#totalQuantity"),
-  loadControlCase: document.querySelector("#loadControlCase"),
-  clearOrders: document.querySelector("#clearOrders"),
-  toast: document.querySelector("#toast"),
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
+const sides = ["left", "right", "top", "bottom"];
+const ids = {
+  left: "Left",
+  right: "Right",
+  top: "Top",
+  bottom: "Bottom",
 };
 
-let language = localStorage.getItem(CONFIG.storage.languageKey) || CONFIG.app.defaultLanguage;
+const ui = {
+  languageButton: $("#languageButton"),
+  settingsPanel: $("#settingsPanel"),
+  settingsToggle: $("#settingsToggle"),
+  sheetPreset: $("#sheetPreset"),
+  sizeStage: $("#sizeStage"),
+  sheetWidth: $("#sheetWidth"),
+  sheetHeight: $("#sheetHeight"),
+  trimEnabled: $("#trimEnabled"),
+  trimUniform: $("#trimUniform"),
+  trimUniformMm: $("#trimUniformMm"),
+  stageHint: $("#stageHint"),
+  sourceResult: $("#sourceResult"),
+  trimmedResult: $("#trimmedResult"),
+  printableResult: $("#printableResult"),
+  trimStatus: $("#trimStatus"),
+  geometryError: $("#geometryError"),
+  geometryResults: $("#geometryResults"),
+  ordersInput: $("#ordersInput"),
+  ordersError: $("#ordersError"),
+  orderCount: $("#orderCount"),
+  printPairCount: $("#printPairCount"),
+  totalQuantity: $("#totalQuantity"),
+  loadControlCase: $("#loadControlCase"),
+  clearOrders: $("#clearOrders"),
+  toast: $("#toast"),
+  trim: Object.fromEntries(sides.map((side) => [side, $(`#trim${ids[side]}`)])),
+  margins: Object.fromEntries(sides.map((side) => [side, $(`#margin${ids[side]}`)])),
+};
+
+function readStoredLanguage() {
+  try {
+    return localStorage.getItem(CONFIG.storage.languageKey);
+  } catch {
+    return null;
+  }
+}
+
+let language = readStoredLanguage() || CONFIG.app.defaultLanguage;
 if (!CONFIG.app.supportedLanguages.includes(language)) language = CONFIG.app.defaultLanguage;
 
-function t(key) {
-  return CONFIG.i18n[language][key] ?? CONFIG.i18n.ru[key] ?? key;
-}
+const t = (key) => CONFIG.i18n[language][key] ?? CONFIG.i18n.ru[key] ?? key;
+const formatMm = ({ width, height }) => `${width} Ã— ${height} ${CONFIG.app.unit}`;
+const values = (inputs) => Object.fromEntries(sides.map((side) => [side, inputs[side].value]));
 
-function formatMm({ width, height }) {
-  return `${width} Ã— ${height} ${CONFIG.app.unit}`;
-}
-
-function setToast(message) {
-  elements.toast.textContent = message;
-  elements.toast.hidden = false;
-  window.clearTimeout(setToast.timeout);
-  setToast.timeout = window.setTimeout(() => {
-    elements.toast.hidden = true;
-  }, 2800);
+function toast(message) {
+  ui.toast.textContent = message;
+  ui.toast.hidden = false;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { ui.toast.hidden = true; }, 2800);
 }
 
 function renderLanguage() {
   document.documentElement.lang = language;
-  const customOption = elements.sheetPreset.options[0];
-  if (customOption?.value === "custom") customOption.textContent = t("customPreset");
-  document.querySelectorAll("[data-lang]").forEach((element) => {
+  $$('[data-lang]').forEach((element) => {
     element.hidden = element.dataset.lang !== language;
   });
-  elements.languageButton.textContent = language === "ru" ? "EN" : "RU";
-  elements.languageButton.setAttribute("aria-label", language === "ru" ? "Switch to English" : "ĞŸĞµÑ€ĞµĞºĞ»ÑÑ‡Ğ¸Ñ‚ÑŒ Ğ½Ğ° Ñ€ÑƒÑÑĞºĞ¸Ğ¹");
-  localStorage.setItem(CONFIG.storage.languageKey, language);
+  const custom = ui.sheetPreset.options[0];
+  if (custom?.value === "custom") custom.textContent = t("customPreset");
+  ui.languageButton.textContent = language === "ru" ? "EN" : "RU";
+  ui.languageButton.ariaLabel = language === "ru" ? "Switch to English" : "ĞŸĞµÑ€ĞµĞºĞ»ÑÑ‡Ğ¸Ñ‚ÑŒ Ğ½Ğ° Ñ€ÑƒÑÑĞºĞ¸Ğ¹";
+  try { localStorage.setItem(CONFIG.storage.languageKey, language); } catch { /* optional */ }
   renderGeometry();
   renderOrders();
 }
 
-async function renderProjectVersion() {
+async function renderVersion() {
   try {
     const response = await fetch("./VERSION.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`VERSION.json request failed: ${response.status}`);
-    const versionData = await response.json();
-    if (typeof versionData.version !== "string" || !versionData.version.trim()) {
-      throw new Error("VERSION.json contains no valid version");
-    }
-    elements.brandVersion.forEach((element) => {
-      element.textContent = versionData.version;
-    });
-    document.title = `${CONFIG.app.name} Â· v${versionData.version}`;
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const { version } = await response.json();
+    if (typeof version !== "string" || !version.trim()) throw new Error("Invalid version");
+    $$('[data-project-version]').forEach((element) => { element.textContent = version; });
+    document.title = `${CONFIG.app.name} Â· v${version}`;
   } catch (error) {
-    console.warn("Could not load VERSION.json; HTML fallback remains visible.", error);
+    console.warn("VERSION.json could not be loaded; the HTML fallback remains visible.", error);
   }
 }
 
 function populatePresets() {
-  const customOption = document.createElement("option");
-  customOption.value = "custom";
-  customOption.textContent = t("customPreset");
-  elements.sheetPreset.append(customOption);
-
+  ui.sheetPreset.append(new Option(t("customPreset"), "custom"));
   CONFIG.sheetPresets.forEach((preset) => {
-    const option = document.createElement("option");
-    option.value = preset.id;
-    option.textContent = `${preset.label} ${CONFIG.app.unit}`;
-    elements.sheetPreset.append(option);
+    ui.sheetPreset.append(new Option(`${preset.label} ${CONFIG.app.unit}`, preset.id));
   });
 }
 
 function applyDefaults() {
-  elements.sheetPreset.value = CONFIG.defaults.sheetPresetId;
-  elements.sheetWidth.value = CONFIG.defaults.sheetWidth;
-  elements.sheetHeight.value = CONFIG.defaults.sheetHeight;
-  elements.sizeStage.value = CONFIG.defaults.sizeStage;
-  elements.trimEnabled.checked = CONFIG.defaults.trimEnabled;
-  elements.trimUniform.checked = CONFIG.defaults.trimUniform;
-  elements.trimUniformMm.value = CONFIG.defaults.trimUniformMm;
-
-  for (const side of Object.keys(elements.trimSides)) {
-    elements.trimSides[side].value = CONFIG.defaults.trimSidesMm[side];
-    elements.pressMargins[side].value = CONFIG.defaults.pressMarginsMm[side];
-  }
-
-  elements.ordersInput.value = CONFIG.defaults.ordersText;
-  syncTrimControls();
-}
-
-function selectedPreset() {
-  return CONFIG.sheetPresets.find((preset) => preset.id === elements.sheetPreset.value) ?? null;
+  const d = CONFIG.defaults;
+  ui.sheetPreset.value = d.sheetPresetId;
+  ui.sheetWidth.value = d.sheetWidth;
+  ui.sheetHeight.value = d.sheetHeight;
+  ui.sizeStage.value = d.sizeStage;
+  ui.trimEnabled.checked = d.trimEnabled;
+  ui.trimUniform.checked = d.trimUniform;
+  ui.trimUniformMm.value = d.trimUniformMm;
+  sides.forEach((side) => {
+    ui.trim[side].value = d.trimSidesMm[side];
+    ui.margins[side].value = d.pressMarginsMm[side];
+  });
+  ui.ordersInput.value = d.ordersText;
 }
 
 function applyPreset() {
-  const preset = selectedPreset();
+  const preset = CONFIG.sheetPresets.find(({ id }) => id === ui.sheetPreset.value);
   if (!preset) return;
-  elements.sheetWidth.value = preset.width;
-  elements.sheetHeight.value = preset.height;
-  elements.sizeStage.value = preset.sizeStage;
+  ui.sheetWidth.value = preset.width;
+  ui.sheetHeight.value = preset.height;
+  ui.sizeStage.value = preset.sizeStage;
   renderGeometry();
 }
 
 function syncTrimControls() {
-  const disabled = !elements.trimEnabled.checked || elements.sizeStage.value === "afterTrim";
-  elements.trimUniformMm.disabled = disabled || !elements.trimUniform.checked;
-  Object.values(elements.trimSides).forEach((input) => {
-    input.disabled = disabled || elements.trimUniform.checked;
-  });
+  const unavailable = !ui.trimEnabled.checked || ui.sizeStage.value === "afterTrim";
+  ui.trimUniformMm.disabled = unavailable || !ui.trimUniform.checked;
+  sides.forEach((side) => { ui.trim[side].disabled = unavailable || ui.trimUniform.checked; });
 }
 
-function trimSidesFromForm() {
-  if (elements.trimUniform.checked) {
-    const value = elements.trimUniformMm.value;
-    return { left: value, right: value, top: value, bottom: value };
-  }
-  return Object.fromEntries(
-    Object.entries(elements.trimSides).map(([side, input]) => [side, input.value]),
-  );
-}
-
-function marginsFromForm() {
-  return Object.fromEntries(
-    Object.entries(elements.pressMargins).map(([side, input]) => [side, input.value]),
-  );
-}
-
-function readGeometryInput() {
-  return {
-    width: elements.sheetWidth.value,
-    height: elements.sheetHeight.value,
-    sizeStage: elements.sizeStage.value,
-    trim: {
-      enabled: elements.trimEnabled.checked,
-      sides: trimSidesFromForm(),
-    },
-    pressMargins: marginsFromForm(),
-    limits: CONFIG.limits,
-  };
+function trimValues() {
+  if (!ui.trimUniform.checked) return values(ui.trim);
+  return Object.fromEntries(sides.map((side) => [side, ui.trimUniformMm.value]));
 }
 
 function renderGeometry() {
   syncTrimControls();
-  elements.stageHint.textContent =
-    elements.sizeStage.value === "afterTrim" ? t("stageAfterTrimHint") : t("stageBeforeTrimHint");
+  ui.stageHint.textContent = ui.sizeStage.value === "afterTrim"
+    ? t("stageAfterTrimHint")
+    : t("stageBeforeTrimHint");
 
   try {
-    const result = calculateSheetGeometry(readGeometryInput());
-    elements.sourceResult.textContent = formatMm(result.source);
-    elements.trimmedResult.textContent = formatMm(result.trimmed);
-    elements.printableResult.textContent = formatMm(result.printable);
-    elements.trimStatus.textContent = result.trimApplied
-      ? language === "ru"
-        ? "Ğ—Ğ°Ñ‡Ğ¸ÑÑ‚ĞºĞ° Ğ¿Ñ€Ğ¸Ğ¼ĞµĞ½ĞµĞ½Ğ°"
-        : "Sheet trim applied"
-      : language === "ru"
-        ? "Ğ—Ğ°Ñ‡Ğ¸ÑÑ‚ĞºĞ° Ğ½Ğµ Ğ²Ñ‹Ñ‡Ğ¸Ñ‚Ğ°Ğ»Ğ°ÑÑŒ Ğ¿Ğ¾Ğ²Ñ‚Ğ¾Ñ€Ğ½Ğ¾"
-        : "No duplicate trim reduction";
-    elements.geometryError.hidden = true;
-    document.querySelector("#geometryResults").classList.remove("has-error");
+    const result = calculateSheetGeometry({
+      width: ui.sheetWidth.value,
+      height: ui.sheetHeight.value,
+      sizeStage: ui.sizeStage.value,
+      trim: { enabled: ui.trimEnabled.checked, sides: trimValues() },
+      pressMargins: values(ui.margins),
+      limits: CONFIG.limits,
+    });
+    ui.sourceResult.textContent = formatMm(result.source);
+    ui.trimmedResult.textContent = formatMm(result.trimmed);
+    ui.printableResult.textContent = formatMm(result.printable);
+    ui.trimStatus.textContent = result.trimApplied
+      ? (language === "ru" ? "Ğ—Ğ°Ñ‡Ğ¸ÑÑ‚ĞºĞ° Ğ¿Ñ€Ğ¸Ğ¼ĞµĞ½ĞµĞ½Ğ°" : "Sheet trim applied")
+      : (language === "ru" ? "ĞŸĞ¾Ğ²Ñ‚Ğ¾Ñ€Ğ½Ğ°Ñ Ğ·Ğ°Ñ‡Ğ¸ÑÑ‚ĞºĞ° Ğ½Ğµ Ğ¿Ñ€Ğ¸Ğ¼ĞµĞ½ĞµĞ½Ğ°" : "No duplicate trim reduction");
+    ui.geometryError.hidden = true;
+    ui.geometryResults.classList.remove("has-error");
   } catch (error) {
-    elements.geometryError.textContent = `${t("invalidInput")}: ${error.message}`;
-    elements.geometryError.hidden = false;
-    document.querySelector("#geometryResults").classList.add("has-error");
+    ui.geometryError.textContent = `${t("invalidInput")}: ${error.message}`;
+    ui.geometryError.hidden = false;
+    ui.geometryResults.classList.add("has-error");
   }
 }
 
 function renderOrders() {
-  const result = parseOrders(elements.ordersInput.value, CONFIG.limits);
-  elements.orderCount.textContent = result.summary.orderCount.toLocaleString(language);
-  elements.printPairCount.textContent = result.summary.printPairCount.toLocaleString(language);
-  elements.totalQuantity.textContent = result.summary.totalQuantity.toLocaleString(language);
-
-  if (result.errors.length === 0) {
-    elements.ordersError.hidden = true;
-    elements.ordersInput.removeAttribute("aria-invalid");
-  } else {
-    elements.ordersError.textContent = result.errors
-      .slice(0, 5)
-      .map((error) => `${language === "ru" ? "Ğ¡Ñ‚Ñ€Ğ¾ĞºĞ°" : "Line"} ${error.line}: ${error.message}`)
-      .join("\n");
-    elements.ordersError.hidden = false;
-    elements.ordersInput.setAttribute("aria-invalid", "true");
-  }
+  const result = parseOrders(ui.ordersInput.value, CONFIG.limits);
+  ui.orderCount.textContent = result.summary.orderCount.toLocaleString(language);
+  ui.printPairCount.textContent = result.summary.printPairCount.toLocaleString(language);
+  ui.totalQuantity.textContent = result.summary.totalQuantity.toLocaleString(language);
+  ui.ordersError.hidden = result.errors.length === 0;
+  ui.ordersInput.toggleAttribute("aria-invalid", result.errors.length > 0);
+  ui.ordersError.textContent = result.errors.slice(0, 5)
+    .map((error) => `${language === "ru" ? "Ğ¡Ñ‚Ñ€Ğ¾ĞºĞ°" : "Line"} ${error.line}: ${error.message}`)
+    .join("\n");
 }
 
 async function loadControlCase() {
   try {
     const response = await fetch(CONFIG.demo.controlCaseUrl, { cache: "no-store" });
-    if (!response.ok) throw new Error(R	Ü™\ÜÛœÙKœİ]\ßX
-NÂˆÛÛœİ]HH]ØZ]™\ÜÛœÙKšœÛÛŠ
-NÂ‚ˆ[[Y[ËœÚY]™\Ù]˜[YHH˜İ\İÛHÂˆ[[Y[ËœÚY]ÚY˜[YHH]KœÚY]ÚYÂˆ[[Y[ËœÚY]ZYÚ˜[YHH]KœÚY]šZYÚÂˆ[[Y[ËœÚ^™TİYÙK˜[YHH]KœÚY]œÚ^™TİYÙNÂˆ[[Y[Ëš[Q[˜X›Y˜ÚXÚÙYH]KœÚY]š[K™[˜X›YÂˆ[[Y[Ëš[U[šY›Ü›K˜ÚXÚÙYBˆ]KœÚY]š[K›YOOH]KœÚY]š[KœšYÚ	‰‚ˆ]KœÚY]š[K›YOOH]KœÚY]š[KÜ	‰‚ˆ]KœÚY]š[K›YOOH]KœÚY]š[K˜›İÛNÂˆ[[Y[Ëš[U[šY›Ü›S[K˜[YHH]KœÚY]š[K›YÂ‚ˆ›Üˆ
-ÛÛœİÚYHÙˆØš™XİšÙ^\Ê[[Y[Ëš[TÚY\ÊJHÂˆ[[Y[Ëš[TÚY\ÖÜÚYWK˜[YHH]KœÚY]š[VÜÚYWNÂˆ[[Y[Ëœ™\ÜÓX\™Ú[œÖÜÚYWK˜[YHH]KœÚY]œ™\ÜÓX\™Ú[œÖÜÚYWNÂˆB‚ˆ[[Y[Ë›Ü™\œÒ[œ]˜[YHHÜ™\œÕÕ^
-]K›Ü™\œÊNÂˆ™[™\‘Ù[ÛY]J
-NÂˆ™[™\“Ü™\œÊ
-NÂˆÙ]Ø\İ
-
-›ØYYÛÛ›ÛØ\ÙHŠJNÂˆHØ]Ú
-\œ›ÜŠHÂˆÛÛœÛÛK™\œ›ÜŠ\œ›ÜŠNÂˆÙ]Ø\İ
-
-›ØY˜Z[YŠJNÂˆBŸB‚™[˜İ[Ûˆ]XÚ\İ[™\œÊ
-HÂˆ[[Y[Ë›[™İXYÙP]Û‹˜Y]™[\İ[™\Š˜ÛXÚÈ‹
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    ui.sheetPreset.value = "custom";
+    ui.sheetWidth.value = data.sheet.width;
+    ui.sheetHeight.value = data.sheet.height;
+    ui.sizeStage.value = data.sheet.sizeStage;
+    ui.trimEnabled.checked = data.sheet.trim.enabled;
+    ui.trimUniform.checked = sides.every((side) => data.sheet.trim[side] === data.sheet.trim.left);
+    ui.trimUniformMm.value = data.sheet.trim.left;
+    sides.forEach((side) => {
+      ui.trim[side].value = data.sheet.trim[side];
+      ui.margins[side].value = data.sheet.pressMargins[side];
+    });
+    ui.ordersInput.value = ordersToText(data.orders);
+    renderGeometry();
+    renderOrders();
+    toast(t("loadedControlCase"));
+  } catch (error) {
+    console.error(error);
+    toast(t("loadFailed"));
+  }
+}
 
-HOˆÂˆ[™İXYÙHH[™İXYÙHOOHœHˆÈ™[ˆˆˆœHÂˆ™[™\“[™İXYÙJ
-NÂˆJNÂ‚ˆ[[Y[ËœÙ][™ÜÕÙÙÛK˜Y]™[\İ[™\Š˜ÛXÚÈ‹
+function attachListeners() {
+  ui.languageButton.addEventListener("click", () => {
+    language = language === "ru" ? "en" : "ru";
+    renderLanguage();
+  });
+  ui.settingsToggle.addEventListener("click", () => {
+    ui.settingsPanel.classList.toggle("is-collapsed");
+    ui.settingsToggle.ariaExpanded = String(!ui.settingsPanel.classList.contains("is-collapsed"));
+  });
+  ui.sheetPreset.addEventListener("change", applyPreset);
+  [ui.sizeStage, ui.trimEnabled, ui.trimUniform].forEach((input) => input.addEventListener("change", renderGeometry));
+  [ui.sheetWidth, ui.sheetHeight, ui.trimUniformMm, ...Object.values(ui.trim), ...Object.values(ui.margins)]
+    .forEach((input) => input.addEventListener("input", renderGeometry));
+  ui.ordersInput.addEventListener("input", renderOrders);
+  ui.loadControlCase.addEventListener("click", loadControlCase);
+  ui.clearOrders.addEventListener("click", () => { ui.ordersInput.value = ""; renderOrders(); });
+}
 
-HOˆÂˆ[[Y[ËœÙ][™ÜÔ[™[˜Û\ÜÓ\İÙÙÛJš\ËXÛÛ\ÙYŠNÂˆÛÛœİÛÛ\ÙYH[[Y[ËœÙ][™ÜÔ[™[˜Û\ÜÓ\İ˜ÛÛZ[œÊš\ËXÛÛ\ÙYŠNÂˆ[[Y[ËœÙ][™ÜÕÙÙÛKœÙ]]šX]J˜\šXKY^[™Y‹İš[™ÊXÛÛ\ÙY
-JNÂˆJNÂ‚ˆ[[Y[ËœÚY]™\Ù]˜Y]™[\İ[™\Š˜Ú[™ÙH‹\T™\Ù]
-NÂˆ[[Y[ËœÚ^™TİYÙK˜Y]™[\İ[™\Š˜Ú[™ÙH‹™[™\‘Ù[ÛY]JNÂˆ[[Y[Ëš[Q[˜X›Y˜Y]™[\İ[™\Š˜Ú[™ÙH‹™[™\‘Ù[ÛY]JNÂˆ[[Y[Ëš[U[šY›Ü›K˜Y]™[\İ[™\Š˜Ú[™ÙH‹™[™\‘Ù[ÛY]JNÂ‚ˆÂˆ[[Y[ËœÚY]ÚYˆ[[Y[ËœÚY]ZYÚˆ[[Y[Ëš[U[šY›Ü›S[Kˆ‹‹“Øš™Xİ˜[Y\Ê[[Y[Ëš[TÚY\ÊKˆ‹‹“Øš™Xİ˜[Y\Ê[[Y[Ëœ™\ÜÓX\™Ú[œÊKˆK™›Ü‘XXÚ
+populatePresets();
+applyDefaults();
+attachListeners();
+renderLanguage();
+renderVersion();
 
-[œ]
-HOˆ[œ]˜Y]™[\İ[™\Šš[œ]‹™[™\‘Ù[ÛY]JJNÂ‚ˆ[[Y[Ë›Ü™\œÒ[œ]˜Y]™[\İ[™\Šš[œ]‹™[™\“Ü™\œÊNÂˆ[[Y[Ë›ØYÛÛ›ÛØ\ÙK˜Y]™[\İ[™\Š˜ÛXÚÈ‹ØYÛÛ›ÛØ\ÙJNÂˆ[[Y[Ë˜ÛX\“Ü™\œË˜Y]™[\İ[™\Š˜ÛXÚÈ‹
-
-HOˆÂˆ[[Y[Ë›Ü™\œÒ[œ]˜[YHHˆÂˆ™[™\“Ü™\œÊ
-NÂˆJNÂŸB‚œÜ[]T™\Ù]Ê
-NÂ˜\QY˜][Ê
-NÂ˜]XÚ\İ[™\œÊ
-NÂœ™[™\“[™İXYÙJ
-NÂœ™[™\”›Ú™Xİ™\œÚ[ÛŠ
-NÂ‚˜ÛÛœİ]Y\HH™]ÈT“ÙX\˜Ú\˜[\ÊÚ[™İË›ØØ][Û‹œÙX\˜Ú
-NÂšYˆ
-]Y\K™Ù]
-ÓÓ‘’QË™[[Ëœ]Y\T\˜[Y]\ŠHOOH˜ÛÛ›ÛŠHÂˆØYÛÛ›ÛØ\ÙJ
-NÂŸB
+if (new URLSearchParams(location.search).get(CONFIG.demo.queryParameter) === "control") {
+  loadControlCase();
+}
