@@ -1,8 +1,13 @@
-# M4 release evidence / Доказательства релиз-кандидата M4
+# M4 release evidence / Доказательства релиза M4
 
-## Версия / Version
+## Версия и объединение / Version and merge
 
-`0.4.0-alpha`
+- version: `0.4.0-alpha`;
+- Pull Request: `#6`;
+- verified PR head: `b8efa6ef625bfffc8e135232220885b9898fc088`;
+- merge commit: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`;
+- rollback branch: `release/v0.4.0-alpha`;
+- alpha milestone: no tag and no GitHub Release.
 
 ## Функциональный снимок / Functional capture
 
@@ -17,7 +22,6 @@
 
 ## Проверенные значения / Verified values
 
-- версия / version: `0.4.0-alpha`;
 - печатные пары / print pairs: `35`;
 - физическая бумага / physical sheets: `3395`;
 - формы / forms: `8`;
@@ -31,6 +35,15 @@
 Desktop и mobile PNG просмотрены вручную: сводка, восемь схем и таблица файлов читаемы; широкие таблицы на мобильном экране доступны через горизонтальную прокрутку.
 
 The desktop and mobile PNG files were reviewed manually. The summary, eight schemes, and file table are readable; wide mobile tables remain accessible through horizontal scrolling.
+
+## Проверки полного head / Full-head checks
+
+Для commit `b8efa6ef625bfffc8e135232220885b9898fc088`:
+
+- Quality checks — success;
+- Capture uImposition screenshots — success;
+- Prepare uImposition release news — success;
+- Validate uNews patchnotes — success.
 
 ## uNews
 
