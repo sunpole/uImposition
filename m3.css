@@ -1,0 +1,23 @@
+.imposition-panel > p { max-width: 900px; }
+.scheme-pairs { display: grid; gap: 22px; margin-top: 24px; }
+.scheme-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.scheme-card { min-width: 0; border: 1px solid #9f9f9f; border-radius: 16px; padding: 16px; background: #f7f7f7; }
+.scheme-card__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.scheme-card__title { margin: 0; font-size: clamp(1rem, 2vw, 1.35rem); letter-spacing: -.025em; }
+.scheme-card__status { flex: 0 0 auto; border: 1px solid #9f9f9f; border-radius: 999px; padding: 3px 8px; font-size: .7rem; background: #fff; }
+.scheme-card__status.is-valid { border-color: #171717; font-weight: 800; }
+.scheme-card__meta { margin: 8px 0 12px; color: #5f5f5f; font-size: .8rem; }
+.scheme-grid { --scheme-columns: 4; display: grid; grid-template-columns: repeat(var(--scheme-columns), minmax(0, 1fr)); border: 2px solid #171717; background: #171717; gap: 1px; }
+.scheme-cell { min-width: 0; min-height: 54px; padding: 7px 4px; background: #fff; display: grid; place-items: center; text-align: center; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: clamp(.66rem, 1.25vw, .9rem); font-weight: 750; line-height: 1.15; overflow-wrap: anywhere; }
+.imposition-panel .formula-card { margin-top: 22px; }
+
+@media (max-width: 820px) {
+  .scheme-pair { grid-template-columns: 1fr; }
+  .scheme-cell { min-height: 58px; font-size: clamp(.72rem, 2.8vw, .92rem); }
+}
+
+@media (max-width: 420px) {
+  .scheme-card { padding: 10px; border-radius: 12px; }
+  .scheme-card__heading { flex-direction: column; }
+  .scheme-cell { min-height: 50px; padding: 5px 2px; font-size: .68rem; }
+}

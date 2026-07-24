@@ -13,22 +13,21 @@
 
 Разработка uImposition ведётся **через GitHub как единственный источник истины**.
 
-Основной рабочий процесс не зависит от локального компьютера, терминала, локального клона или установленной среды разработки. ChatGPT должен читать файлы из GitHub, создавать отдельную ветку, вносить изменения через GitHub-инструменты, открывать Pull Request и проверять результат через GitHub Actions и GitHub Pages.
+Основной процесс не зависит от локального компьютера, терминала, локального клона или установленной среды разработки. ChatGPT читает файлы из GitHub, работает в отдельной ветке, открывает Pull Request и проверяет результат через GitHub Actions, настоящий Chromium и GitHub Pages.
 
-Терминал или локальный компьютер могут использоваться только как дополнительная ручная проверка владельцем проекта. Они не являются обязательными для разработки и не являются источником истины.
+Терминал или локальный компьютер используются только как дополнительная ручная проверка владельцем и не являются источником истины.
 
 ### Текущее состояние
 
 - репозиторий: `sunpole/uImposition`;
 - сайт: `https://sunpole.github.io/uImposition/`;
-- основная ветка: `main`;
-- текущая версия в `main`: **`0.2.0-alpha`**;
-- завершённый этап: **M2 — вместимость изделия и точные пары страниц**;
-- следующая версия: **`0.3.0-alpha`**;
-- следующий этап: **M3 — лицо, зеркальный оборот, стрелки и рамочные схемы**;
-- рабочая ветка M3 уже создана: `m3/0.3.0-alpha`;
-- на момент создания этого handoff реализация M3 ещё не начата;
-- точка отката M2: `release/v0.2.0-alpha`.
+- основная ветка после объединения M3: `main`;
+- текущая версия: **`0.3.0-alpha`**;
+- завершённый этап: **M3 — лицо и автоматически зеркальный оборот**;
+- следующая версия: **`0.4.0-alpha`**;
+- следующий этап: **M4 — производственные итоги и отчёт**;
+- точка отката M3: `release/v0.3.0-alpha`;
+- M3 остаётся ручной контрольной раскладкой и не заявляет автоматический минимум бумаги.
 
 ### Что обязательно прочитать перед изменениями
 
@@ -37,12 +36,25 @@
 3. `VERSION.json` и `VERSION.md`;
 4. `docs/CURRENT_STATE.md`;
 5. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
-6. `docs/M3_IMPLEMENTATION_PLAN.md`;
+6. `docs/ROADMAP.md`;
 7. `docs/TECHNICAL_SPECIFICATION_RU.md`;
 8. `docs/ARCHITECTURE.md`;
 9. `src/config.js`;
 10. `data/control-case.json`;
-11. последние Pull Request и проверки GitHub Actions.
+11. `data/control-layout-m3.json`;
+12. последние Pull Request и GitHub Actions.
+
+### Что реализовано в M3
+
+- `src/front-layout.js` — лицо сплошными блоками row-major;
+- `src/orientation.js` — внутренние направления и преобразование стрелок;
+- `src/back-layout.js` — оборот только как зеркало готового лица;
+- `src/imposition-validation.js` — независимая проверка соответствия;
+- `src/scheme-renderer.js` — DOM-отрисовка проверенных схем;
+- `src/m3-demo.js` — координация четырёх контрольных монтажей;
+- 4 лица и 4 оборота по `4 × 4 = 16` позиций;
+- desktop/mobile Chromium screenshots;
+- новый патчноут и PNG через uNews.
 
 ### Главные правила
 
@@ -53,15 +65,25 @@
 - Новую расчётную логику оформлять отдельным чистым модулем и тестами.
 - Не строить оборот самостоятельно: он всегда выводится из лица.
 - Не принимать недопечатку.
-- Не объявлять версию готовой до успешных GitHub Actions и проверки реального Chromium-скриншота.
-- При изменении версии одновременно обновлять `VERSION.json`, `VERSION.md`, `CHANGELOG.md`, README и видимую версию сайта.
-- Стабильная версия получает recovery-ветку, tag и GitHub Release. Alpha-веха получает как минимум recovery-ветку.
+- Не считать ручную контрольную раскладку доказанным глобальным минимумом.
+- Не объявлять версию готовой до успешных Actions и проверки реального Chromium-скриншота.
+- При изменении версии одновременно обновлять все источники версии.
+- Alpha-веха получает recovery-ветку; стабильная версия — recovery-ветку, tag и настоящий GitHub Release.
 
 ### Точная точка продолжения
 
-Продолжить в ветке `m3/0.3.0-alpha` по плану `docs/M3_IMPLEMENTATION_PLAN.md`.
+Начать M4 в новой отдельной ветке от проверенного `main` версии `0.3.0-alpha`.
 
-Первый кодовый шаг M3: добавить независимые модули для назначения позиций лицу, преобразования ориентации, построения зеркального оборота и проверки взаимного соответствия. Только после тестов подключать их к DOM-интерфейсу.
+Первый кодовый шаг M4: спроектировать и реализовать независимые чистые функции, которые для явных монтажей рассчитывают:
+
+- напечатанное количество по каждой паре;
+- недопечатку и перетираж;
+- лицевые и оборотные формы;
+- физическую бумагу;
+- листопрогоны;
+- проверяемую сводку без DOM.
+
+Только после тестов подключать производственный отчёт к интерфейсу.
 
 </td>
 <td width="50%" valign="top">
@@ -72,55 +94,45 @@
 
 uImposition is developed with **GitHub as the single source of truth**.
 
-The primary workflow does not depend on a local computer, terminal, local clone, or locally installed development environment. ChatGPT must read the repository through GitHub, create a feature branch, write changes through GitHub tools, open a Pull Request, and verify the result through GitHub Actions and GitHub Pages.
+The primary workflow does not depend on a local computer, terminal, local clone, or installed development environment. ChatGPT reads the repository through GitHub, works in a feature branch, opens a Pull Request, and verifies the result through GitHub Actions, factual Chromium screenshots, and GitHub Pages.
 
-A terminal or local computer may be used only as an additional manual verification method by the project owner. They are not required for development and are not a source of truth.
+A terminal or local computer is optional owner-side verification only and is not a source of truth.
 
 ### Current state
 
 - repository: `sunpole/uImposition`;
 - website: `https://sunpole.github.io/uImposition/`;
-- default branch: `main`;
-- current version in `main`: **`0.2.0-alpha`**;
-- completed milestone: **M2 — product capacity and exact source-page pairs**;
-- next version: **`0.3.0-alpha`**;
-- next milestone: **M3 — front, mirrored back, direction arrows, and bordered schemes**;
-- M3 working branch already exists: `m3/0.3.0-alpha`;
-- M3 implementation had not started when this handoff was created;
-- M2 rollback checkpoint: `release/v0.2.0-alpha`.
+- default branch after the M3 merge: `main`;
+- current version: **`0.3.0-alpha`**;
+- completed milestone: **M3 — front and automatically mirrored back**;
+- next version: **`0.4.0-alpha`**;
+- next milestone: **M4 — production totals and reporting**;
+- M3 rollback checkpoint: `release/v0.3.0-alpha`;
+- M3 remains a manual control layout and does not claim automatic paper minimisation.
 
 ### Required reading before any change
 
-1. `START_HERE.md`;
-2. `AGENTS.md`;
-3. `VERSION.json` and `VERSION.md`;
-4. `docs/CURRENT_STATE.md`;
-5. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
-6. `docs/M3_IMPLEMENTATION_PLAN.md`;
-7. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-8. `docs/ARCHITECTURE.md`;
-9. `src/config.js`;
-10. `data/control-case.json`;
-11. recent Pull Requests and GitHub Actions checks.
+Read `AGENTS.md`, version sources, current state, roadmap, specifications, architecture, configuration, both control JSON files, and recent Pull Requests and Actions.
+
+### Implemented in M3
+
+M3 contains pure front assignment, orientation, mirrored-back derivation, independent validation, DOM-only rendering, four control fronts and four backs, factual desktop/mobile Chromium screenshots, and a uNews patchnote with a new PNG.
 
 ### Core rules
 
-- Never infer repository state from chat history; read GitHub first.
+- Read GitHub before inferring state.
 - Do not write functional milestones directly to `main`.
-- One task must use one branch and one clear Pull Request.
-- Production rules and values must not be hidden in UI code.
-- New calculation logic must be a separate pure module with tests.
-- Never design the back independently: derive it from the front.
-- Never accept underproduction.
-- Do not declare a version complete before successful GitHub Actions and a factual Chromium screenshot review.
-- A version change must synchronise `VERSION.json`, `VERSION.md`, `CHANGELOG.md`, README, and the visible site version.
-- A stable version requires a recovery branch, tag, and GitHub Release. An alpha milestone requires at least a recovery branch.
+- Keep production rules out of UI code.
+- Put new calculation logic in pure tested modules.
+- Derive every back only from its front.
+- Reject underproduction.
+- Never treat the manual control layout as a proven global optimum.
+- Synchronise all version sources together.
+- An alpha milestone requires a recovery branch; a stable version requires a recovery branch, tag, and actual GitHub Release.
 
 ### Exact continuation point
 
-Continue on `m3/0.3.0-alpha` according to `docs/M3_IMPLEMENTATION_PLAN.md`.
-
-The first M3 coding step is to add independent modules for front-position assignment, orientation transformation, mirrored-back derivation, and front/back validation. Connect those modules to the DOM interface only after their tests pass.
+Start M4 in a new branch from verified `main` at `0.3.0-alpha`. First create DOM-independent functions and tests for produced quantity, underproduction, overrun, plates, physical paper, press passes, and a validated summary. Integrate the report into the UI only after those tests pass.
 
 </td>
 </tr>
@@ -137,17 +149,15 @@ The first M3 coding step is to add independent modules for front-position assign
 - VERSION.json и VERSION.md;
 - docs/CURRENT_STATE.md;
 - docs/GITHUB_ONLY_DEVELOPMENT.md;
-- docs/M3_IMPLEMENTATION_PLAN.md;
+- docs/ROADMAP.md;
 - docs/TECHNICAL_SPECIFICATION_RU.md;
 - docs/ARCHITECTURE.md;
 - src/config.js;
 - data/control-case.json;
+- data/control-layout-m3.json;
 - последние Pull Request и GitHub Actions.
 
 Разработка ведётся GitHub-first и без обязательного терминала или локального ПК.
-Не проси локальный клон и не основывай работу на локальных файлах.
-Терминал допускается только как дополнительная проверка, но не как обязательный этап и не как источник истины.
-
-Перед изменениями дай короткий аудит фактического состояния GitHub.
-Затем продолжи M3 в ветке m3/0.3.0-alpha строго модульно: чистые расчётные модули, отдельные тесты, затем UI, Pull Request, GitHub Actions, реальный Chromium-скриншот, uNews и recovery-ветка после merge.
+Перед изменениями дай краткий аудит фактического состояния GitHub.
+Затем начни M4 в отдельной ветке от main версии 0.3.0-alpha: сначала чистые расчётные модули и тесты для напечатанного количества, недопечатки, перетиража, форм, бумаги и листопрогонов; затем UI, Pull Request, GitHub Actions, реальный Chromium-скриншот, uNews и recovery-ветка после merge.
 ```

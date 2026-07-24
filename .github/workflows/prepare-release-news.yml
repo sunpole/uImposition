@@ -89,4 +89,18 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add news/
           git commit -m "news: prepare uImposition ${RELEASE_VERSION} patchnote"
-          git push origin HEAD:${TARGET_BRANCH}
+          local_sha="$(git rev-parse HEAD)"
+
+          if git push origin HEAD:${TARGET_BRANCH}; then
+            exit 0
+          fi
+
+          echo "Initial push returned a failure; verifying the remote branch."
+          git fetch origin "${TARGET_BRANCH}"
+          if git merge-base --is-ancestor "${local_sha}" "origin/${TARGET_BRANCH}"; then
+            echo "The generated commit is already present on the remote branch."
+            exit 0
+          fi
+
+          echo "The generated commit is not present on the remote branch."
+          exit 1

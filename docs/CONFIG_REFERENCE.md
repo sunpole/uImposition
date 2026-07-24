@@ -6,7 +6,7 @@
 
 All editable production and interface values live in `src/config.js`. Calculation modules must not contain hidden production constants.
 
-## Реализованные группы M2 / Implemented M2 groups
+## Реализованные группы M3 / Implemented M3 groups
 
 | Группа | Назначение / Purpose |
 |---|---|
@@ -17,8 +17,19 @@ All editable production and interface values live in `src/config.js`. Calculatio
 | `defaults` | значения первого запуска / initial UI defaults |
 | `limits` | допустимые диапазоны и лимиты отображения / ranges and display limits |
 | `storage` | ключи браузерного хранения / browser-storage keys |
-| `demo` | контрольный набор / control dataset |
+| `demo` | контрольный заказ и контрольные монтажи / control order and control impositions |
 | `i18n` | русские и английские подписи / Russian and English labels |
+
+## Контрольные источники M3 / M3 control sources
+
+В группе `demo` используются два независимых источника:
+
+- `controlCaseUrl` → `data/control-case.json` — лист, изделие и 20 заказов;
+- `controlLayoutUrl` → `data/control-layout-m3.json` — четыре ручные раскладки лицевых позиций.
+
+The `demo` group uses two independent sources: the control order and the four manual front-layout assignments. The back layouts are never stored independently; they are derived from the fronts at runtime.
+
+Ручные тиражи `1500`, `1100`, `450`, `345` являются контрольными значениями для M3 и не должны восприниматься как результат оптимизатора.
 
 ## Геометрия листа / Sheet geometry
 
@@ -32,7 +43,7 @@ All editable production and interface values live in `src/config.js`. Calculatio
 
 ## Геометрия изделия / Product geometry
 
-`productPresets` содержит готовые размеры без выпуска. M2 поддерживает:
+`productPresets` содержит готовые размеры без выпуска. Поддерживаются:
 
 - `width`, `height` — готовый формат;
 - `bleed` — выпуск с каждой стороны;
@@ -49,8 +60,6 @@ occupied height = finished height + 2 × bleed
 
 Для раздельного режима дополнительный `gap` применяется только между соседними занимаемыми прямоугольниками, а не после последнего изделия.
 
-`productPresets` stores finished sizes without bleed. In separated mode, the additional `gap` is inserted only between adjacent occupied rectangles, not after the final product.
-
 ## Подсчёт сетки / Grid count
 
 Для каждой ориентации `0°` и `90°`:
@@ -64,6 +73,14 @@ positions = columns × rows
 Сначала выбирается максимальное число позиций. При равенстве используется меньшая неиспользованная площадь ограничивающего прямоугольника, затем меньший остаток по краям, затем стабильное предпочтение `0°`.
 
 Maximum position count is the first selector. Ties use the smaller unused bounding area, then smaller combined edge waste, then stable preference for `0°`.
+
+## M3: лицо и оборот / M3: front and back
+
+- лицо заполняется блоками из `data/control-layout-m3.json` в порядке row-major;
+- `rotation: 0` создаёт направление `up`, `rotation: 90` — `right`;
+- оборот не хранится в конфигурации и не группируется отдельно;
+- горизонтальный переворот зеркалит колонки и преобразует `right` в `left`;
+- знак `-` является только отображением `backPage: null`.
 
 ## Значения по умолчанию / Defaults
 

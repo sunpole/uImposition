@@ -1,25 +1,50 @@
 # Changelog
 
-## Unreleased — documentation handoff
+## 0.3.0-alpha — 2026-07-24
+
+### Added
+
+- pure `orientation`, `front-layout`, `back-layout`, and `imposition-validation` modules;
+- contiguous row-major front-position blocks;
+- automatic mirrored-back derivation that preserves row order and reverses columns;
+- exact front/back page mapping, including null unmatched backs;
+- independent file, pair, page, coordinate, and direction validation;
+- `data/control-layout-m3.json` with four manual 4×4 control layouts;
+- tests covering all four fronts and four backs, file 119, null backs, and block continuity;
+- DOM-only scheme renderer with `file,page arrow` cells;
+- responsive desktop/mobile cards for eight verified schemes;
+- automatic clearing of stale control schemes after order, sheet, or product changes.
+
+### Changed
+
+- the control demo now shows four `SHEET-N_FRONT` and four automatically mirrored `SHEET-N_BACK` schemes;
+- the visible site, package metadata, screenshot tooling, documentation, and version manifest are synchronized to `0.3.0-alpha`;
+- screenshot scenarios now assert M3 scheme content rather than only M2 capacity;
+- M4 production totals are now the next active milestone.
+
+### Verified
+
+- each control scheme contains exactly 16 front and 16 back cells;
+- every back is derived only from its corresponding front;
+- a horizontal left-to-right turn maps `→` to `←`;
+- unmatched final odd pages appear only as dash-only back cells;
+- file 119 preserves complete `1/2` and `3/4` pairs;
+- desktop and mobile Chromium screenshots display all eight schemes;
+- the manual control layout remains a reference rather than a proven global optimum.
+
+## Documentation handoff — 2026-07-24
 
 ### Added
 
 - root `START_HERE.md` entry point for a new ChatGPT conversation or device;
 - exact current-state record in `docs/CURRENT_STATE.md`;
-- GitHub-only development workflow that does not depend on a local clone or terminal;
-- modular M3 implementation plan with explicit module boundaries, control layouts, and acceptance tests;
-- copy-ready prompt for continuing development from a new chat using GitHub only.
+- GitHub-only development workflow independent of a local clone or terminal;
+- modular M3 implementation plan with explicit module boundaries and acceptance tests.
 
 ### Changed
 
-- `AGENTS.md` now requires GitHub-first auditing and prohibits relying on chat memory or local files;
-- README now exposes the continuation entry point and distinguishes primary GitHub Actions verification from optional local checks;
-- roadmap now marks M2 complete and M3 as the active next milestone.
-
-### Version
-
-- project runtime version remains `0.2.0-alpha`;
-- this documentation patch does not claim M3 functionality or change the product version.
+- `AGENTS.md` requires GitHub-first auditing and prohibits relying on chat memory or local files;
+- README exposes the continuation entry point and distinguishes GitHub Actions verification from optional local checks.
 
 ## 0.2.0-alpha — 2026-07-24
 
@@ -40,10 +65,10 @@
 
 ### Changed
 
-- GitHub Pages now presents M2 capacity and page-pair results;
-- central configuration now includes product presets, production spacing defaults and limits;
-- release-news preparation reads a generic milestone marker instead of hard-coded M1 text;
-- screenshot scenarios now prove the M2 result on desktop and mobile;
+- GitHub Pages presents M2 capacity and page-pair results;
+- central configuration includes product presets, production spacing defaults and limits;
+- release-news preparation reads a generic milestone marker;
+- screenshot scenarios prove the M2 result on desktop and mobile;
 - version synchronized to `0.2.0-alpha` across the site, package metadata and documentation.
 
 ### Verified
@@ -77,8 +102,8 @@
 
 ### Changed
 
-- GitHub Pages landing page is now the first working M1 interface;
-- `uImposition · v{version}` is a clickable home-page logo;
+- GitHub Pages landing page became the first working M1 interface;
+- `uImposition · v{version}` became a clickable home-page logo;
 - the visible page title and logo version load from `VERSION.json`;
 - the settings panel opens by default and can collapse to an eye-style emblem.
 
@@ -106,7 +131,6 @@
 ### Added
 
 - Russian-first bilingual repository documentation;
-- two-column Russian/English repository overview;
 - full Russian and English technical specifications;
 - architecture, configuration, algorithm, test and roadmap documents;
 - business and monetization model;

@@ -41,28 +41,32 @@
 
 Точка отката: `release/v0.2.0-alpha`.
 
-### M3 — `0.3.0-alpha`, следующий активный этап
+### M3 — `0.3.0-alpha`, завершён
 
-Рабочая ветка: `m3/0.3.0-alpha`.
-
-- модульное заполнение лица сплошными блоками;
-- автоматическое зеркало оборота;
-- преобразование стрелок;
-- независимая проверка лица и оборота;
+- чистое модульное заполнение лица сплошными блоками;
+- автоматическое зеркало оборота без независимой группировки;
+- преобразование стрелок при перевороте листа;
+- независимая проверка файла, pair-id, страниц, координат и направлений;
 - схемы `ЛИСТ-N_ЛИЦО` и `ЛИСТ-N_ОБОРОТ`;
-- рамочные карточки, пригодные для скриншотов;
-- 4 лица и 4 оборота контрольного примера.
+- рамочные desktop/mobile карточки;
+- 4 лица и 4 оборота контрольного примера;
+- отдельные контрольные данные и тесты;
+- реальные Chromium screenshots и патчноут uNews.
 
-Подробный план: `docs/M3_IMPLEMENTATION_PLAN.md`.
+После объединения создаётся точка отката: `release/v0.3.0-alpha`.
 
-### M4 — тиражи и отчёт
+Подробный план и критерии: `docs/M3_IMPLEMENTATION_PLAN.md`.
 
-- напечатано;
-- недопечатка;
-- перетираж;
-- формы;
-- бумага;
-- листопрогоны.
+### M4 — `0.4.0-alpha`, следующий активный этап
+
+- напечатанное количество по каждой паре страниц;
+- недопечатка как недопустимый результат;
+- перетираж по файлам и парам;
+- количество лицевых и оборотных форм;
+- физическая бумага;
+- листопрогоны;
+- проверяемый производственный отчёт;
+- чистые расчётные модули и Node-тесты до подключения UI.
 
 ### M5 — PDF
 
@@ -130,28 +134,32 @@ Rollback checkpoint: `release/v0.1.0-alpha`.
 
 Rollback checkpoint: `release/v0.2.0-alpha`.
 
-### M3 — `0.3.0-alpha`, next active milestone
+### M3 — `0.3.0-alpha`, complete
 
-Working branch: `m3/0.3.0-alpha`.
-
-- modular contiguous front blocks;
-- automatic mirrored back;
-- direction transformation;
-- independent front/back validation;
+- pure contiguous front-block assignment;
+- automatic mirrored back with no independent grouping;
+- direction transformation for the sheet turn;
+- independent file, pair-id, page, coordinate, and direction validation;
 - `SHEET-N_FRONT` and `SHEET-N_BACK` schemes;
-- bordered screenshot-ready cards;
-- four fronts and four backs for the control example.
+- bordered desktop/mobile cards;
+- four control fronts and four backs;
+- dedicated control data and tests;
+- factual Chromium screenshots and a uNews patchnote.
 
-Detailed plan: `docs/M3_IMPLEMENTATION_PLAN.md`.
+Rollback checkpoint created after merge: `release/v0.3.0-alpha`.
 
-### M4 — runs and reporting
+Detailed plan and criteria: `docs/M3_IMPLEMENTATION_PLAN.md`.
 
-- produced quantity;
-- underproduction;
-- overrun;
-- plates;
-- paper;
-- press passes.
+### M4 — `0.4.0-alpha`, next active milestone
+
+- produced quantity for every page pair;
+- underproduction as an invalid result;
+- overrun by file and pair;
+- front and back plate/form counts;
+- physical paper;
+- press passes;
+- a validated production report;
+- pure calculation modules and Node tests before UI integration.
 
 ### M5 — PDF
 

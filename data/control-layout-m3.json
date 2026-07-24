@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "name": "M3 manual control layout / Ручная контрольная раскладка M3",
+  "status": "manual reference, not proven global optimum",
+  "layouts": [
+    {
+      "id": "1",
+      "runLength": 1500,
+      "rows": 4,
+      "columns": 4,
+      "rotation": 90,
+      "blocks": [
+        { "file": "33", "frontPage": 1, "count": 6 },
+        { "file": "33", "frontPage": 3, "count": 6 },
+        { "file": "70", "frontPage": 1, "count": 1 },
+        { "file": "70", "frontPage": 3, "count": 1 },
+        { "file": "25", "frontPage": 1, "count": 1 },
+        { "file": "25", "frontPage": 3, "count": 1 }
+      ]
+    },
+    {
+      "id": "2",
+      "runLength": 1100,
+      "rows": 4,
+      "columns": 4,
+      "rotation": 90,
+      "blocks": [
+        { "file": "20", "frontPage": 1, "count": 2 },
+        { "file": "20", "frontPage": 3, "count": 2 },
+        { "file": "99", "frontPage": 1, "count": 2 },
+        { "file": "40", "frontPage": 1, "count": 2 },
+        { "file": "70", "frontPage": 1, "count": 1 },
+        { "file": "70", "frontPage": 3, "count": 1 },
+        { "file": "41", "frontPage": 1, "count": 1 },
+        { "file": "41", "frontPage": 3, "count": 1 },
+        { "file": "67", "frontPage": 1, "count": 1 },
+        { "file": "67", "frontPage": 3, "count": 1 },
+        { "file": "126", "frontPage": 1, "count": 1 },
+        { "file": "126", "frontPage": 3, "count": 1 }
+      ]
+    },
+    {
+      "id": "3",
+      "runLength": 450,
+      "rows": 4,
+      "columns": 4,
+      "rotation": 90,
+      "blocks": [
+        { "file": "97", "frontPage": 1, "count": 3 },
+        { "file": "97", "frontPage": 3, "count": 3 },
+        { "file": "70", "frontPage": 1, "count": 2 },
+        { "file": "70", "frontPage": 3, "count": 2 },
+        { "file": "8", "frontPage": 1, "count": 1 },
+        { "file": "8", "frontPage": 3, "count": 1 },
+        { "file": "62", "frontPage": 1, "count": 1 },
+        { "file": "36", "frontPage": 1, "count": 1 },
+        { "file": "119", "frontPage": 1, "count": 1 },
+        { "file": "119", "frontPage": 3, "count": 1 }
+      ]
+    },
+    {
+      "id": "4",
+      "runLength": 345,
+      "rows": 4,
+      "columns": 4,
+      "rotation": 90,
+      "blocks": [
+        { "file": "33", "frontPage": 1, "count": 2 },
+        { "file": "33", "frontPage": 3, "count": 2 },
+        { "file": "111", "frontPage": 1, "count": 2 },
+        { "file": "72", "frontPage": 1, "count": 1 },
+        { "file": "72", "frontPage": 3, "count": 1 },
+        { "file": "69", "frontPage": 1, "count": 1 },
+        { "file": "69", "frontPage": 3, "count": 1 },
+        { "file": "75", "frontPage": 1, "count": 1 },
+        { "file": "75", "frontPage": 3, "count": 1 },
+        { "file": "84", "frontPage": 1, "count": 1 },
+        { "file": "84", "frontPage": 3, "count": 1 },
+        { "file": "43", "frontPage": 1, "count": 1 },
+        { "file": "43", "frontPage": 3, "count": 1 }
+      ]
+    }
+  ]
+}
