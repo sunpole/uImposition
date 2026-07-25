@@ -28,6 +28,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           mapfile -t manifests < <(find archive/development -mindepth 2 -maxdepth 2 -name release.json -type f | sort)
           if [ "${#manifests[@]}" -eq 0 ]; then
             echo "No release manifests found."
@@ -63,28 +66,47 @@ jobs:
               fi
             done
 
+            release_exists=false
+            if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              release_exists=true
+            fi
+
+            remote_tag_sha="$(git ls-remote origin "refs/tags/${TAG}" | head -n1 | cut -f1)"
+            remote_tag_commit="$(git ls-remote origin "refs/tags/${TAG}^{}" | head -n1 | cut -f1)"
+            if [ -z "$remote_tag_commit" ]; then
+              remote_tag_commit="$remote_tag_sha"
+            fi
+
             rollback_branch="release/v${VERSION}"
             remote_branch_sha="$(git ls-remote origin "refs/heads/${rollback_branch}" | cut -f1)"
             if [ -z "$remote_branch_sha" ]; then
               git push origin "$GITHUB_SHA:refs/heads/${rollback_branch}"
               echo "Created rollback branch ${rollback_branch} at ${GITHUB_SHA}."
-            elif [ "$remote_branch_sha" != "$GITHUB_SHA" ]; then
-              echo "Rollback branch ${rollback_branch} already exists at ${remote_branch_sha}; refusing to move it."
-              exit 1
-            else
+            elif [ "$remote_branch_sha" = "$GITHUB_SHA" ]; then
               echo "Rollback branch ${rollback_branch} already matches ${GITHUB_SHA}."
+            elif [ -n "$remote_tag_sha" ] || [ "$release_exists" = "true" ]; then
+              echo "Rollback branch differs after tag or Release publication; refusing to move it."
+              exit 1
+            elif git merge-base --is-ancestor "$remote_branch_sha" "$GITHUB_SHA"; then
+              git push origin "$GITHUB_SHA:refs/heads/${rollback_branch}"
+              echo "Fast-forwarded unpublished rollback branch ${rollback_branch} to ${GITHUB_SHA}."
+            else
+              echo "Rollback branch ${rollback_branch} is not an ancestor of ${GITHUB_SHA}; refusing to rewrite it."
+              exit 1
             fi
 
-            remote_tag_sha="$(git ls-remote origin "refs/tags/${TAG}" | head -n1 | cut -f1)"
             if [ -z "$remote_tag_sha" ]; then
               git tag -a "$TAG" "$GITHUB_SHA" -m "$TITLE"
               git push origin "refs/tags/${TAG}"
               echo "Created tag ${TAG}."
+            elif [ "$remote_tag_commit" != "$GITHUB_SHA" ]; then
+              echo "Tag ${TAG} already points to ${remote_tag_commit}; refusing to move it to ${GITHUB_SHA}."
+              exit 1
             else
-              echo "Tag ${TAG} already exists."
+              echo "Tag ${TAG} already matches ${GITHUB_SHA}."
             fi
 
-            if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            if [ "$release_exists" = "true" ]; then
               echo "GitHub Release ${TAG} already exists."
               continue
             fi
