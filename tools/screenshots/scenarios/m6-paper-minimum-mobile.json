@@ -1,0 +1,20 @@
+{
+  "id": "m6-paper-minimum-mobile",
+  "path": "/?demo=control",
+  "viewport": { "width": 430, "height": 932 },
+  "assertions": [
+    { "selector": ".brand", "text": "v0.5.0-alpha" },
+    { "selector": "#paperSolutionStatus", "text": "Минимум бумаги доказан" },
+    { "selector": "#paperOptimalSheets", "text": "305" },
+    { "selector": "#paperSavings", "text": "90" },
+    { "selector": "#paperOptimalForms", "text": "112" },
+    { "selector": "#paperOptimalPressPasses", "text": "610" },
+    { "selector": "#paperOptimalPairOverrun", "text": "10" },
+    { "selector": "#paperOptimalProof", "text": "меньше бумаги невозможно" },
+    { "selector": ".paper-warning", "text": "с 8 до 112" },
+    { "selector": ".paper-runs > summary", "text": "56 автоматических монтажей" },
+    { "selector": "#pdfExportStatus", "text": "Готово: схемы 8 стр. · отчёт 6 стр." }
+  ],
+  "screenshot": "uimposition-v0-5-0-alpha-m6-paper-minimum-mobile.png",
+  "fullPage": true
+}
