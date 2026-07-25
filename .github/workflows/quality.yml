@@ -22,4 +22,20 @@ jobs:
           node-version: "22"
 
       - name: Run source checks and tests
-        run: npm run check
+        id: quality
+        shell: bash
+        run: |
+          set +e
+          npm run check > quality-check.log 2>&1
+          status=$?
+          tail -n 120 quality-check.log
+          exit "$status"
+
+      - name: Upload quality diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: uimposition-quality-${{ github.event.pull_request.number || github.run_id }}-${{ github.run_attempt }}
+          path: quality-check.log
+          if-no-files-found: warn
+          retention-days: 30
