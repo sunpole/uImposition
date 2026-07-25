@@ -2,9 +2,9 @@
 
 ## Основной принцип / Core principle
 
-Все изменяемые производственные и экспортные параметры находятся в `src/config.js` или в явных входных данных. Расчётные и PDF-модули не содержат скрытых производственных значений.
+Все изменяемые производственные, экспортные и поисковые параметры находятся в `src/config.js` или в явных входных данных. Расчётные, PDF- и оптимизационные модули не содержат скрытых производственных значений.
 
-All editable production and export parameters live in `src/config.js` or explicit input data. Calculation and PDF modules contain no hidden production constants.
+All editable production, export, and search parameters live in `src/config.js` or explicit input data. Calculation, PDF, and optimisation modules contain no hidden production constants.
 
 ## Действующие группы / Active groups
 
@@ -18,6 +18,7 @@ All editable production and export parameters live in `src/config.js` or explici
 | `storage` | browser storage keys |
 | `demo` | контрольный заказ и монтажи / control input |
 | `pdf` | страницы, рендер, качество и имена PDF / PDF pages, rendering, quality, names |
+| `optimizer` | границы пространства поиска / search-space boundaries |
 | `i18n` | подписи интерфейса / interface labels |
 
 ## Геометрия и производство / Geometry and production
@@ -80,6 +81,29 @@ CONFIG.pdf.reportDocumentFileName   = "uImposition-production-report.pdf"
 - `pdf-binary.js` помещает каждый JPEG в отдельный PDF Page/XObject;
 - runtime-зависимости, CDN и передача font-файлов отсутствуют.
 
+## M6: пространство кандидатов / M6 candidate space
+
+```text
+CONFIG.optimizer.candidateGeneration.minDistinctPairs = 1
+CONFIG.optimizer.candidateGeneration.maxDistinctPairs = 2
+CONFIG.optimizer.candidateGeneration.maxCandidates    = 10000
+CONFIG.optimizer.candidateGeneration.idPrefix         = "AUTO"
+```
+
+Первый доказуемый набор M6 включает все полные 16-позиционные кандидаты с одной или двумя различными печатными парами.
+
+Для `35` пар и вместимости `16`:
+
+```text
+single-pair candidates = C(35, 1) × C(15, 0) = 35
+two-pair candidates    = C(35, 2) × C(15, 1) = 8925
+total                   = 8960
+```
+
+Лимит `10000` выше полного размера `8960`, поэтому контрольный набор не усечён. Если пользовательский или будущий набор превышает лимит, генератор обязан вернуть `truncated: true` и не имеет права утверждать полноту пространства поиска.
+
+The first exact M6 space contains every full candidate with one or two distinct print pairs. The control case produces exactly 8960 candidates and therefore fits below the configured 10000-candidate limit without truncation.
+
 ## Значения первого запуска / Initial defaults
 
 - язык: `ru`;
@@ -90,4 +114,5 @@ CONFIG.pdf.reportDocumentFileName   = "uImposition-production-report.pdf"
 - выпуск: `0`;
 - режим: `commonCut`;
 - дополнительный зазор: `0`;
-- PDF схем: A4.
+- PDF схем: A4;
+- пространство M6: полные кандидаты с 1–2 различными парами, максимум `10000` кандидатов.
