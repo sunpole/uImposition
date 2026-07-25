@@ -9,18 +9,18 @@ Last updated: **25 July 2026**
 
 ## Русский
 
-### Версия и ветки
+### Версия и release checkpoint
 
-- `main`: **`0.5.0-alpha`**;
-- рабочая ветка: **`m6/0.6.0-alpha`**;
-- Pull Request: **№10**, draft;
-- кандидат версии: **`0.6.0-alpha`**;
-- завершённые публичные этапы: M0–M5;
-- M6 функционально реализован и проходит проверки в PR;
-- следующий этап после объединения: M7;
-- точки отката: `release/v0.1.0-alpha` … `release/v0.5.0-alpha`.
+- версия этапа: **`0.6.0-alpha`**;
+- implementation Pull Request: **№10**;
+- milestone: **M6 — доказанный минимум физической бумаги**;
+- release manifest: `archive/development/0.6.0-alpha/release.json`;
+- checkpoint включает release news, крупный PNG, постоянный evidence ZIP и три сохранённых исторических ZIP;
+- ожидаемые GitHub-объекты: `release/v0.6.0-alpha`, tag `v0.6.0-alpha`, GitHub prerelease;
+- фактическое состояние PR, `main`, ветки, tag, Release и uNews queue проверять непосредственно в GitHub;
+- следующий этап после полного подтверждения checkpoint: M7.
 
-### Что реально работает в кандидате M6
+### Что реально работает в M6
 
 1. Геометрия листа, зачистка и непечатные поля.
 2. Формат изделия, выпуск, общий и раздельный рез.
@@ -39,6 +39,9 @@ Last updated: **25 July 2026**
 15. Отдельный учёт цветовых пластин 4+4.
 16. Regression-кейсы A6 landscape/portrait, mixed A4/A5/A6 и A5 `400/700/4200`.
 17. Node, Chromium, `pdfinfo`, Poppler и ручная визуальная проверка.
+18. Крупный screenshot только панели M6 для Telegram.
+19. Release news и короткий Telegram-текст.
+20. Постоянная история разработки в `archive/development/0.6.0-alpha/`.
 
 ### Проверенный результат M6
 
@@ -67,11 +70,13 @@ Last updated: **25 July 2026**
 - полный Pareto-набор;
 - автоматический mixed-format packing;
 - тетрадный/фальцевальный спуск;
-- постоянное хранение полного проекта.
+- постоянное хранение полного рабочего проекта пользователя.
 
 ### Следующий безопасный шаг — M7
 
-M7 начинается только после объединения и точки отката M6. Сначала создаются чистые модели целей, профиля решений и лексикографического ранжирования. Затем добавляется свой оборот на контрольном кейсе:
+M7 начинается только после проверки, что PR №10 объединён, rollback-ветка, tag и GitHub prerelease существуют, а патчноут находится в очереди uNews.
+
+Сначала создаются чистые модели целей, профиля решений и лексикографического ранжирования. Затем добавляется свой оборот на контрольном кейсе:
 
 ```text
 4 разных A6
@@ -90,18 +95,17 @@ M7 начинается только после объединения и точ
 
 ## English
 
-### Version and branches
+### Version and release checkpoint
 
-- `main`: **`0.5.0-alpha`**;
-- working branch: **`m6/0.6.0-alpha`**;
-- draft PR: **#10**;
-- candidate version: **`0.6.0-alpha`**;
-- M6 is functionally implemented and verified in the PR;
-- M7 begins after merge and the `release/v0.6.0-alpha` rollback point.
+- milestone version: **`0.6.0-alpha`**;
+- implementation PR: **#10**;
+- release manifest: `archive/development/0.6.0-alpha/release.json`;
+- the checkpoint includes release news, a focused PNG, a permanent evidence ZIP, and three preserved historical ZIPs;
+- verify the factual PR, main, rollback branch, tag, GitHub prerelease, and uNews queue state directly in GitHub before continuing.
 
-### Verified M6 candidate
+### Verified M6
 
-A complete 8,960-candidate control space, automatic valid run construction, a proven 3,305-sheet physical-paper minimum, 56 impositions, 112 side-layout forms, 6,610 passes, zero underproduction, 10 pair overrun, zero file overrun, separate color-plate metrics, production regressions, and browser/PDF verification.
+A complete 8,960-candidate control space, automatic valid run construction, a proven 3,305-sheet physical-paper minimum, 56 impositions, 112 side-layout forms, 6,610 passes, zero underproduction, 10 pair overrun, zero file overrun, separate color-plate metrics, production regressions, browser/PDF verification, focused Telegram evidence, release news, and permanent repository archives.
 
 ### Not implemented yet
 
@@ -109,7 +113,7 @@ Interactive objective ordering, instant re-ranking, automatic work-and-turn, wor
 
 ### Next safe step — M7
 
-Implement pure objective/ranking models first, then the four-A6 1+1 × 4000 work-and-turn case. Both duplex strategies must use 1,000 sheets and 2,000 passes; work-and-turn must reduce side-layout forms and color plates from two to one while remaining an explicit operator choice.
+After verifying the complete M6 checkpoint, implement pure objective/ranking models first, then the four-A6 1+1 × 4000 work-and-turn case. Both duplex strategies must use 1,000 sheets and 2,000 passes; work-and-turn must reduce side-layout forms and color plates from two to one while remaining an explicit operator choice.
 
 Details: `docs/M7_IMPLEMENTATION_PLAN.md`.  
 Fixture: `data/m7-decision-cases.json`.
