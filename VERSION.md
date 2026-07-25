@@ -6,13 +6,15 @@
 
 ## Русский
 
-### Текущая версия кандидата
+### Текущий release checkpoint
 
 **`0.6.0-alpha`**  
 Дата версии: **25 июля 2026**  
-Ветка: **`m6/0.6.0-alpha`**  
-Pull Request: **№10**  
-Этап: **M6 — доказанный минимум физической бумаги**
+Implementation Pull Request: **№10**  
+Этап: **M6 — доказанный минимум физической бумаги**  
+Release manifest: `archive/development/0.6.0-alpha/release.json`
+
+Фактическое состояние PR, `main`, rollback-ветки, tag и GitHub prerelease проверяется непосредственно в GitHub; документ не хранит переходный статус `draft/open/merged`.
 
 ### Что работает
 
@@ -31,7 +33,9 @@ Pull Request: **№10**
 - regression-кейсы A6 landscape/portrait и A5 `400/700/4200`;
 - прежние два PDF и их Chromium/Poppler-проверка сохранены;
 - отдельный крупный screenshot панели M6 для Telegram;
-- постоянный архив разработки и автоматическая публикация GitHub prerelease.
+- release news и короткий Telegram-текст;
+- три исторических Action ZIP и общий evidence ZIP сохранены в репозитории;
+- автоматическая публикация rollback-ветки, immutable tag и GitHub prerelease после входа manifest в `main`.
 
 ### Проверенный контрольный результат M6
 
@@ -66,6 +70,7 @@ Pull Request: **№10**
 - автоматическая упаковка смешанных форматов;
 - минимум форм и многокритериальный компромисс;
 - набор Парето;
+- автоматический свой оборот;
 - тетрадный/фальцевальный спуск полос;
 - импорт/экспорт полного проекта и постоянное хранение.
 
@@ -73,24 +78,26 @@ Pull Request: **№10**
 
 **`0.7.0-alpha` — M7**
 
-Сократить число форм и показать многокритериальный набор вариантов между бумагой, формами и перетиражем.
+Сократить число форм, добавить изменяемую иерархию, свой/чужой оборот и показать многокритериальный набор вариантов между бумагой, формами и перетиражем.
 
 </td>
 <td width="50%" valign="top">
 
 ## English
 
-### Current candidate version
+### Current release checkpoint
 
 **`0.6.0-alpha`**  
 Version date: **25 July 2026**  
-Branch: **`m6/0.6.0-alpha`**  
-Pull Request: **#10**  
-Stage: **M6 — proven physical-paper minimum**
+Implementation PR: **#10**  
+Stage: **M6 — proven physical-paper minimum**  
+Release manifest: `archive/development/0.6.0-alpha/release.json`
+
+The factual PR, main, rollback branch, tag, and GitHub prerelease state is verified directly in GitHub rather than stored as transient draft/open/merged wording in this document.
 
 ### Working now
 
-All verified M1–M5 functionality plus a pure candidate/demand model, exact first/completion event runs, the complete 8,960-candidate one/two-pair control space, automatic valid run construction, independent front/back/report rematerialisation, a proven 3,305-sheet paper minimum, explicit manual comparison, separate 4+4 plate metrics, fixed mixed-format duplex validation, additional A6/A5 production regressions, a focused Telegram screenshot, a permanent development archive, and automatic GitHub prerelease publication.
+All verified M1–M5 functionality plus a pure candidate/demand model, exact first/completion event runs, the complete 8,960-candidate one/two-pair control space, automatic valid run construction, independent front/back/report rematerialisation, a proven 3,305-sheet paper minimum, explicit manual comparison, separate 4+4 plate metrics, fixed mixed-format duplex validation, additional A6/A5 production regressions, a focused Telegram screenshot, permanent historical archives, release news, and automatic rollback branch/tag/GitHub prerelease publication.
 
 ### Verified M6 result
 
@@ -98,13 +105,13 @@ The universal capacity lower bound is `ceil(52870 / 16) = 3305`. The constructed
 
 ### Not implemented yet
 
-Automatic mixed-format packing, form minimisation, multi-objective Pareto alternatives, folded-signature pagination, and complete-project persistence.
+Automatic mixed-format packing, form minimisation, objective reordering, work-and-turn, multi-objective Pareto alternatives, folded-signature pagination, and complete-project persistence.
 
 ### Next target version
 
 **`0.7.0-alpha` — M7**
 
-Reduce form count and present multi-objective trade-offs across paper, forms, and overrun.
+Reduce form count, add objective ordering and work-and-turn/work-and-back comparison, and present multi-objective trade-offs across paper, forms, and overrun.
 
 </td>
 </tr>
@@ -115,8 +122,9 @@ Reduce form count and present multi-objective trade-offs across paper, forms, an
 - `VERSION.json` — машинный источник;
 - `VERSION.md` — понятное состояние;
 - `CHANGELOG.md` — история;
-- `docs/VERSIONING.md` — правила.
+- `docs/VERSIONING.md` — правила;
+- `archive/development/0.6.0-alpha/release.json` — machine-readable release checkpoint.
 
 ## Релизы и откат / Releases and rollback
 
-`0.6.0-alpha` пока является проверяемым кандидатом в PR №10. После объединения автоматически создаются recovery-ветка `release/v0.6.0-alpha`, tag `v0.6.0-alpha` и настоящий GitHub **prerelease** с release notes, крупным PNG и ZIP доказательств. Патчноут и изображение одновременно входят в очередь uNews/Telegram.
+Checkpoint `0.6.0-alpha` определяет recovery-ветку `release/v0.6.0-alpha`, immutable tag `v0.6.0-alpha` и настоящий GitHub **prerelease** с release notes, крупным PNG и ZIP доказательств. Патчноут и изображение одновременно входят в очередь uNews/Telegram. Их фактическое существование проверяется через GitHub после merge.
