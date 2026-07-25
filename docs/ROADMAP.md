@@ -6,81 +6,120 @@
 
 ## Русский
 
-### M0–M4 — завершены
+### M0–M5 — завершены
 
 - M0: репозиторий, ТЗ, лицензия и контрольные данные;
 - M1: лист, зачистка, поля, ввод заказов и пары страниц;
 - M2: изделие, выпуск, сетки 0°/90° и вместимость;
 - M3: лицо, автоматически зеркальный оборот и проверка схем;
-- M4: производство, бумага, формы, листопрогоны и отчёт.
+- M4: производство, бумага, формы, листопрогоны и отчёт;
+- M5: два PDF, Chromium, `pdfinfo` и Poppler.
 
-Точки отката: `release/v0.1.0-alpha` … `release/v0.4.0-alpha`.
+Точки отката: `release/v0.1.0-alpha` … `release/v0.5.0-alpha`.
 
-### M5 — `0.5.0-alpha`, завершён
+### M6 — `0.6.0-alpha`, текущий кандидат
 
-- чистая модель двух PDF-документов;
-- одна схема на одну страницу;
-- детерминированный порядок четырёх лиц и четырёх оборотов;
-- A4, пропорциональный и пользовательский режимы схем;
-- отдельный восьмистраничный PDF схем;
-- отдельный шестистраничный PDF отчёта;
-- dependency-free PDF 1.4 writer;
-- Canvas-отрисовка кириллицы, стрелок, метрик и таблиц;
-- браузерное скачивание;
-- Playwright-проверка структуры и числа страниц;
-- `pdfinfo` и Poppler-render всех `14` страниц;
-- визуальная проверка обрезки, глифов, заголовков и таблиц.
+- чистая модель кандидата и остаточного спроса;
+- отдельные событийные тиражи `T_first` и `T_complete`;
+- полный контрольный набор `8960` кандидатов с 1–2 парами;
+- автоматическая конструкция допустимых тиражей;
+- независимая материализация лица, оборота и production report;
+- доказанный минимум физической бумаги `3305` листов;
+- сравнение с ручными `3395` листами;
+- предупреждение о росте layout-форм `8 → 112`;
+- отдельный учёт цветовых пластин 4+4;
+- regression-кейсы A6 landscape/portrait, mixed A4/A5/A6 и A5 `400/700/4200`;
+- desktop/mobile Chromium evidence.
 
-PR: `#8`. Merge commit: `366ea45efd2566c7bb25ff14ff0cbc0df7472594`.  
-Точка отката: `release/v0.5.0-alpha`.  
-Подробности: `docs/M5_IMPLEMENTATION_PLAN.md`, `docs/M5_RELEASE_EVIDENCE.md`.
+PR: `#10`. После объединения создаётся точка отката `release/v0.6.0-alpha`.
 
-### M6 — `0.6.0-alpha`, следующий активный этап
+### M7 — `0.7.0-alpha`, решения оператора
 
-- чистая модель кандидата монтажа;
-- расчёт минимального допустимого тиража кандидата;
-- генерация альтернативных наборов позиций;
-- запрет недопечатки для любого кандидата;
-- автоматический подбор тиражей;
-- минимизация физической бумаги как главная цель;
-- объяснение разделённых заказов и выбранного результата;
-- сравнение с ручным ориентиром `3395` листов.
+#### M7.1 — изменяемая иерархия
 
-### M7 — несколько целей
+- перетаскиваемый порядок целей;
+- кнопки вверх/вниз для мобильного режима;
+- лексикографическое сравнение;
+- мгновенная пересортировка уже найденных вариантов;
+- жёсткие ограничения нельзя перемещать или отключать.
 
-Минимум форм, минимум перетиража, пользовательская иерархия и набор Парето.
+Приоритеты включают:
+
+- бумагу;
+- layout-формы;
+- цветовые пластины;
+- два вида перетиража;
+- листопрогоны;
+- разделённые заказы;
+- количество монтажей;
+- компактность производственной раскладки.
+
+#### M7.2 — свой и чужой оборот
+
+- сравнение обоих технологических режимов;
+- фильтры `только чужой / оба / только свой`;
+- отдельное объяснение бумаги, форм, пластин, прогонов и операции переворота;
+- контрольный кейс: четыре A6 1+1, 2 страницы, по 4000;
+- в контрольном кейсе свой оборот сохраняет `1000` листов и `2000` прогонов, но сокращает layout-формы и цветовые пластины `2 → 1`.
+
+#### M7.3 — все существенно разные варианты
+
+- минимум бумаги;
+- минимум форм;
+- минимум пластин;
+- минимум перетиража;
+- минимум прогонов;
+- удобная сборка;
+- лучший свой оборот;
+- лучший чужой оборот;
+- рекомендуемый вариант по текущей иерархии;
+- полный раскрываемый Pareto-набор без доминируемых дублей.
+
+Для каждого варианта показываются точные дельты: что стало лучше, что стало хуже, где возник перетираж и какие заказы разделены.
+
+#### M7.4 — компактный интерфейс
+
+- плотная таблица вместо множества крупных карточек;
+- основные метрики в одной строке;
+- закреплённая компактная панель приоритетов;
+- режим `Только различия`;
+- детали и схемы раскрываются по одной;
+- мобильный интерфейс не дублирует длинные пояснения.
+
+Подробности: `docs/M7_IMPLEMENTATION_PLAN.md`.
 
 ### M8 — production `1.0.0`
 
-Реальные производственные проверки, граничные случаи, руководство и стабильный GitHub Release.
+Реальные производственные проверки, граничные случаи, руководство, импорт/экспорт проекта, постоянное хранение и стабильный GitHub Release.
 
 </td>
 <td width="50%" valign="top">
 
 ## English
 
-### M0–M4 — complete
+### M0–M5 — complete
 
-Repository/specification, sheet and order geometry, capacity, validated front/back schemes, and production reporting. Rollback branches exist through `release/v0.4.0-alpha`.
+Repository/specification, geometry, exact pairs, validated front/back schemes, production reporting, two PDFs, Chromium, `pdfinfo`, and Poppler.
 
-### M5 — `0.5.0-alpha`, complete
+### M6 — `0.6.0-alpha`, current candidate
 
-A pure two-document PDF model, one scheme per page, deterministic eight-page scheme output, a separate six-page report, A4/proportional/custom scheme modes, dependency-free PDF writing, Canvas rasterisation, browser downloads, Playwright structure checks, `pdfinfo`, Poppler rendering of all fourteen pages, and manual visual review.
+Pure candidate/demand models, the complete 8,960-candidate control space, automatic valid run construction, independent production rematerialisation, a proven 3,305-sheet physical-paper minimum, explicit 3,395-sheet manual comparison, separate color-plate metrics, production regressions, and desktop/mobile Chromium evidence.
 
-PR: `#8`. Merge commit: `366ea45efd2566c7bb25ff14ff0cbc0df7472594`.  
-Rollback: `release/v0.5.0-alpha`.
+### M7 — `0.7.0-alpha`, operator decision system
 
-### M6 — `0.6.0-alpha`, next active milestone
+- drag-and-drop objective hierarchy with instant re-ranking;
+- explicit work-and-back versus work-and-turn comparison;
+- a four-A6 1+1 × 4000 work-and-turn control case;
+- paper, side-layout forms, color plates, passes, overrun, split-order, and layout-compactness metrics;
+- recommended, extreme, and full non-dominated Pareto alternatives;
+- exact better/worse deltas for every option;
+- a compact desktop/mobile comparison interface.
 
-Define candidate impositions and minimum valid run lengths, generate alternatives, reject all underproduction, assign runs automatically, minimise physical paper, explain split orders, and compare results with the `3395`-sheet manual reference.
-
-### M7 — multiple objectives
-
-Minimum forms, minimum overrun, user-defined hierarchy, and Pareto alternatives.
+Details: `docs/M7_IMPLEMENTATION_PLAN.md`.
 
 ### M8 — production `1.0.0`
 
-Real production validation, edge cases, user guide, and a stable GitHub Release.
+Real production validation, edge cases, user guide, project persistence/import/export, and a stable GitHub Release.
 
 </td>
 </tr>
