@@ -22,7 +22,8 @@
 10. активный milestone-план;
 11. последние Pull Request, commit и GitHub Actions;
 12. `docs/NEWS_PUBLISHING.md` и `docs/SCREENSHOT_AUTOMATION.md`;
-13. `docs/DEVELOPMENT_HISTORY_POLICY.md` — сохранение полезной истории и artifacts.
+13. `docs/DEVELOPMENT_HISTORY_POLICY.md` — сохранение полезной истории и artifacts;
+14. `docs/VERSIONING.md` — обязательный release checkpoint каждого законченного патча.
 
 При противоречии между чатом и GitHub действует GitHub. При противоречии между документацией и рабочим кодом нельзя молча выбирать одну сторону: расхождение нужно зафиксировать и исправить.
 
@@ -56,17 +57,20 @@ ChatGPT должен:
 - Не писать функциональный milestone напрямую в `main`.
 - После каждого патча запускать соответствующие GitHub Actions.
 - При изменении версии синхронно обновлять `VERSION.json`, `VERSION.md`, `CHANGELOG.md`, README и видимую версию сайта.
-- После alpha-вехи создавать recovery-ветку `release/v{version}`.
-- После достижения стабильной версии создавать recovery-ветку, tag и настоящий GitHub Release.
-- Не утверждать, что GitHub Release создан, если создана только ветка.
+- Каждый законченный публикуемый патч получает уникальную версию, recovery-ветку `release/v{version}`, tag `v{version}` и настоящий GitHub Release.
+- Alpha, beta и RC публикуются как GitHub prerelease; stable — как обычный Release.
+- Нельзя перемещать уже опубликованный tag на другой commit.
+- Не утверждать, что GitHub Release создан, если создана только ветка или tag.
 - Не утверждать, что функция работает, пока нет кода, теста, успешного Action и доказательного screenshot для пользовательского изменения.
+- Каждый законченный release сразу получает `news/*.md`, новое реальное изображение и короткий текст для очереди uNews/Telegram.
+- Каждый release получает постоянный архив в `archive/development/{version}/` и evidence ZIP как asset GitHub Release.
 - Не удалять полезные планы, evidence, screenshots, PDF-artifacts, workflows, tests, fixtures или корректные milestone-документы только потому, что они стали историческими.
 - Удалять только заведомо неверное, небезопасное, повреждённое или вводящее в заблуждение содержимое; причину удаления фиксировать в commit или PR.
 - Массовую архивацию истории в ветку, каталог или отдельный репозиторий выполнять только по отдельному решению владельца.
 
 ## uNews и скриншоты
 
-- Каждая заметная новая версия получает новый патчноут в `news/`.
+- Каждый законченный release получает новый патчноут в `news/` в том же цикле, а не позже.
 - Каждый патчноут получает новый реальный PNG/JPEG.
 - Пользовательское изменение снимается с точного commit настоящим Chromium.
 - Перед добавлением изображения в `news/` проверить artifact и manifest.
@@ -74,8 +78,9 @@ ChatGPT должен:
 - AI-картинка не доказывает реальную функцию.
 - Скриншот не должен показывать secrets, cookies, приватные данные и локальные пути.
 - Реальная отправка Telegram выполняется только uNews через GitHub Actions.
-- Длинные full-page screenshots можно сохранять как техническое доказательство.
-- Для Telegram предпочтителен отдельный крупный кадр новой функции, если он лучше объясняет изменение.
+- Длинные full-page screenshots сохраняются как техническое доказательство и история.
+- Для Telegram используется отдельный крупный кадр новой функции, если он лучше объясняет изменение.
+- Патчноут, PNG и release manifest должны войти в `main`, чтобы uNews получил их сразу после merge.
 
 ## Предпочтительная технология
 
@@ -101,19 +106,16 @@ ChatGPT должен:
 7. изменилась ли версия и синхронизированы ли источники;
 8. объединён ли PR;
 9. создана ли recovery-ветка;
-10. создан ли настоящий GitHub Release.
+10. создан ли tag;
+11. создан ли настоящий GitHub Release/prerelease;
+12. созданы ли release news, архив и очередь uNews/Telegram.
 
 ---
 
 ## English summary
 
-- Read `START_HERE.md` first.
-- GitHub is the single source of truth.
-- Do not rely on a previous chat, local clone, terminal, or local computer.
-- Use a feature branch, Pull Request, GitHub Actions, factual Chromium screenshots, and GitHub Pages.
-- Keep calculation logic in small pure modules with tests; keep `src/app.js` as a DOM coordinator.
-- Never derive the back independently from the front.
-- Never accept underproduction.
-- Synchronise all version sources in one patch.
-- Preserve useful development history and artifacts; delete only false, unsafe, corrupted, or irreparably misleading material.
-- An alpha milestone requires a recovery branch; a stable version requires a recovery branch, tag, and actual GitHub Release.
+- Read `START_HERE.md` first and treat GitHub as the single source of truth.
+- Use feature branches, Pull Requests, Actions, factual Chromium evidence, and GitHub Pages.
+- Keep calculation logic pure, never derive backs independently, and never accept underproduction.
+- Every completed published patch receives a unique version, rollback branch, immutable tag, actual GitHub Release or prerelease, focused release news, permanent evidence archive, and immediate uNews/Telegram queue entry.
+- Preserve useful development history; delete only false, unsafe, corrupted, or irreparably misleading material.
