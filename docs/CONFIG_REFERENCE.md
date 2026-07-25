@@ -32,7 +32,7 @@ produced pair = Σ(position count × imposition run)
 underproduction = max(0, required − produced)
 overrun = max(0, produced − required)
 physical sheets = Σ(imposition run)
-forms = front forms + back forms
+layout forms = front forms + back forms
 press passes = 2 × physical sheets
 ```
 
@@ -42,6 +42,7 @@ press passes = 2 × physical sheets
 
 - `data/control-case.json`: лист, изделие, 20 заказов, режим оборота и ожидаемые итоги;
 - `data/control-layout-m3.json`: четыре явных лица и ручные тиражи;
+- `data/production-regression-cases.json`: ориентации A6, mixed-format и разнотиражные A5-кейсы;
 - обороты всегда выводятся из лиц;
 - производственный отчёт выводится из проверенных схем.
 
@@ -74,13 +75,6 @@ CONFIG.pdf.reportDocumentFileName   = "uImposition-production-report.pdf"
 
 Производственный отчёт всегда создаётся отдельным A4-документом. Он не добавляется девятой страницей в основной PDF схем.
 
-### Рендер / Rendering
-
-- браузер Canvas отрисовывает кириллицу и стрелки;
-- Canvas преобразуется в JPEG;
-- `pdf-binary.js` помещает каждый JPEG в отдельный PDF Page/XObject;
-- runtime-зависимости, CDN и передача font-файлов отсутствуют.
-
 ## M6: пространство кандидатов / M6 candidate space
 
 ```text
@@ -90,7 +84,7 @@ CONFIG.optimizer.candidateGeneration.maxCandidates    = 10000
 CONFIG.optimizer.candidateGeneration.idPrefix         = "AUTO"
 ```
 
-Первый доказуемый набор M6 включает все полные 16-позиционные кандидаты с одной или двумя различными печатными парами.
+Первый доказуемый набор M6 включает все полные кандидаты с одной или двумя различными печатными парами.
 
 Для `35` пар и вместимости `16`:
 
@@ -100,9 +94,72 @@ two-pair candidates    = C(35, 2) × C(15, 1) = 8925
 total                   = 8960
 ```
 
-Лимит `10000` выше полного размера `8960`, поэтому контрольный набор не усечён. Если пользовательский или будущий набор превышает лимит, генератор обязан вернуть `truncated: true` и не имеет права утверждать полноту пространства поиска.
+Лимит `10000` выше полного размера `8960`, поэтому контрольный набор не усечён. Если другой вход превышает лимит, генератор возвращает `truncated: true` и не имеет права утверждать полноту пространства.
 
-The first exact M6 space contains every full candidate with one or two distinct print pairs. The control case produces exactly 8960 candidates and therefore fits below the configured 10000-candidate limit without truncation.
+## M6: доказательство бумажного минимума
+
+```text
+required pair quantity = 52870
+capacity                = 16
+paper lower bound       = ceil(52870 / 16) = 3305
+constructed paper       = 3305
+```
+
+Совпадение допустимой конструкции с универсальной нижней границей позволяет поставить статус `provenGlobalMinimum` для физической бумаги. Этот статус не переносится автоматически на формы или другие цели.
+
+## 4+4: явные входные данные
+
+Цветность передаётся явно:
+
+```json
+{ "front": 4, "back": 4 }
+```
+
+`src/print-specification.js` разделяет:
+
+```text
+one 4+4 imposition:
+layout forms = 2
+color plates = 8
+
+three 4+4 impositions:
+layout forms = 6
+color plates = 24
+```
+
+Поле `productionReport.totals.forms` пока означает layout-формы сторон. Цветовые пластины не подменяют это поле и считаются отдельной метрикой.
+
+## Производственные regression inputs
+
+### A6 32 страницы
+
+- landscape: `148 × 105`, лучший поворот `0°`, `4×4`;
+- portrait: `105 × 148`, лучший поворот `90°`, `4×4`;
+- количество страниц: `32`;
+- пары: `16` последовательных пар;
+- контрольный тираж: `1000`;
+- цветность: `4+4`.
+
+Эти данные проверяют геометрию и текущую последовательную модель пар. Они не означают сигнатурную пагинацию для фальцовки.
+
+### Mixed-format duplex
+
+Заданные прямоугольники внутри `608 × 431`:
+
+- `1×A4 landscape`;
+- `2×A5 portrait`;
+- `8×A6 landscape`.
+
+Координаты находятся в `data/production-regression-cases.json`. Валидатор проверяет границы, пересечения и зеркальный оборот. Автоматического rectangle packing пока нет.
+
+### A5 variable runs
+
+- формат: `148 × 210`;
+- сетка: `4×2 = 8`;
+- заказы: `400`, `700`, `4200`, по 2 страницы;
+- lower bound: `663` листа;
+- тиражи монтажей: `50`, `88`, `525`;
+- перетираж: `4`.
 
 ## Значения первого запуска / Initial defaults
 
