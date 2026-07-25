@@ -1,0 +1,106 @@
+name: Publish uImposition version release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'archive/development/*/release.json'
+      - '.github/workflows/publish-version-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout exact main commit
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Publish every missing version checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t manifests < <(find archive/development -mindepth 2 -maxdepth 2 -name release.json -type f | sort)
+          if [ "${#manifests[@]}" -eq 0 ]; then
+            echo "No release manifests found."
+            exit 0
+          fi
+
+          for manifest in "${manifests[@]}"; do
+            eval "$(node --input-type=module - "$manifest" <<'NODE'
+          import fs from 'node:fs';
+          const manifestPath = process.argv[2];
+          const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
+          console.log(`VERSION=${quote(data.version)}`);
+          console.log(`TAG=${quote(data.tag)}`);
+          console.log(`TITLE=${quote(data.title)}`);
+          console.log(`PRERELEASE=${quote(Boolean(data.prerelease) ? 'true' : 'false')}`);
+          console.log(`SOURCE_COMMIT=${quote(data.sourceCommit)}`);
+          console.log(`PATCHNOTE=${quote(data.patchnote)}`);
+          console.log(`IMAGE=${quote(data.image)}`);
+          console.log(`ARCHIVE=${quote(data.archive)}`);
+          NODE
+          )"
+
+            if ! git merge-base --is-ancestor "$SOURCE_COMMIT" "$GITHUB_SHA"; then
+              echo "Skip $VERSION: source commit $SOURCE_COMMIT is not part of $GITHUB_SHA."
+              continue
+            fi
+
+            for required in "$PATCHNOTE" "$IMAGE" "$ARCHIVE"; do
+              if [ ! -f "$required" ]; then
+                echo "Required release file is missing: $required"
+                exit 1
+              fi
+            done
+
+            rollback_branch="release/v${VERSION}"
+            remote_branch_sha="$(git ls-remote origin "refs/heads/${rollback_branch}" | cut -f1)"
+            if [ -z "$remote_branch_sha" ]; then
+              git push origin "$GITHUB_SHA:refs/heads/${rollback_branch}"
+              echo "Created rollback branch ${rollback_branch} at ${GITHUB_SHA}."
+            elif [ "$remote_branch_sha" != "$GITHUB_SHA" ]; then
+              echo "Rollback branch ${rollback_branch} already exists at ${remote_branch_sha}; refusing to move it."
+              exit 1
+            else
+              echo "Rollback branch ${rollback_branch} already matches ${GITHUB_SHA}."
+            fi
+
+            remote_tag_sha="$(git ls-remote origin "refs/tags/${TAG}" | head -n1 | cut -f1)"
+            if [ -z "$remote_tag_sha" ]; then
+              git tag -a "$TAG" "$GITHUB_SHA" -m "$TITLE"
+              git push origin "refs/tags/${TAG}"
+              echo "Created tag ${TAG}."
+            else
+              echo "Tag ${TAG} already exists."
+            fi
+
+            if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              echo "GitHub Release ${TAG} already exists."
+              continue
+            fi
+
+            release_args=(
+              "$TAG"
+              "$ARCHIVE#Development evidence archive"
+              "$IMAGE#Focused feature screenshot"
+              --repo "$GITHUB_REPOSITORY"
+              --verify-tag
+              --title "$TITLE"
+              --notes-file "$PATCHNOTE"
+            )
+            if [ "$PRERELEASE" = "true" ]; then
+              release_args+=(--prerelease)
+            fi
+            gh release create "${release_args[@]}"
+            echo "Published GitHub Release ${TAG}."
+          done
