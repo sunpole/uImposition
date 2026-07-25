@@ -16,7 +16,7 @@
 
 Точки отката: `release/v0.1.0-alpha` … `release/v0.4.0-alpha`.
 
-### M5 — `0.5.0-alpha`, завершён в PR №8
+### M5 — `0.5.0-alpha`, завершён
 
 - чистая модель двух PDF-документов;
 - одна схема на одну страницу;
@@ -28,14 +28,16 @@
 - Canvas-отрисовка кириллицы, стрелок, метрик и таблиц;
 - браузерное скачивание;
 - Playwright-проверка структуры и числа страниц;
-- `pdfinfo` и Poppler-render всех 14 страниц;
+- `pdfinfo` и Poppler-render всех `14` страниц;
 - визуальная проверка обрезки, глифов, заголовков и таблиц.
 
-После merge создаётся `release/v0.5.0-alpha`. Подробности: `docs/M5_IMPLEMENTATION_PLAN.md`.
+PR: `#8`. Merge commit: `366ea45efd2566c7bb25ff14ff0cbc0df7472594`.  
+Точка отката: `release/v0.5.0-alpha`.  
+Подробности: `docs/M5_IMPLEMENTATION_PLAN.md`, `docs/M5_RELEASE_EVIDENCE.md`.
 
 ### M6 — `0.6.0-alpha`, следующий активный этап
 
-- модель кандидата монтажа;
+- чистая модель кандидата монтажа;
 - расчёт минимального допустимого тиража кандидата;
 - генерация альтернативных наборов позиций;
 - запрет недопечатки для любого кандидата;
@@ -61,15 +63,16 @@
 
 Repository/specification, sheet and order geometry, capacity, validated front/back schemes, and production reporting. Rollback branches exist through `release/v0.4.0-alpha`.
 
-### M5 — `0.5.0-alpha`, complete in PR #8
+### M5 — `0.5.0-alpha`, complete
 
 A pure two-document PDF model, one scheme per page, deterministic eight-page scheme output, a separate six-page report, A4/proportional/custom scheme modes, dependency-free PDF writing, Canvas rasterisation, browser downloads, Playwright structure checks, `pdfinfo`, Poppler rendering of all fourteen pages, and manual visual review.
 
-`release/v0.5.0-alpha` is created after merge. Details: `docs/M5_IMPLEMENTATION_PLAN.md`.
+PR: `#8`. Merge commit: `366ea45efd2566c7bb25ff14ff0cbc0df7472594`.  
+Rollback: `release/v0.5.0-alpha`.
 
 ### M6 — `0.6.0-alpha`, next active milestone
 
-Define candidate impositions and minimum valid run lengths, generate alternatives, reject all underproduction, assign runs automatically, minimise physical paper, explain split orders, and compare results with the 3395-sheet manual reference.
+Define candidate impositions and minimum valid run lengths, generate alternatives, reject all underproduction, assign runs automatically, minimise physical paper, explain split orders, and compare results with the `3395`-sheet manual reference.
 
 ### M7 — multiple objectives
 
