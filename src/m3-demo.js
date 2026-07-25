@@ -4,16 +4,22 @@ import { createFrontLayout } from "./front-layout.js";
 import { createBackLayout } from "./back-layout.js";
 import { validateImposition } from "./imposition-validation.js";
 import { buildProductionReport } from "./production-report.js";
+import { minimizePhysicalPaper } from "./paper-minimizer.js";
 import { renderSchemePairs } from "./scheme-renderer.js";
 import {
   renderProductionReport,
   renderProductionReportEmpty,
 } from "./production-report-renderer.js";
+import {
+  renderPaperSolution,
+  renderPaperSolutionEmpty,
+} from "./paper-solution-renderer.js";
 import { createPdfExportController } from "./pdf-export-ui.js";
 
 const state = {
   records: null,
   report: null,
+  paperSolution: null,
   controlCase: null,
   loadSequence: 0,
 };
@@ -74,11 +80,23 @@ function ensureProductionPanel(impositionPanel) {
   return panel;
 }
 
+function ensurePaperSolutionPanel(productionPanel) {
+  const existing = document.querySelector("#paperSolution");
+  if (existing) return existing;
+  const panel = document.createElement("section");
+  panel.id = "paperSolution";
+  panel.className = "panel paper-solution-panel";
+  productionPanel.after(panel);
+  return panel;
+}
+
 const panel = ensurePanel();
 const productionPanel = ensureProductionPanel(panel);
+const paperSolutionPanel = ensurePaperSolutionPanel(productionPanel);
 ensureStylesheet("m3.css", "data-m3-styles");
 ensureStylesheet("m4.css", "data-m4-styles");
 ensureStylesheet("m5.css", "data-m5-styles");
+ensureStylesheet("m6.css", "data-m6-styles");
 
 const ui = {
   status: panel.querySelector("#impositionStatus"),
@@ -86,6 +104,7 @@ const ui = {
   error: panel.querySelector("#impositionError"),
   schemes: panel.querySelector("#impositionSchemes"),
   production: productionPanel,
+  paperSolution: paperSolutionPanel,
   loadControlCase: document.querySelector("#loadControlCase"),
   clearOrders: document.querySelector("#clearOrders"),
   ordersInput: document.querySelector("#ordersInput"),
@@ -93,7 +112,7 @@ const ui = {
 };
 
 const pdfExport = createPdfExportController({
-  anchor: productionPanel,
+  anchor: paperSolutionPanel,
   getRecords: () => state.records,
   getReport: () => state.report,
   getSheetSize: () => {
@@ -112,7 +131,7 @@ function syncLanguageContent() {
     renderSchemePairs(ui.schemes, state.records, { language: current });
     ui.status.textContent = current === "ru" ? "4 лица · 4 оборота · проверено" : "4 fronts · 4 backs · validated";
   } else if (!ui.error.hidden) {
-    ui.status.textContent = current === "ru" ? "Ошибка M3/M4/M5" : "M3/M4/M5 error";
+    ui.status.textContent = current === "ru" ? "Ошибка M3–M6" : "M3–M6 error";
   } else {
     ui.status.textContent = current === "ru" ? "Загрузите контрольный заказ" : "Load the control dataset";
     ui.empty.textContent = current === "ru"
@@ -128,6 +147,15 @@ function syncLanguageContent() {
       error: ui.error.hidden ? "" : ui.error.textContent,
     });
   }
+
+  if (state.paperSolution && state.report) {
+    renderPaperSolution(ui.paperSolution, state.paperSolution, state.report, { language: current });
+  } else {
+    renderPaperSolutionEmpty(ui.paperSolution, {
+      language: current,
+      error: ui.error.hidden ? "" : ui.error.textContent,
+    });
+  }
   pdfExport.sync();
 }
 
@@ -135,6 +163,7 @@ function clearControlLayouts() {
   state.loadSequence += 1;
   state.records = null;
   state.report = null;
+  state.paperSolution = null;
   state.controlCase = null;
   ui.schemes.replaceChildren();
   ui.error.hidden = true;
@@ -164,14 +193,25 @@ function buildRecords(layoutData, pagePairs) {
   });
 }
 
+function controlGrid(controlCase) {
+  const rotation = Number(controlCase?.verifiedM2?.bestRotation);
+  const key = rotation === 90 ? "orientation90" : rotation === 0 ? "orientation0" : "";
+  const grid = key ? controlCase?.verifiedM2?.[key] : null;
+  if (!grid || !Number.isInteger(grid.rows) || !Number.isInteger(grid.columns)) {
+    throw new Error("Control case does not contain a verified best grid");
+  }
+  return { rows: grid.rows, columns: grid.columns, rotation };
+}
+
 async function loadControlLayouts() {
   const sequence = ++state.loadSequence;
   const current = language();
-  ui.status.textContent = current === "ru" ? "Проверка схем и отчёта…" : "Validating schemes and report…";
+  ui.status.textContent = current === "ru" ? "Проверка схем, отчёта и минимума…" : "Validating schemes, report, and minimum…";
   ui.empty.textContent = "";
   ui.error.hidden = true;
   ui.error.textContent = "";
   renderProductionReportEmpty(ui.production, { language: current });
+  renderPaperSolutionEmpty(ui.paperSolution, { language: current });
 
   try {
     const [controlCase, layoutData] = await Promise.all([
@@ -185,13 +225,21 @@ async function loadControlLayouts() {
       impositions: records,
       duplexMode: controlCase.duplexMode,
     });
+    const grid = controlGrid(controlCase);
+    const paperSolution = minimizePhysicalPaper({
+      pagePairs,
+      ...grid,
+      duplexMode: controlCase.duplexMode,
+    });
     if (sequence !== state.loadSequence) return;
 
     state.records = records;
     state.report = report;
+    state.paperSolution = paperSolution;
     state.controlCase = controlCase;
     renderSchemePairs(ui.schemes, records, { language: current });
     renderProductionReport(ui.production, report, { language: current });
+    renderPaperSolution(ui.paperSolution, paperSolution, report, { language: current });
     ui.status.textContent = current === "ru" ? "4 лица · 4 оборота · проверено" : "4 fronts · 4 backs · validated";
     pdfExport.sync();
   } catch (error) {
@@ -199,12 +247,14 @@ async function loadControlLayouts() {
     console.error(error);
     state.records = null;
     state.report = null;
+    state.paperSolution = null;
     state.controlCase = null;
     ui.schemes.replaceChildren();
-    ui.status.textContent = current === "ru" ? "Ошибка M3/M4/M5" : "M3/M4/M5 error";
+    ui.status.textContent = current === "ru" ? "Ошибка M3–M6" : "M3–M6 error";
     ui.error.textContent = error.message;
     ui.error.hidden = false;
     renderProductionReportEmpty(ui.production, { language: current, error: error.message });
+    renderPaperSolutionEmpty(ui.paperSolution, { language: current, error: error.message });
     pdfExport.sync();
   }
 }
