@@ -38,7 +38,21 @@
     "ru": "Сократить число форм, сформировать многокритериальные компромиссы и показать компактный набор Парето между бумагой, формами и перетиражем.",
     "en": "Reduce form count, construct multi-objective trade-offs, and present a compact Pareto set across paper, forms, and overrun."
   },
-  "versionSources": { "machine": "VERSION.json", "human": "VERSION.md", "history": "CHANGELOG.md", "policy": "docs/VERSIONING.md" },
-  "releasePolicy": { "stableCheckpointBranch": "release/v{version}", "githubReleaseRequiredForStable": true, "rollbackPurpose": true },
-  "synchronizationRule": "When the project version changes, VERSION.json, VERSION.md and CHANGELOG.md must be updated in the same patch."
+  "versionSources": {
+    "machine": "VERSION.json",
+    "human": "VERSION.md",
+    "history": "CHANGELOG.md",
+    "policy": "docs/VERSIONING.md"
+  },
+  "releasePolicy": {
+    "rollbackBranch": "release/v{version}",
+    "tag": "v{version}",
+    "githubReleaseRequiredForEveryPublishedPatch": true,
+    "preReleaseChannels": ["alpha", "beta", "rc"],
+    "releaseNewsRequired": true,
+    "telegramQueueRequired": true,
+    "permanentEvidenceArchiveRequired": true,
+    "publishedTagsAreImmutable": true
+  },
+  "synchronizationRule": "When the project version changes, VERSION.json, VERSION.md, CHANGELOG.md, README, package.json, visible site version, release news, screenshot scenarios, and release archive manifest must be updated in the same release cycle."
 }
