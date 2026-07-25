@@ -1,5 +1,56 @@
 # Changelog
 
+## 0.6.0-alpha — 2026-07-25
+
+### Added
+
+- pure immutable imposition-candidate and pair-demand models;
+- distinct first-saturation and candidate-completion event run lengths;
+- exact complete one/two-pair candidate generation for the control capacity;
+- all `8960` unique 35-pair / 16-position candidates without hidden truncation;
+- automatic construction of valid run lengths with zero underproduction;
+- a universal paper lower-bound proof and an independently rematerialized solution;
+- pure paper-solution comparison view model and responsive renderer;
+- a focused Telegram/uNews screenshot scenario for the M6 result panel;
+- concise CI failure diagnostics with the full quality log retained as an artifact;
+- explicit 4+4 print specification separating side-layout forms from color plates;
+- fixed mixed-format duplex validation with overlap, boundary, page, and mirror checks;
+- production regression fixtures for A6 landscape/portrait, mixed A4/A5/A6, and variable-run A5;
+- a documented M7 operator-decision plan and a machine-readable own-back fixture.
+
+### Changed
+
+- the control demo now calculates and explains the proven paper minimum after the manual production report;
+- visible site and package versions are synchronized to `0.6.0-alpha`;
+- screenshot tooling can capture a named component instead of a full-page image;
+- release news can use a close-up of the feature that actually changed;
+- architecture, configuration, test plan, roadmap, README, current state, and version documents describe the M6 boundary;
+- M7 now explicitly covers draggable objective priority, instant re-ranking, own/foreign back comparison, Pareto alternatives, and compact layout.
+
+### Verified
+
+- required pair quantity: `52870`;
+- capacity per physical sheet: `16`;
+- universal lower bound: `ceil(52870 / 16) = 3305`;
+- constructed valid solution: `3305` physical sheets;
+- saving versus the manual reference: `90` sheets (`2.65%`);
+- automatic solution: `56` impositions, `112` side-layout forms, `6610` press passes;
+- underproduction: `0`;
+- pair overrun: `10`;
+- complete-file overrun: `0`;
+- independent production-report rematerialisation confirms the same totals;
+- desktop/mobile Chromium shows the proof and the `8 → 112` form trade-off;
+- both existing PDFs remain downloadable, structurally valid, readable by `pdfinfo`, and renderable by Poppler;
+- A6 `148×105`, 32 pages, 4+4 uses `4×4` without rotation;
+- A6 `105×148`, 32 pages, 4+4 rotates 90° to `4×4`;
+- the supplied `1×A4 + 2×A5 + 8×A6` mixed duplex fits `608×431` without overlap;
+- A5 quantities `400 / 700 / 4200` reach the proven `663`-sheet lower bound with total overrun `4`;
+- one 4+4 imposition means `2` side-layout forms and `8` color plates.
+
+### Boundary
+
+M6 proves the minimum physical paper for the control uniform-grid input. It does not yet minimise forms, generate automatic mixed-format packing, implement folded-signature pagination, or calculate work-and-turn layouts. Those operator-decision capabilities begin in M7.
+
 ## 0.5.0-alpha — 2026-07-24
 
 ### Added
