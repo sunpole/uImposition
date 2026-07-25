@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "version": "0.6.0-alpha",
+  "type": "feature",
+  "title": "uImposition: доказанный минимум бумаги",
+  "slug": "proven-paper-minimum",
+  "scenario": "m6-paper-minimum-telegram",
+  "archiveScenarios": [
+    "m5-pdf-export-desktop",
+    "m5-pdf-export-mobile",
+    "m5-report-pdf-export-desktop",
+    "m6-paper-minimum-desktop",
+    "m6-paper-minimum-mobile",
+    "m6-paper-minimum-telegram"
+  ],
+  "historicalArtifacts": [
+    {
+      "artifactId": 8615371480,
+      "fileName": "uimposition-m6-final-evidence-pre-focused-fix.zip"
+    },
+    {
+      "artifactId": 8615479063,
+      "fileName": "uimposition-m6-focused-check-with-collapsed-settings.zip"
+    },
+    {
+      "artifactId": 8615504287,
+      "fileName": "uimposition-m6-clean-focused-check.zip"
+    }
+  ],
+  "imageText": "Панель автоматического минимума бумаги: 3305 листов, экономия 90, недопечатка 0, формы 112.",
+  "summary": "M6 впервые автоматически строит допустимую раскладку, достигающую универсальной нижней границы бумаги, и отдельно показывает цену этого результата в количестве форм.",
+  "features": [
+    "автоматическая конструкция тиражей без недопечатки",
+    "доказательство глобального минимума физической бумаги для контрольного uniform-grid набора",
+    "сравнение автоматического и ручного вариантов с точными дельтами",
+    "отдельный учёт layout-форм и цветовых пластин 4+4",
+    "regression-тесты A6 landscape/portrait, mixed A4/A5/A6 и A5 400/700/4200",
+    "крупный Chromium-снимок новой панели для Telegram и полный технический evidence-архив"
+  ],
+  "controlFacts": [
+    "нижняя граница: ceil(52870 / 16) = 3305 листов",
+    "автоматический вариант: 3305 листов вместо ручных 3395",
+    "экономия бумаги: 90 листов, или 2,65%",
+    "недопечатка: 0; перетираж пар: 10; перетираж готовых файлов: 0",
+    "компромисс: 56 монтажей и 112 layout-форм вместо 4 монтажей и 8 форм",
+    "листопрогоны: 6610 вместо 6790"
+  ],
+  "nextStep": "Следующий этап M7 добавит изменяемую иерархию целей, свой и чужой оборот, Pareto-варианты и компактный интерфейс сравнения.",
+  "telegramText": "uImposition 0.6.0-alpha: программа сама нашла и доказала минимум бумаги — 3305 листов вместо 3395, без недопечатки. Экономия 90 листов, но форм стало 112 вместо 8: интерфейс честно показывает этот компромисс."
+}
