@@ -32,6 +32,26 @@ function countPdfPages(bytes) {
   return (text.match(/\/Type\s*\/Page\b/g) ?? []).length;
 }
 
+async function runBeforeScreenshotActions(page, actions = []) {
+  for (const action of actions) {
+    if (action.action === "click") {
+      const locator = page.locator(action.selector);
+      await expect(locator).toBeVisible();
+      await locator.click();
+      continue;
+    }
+    if (action.action === "waitForHidden") {
+      await page.locator(action.selector).waitFor({ state: "hidden", timeout: action.timeoutMs ?? 10000 });
+      continue;
+    }
+    if (action.action === "wait") {
+      await page.waitForTimeout(action.timeoutMs ?? 250);
+      continue;
+    }
+    throw new Error(`Unsupported beforeScreenshot action: ${action.action}`);
+  }
+}
+
 for (const scenario of scenarios) {
   test(`capture ${scenario.id}`, async ({ page }) => {
     await page.setViewportSize(scenario.viewport);
@@ -76,6 +96,8 @@ for (const scenario of scenarios) {
       }
     }
 
+    await runBeforeScreenshotActions(page, scenario.beforeScreenshot);
+
     const screenshotPath = path.join(outputDir, scenario.screenshot);
     if (scenario.screenshotSelector) {
       const target = page.locator(scenario.screenshotSelector);
@@ -93,6 +115,7 @@ for (const scenario of scenarios) {
       viewport: scenario.viewport,
       screenshot: scenario.screenshot,
       screenshotSelector: scenario.screenshotSelector || null,
+      beforeScreenshot: scenario.beforeScreenshot ?? [],
       assertions: scenario.assertions,
       download: downloadEntry,
     };
