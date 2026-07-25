@@ -2,96 +2,92 @@
 
 ## Основной принцип / Core principle
 
-Все изменяемые производственные параметры находятся в `src/config.js` или в явных входных данных. Расчётные модули не содержат скрытых производственных значений.
+Все изменяемые производственные и экспортные параметры находятся в `src/config.js` или в явных входных данных. Расчётные и PDF-модули не содержат скрытых производственных значений.
 
-All editable production parameters live in `src/config.js` or explicit input data. Calculation modules contain no hidden production values.
+All editable production and export parameters live in `src/config.js` or explicit input data. Calculation and PDF modules contain no hidden production constants.
 
 ## Действующие группы / Active groups
 
 | Группа | Назначение / Purpose |
 |---|---|
 | `app` | название, язык, единицы / name, language, units |
-| `sheetPresets` | реальные размеры после зачистки / post-trim sheet sizes |
-| `productPresets` | A4, A5, A6 / finished-product presets |
-| `bleedPresetsMm` | быстрые выпуски / quick bleed values |
+| `sheetPresets` | размеры после зачистки / post-trim sizes |
+| `productPresets` | A4, A5, A6 / finished sizes |
 | `defaults` | первый запуск / initial state |
 | `limits` | допустимые диапазоны / allowed ranges |
-| `storage` | ключи браузерного хранения / browser storage keys |
-| `demo` | контрольный заказ и монтажи / control order and impositions |
+| `storage` | browser storage keys |
+| `demo` | контрольный заказ и монтажи / control input |
+| `pdf` | страницы, рендер, качество и имена PDF / PDF pages, rendering, quality, names |
 | `i18n` | подписи интерфейса / interface labels |
 
-## Контрольные источники M4 / M4 control sources
-
-- `controlCaseUrl` → `data/control-case.json`: лист, изделие, режим оборота, 20 заказов и ожидаемые производственные суммы;
-- `controlLayoutUrl` → `data/control-layout-m3.json`: четыре явных лицевых монтажа и их ручные тиражи;
-- оборот не хранится отдельно: он всегда строится из лица;
-- производственный отчёт вычисляется из пар страниц и проверенных схем.
-
-The control case provides the orders, duplex mode, and expected totals. The layout file provides four explicit fronts and manual run lengths. Backs and production totals are derived at runtime.
-
-Ручные тиражи `1500`, `1100`, `450`, `345` не являются настройкой по умолчанию и не должны использоваться вне контрольного примера как скрытая константа.
-
-## Геометрия / Geometry
+## Геометрия и производство / Geometry and production
 
 ```text
-post-trim width  = source width  − left trim − right trim
-post-trim height = source height − top trim  − bottom trim
-printable width  = post-trim width  − left margin − right margin
-printable height = post-trim height − top margin  − bottom margin
-occupied width   = finished width  + 2 × bleed
-occupied height  = finished height + 2 × bleed
-columns = floor((printable width  + gap) / (cell width  + gap))
-rows    = floor((printable height + gap) / (cell height + gap))
-positions = columns × rows
+post-trim = source sheet − sheet trim
+printable = post-trim − press margins
+occupied item = finished size + bleed
+positions = rows × columns
+produced pair = Σ(position count × imposition run)
+underproduction = max(0, required − produced)
+overrun = max(0, produced − required)
+physical sheets = Σ(imposition run)
+forms = front forms + back forms
+press passes = 2 × physical sheets
 ```
 
-`afterTrim` не уменьшается повторно. `commonCut` допускается только при нулевом выпуске.
+`afterTrim` не уменьшается повторно. Недопечатка блокирует производственную готовность.
 
-## Лицо и оборот / Front and back
+## Контрольные источники / Control sources
 
-- блоки лица заполняются row-major;
-- `rotation: 0` → `up`, `rotation: 90` → `right`;
-- горизонтальный переворот зеркалит колонки;
-- `right` превращается в `left`;
-- `backPage: null` отображается знаком `-` только на обороте.
+- `data/control-case.json`: лист, изделие, 20 заказов, режим оборота и ожидаемые итоги;
+- `data/control-layout-m3.json`: четыре явных лица и ручные тиражи;
+- обороты всегда выводятся из лиц;
+- производственный отчёт выводится из проверенных схем.
 
-## M4: производственные метрики / M4 production metrics
+Ручные тиражи `1500`, `1100`, `450`, `345` не являются скрытыми defaults или результатом оптимизатора.
 
-Для пары `i` и монтажа `m`:
+## M5: PDF-конфигурация / M5 PDF configuration
 
 ```text
-produced_i = Σ(positionCount_i,m × runLength_m)
-underproduction_i = max(0, required_i − produced_i)
-overrun_i = max(0, produced_i − required_i)
+CONFIG.pdf.defaultPageMode          = "a4"
+CONFIG.pdf.supportedPageModes       = ["a4", "sheetProportional", "custom"]
+CONFIG.pdf.a4                       = 210 × 297 mm
+CONFIG.pdf.defaultMarginMm          = 10
+CONFIG.pdf.preserveAspectRatio      = true
+CONFIG.pdf.safeNameDigits           = 2
+CONFIG.pdf.renderDpi                = 180
+CONFIG.pdf.jpegQuality              = 0.92
+CONFIG.pdf.proportionalLongSideMm   = 297
+CONFIG.pdf.schemeDocumentFileName   = "uImposition-schemes.pdf"
+CONFIG.pdf.reportDocumentFileName   = "uImposition-production-report.pdf"
 ```
 
-Для готового файла:
+### Режимы страниц схем / Scheme page modes
 
-```text
-completeProduced = min(produced quantity of every file pair)
-fileOverrun = max(0, completeProduced − required file quantity)
-```
+- `a4`: фиксированные `210 × 297 мм`;
+- `sheetProportional`: длинная сторона `297 мм`, отношение сторон берётся из фактического листа;
+- `custom`: пользователь задаёт ширину и высоту;
+- во всех режимах схема вписывается через `contain` без искажения.
 
-Для `duplexMode: separateFrontBackForms`:
+### PDF отчёта / Report PDF
 
-```text
-physicalSheets = Σ(runLength_m)
-frontForms = impositionCount
-backForms = impositionCount
-forms = frontForms + backForms
-pressPasses = 2 × physicalSheets
-```
+Производственный отчёт всегда создаётся отдельным A4-документом. Он не добавляется девятой страницей в основной PDF схем.
 
-Другие способы оборота пока отклоняются как неподдерживаемые, а не рассчитываются предположительно.
+### Рендер / Rendering
+
+- браузер Canvas отрисовывает кириллицу и стрелки;
+- Canvas преобразуется в JPEG;
+- `pdf-binary.js` помещает каждый JPEG в отдельный PDF Page/XObject;
+- runtime-зависимости, CDN и передача font-файлов отсутствуют.
 
 ## Значения первого запуска / Initial defaults
 
-- язык / language: `ru`;
-- исходный лист / source sheet: `620 × 450`;
-- зачистка / trim: `2` мм с каждой стороны;
-- поля / margins: `4 / 4 / 2 / 13` мм;
-- изделие / product: `A6`, `105 × 148`;
-- выпуск / bleed: `0`;
-- режим / spacing mode: `commonCut`;
-- дополнительный зазор / gap: `0`;
-- панель настроек / settings panel: open.
+- язык: `ru`;
+- исходный лист: `620 × 450`;
+- зачистка: `2` мм с каждой стороны;
+- поля: `4 / 4 / 2 / 13` мм;
+- изделие: A6 `105 × 148`;
+- выпуск: `0`;
+- режим: `commonCut`;
+- дополнительный зазор: `0`;
+- PDF схем: A4.

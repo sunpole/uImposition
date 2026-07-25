@@ -10,7 +10,7 @@ on:
   pull_request:
     paths:
       - index.html
-      - styles.css
+      - "*.css"
       - VERSION.json
       - src/**
       - data/**
@@ -47,7 +47,12 @@ jobs:
         working-directory: tools/screenshots
         run: npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
 
-      - name: Capture factual screenshots
+      - name: Install PDF verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: Capture factual screenshots and downloads
         id: capture
         continue-on-error: true
         working-directory: tools/screenshots
@@ -56,7 +61,41 @@ jobs:
           set -o pipefail
           npm run capture 2>&1 | tee ../../capture.log
 
-      - name: Upload screenshot and diagnostic artifact
+      - name: Verify and render downloaded PDFs
+        if: steps.capture.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          pdfs=(artifacts/screenshots/*.pdf)
+          if (( ${#pdfs[@]} == 0 )); then
+            echo "No PDF downloads were produced by the selected scenarios."
+            exit 0
+          fi
+
+          for pdf in "${pdfs[@]}"; do
+            base="$(basename "$pdf" .pdf)"
+            info="artifacts/screenshots/${base}.pdfinfo.txt"
+            render_dir="artifacts/screenshots/pdf-renders/${base}"
+            mkdir -p "$render_dir"
+
+            pdfinfo "$pdf" | tee "$info"
+            pages="$(awk '/^Pages:/ {print $2}' "$info")"
+            if [[ ! "$pages" =~ ^[1-9][0-9]*$ ]]; then
+              echo "Could not determine a positive page count for $pdf"
+              exit 1
+            fi
+
+            pdftoppm -png -r 120 "$pdf" "$render_dir/page"
+            rendered="$(find "$render_dir" -maxdepth 1 -type f -name 'page-*.png' | wc -l)"
+            if [[ "$rendered" -ne "$pages" ]]; then
+              echo "Rendered $rendered pages but pdfinfo reports $pages for $pdf"
+              exit 1
+            fi
+            echo "Verified and rendered $pages pages from $pdf"
+          done
+
+      - name: Upload screenshot, PDF and diagnostic artifact
         if: always()
         uses: actions/upload-artifact@v5
         with:

@@ -82,6 +82,21 @@ export const CONFIG = Object.freeze({
     controlLayoutUrl: "./data/control-layout-m3.json",
   },
 
+  pdf: {
+    defaultPageMode: "a4",
+    supportedPageModes: ["a4", "sheetProportional", "custom"],
+    a4: { widthMm: 210, heightMm: 297 },
+    defaultMarginMm: 10,
+    preserveAspectRatio: true,
+    safeNameDigits: 2,
+    renderDpi: 180,
+    jpegQuality: 0.92,
+    proportionalLongSideMm: 297,
+    canvasFontFamily: "Arial, 'DejaVu Sans', sans-serif",
+    schemeDocumentFileName: "uImposition-schemes.pdf",
+    reportDocumentFileName: "uImposition-production-report.pdf",
+  },
+
   i18n: {
     ru: {
       customPreset: "Произвольный размер",
@@ -110,7 +125,7 @@ export const CONFIG = Object.freeze({
       customPreset: "Custom size",
       customProduct: "Custom product size",
       beforeTrim: "Size before sheet trim",
-      afterTrim: "Size already after sheet trim",
+      afterTrim: "Size already after trim",
       noOrders: "No orders entered yet",
       orderCount: "Files",
       printPairCount: "Print pairs",

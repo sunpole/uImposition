@@ -1,0 +1,25 @@
+{
+  "id": "m5-report-pdf-export-desktop",
+  "path": "/?demo=control",
+  "viewport": { "width": 1440, "height": 1200 },
+  "assertions": [
+    { "selector": ".brand", "text": "v0.5.0-alpha" },
+    { "selector": "#productionPhysicalSheets", "text": "395" },
+    { "selector": "#productionForms", "text": "8" },
+    { "selector": "#productionPressPasses", "text": "790" },
+    { "selector": "#productionPairOverrun", "text": "450" },
+    { "selector": "#pdfExportStatus", "text": "Готово: схемы 8 стр. · отчёт 6 стр." },
+    { "selector": "#exportReportPdf", "text": "Скачать PDF отчёта (A4)" }
+  ],
+  "download": {
+    "selector": "#exportReportPdf",
+    "fileName": "uImposition-production-report.pdf",
+    "artifact": "uimposition-v0-5-0-alpha-production-report.pdf",
+    "expectedPages": 6
+  },
+  "afterDownloadAssertions": [
+    { "selector": "#pdfExportStatus", "text": "PDF отчёта создан: 6 страниц" }
+  ],
+  "screenshot": "uimposition-v0-5-0-alpha-m5-report-pdf-export-desktop.png",
+  "fullPage": true
+}

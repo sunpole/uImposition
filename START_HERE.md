@@ -9,22 +9,17 @@
 
 ## Русский
 
-### Как продолжается разработка
-
-GitHub является единственным источником истины. Разработка ведётся в отдельных ветках и Pull Request, а результат проверяется GitHub Actions, настоящим Chromium и GitHub Pages. Терминал и локальный компьютер необязательны.
-
 ### Текущее состояние
 
 - репозиторий: `sunpole/uImposition`;
 - сайт: `https://sunpole.github.io/uImposition/`;
-- основная ветка: `main`;
-- текущая версия: **`0.4.0-alpha`**;
-- M4 объединён через PR №6;
-- merge commit M4: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`;
-- завершённый этап: **M4 — производственные итоги и отчёт**;
-- следующая версия: **`0.5.0-alpha`**;
-- следующий этап: **M5 — PDF-экспорт**;
-- точка отката M4: `release/v0.4.0-alpha`.
+- релиз-кандидат: ветка `m5/0.5.0-alpha`, PR №8;
+- версия кандидата: **`0.5.0-alpha`**;
+- завершённый функциональный этап: **M5 — PDF-экспорт**;
+- следующая версия после объединения: **`0.6.0-alpha`**;
+- следующий этап: **M6 — автоматический минимум бумаги**;
+- текущая точка отката в `main`: `release/v0.4.0-alpha`;
+- после объединения M5 создаётся `release/v0.5.0-alpha`.
 
 ### Что обязательно прочитать
 
@@ -35,48 +30,46 @@ GitHub является единственным источником истин
 5. `docs/ROADMAP.md`;
 6. `docs/TECHNICAL_SPECIFICATION_RU.md`;
 7. `docs/ARCHITECTURE.md`;
-8. `docs/M4_IMPLEMENTATION_PLAN.md`;
-9. `docs/M4_RELEASE_EVIDENCE.md`;
-10. `data/control-case.json`;
-11. `data/control-layout-m3.json`;
-12. последние Pull Request и GitHub Actions.
+8. `docs/M5_IMPLEMENTATION_PLAN.md`;
+9. `data/control-case.json`;
+10. `data/control-layout-m3.json`;
+11. последние Pull Request и GitHub Actions.
 
-### Что реализовано в M4
+### Что реализовано в M5
 
-- чистая производственная арифметика и независимая валидация;
-- напечатано, недопечатка и перетираж по 35 парам;
-- готовые тиражи и перетираж по 20 файлам;
-- физическая бумага, формы и листопрогоны;
-- адаптивный производственный отчёт;
-- новый фактический PNG и патчноут uNews.
+- чистая неизменяемая модель PDF-документов;
+- собственный dependency-free PDF writer;
+- Canvas-отрисовка кириллицы, стрелок, схем и таблиц;
+- отдельный PDF схем: `8` страниц;
+- отдельный PDF отчёта: `6` страниц;
+- A4, пропорциональный и custom-режимы страниц схем;
+- скачивание обоих документов в браузере;
+- структурная проверка, `pdfinfo` и Poppler-render всех страниц.
 
-### Проверенный контрольный результат
+### Проверенный результат
 
-- физическая бумага: `3395`;
-- формы: `4` лица + `4` оборота = `8`;
-- листопрогоны: `6790`;
-- недопечатка: `0`;
-- перетираж печатных пар: `1450`;
-- перетираж готовых файлов: `930`.
-
-Тиражи монтажей `1500`, `1100`, `450`, `345` остаются ручным контрольным входом. Автоматический подбор и доказанный минимум бумаги ещё не реализованы.
+- четыре монтажа → `8` страниц схем;
+- одна страница = одна схема;
+- порядок: лицо, оборот для каждого монтажа;
+- отчёт не смешивается со схемами;
+- отчёт: сводка + 2 страницы файлов + 3 страницы пар;
+- все `14` страниц читаются и рендерятся без обрезки и сломанных символов.
 
 ### Главные правила
 
-- сначала читать GitHub, а не историю чата;
-- функциональный milestone не писать напрямую в `main`;
-- формулы держать в чистых модулях, UI использовать только для отображения;
-- оборот всегда выводить из лица;
+- GitHub — единственный источник истины;
+- функциональные этапы не писать напрямую в `main`;
+- расчёты и PDF-модель держать отдельно от DOM-renderer;
+- экспортировать только валидные схемы и production-ready отчёт;
 - недопечатку считать недопустимой;
-- ручной вариант не называть глобальным минимумом;
-- версию завершать только после Actions, Chromium, uNews и проверки результата;
+- ручной контрольный вариант не называть глобальным минимумом;
 - alpha-вехе создавать recovery-ветку без настоящего GitHub Release.
 
 ### Точная точка продолжения
 
-Начать M5 в отдельной ветке `m5/0.5.0-alpha` от проверенного `main`.
+После объединения PR №8 начать M6 в ветке `m6/0.6.0-alpha`.
 
-Первый безопасный шаг: спроектировать DOM-независимую модель PDF-документа и тесты, которые гарантируют одну схему на страницу, правильный порядок восьми схем и отдельный производственный отчёт. Только после этого подключать генерацию PDF.
+Первый безопасный шаг M6: описать модель кандидата монтажа и чистые функции расчёта допустимого минимального тиража каждого кандидата. Только после этого генерировать альтернативы и сравнивать бумагу.
 
 </td>
 <td width="50%" valign="top">
@@ -85,24 +78,20 @@ GitHub является единственным источником истин
 
 ### Current state
 
-- repository: `sunpole/uImposition`;
-- website: `https://sunpole.github.io/uImposition/`;
-- default branch: `main`;
-- current version: **`0.4.0-alpha`**;
-- M4 merged through PR #6;
-- M4 merge commit: `67be7ba3441e4ab2c21eac22c2c4eee07d5f65f6`;
-- completed milestone: **M4 — production totals and report**;
-- next version: **`0.5.0-alpha`**;
-- next milestone: **M5 — PDF export**;
-- M4 rollback point: `release/v0.4.0-alpha`.
+- release candidate: `m5/0.5.0-alpha`, PR #8;
+- candidate version: **`0.5.0-alpha`**;
+- completed functional milestone: **M5 — PDF export**;
+- next milestone: **M6 — automatic paper minimisation**;
+- current rollback point: `release/v0.4.0-alpha`;
+- `release/v0.5.0-alpha` is created after merge.
 
-### Implemented in M4
+### Implemented in M5
 
-Pure production arithmetic and independent validation, pair/file totals, physical sheets, forms, press passes, a responsive production report, factual Chromium evidence, and a validated uNews patchnote.
+A pure document model, dependency-free PDF writer, Canvas rendering, a separate eight-page scheme PDF, a separate six-page report PDF, browser downloads, structural checks, `pdfinfo`, and Poppler rendering of every page.
 
 ### Exact continuation point
 
-Start M5 in `m5/0.5.0-alpha` from verified `main`. First design and test a DOM-independent PDF document model with one scheme per page, deterministic ordering of all eight schemes, and a separate production report. Integrate PDF generation afterward.
+After PR #8 is merged, start M6 in `m6/0.6.0-alpha`. First define a pure candidate model and minimum valid run-length functions, then generate and compare alternatives.
 
 </td>
 </tr>
@@ -113,8 +102,9 @@ Start M5 in `m5/0.5.0-alpha` from verified `main`. First design and test a DOM-i
 ```text
 Открой репозиторий sunpole/uImposition через GitHub.
 
-Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/ROADMAP.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/M4_IMPLEMENTATION_PLAN.md, docs/M4_RELEASE_EVIDENCE.md, data/control-case.json и data/control-layout-m3.json. Проверь последние PR и GitHub Actions.
+Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/ROADMAP.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/M5_IMPLEMENTATION_PLAN.md, data/control-case.json и data/control-layout-m3.json. Проверь последние PR и GitHub Actions.
 
 GitHub — единственный источник истины. Не требуй локальный клон.
-Начни M5 в ветке m5/0.5.0-alpha: сначала чистая модель PDF и тесты порядка/страниц, затем генерация, UI, Chromium, uNews и recovery-ветка после merge.
+Если PR №8 открыт — заверши финальные проверки, uNews, merge и recovery-ветку release/v0.5.0-alpha.
+Если M5 уже объединён — начни M6 в ветке m6/0.6.0-alpha: сначала чистая модель кандидатов и расчёт минимальных допустимых тиражей, затем генерация альтернатив, UI, Chromium, uNews и recovery-ветка.
 ```

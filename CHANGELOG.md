@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.5.0-alpha — 2026-07-24
+
+### Added
+
+- centralized PDF configuration with A4, sheet-proportional, and custom page modes;
+- pure `pdf-document-model` with deterministic scheme and report documents;
+- dependency-free PDF 1.4 writer using JPEG page XObjects;
+- browser Canvas renderer for Cyrillic labels, page arrows, tables, and production totals;
+- separate eight-page scheme PDF with one validated scheme per page;
+- separate six-page A4 production-report PDF;
+- browser download controls for both documents;
+- structural page-count verification in Playwright;
+- `pdfinfo` validation and Poppler rendering of every downloaded page;
+- dedicated M5 unit, integration, geometry, pagination, and binary tests;
+- `docs/M5_IMPLEMENTATION_PLAN.md`.
+
+### Changed
+
+- the control demo now exposes independent scheme and report PDF downloads;
+- wide report tables are paginated deterministically;
+- incomplete final table pages keep stable row height;
+- long report titles automatically shrink to avoid page-number overlap;
+- screenshot artifacts now include downloaded PDFs, `pdfinfo` output, and rendered PNG pages;
+- visible version and package metadata are synchronized to `0.5.0-alpha`;
+- M6 paper minimisation is the next active milestone.
+
+### Verified
+
+- four impositions create exactly eight scheme pages in required front/back order;
+- the production report remains a separate six-page document;
+- A4 MediaBox is `595.276 × 841.89 pt`;
+- Poppler reads and renders all 14 pages from both documents;
+- Cyrillic, arrows, page numbers, tables, and long contribution rows are readable;
+- no clipping, black squares, broken glyphs, or overlapping headers were found;
+- invalid schemes and non-production-ready reports are rejected before export;
+- zero runtime dependencies and no CDN are required.
+
 ## 0.4.0-alpha — 2026-07-24
 
 ### Added
