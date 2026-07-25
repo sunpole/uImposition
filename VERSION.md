@@ -9,7 +9,8 @@
 ### Текущая версия
 
 **`0.5.0-alpha`**  
-Дата: **24 июля 2026**  
+Дата версии: **24 июля 2026**  
+Объединено в `main`: **25 июля 2026**  
 Этап: **M5 — PDF-экспорт**
 
 ### Что работает
@@ -30,12 +31,12 @@
 
 - четыре монтажа → `8` страниц схем;
 - основной PDF содержит только схемы;
-- отчёт не добавляется девятой страницей и создаётся отдельным файлом;
-- отдельный отчёт содержит `6` страниц;
-- Poppler успешно прочитал и отрендерил все `14` страниц двух документов;
+- отчёт создаётся отдельным шестистраничным файлом;
+- Poppler успешно прочитал и отрендерил все `14` страниц;
 - A4-схемы не обрезаны, пропорции сохранены;
 - в отчёте читаются итоговые метрики, 20 файлов, 35 пар и вклады монтажей;
-- заголовки, номера страниц, кириллица и длинные строки не пересекаются.
+- заголовки, номера страниц, кириллица и длинные строки не пересекаются;
+- производственные итоги: `3395` листов, `8` форм, `6790` листопрогонов, недопечатка `0`.
 
 ### Ещё не реализовано
 
@@ -59,24 +60,17 @@
 ### Current version
 
 **`0.5.0-alpha`**  
-Date: **24 July 2026**  
+Version date: **24 July 2026**  
+Merged to `main`: **25 July 2026**  
 Stage: **M5 — PDF export**
 
 ### Working now
 
-- all verified M1–M4 functionality;
-- a separate eight-page scheme PDF with one scheme per page;
-- deterministic front/back order for four impositions;
-- A4, sheet-proportional, and custom scheme page modes;
-- a separate six-page A4 production-report PDF;
-- browser Canvas rasterisation for Cyrillic text and arrows;
-- a dependency-free PDF writer with no CDN or runtime packages;
-- structural checks, `pdfinfo`, and Poppler rendering of every page;
-- direct browser download of both documents.
+All verified M1–M4 functionality; a separate eight-page scheme PDF; deterministic front/back order; A4, sheet-proportional, and custom scheme modes; a separate six-page A4 production report; browser Canvas rasterisation; dependency-free PDF writing; structural checks; `pdfinfo`; Poppler rendering; and direct browser download of both documents.
 
 ### Verified M5 result
 
-Four impositions produce eight scheme pages. The report remains a separate six-page document. Poppler successfully reads and renders all fourteen pages; no clipping, broken glyphs, overlapping headers, or black squares were found.
+Four impositions produce eight scheme pages. The report remains a separate six-page document. Poppler successfully reads and renders all fourteen pages; no clipping, broken glyphs, overlapping headers, or black squares were found. Verified production totals remain `3395` physical sheets, `8` forms, `6790` press passes, and `0` underproduction.
 
 ### Not implemented yet
 
@@ -101,4 +95,4 @@ Generate alternatives, assign imposition run lengths automatically, and minimise
 
 ## Релизы и откат / Releases and rollback
 
-После объединения и проверки alpha-веха `0.5.0-alpha` получает recovery-ветку `release/v0.5.0-alpha`. Настоящий GitHub Release создаётся только для стабильной production-версии.
+M5 объединён через PR №8, merge commit `366ea45efd2566c7bb25ff14ff0cbc0df7472594`. Проверенная alpha-точка отката существует как `release/v0.5.0-alpha`. Настоящий GitHub Release создаётся только для стабильной production-версии.

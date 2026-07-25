@@ -1,53 +1,55 @@
-# M5 release evidence / Доказательства релиз-кандидата M5
+# M5 release evidence / Доказательства релиза M5
 
 ## Версия / Version
 
 `0.5.0-alpha`
 
-## Функциональный commit / Functional commit
+## Git history
 
+- feature branch: `m5/0.5.0-alpha`;
+- Pull Request: `#8`;
+- verified full head: `b3ff6e68ce41d9cd01d694a590dbd6d85adc5805`;
+- merge commit: `366ea45efd2566c7bb25ff14ff0cbc0df7472594`;
+- rollback branch: `release/v0.5.0-alpha`;
 - release-marker commit: `154a725d81429905ceec4f72f9c8de14c631a6ee`;
-- предрелизный commit без маркера / pre-marker commit: `1ac9a450ab587d990a55195c0a7b1a3838ef2aca`;
-- branch: `m5/0.5.0-alpha`;
-- Pull Request: `#8`.
+- pre-marker functional commit: `1ac9a450ab587d990a55195c0a7b1a3838ef2aca`.
 
-## GitHub Actions
+## Финальные GitHub Actions / Final GitHub Actions
 
-Для marker commit `154a725d81429905ceec4f72f9c8de14c631a6ee`:
+Для полного head `b3ff6e68ce41d9cd01d694a590dbd6d85adc5805`:
 
 - Quality checks — success;
 - Capture uImposition screenshots — success;
 - Validate uNews patchnotes — success;
-- Prepare uImposition release news — release files created and committed.
+- Prepare uImposition release news — success.
 
-### Основной artifact / Primary artifact
+### Финальный artifact / Final artifact
 
-- workflow run: `30114927307`;
+- workflow run: `30115025504`;
 - artifact: `uimposition-screenshots-8-1`;
-- artifact id: `8605225707`;
-- artifact digest: `sha256:7db355f07590f563268944f694716ddc4b49de266b2f3972f4d9d91a5d6bcd7f`;
-- source commit: `154a725d81429905ceec4f72f9c8de14c631a6ee`.
+- artifact id: `8605081454`;
+- artifact digest: `sha256:f88b7c48d8f0ae197bed9d73e9ce83d1836236022e51acd8809d970ad43439c2`;
+- source commit: `b3ff6e68ce41d9cd01d694a590dbd6d85adc5805`.
 
 Artifact содержит desktop/mobile PNG, оба PDF, `pdfinfo`, manifest, logs и PNG-render каждой PDF-страницы.
 
 ## PDF схем / Scheme PDF
 
 - browser file name: `uImposition-schemes.pdf`;
-- artifact file: `uimposition-v0-5-0-alpha-control-schemes.pdf`;
 - page count: `8`;
-- page size: A4, приблизительно `595.276 × 841.89 pt`;
+- default page size: A4;
 - порядок: лицо, оборот для каждого из четырёх монтажей;
 - одна страница содержит ровно одну схему;
-- Poppler успешно создал 8 PNG.
+- доступны A4, sheet-proportional и custom режимы;
+- Poppler успешно создал `8` PNG.
 
 ## PDF отчёта / Production-report PDF
 
 - browser file name: `uImposition-production-report.pdf`;
-- artifact file: `uimposition-v0-5-0-alpha-production-report.pdf`;
 - page count: `6`;
 - page size: A4;
 - состав: 1 сводка, 2 страницы файлов, 3 страницы печатных пар;
-- Poppler успешно создал 6 PNG.
+- Poppler успешно создал `6` PNG.
 
 ## Ручная визуальная проверка / Manual visual review
 
@@ -66,13 +68,11 @@ Artifact содержит desktop/mobile PNG, оба PDF, `pdfinfo`, manifest, l
 
 ## uNews
 
-- release workflow run: `30114926864`;
 - patchnote/image commit: `9792ec33dde75a49344b568540b3e5b7dce26eed`;
 - patchnote: `news/2026-07-24-uimposition-v0-5-0-alpha-separate-scheme-and-report-pdfs.md`;
 - image: `news/2026-07-24-uimposition-v0-5-0-alpha-separate-scheme-and-report-pdfs.png`;
 - image source: Playwright;
 - image scenario: `m5-pdf-export-desktop`;
-- image source commit: `154a725d81429905ceec4f72f9c8de14c631a6ee`;
 - release marker consumed and deleted.
 
 ## Проверенные производственные значения / Verified production totals
