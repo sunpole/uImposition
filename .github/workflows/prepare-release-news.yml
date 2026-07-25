@@ -165,12 +165,13 @@ jobs:
             exit 0
           fi
 
-          echo "Initial push returned a failure; verifying the remote branch."
-          git fetch origin "${TARGET_BRANCH}"
-          if git merge-base --is-ancestor "${local_sha}" "origin/${TARGET_BRANCH}"; then
-            echo "The generated commit is already present on the remote branch."
+          echo "Initial push returned a failure; verifying the exact remote branch head."
+          remote_sha="$(git ls-remote origin "refs/heads/${TARGET_BRANCH}" | cut -f1)"
+          if [ "$remote_sha" = "$local_sha" ]; then
+            echo "The generated commit is already the remote branch head."
             exit 0
           fi
 
-          echo "The generated commit is not present on the remote branch."
+          echo "Generated commit: ${local_sha}"
+          echo "Remote branch head: ${remote_sha:-missing}"
           exit 1
