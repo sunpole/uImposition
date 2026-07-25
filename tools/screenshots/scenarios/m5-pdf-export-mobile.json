@@ -3,14 +3,15 @@
   "path": "/?demo=control",
   "viewport": { "width": 430, "height": 932 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.5.0-alpha" },
+    { "selector": ".brand", "text": "v0.6.0-alpha" },
     { "selector": "#impositionStatus", "text": "4 лица" },
     { "selector": "#productionStatus", "text": "Недопечатки нет" },
+    { "selector": "#paperSolutionStatus", "text": "Минимум бумаги доказан" },
     { "selector": "#pdfExportPanel", "text": "Экспорт в PDF" },
     { "selector": "#pdfExportStatus", "text": "Готово: схемы 8 стр. · отчёт 6 стр." },
     { "selector": "#exportSchemesPdf", "text": "Скачать PDF схем" },
     { "selector": "#exportReportPdf", "text": "Скачать PDF отчёта" }
   ],
-  "screenshot": "uimposition-v0-5-0-alpha-m5-pdf-export-mobile.png",
+  "screenshot": "uimposition-v0-6-0-alpha-m5-pdf-export-mobile.png",
   "fullPage": true
 }

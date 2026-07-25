@@ -27,12 +27,16 @@ const patchnoteName = `${baseName}.md`;
 const sourceImage = path.join(root, "artifacts/screenshots", entry.screenshot);
 const targetImage = path.join(root, "news", imageName);
 const targetPatchnote = path.join(root, "news", patchnoteName);
+const releaseDirectory = path.join(root, "archive", "development", marker.version);
+const archiveName = `uimposition-v${safeVersion}-evidence.zip`;
+const releaseManifestPath = path.join(releaseDirectory, "release.json");
 
 function bulletList(items) {
   return items.map((item) => `- ${item};`).join("\n").replace(/;$/, ".");
 }
 
 await mkdir(path.join(root, "news"), { recursive: true });
+await mkdir(releaseDirectory, { recursive: true });
 await copyFile(sourceImage, targetImage);
 
 const frontMatter = `---
@@ -74,5 +78,35 @@ ${marker.telegramText}
 `;
 
 await writeFile(targetPatchnote, body, "utf8");
+
+const prerelease = /-(alpha|beta|rc(?:\.|$))/i.test(marker.version);
+const releaseManifest = {
+  schemaVersion: 1,
+  project: "uImposition",
+  version: marker.version,
+  tag: `v${marker.version}`,
+  title: `uImposition v${marker.version}`,
+  prerelease,
+  sourceCommit: entry.commit,
+  createdAt: queuedAt,
+  patchnote: path.relative(root, targetPatchnote).replaceAll("\\", "/"),
+  image: path.relative(root, targetImage).replaceAll("\\", "/"),
+  archive: path.relative(root, path.join(releaseDirectory, archiveName)).replaceAll("\\", "/"),
+  screenshotScenario: entry.scenario,
+  archiveScenarios: Array.isArray(marker.archiveScenarios) && marker.archiveScenarios.length > 0
+    ? marker.archiveScenarios
+    : [marker.scenario],
+  historicalArtifacts: Array.isArray(marker.historicalArtifacts) ? marker.historicalArtifacts : [],
+  telegramText: marker.telegramText,
+};
+
+await writeFile(releaseManifestPath, `${JSON.stringify(releaseManifest, null, 2)}\n`, "utf8");
 await rm(markerPath);
-console.log(JSON.stringify({ imageName, patchnoteName, queuedAt, imageCommit: entry.commit }, null, 2));
+console.log(JSON.stringify({
+  imageName,
+  patchnoteName,
+  queuedAt,
+  imageCommit: entry.commit,
+  releaseManifest: path.relative(root, releaseManifestPath),
+  archive: releaseManifest.archive,
+}, null, 2));

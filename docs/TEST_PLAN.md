@@ -10,11 +10,13 @@
 
 1. модульные тесты;
 2. интеграционные тесты расчёта;
-3. визуальные проверки схем и отчёта;
-4. проверка браузерного скачивания;
-5. структурная PDF-проверка;
-6. полный Poppler-render;
-7. ручная проверка всех страниц.
+3. повторная материализация лица и оборота;
+4. независимый производственный отчёт;
+5. визуальные проверки интерфейса;
+6. проверка браузерного скачивания;
+7. структурная PDF-проверка;
+8. полный Poppler-render;
+9. ручная проверка доказательных изображений и PDF-страниц.
 
 ### Базовые сценарии
 
@@ -35,52 +37,89 @@
 - готовый тираж файла = минимум среди его пар;
 - перетираж файла и пар показывается отдельно;
 - бумага = сумма тиражей монтажей;
-- формы = лицо + оборот;
+- layout-формы = лицо + оборот;
 - листопрогоны = 2 × физические листы;
 - неизвестные пары и повреждённые схемы блокируются.
 
-### M5: модель PDF
+### M5: PDF
 
-- четыре монтажа создают ровно `8` логических страниц схем;
-- порядок: `1 лицо`, `1 оборот`, `2 лицо`, `2 оборот` и далее;
-- каждая страница содержит одну схему;
-- русский и английский заголовки не меняют порядок;
-- основной PDF и отчёт имеют разные имена файлов;
-- invalid imposition и invalid production report не экспортируются;
-- A4 = `210 × 297 мм`;
-- пропорциональный режим сохраняет отношение `616 / 446`;
-- custom-режим отклоняет нулевые и отрицательные размеры.
+- четыре монтажа создают ровно `8` страниц схем;
+- порядок: лицо/оборот каждого монтажа;
+- отдельный отчёт содержит `6` страниц A4;
+- основной PDF и отчёт имеют разные имена;
+- invalid imposition и invalid report не экспортируются;
+- A4, пропорциональный и custom-режимы валидируются;
+- PDF начинается `%PDF-1.4`, заканчивается `%%EOF`;
+- число Page-объектов совпадает с ожидаемым;
+- Chromium скачивает оба документа;
+- `pdfinfo` читает документы;
+- Poppler создаёт `8 + 6 = 14` PNG;
+- отсутствуют обрезка, чёрные квадраты, сломанная кириллица и пересечения заголовков.
 
-### M5: бинарный PDF
+### M6.1: модель кандидата
 
-- файл начинается `%PDF-1.4` и заканчивается `%%EOF`;
-- число `/Type /Page` совпадает с ожидаемым;
-- каждый JPEG использует `/DCTDecode`;
-- присутствуют Catalog, Pages, xref, trailer и startxref;
-- A4 MediaBox соответствует примерно `595.276 × 841.89 pt`;
-- повреждённый JPEG отклоняется до создания PDF.
+- кандидат содержит ровно `rows × columns` позиций;
+- неизвестная пара отклоняется;
+- повторный блок пары отклоняется;
+- `T_first` и `T_complete` считаются отдельно;
+- применение тиража не изменяет исходное состояние спроса;
+- ручная последовательность `1500 / 1100 / 450 / 345` воспроизводит `3395` листов и перетираж пар `1450`.
 
-### M5: PDF схем
+### M6.2: генерация кандидатов
 
-- Chromium скачивает `uImposition-schemes.pdf`;
-- документ содержит ровно `8` страниц;
-- `pdfinfo` успешно читает документ;
-- Poppler создаёт ровно `8` PNG;
-- на каждой странице есть заголовок, тираж, сетка и 16 ячеек;
-- нет обрезки, искажения пропорций, чёрных квадратов и сломанной кириллицы;
-- стрелки и знак `-` читаются корректно.
+- для 35 пар и 16 позиций полный набор с 1–2 парами содержит ровно `8960` кандидатов;
+- все производственные сигнатуры уникальны;
+- порядок генерации детерминирован;
+- лимит меньше пространства возвращает `truncated: true`;
+- усечённый набор нельзя объявлять полным.
 
-### M5: PDF отчёта
+### M6.3: минимум бумаги
 
-- Chromium скачивает отдельный `uImposition-production-report.pdf`;
-- документ содержит ровно `6` страниц A4;
-- порядок: сводка, 2 страницы файлов, 3 страницы пар;
-- Poppler создаёт ровно `6` PNG;
-- итоговые значения `3395 / 8 / 6790 / 0 / 1450 / 930` читаются;
-- таблицы содержат 20 файлов и 35 пар;
-- длинные строки вкладов не выходят за ячейки;
-- заголовок не пересекается с номером страницы;
-- неполные последние страницы сохраняют нормальную высоту строк.
+- универсальная нижняя граница: `ceil(52870 / 16) = 3305`;
+- построенный вариант достигает `3305`;
+- недопечатка равна `0`;
+- перетираж пар равен неизбежным `10`;
+- все 56 кандидатов имеют не более двух различных пар;
+- материализация создаёт 56 валидных лиц и зеркальных оборотов;
+- независимый production report подтверждает `3305 / 112 / 6610 / 0 / 10 / 0`;
+- UI показывает экономию `90` листов и предупреждает о росте форм `8 → 112`;
+- результат называется глобальным минимумом только при достижении универсальной нижней границы.
+
+### Производственные regression-кейсы
+
+Источник: `data/production-regression-cases.json`.
+
+1. **A6 альбомный 148×105, 32 страницы, 4+4**
+   - `4 × 4 = 16` без поворота;
+   - 16 последовательных пар `1/2 … 31/32`;
+   - один монтаж с тиражом `1000`;
+   - layout-формы `2`, цветовые пластины `8`, недопечатка `0`.
+
+2. **A6 вертикальный 105×148, 32 страницы, 4+4**
+   - лучший поворот `90°`;
+   - после поворота `4 × 4 = 16`;
+   - без поворота только `5 × 2 = 10`;
+   - один монтаж с тиражом `1000`, layout-формы `2`, пластины `8`.
+
+3. **Смешанный монтаж 1 A4 + 2 A5 + 8 A6, 4+4**
+   - все 11 прямоугольников внутри `608 × 431`;
+   - пересечений нет;
+   - использовано `248850 мм²`, свободно `13198 мм²`;
+   - оборот получен только горизонтальным зеркалом;
+   - layout-формы `2`, цветовые пластины `8`.
+
+4. **A5, 8 позиций, тиражи 400 / 700 / 4200, 2 страницы, 4+4**
+   - нижняя граница `ceil(5300 / 8) = 663`;
+   - тиражи монтажей `50 / 88 / 525`;
+   - бумага `663`, формы `6`, пластины `24`, листопрогоны `1326`;
+   - недопечатка `0`;
+   - только заказ 700 печатается как 704, общий перетираж `4`.
+
+### Границы тестов
+
+- 32-страничный A6 regression проверяет геометрию и последовательные пары, но не тетрадный фальцевальный спуск;
+- смешанный regression проверяет заданную раскладку, но не автоматический mixed-format packing;
+- поле `forms` исторически означает layout-формы сторон; цветовые пластины 4+4 считаются отдельно.
 
 </td>
 <td width="50%" valign="top">
@@ -89,59 +128,43 @@
 
 ### Test levels
 
-1. unit tests;
-2. calculation integration tests;
-3. scheme/report visual checks;
-4. browser download verification;
-5. structural PDF checks;
-6. complete Poppler rendering;
-7. manual review of every page.
+Unit tests, calculation integration, front/back rematerialisation, independent production reporting, browser visual checks, PDF download verification, structural checks, complete Poppler rendering, and manual evidence review.
 
-### M5: PDF model
+### M6 verification
 
-- four impositions create exactly eight scheme pages;
-- order is front/back for each imposition;
-- each page contains one scheme;
-- language changes labels but not ordering;
-- scheme and report documents use different file names;
-- invalid impositions and reports cannot be exported;
-- A4, proportional, and custom page modes validate explicitly.
+- exact immutable candidate and demand-state calculations;
+- complete 8960-candidate one/two-pair control space;
+- explicit truncation reporting;
+- universal paper lower bound `ceil(52870 / 16) = 3305`;
+- a valid construction that reaches 3305 and therefore proves the paper minimum;
+- independent rematerialisation of 56 front/back impositions;
+- production totals `3305` sheets, `112` side-layout forms, `6610` passes, `0` underproduction, `10` pair overrun, `0` file overrun;
+- UI evidence for the 90-sheet saving and 8-to-112 form trade-off.
 
-### M5: PDF binary
+### Production regressions
 
-- `%PDF-1.4`, `%%EOF`, Catalog, Pages, xref, trailer, and startxref exist;
-- Page-object count matches the expected count;
-- every JPEG uses `/DCTDecode`;
-- A4 MediaBox is approximately `595.276 × 841.89 pt`;
-- malformed JPEG data is rejected.
+- 32-page A6 landscape and portrait, both producing a verified 16-pair 4+4 duplex run;
+- one A4, two A5, and eight A6 rectangles on one mirrored duplex sheet;
+- A5 quantities 400, 700, and 4200 reaching the proven 663-sheet lower bound;
+- explicit separation between side-layout forms and 4+4 color plates.
 
-### M5: scheme PDF
-
-Chromium downloads an eight-page PDF, `pdfinfo` reads it, Poppler renders eight PNG files, and manual review confirms correct order, Cyrillic, arrows, aspect ratio, and no clipping or broken glyphs.
-
-### M5: report PDF
-
-Chromium downloads a separate six-page A4 report. It contains a summary, two file pages, and three pair pages. Poppler renders all pages, all control totals are readable, long contribution rows fit, and headers never overlap page numbers.
+The 32-page tests do not claim folded-signature pagination, and the mixed-format test validates a supplied packing rather than automatic rectangle packing.
 
 </td>
 </tr>
 </table>
 
-## Контрольный набор / Control dataset
+## Основной контрольный набор / Primary control dataset
 
 `data/control-case.json`
 
 - 20 файлов / files;
 - 35 печатных пар / print pairs;
-- 4 монтажа / impositions;
-- 8 форм / forms;
-- 3395 физических листов / physical sheets;
-- 6790 листопрогонов / press passes;
+- ручной ориентир: 4 монтажа, 8 форм, 3395 листов, 6790 прогонов;
+- автоматический минимум бумаги: 56 монтажей, 112 форм, 3305 листов, 6610 прогонов;
 - недопечатка / underproduction: 0;
-- перетираж пар / pair overrun: 1450;
-- перетираж файлов / complete-file overrun: 930;
+- ручной перетираж пар / manual pair overrun: 1450;
+- автоматический перетираж пар / automatic pair overrun: 10;
 - PDF схем / scheme PDF: 8 pages;
 - PDF отчёта / report PDF: 6 pages;
 - всего проверенных PDF-страниц / total verified PDF pages: 14.
-
-Программный оптимизатор может улучшить ручной ориентир, но не может нарушать жёсткие ограничения.

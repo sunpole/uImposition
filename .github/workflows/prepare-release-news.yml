@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   prepare:
@@ -27,6 +28,7 @@ jobs:
     env:
       SCREENSHOT_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
       TARGET_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Checkout exact feature branch
@@ -58,9 +60,35 @@ jobs:
           node --input-type=module <<'NODE' >> "$GITHUB_ENV"
           import fs from 'node:fs';
           const marker = JSON.parse(fs.readFileSync('news/.prepare-release.json', 'utf8'));
-          console.log(`SCREENSHOT_SCENARIOS=${marker.scenario}`);
+          const scenarios = Array.isArray(marker.archiveScenarios) && marker.archiveScenarios.length > 0
+            ? marker.archiveScenarios
+            : [marker.scenario];
+          console.log(`SCREENSHOT_SCENARIOS=${scenarios.join(',')}`);
           console.log(`RELEASE_VERSION=${marker.version}`);
           NODE
+
+      - name: Preserve referenced historical Action archives
+        if: steps.marker.outputs.exists == 'true'
+        shell: bash
+        run: |
+          mkdir -p "archive/development/${RELEASE_VERSION}/historical"
+          node --input-type=module <<'NODE' > /tmp/uimposition-historical-artifacts.tsv
+          import fs from 'node:fs';
+          const marker = JSON.parse(fs.readFileSync('news/.prepare-release.json', 'utf8'));
+          for (const item of marker.historicalArtifacts ?? []) {
+            if (!Number.isInteger(Number(item.artifactId))) throw new Error('historical artifactId must be an integer');
+            const fileName = String(item.fileName ?? `artifact-${item.artifactId}.zip`)
+              .replace(/[^0-9A-Za-z._-]+/g, '-');
+            console.log(`${Number(item.artifactId)}\t${fileName}`);
+          }
+          NODE
+          while IFS=$'\t' read -r artifact_id file_name; do
+            [ -z "$artifact_id" ] && continue
+            gh api \
+              -H "Accept: application/vnd.github+json" \
+              "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" \
+              > "archive/development/${RELEASE_VERSION}/historical/${file_name}"
+          done < /tmp/uimposition-historical-artifacts.tsv
 
       - name: Install pinned screenshot tooling
         if: steps.marker.outputs.exists == 'true'
@@ -72,35 +100,78 @@ jobs:
         working-directory: tools/screenshots
         run: npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
 
-      - name: Capture exact release screenshot
+      - name: Capture exact release screenshots and downloads
         if: steps.marker.outputs.exists == 'true'
         working-directory: tools/screenshots
         run: npm run capture
 
-      - name: Create patchnote and copy selected PNG
+      - name: Create patchnote, selected PNG, and release manifest
         if: steps.marker.outputs.exists == 'true'
         run: node tools/news/prepare-release.mjs
 
-      - name: Commit prepared news to feature branch
+      - name: Create permanent development evidence ZIP
+        if: steps.marker.outputs.exists == 'true'
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import pathlib
+          import zipfile
+
+          root = pathlib.Path('.').resolve()
+          release_dir = root / 'archive' / 'development' / '${{ env.RELEASE_VERSION }}'
+          manifest_path = release_dir / 'release.json'
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          archive_path = root / manifest['archive']
+          archive_path.parent.mkdir(parents=True, exist_ok=True)
+
+          inputs = [
+              root / 'artifacts' / 'screenshots',
+              root / manifest['patchnote'],
+              root / manifest['image'],
+              manifest_path,
+              release_dir / 'historical',
+          ]
+
+          with zipfile.ZipFile(archive_path, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+              seen = set()
+              for item in inputs:
+                  if not item.exists():
+                      continue
+                  paths = [item] if item.is_file() else sorted(path for path in item.rglob('*') if path.is_file())
+                  for path in paths:
+                      if path.resolve() == archive_path.resolve():
+                          continue
+                      relative = path.relative_to(root).as_posix()
+                      if relative in seen:
+                          continue
+                      seen.add(relative)
+                      archive.write(path, relative)
+
+          print(f'Created {archive_path.relative_to(root)} with {len(seen)} files')
+          PY
+
+      - name: Commit news and permanent development archive
         if: steps.marker.outputs.exists == 'true'
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add news/
-          git commit -m "news: prepare uImposition ${RELEASE_VERSION} patchnote"
+          git add -A news/ archive/development/
+          git commit -m "release: prepare uImposition ${RELEASE_VERSION} news and evidence"
           local_sha="$(git rev-parse HEAD)"
 
           if git push origin HEAD:${TARGET_BRANCH}; then
             exit 0
           fi
 
-          echo "Initial push returned a failure; verifying the remote branch."
-          git fetch origin "${TARGET_BRANCH}"
-          if git merge-base --is-ancestor "${local_sha}" "origin/${TARGET_BRANCH}"; then
-            echo "The generated commit is already present on the remote branch."
+          echo "Initial push returned a failure; verifying the exact remote branch head."
+          remote_sha="$(git ls-remote origin "refs/heads/${TARGET_BRANCH}" | cut -f1)"
+          if [ "$remote_sha" = "$local_sha" ]; then
+            echo "The generated commit is already the remote branch head."
             exit 0
           fi
 
-          echo "The generated commit is not present on the remote branch."
+          echo "Generated commit: ${local_sha}"
+          echo "Remote branch head: ${remote_sha:-missing}"
           exit 1

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "name": "Production regression cases / Производственные контрольные кейсы",
+  "sheet": {
+    "postTrim": { "width": 616, "height": 446 },
+    "pressMargins": { "left": 4, "right": 4, "top": 2, "bottom": 13 },
+    "printable": { "width": 608, "height": 431 }
+  },
+  "a6Landscape32Pages": {
+    "file": "A6-LANDSCAPE-32",
+    "quantity": 1000,
+    "pages": 32,
+    "colors": { "front": 4, "back": 4 },
+    "product": { "width": 148, "height": 105, "bleed": 0, "spacingMode": "commonCut", "gap": 0 },
+    "expected": { "bestRotation": 0, "columns": 4, "rows": 4, "positions": 16, "printPairs": 16 }
+  },
+  "a6Portrait32Pages": {
+    "file": "A6-PORTRAIT-32",
+    "quantity": 1000,
+    "pages": 32,
+    "colors": { "front": 4, "back": 4 },
+    "product": { "width": 105, "height": 148, "bleed": 0, "spacingMode": "commonCut", "gap": 0 },
+    "expected": { "bestRotation": 90, "columns": 4, "rows": 4, "positions": 16, "printPairs": 16 }
+  },
+  "mixedFormatsDuplex": {
+    "id": "MIXED-A4-A5-A6",
+    "colors": { "front": 4, "back": 4 },
+    "expectedItemCounts": { "A4": 1, "A5": 2, "A6": 8, "total": 11 },
+    "placements": [
+      { "id": "A4-1", "format": "A4", "file": "A4-1", "frontPage": 1, "backPage": 2, "x": 0, "y": 0, "width": 297, "height": 210, "rotation": 90 },
+      { "id": "A5-1", "format": "A5", "file": "A5-1", "frontPage": 1, "backPage": 2, "x": 297, "y": 0, "width": 148, "height": 210, "rotation": 0 },
+      { "id": "A5-2", "format": "A5", "file": "A5-2", "frontPage": 1, "backPage": 2, "x": 445, "y": 0, "width": 148, "height": 210, "rotation": 0 },
+      { "id": "A6-1", "format": "A6", "file": "A6-1", "frontPage": 1, "backPage": 2, "x": 0, "y": 210, "width": 148, "height": 105, "rotation": 90 },
+      { "id": "A6-2", "format": "A6", "file": "A6-2", "frontPage": 1, "backPage": 2, "x": 148, "y": 210, "width": 148, "height": 105, "rotation": 90 },
+      { "id": "A6-3", "format": "A6", "file": "A6-3", "frontPage": 1, "backPage": 2, "x": 296, "y": 210, "width": 148, "height": 105, "rotation": 90 },
+      { "id": "A6-4", "format": "A6", "file": "A6-4", "frontPage": 1, "backPage": 2, "x": 444, "y": 210, "width": 148, "height": 105, "rotation": 90 },
+      { "id": "A6-5", "format": "A6", "file": "A6-5", "frontPage": 1, "backPage": 2, "x": 0, "y": 315, "width": 148, "height": 105, "rotation": 90 },
+      { "id": "A6-6", "format": "A6", "file": "A6-6", "frontPage": 1, "backPage": 2, "x": 148, "y": 315, "width": 148, "height": 105, "rotation": 90 },
+      { "id": "A6-7", "format": "A6", "file": "A6-7", "frontPage": 1, "backPage": 2, "x": 296, "y": 315, "width": 148, "height": 105, "rotation": 90 },
+      { "id": "A6-8", "format": "A6", "file": "A6-8", "frontPage": 1, "backPage": 2, "x": 444, "y": 315, "width": 148, "height": 105, "rotation": 90 }
+    ]
+  },
+  "a5VariableRuns": {
+    "colors": { "front": 4, "back": 4 },
+    "product": { "width": 148, "height": 210, "bleed": 0, "spacingMode": "commonCut", "gap": 0 },
+    "orders": [
+      { "file": "A5-400", "quantity": 400, "pages": 2 },
+      { "file": "A5-700", "quantity": 700, "pages": 2 },
+      { "file": "A5-4200", "quantity": 4200, "pages": 2 }
+    ],
+    "expected": {
+      "rotation": 0,
+      "columns": 4,
+      "rows": 2,
+      "positions": 8,
+      "requiredPairQuantity": 5300,
+      "paperLowerBound": 663,
+      "physicalSheets": 663,
+      "pairOverrun": 4,
+      "fileOverrun": 4,
+      "impositions": 3,
+      "forms": 6,
+      "pressPasses": 1326
+    }
+  }
+}

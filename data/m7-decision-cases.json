@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "name": "M7 operator decision cases",
+  "defaultObjectiveOrder": [
+    "physicalSheets",
+    "layoutForms",
+    "colorPlates",
+    "fileOverrun",
+    "pairOverrun",
+    "pressPasses",
+    "splitOrders",
+    "impositionCount",
+    "layoutCompactness",
+    "distinctOrdersPerImposition"
+  ],
+  "hardConstraints": [
+    "zeroUnderproduction",
+    "validPrintableGeometry",
+    "validFrontBackMapping",
+    "validOrientation",
+    "validDuplexStrategy",
+    "validatedProductionReport"
+  ],
+  "a6FourKindsOwnBack": {
+    "id": "M7-A6-FOUR-KINDS-OWN-BACK",
+    "description": "Four different two-page A6 1+1 orders, 4000 copies each",
+    "sheet": {
+      "postTrim": { "width": 616, "height": 446 },
+      "printable": { "width": 608, "height": 431 }
+    },
+    "product": {
+      "width": 105,
+      "height": 148,
+      "bleed": 0,
+      "spacingMode": "commonCut"
+    },
+    "placement": {
+      "rotation": 90,
+      "columns": 4,
+      "rows": 4,
+      "positions": 16
+    },
+    "colors": { "front": 1, "back": 1 },
+    "orders": [
+      { "file": "A6-1", "quantity": 4000, "pages": 2 },
+      { "file": "A6-2", "quantity": 4000, "pages": 2 },
+      { "file": "A6-3", "quantity": 4000, "pages": 2 },
+      { "file": "A6-4", "quantity": 4000, "pages": 2 }
+    ],
+    "foreignBack": {
+      "strategy": "sheetwise",
+      "frontPositionsPerOrder": 4,
+      "backPositionsPerOrder": 4,
+      "runLength": 1000,
+      "physicalSheets": 1000,
+      "pressPasses": 2000,
+      "impositionCount": 1,
+      "layoutForms": 2,
+      "colorPlates": 2,
+      "underproduction": 0,
+      "fileOverrun": 0,
+      "pairOverrun": 0
+    },
+    "ownBack": {
+      "strategy": "workAndTurn",
+      "frontPositionsPerOrderOnSharedForm": 2,
+      "backPositionsPerOrderOnSharedForm": 2,
+      "finishedCopiesPerOrderPerPhysicalSheet": 4,
+      "runLength": 1000,
+      "physicalSheets": 1000,
+      "pressPasses": 2000,
+      "impositionCount": 1,
+      "layoutForms": 1,
+      "colorPlates": 1,
+      "underproduction": 0,
+      "fileOverrun": 0,
+      "pairOverrun": 0,
+      "requires": [
+        "horizontalTurnCompatibility",
+        "symmetricHalfSheetMapping",
+        "samePlateSecondPass",
+        "operatorExplanation"
+      ]
+    },
+    "expectedDecision": {
+      "paperPriorityOnly": "tie",
+      "paperThenForms": "ownBack",
+      "paperThenColorPlates": "ownBack",
+      "mustShowBothVariants": true,
+      "mustShowTechnologyWarning": true
+    }
+  }
+}

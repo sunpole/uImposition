@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="uImposition — профессиональный расчёт офсетных монтажей / professional offset imposition planning">
-  <title>uImposition · v0.5.0-alpha</title>
+  <title>uImposition · v0.6.0-alpha</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,21 +12,21 @@
     <nav class="nav" aria-label="Основная навигация">
       <a class="brand" href="./" aria-label="uImposition — главная страница">
         <span class="brand__name">uImposition</span>
-        <span class="brand__version">v<span data-project-version>0.5.0-alpha</span></span>
+        <span class="brand__version">v<span data-project-version>0.6.0-alpha</span></span>
       </a>
       <button id="languageButton" class="language-button" type="button" aria-label="Switch to English">EN</button>
     </nav>
 
     <div class="hero__content" data-lang="ru">
       <p class="eyebrow">Проектирование офсетных монтажей</p>
-      <h1>Проверенные схемы и отчёт — в PDF.</h1>
-      <p>M5 экспортирует восемь схем по одной на страницу и формирует отдельный шестистраничный производственный отчёт.</p>
+      <h1>Минимум бумаги — с доказательством.</h1>
+      <p>M6 автоматически строит вариант на 3 305 листов, достигает универсальной нижней границы и сравнивает его с ручной раскладкой.</p>
     </div>
 
     <div class="hero__content" data-lang="en" hidden>
       <p class="eyebrow">Offset imposition planning</p>
-      <h1>Validated schemes and report — in PDF.</h1>
-      <p>M5 exports eight schemes with one scheme per page and creates a separate six-page production report.</p>
+      <h1>Paper minimum — with a proof.</h1>
+      <p>M6 automatically constructs a 3,305-sheet solution, reaches the universal lower bound, and compares it with the manual layout.</p>
     </div>
   </header>
 
@@ -242,16 +242,16 @@
     </section>
 
     <section class="panel roadmap-panel">
-      <h2 data-lang="ru">Текущая граница M5</h2><h2 data-lang="en" hidden>Current M5 boundary</h2>
+      <h2 data-lang="ru">Текущая граница M6</h2><h2 data-lang="en" hidden>Current M6 boundary</h2>
       <div class="two-column-copy">
-        <div data-lang="ru"><p><strong>Работает:</strong> геометрия, вместимость, точные пары, лицо и оборот, производственные итоги, отдельный PDF схем на 8 страниц и отдельный PDF отчёта на 6 страниц.</p><p><strong>Следом, M6:</strong> генерация альтернатив, автоматический подбор тиражей монтажей и минимум физической бумаги без недопечатки.</p></div>
-        <div data-lang="en" hidden><p><strong>Working:</strong> geometry, capacity, exact pairs, fronts and backs, production totals, a separate eight-page scheme PDF, and a separate six-page report PDF.</p><p><strong>Next, M6:</strong> alternative generation, automatic imposition run assignment, and minimum physical paper without underproduction.</p></div>
+        <div data-lang="ru"><p><strong>Работает:</strong> геометрия, точные пары, проверенные лицо/оборот, производственный отчёт, два PDF и доказанный минимум бумаги 3 305 листов для контрольного набора.</p><p><strong>Следом, M7:</strong> уменьшение числа форм, многокритериальный компромисс и компактный набор Парето между бумагой, формами и перетиражем.</p></div>
+        <div data-lang="en" hidden><p><strong>Working:</strong> geometry, exact pairs, validated fronts/backs, production reporting, two PDFs, and a proven 3,305-sheet paper minimum for the control dataset.</p><p><strong>Next, M7:</strong> reduce form count and present a compact multi-objective Pareto set across paper, forms, and overrun.</p></div>
       </div>
     </section>
   </main>
 
   <div id="toast" class="toast" role="status" hidden></div>
-  <footer><a href="./" class="footer-brand">uImposition · v<span data-project-version>0.5.0-alpha</span></a><span>© 2026 Anton Magomedov</span></footer>
+  <footer><a href="./" class="footer-brand">uImposition · v<span data-project-version>0.6.0-alpha</span></a><span>© 2026 Anton Magomedov</span></footer>
   <script type="module" src="src/app.js"></script>
   <script type="module" src="src/m3-demo.js"></script>
 </body>

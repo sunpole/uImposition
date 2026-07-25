@@ -97,6 +97,15 @@ export const CONFIG = Object.freeze({
     reportDocumentFileName: "uImposition-production-report.pdf",
   },
 
+  optimizer: {
+    candidateGeneration: {
+      minDistinctPairs: 1,
+      maxDistinctPairs: 2,
+      maxCandidates: 10000,
+      idPrefix: "AUTO",
+    },
+  },
+
   i18n: {
     ru: {
       customPreset: "Произвольный размер",

@@ -12,18 +12,23 @@
 - `VERSION.md` — состояние для человека;
 - `CHANGELOG.md` — история;
 - `package.json` — техническая версия JavaScript-проекта;
-- recovery-ветка `release/v{version}` — точка отката;
-- GitHub Release и tag — публичная стабильная версия.
+- recovery-ветка `release/v{version}` — неизменяемая точка отката;
+- tag `v{version}` — точное имя версии;
+- GitHub Release — опубликованный checkpoint;
+- `news/*.md` и изображение — release news для uNews/Telegram;
+- `archive/development/{version}/` — постоянные доказательства и архивы разработки.
 
 ### Формат
 
-`MAJOR.MINOR.PATCH[-CHANNEL]`
+`MAJOR.MINOR.PATCH[-CHANNEL[.N]]`
 
 - `docs` — документация без рабочего продукта;
 - `alpha` — работающая, но неполная версия;
 - `beta` — основная функциональность собрана;
 - `rc.N` — кандидат;
 - без суффикса — стабильный релиз.
+
+Если после уже опубликованной alpha-версии завершён отдельный небольшой патч, он получает новый уникальный номер, например `0.6.1-alpha` или `0.6.0-alpha.1`. Нельзя перемещать уже опубликованный tag на другой commit.
 
 ### Обязательная синхронизация
 
@@ -33,20 +38,44 @@
 2. `VERSION.md`;
 3. `CHANGELOG.md`;
 4. `package.json`;
-5. видимую версию сайта.
+5. README;
+6. видимую версию сайта;
+7. screenshot-сценарии версии;
+8. release news и archive manifest.
 
-### Стабильная точка
+### Обязательный checkpoint каждого завершённого патча
 
-Каждая версия, признанная стабильной для отката, получает:
+Каждый патч, признанный завершённым и публикуемый в `main`, получает:
 
-1. успешные тесты;
-2. ручную проверку сайта;
-3. новый реальный screenshot;
-4. recovery-ветку `release/v{version}`;
-5. tag `v{version}`;
-6. GitHub Release с кратким описанием и ссылкой на патчноут.
+1. успешные source checks и тесты;
+2. реальный Chromium screenshot с точного commit;
+3. ручную визуальную проверку;
+4. новый патчноут и короткий текст для Telegram;
+5. постоянный архив доказательств в репозитории;
+6. recovery-ветку `release/v{version}`;
+7. tag `v{version}`;
+8. настоящий GitHub Release;
+9. флаг prerelease для `alpha`, `beta` и `rc`;
+10. обычный стабильный Release для версии без суффикса.
 
-Создание ветки не равно созданию Release. Нельзя сообщать о релизе, пока GitHub Release фактически не существует.
+Создание ветки или tag отдельно не равно созданию Release. Нельзя сообщать, что релиз выпущен, пока объект GitHub Release фактически не существует.
+
+### Автоматический цикл
+
+```text
+feature branch
+→ PR и проверки
+→ фокусный screenshot + полный технический evidence
+→ news + archive/development/{version}
+→ merge в main
+→ release/v{version}
+→ tag v{version}
+→ GitHub prerelease/release
+→ uNews queue
+→ Telegram
+```
+
+`publish-version-release.yml` создаёт rollback-ветку, tag и GitHub Release только после того, как release manifest вошёл в `main`.
 
 </td>
 <td width="50%" valign="top">
@@ -55,45 +84,15 @@
 
 ### Sources of truth
 
-- `VERSION.json` — machine-readable version and status;
-- `VERSION.md` — human-readable state;
-- `CHANGELOG.md` — history;
-- `package.json` — JavaScript package version;
-- `release/v{version}` — rollback branch;
-- GitHub Release and tag — public stable release.
+Machine and human version files, changelog, package metadata, immutable rollback branch, exact tag, GitHub Release, release news, and the permanent development archive all form the version checkpoint.
 
-### Format
+### Every completed published patch
 
-`MAJOR.MINOR.PATCH[-CHANNEL]`
+Every completed patch merged to `main` receives passing checks, a factual Chromium screenshot, manual visual review, release news, a permanent evidence archive, `release/v{version}`, tag `v{version}`, and an actual GitHub Release. Alpha, beta, and RC versions are GitHub prereleases; stable versions are normal releases.
 
-- `docs` — documentation-only setup;
-- `alpha` — working but incomplete;
-- `beta` — core functionality assembled;
-- `rc.N` — release candidate;
-- no suffix — stable release.
+A later small patch must use a new unique version. Existing tags are immutable and must never be moved.
 
-### Mandatory synchronization
-
-A version change updates in one patch:
-
-1. `VERSION.json`;
-2. `VERSION.md`;
-3. `CHANGELOG.md`;
-4. `package.json`;
-5. the visible website version.
-
-### Stable checkpoint
-
-Every version accepted as a rollback-safe stable checkpoint receives:
-
-1. passing tests;
-2. manual website review;
-3. a new factual screenshot;
-4. `release/v{version}` recovery branch;
-5. `v{version}` tag;
-6. GitHub Release with concise notes and patchnote link.
-
-A branch is not a GitHub Release. Never report a release as created until it actually exists.
+A branch or tag alone is not a GitHub Release. Never report a release as published until the GitHub Release object actually exists.
 
 </td>
 </tr>
