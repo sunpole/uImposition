@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "project": "uImposition",
+  "version": "0.6.0-alpha",
+  "tag": "v0.6.0-alpha",
+  "title": "uImposition v0.6.0-alpha",
+  "prerelease": true,
+  "sourceCommit": "3efb8f311637c48ef2a3d2477e36eb511fed7b8b",
+  "createdAt": "2026-07-25T04:41:27Z",
+  "patchnote": "news/2026-07-25-uimposition-v0-6-0-alpha-proven-paper-minimum.md",
+  "image": "news/2026-07-25-uimposition-v0-6-0-alpha-proven-paper-minimum.png",
+  "archive": "archive/development/0.6.0-alpha/uimposition-v0-6-0-alpha-evidence.zip",
+  "screenshotScenario": "m6-paper-minimum-telegram",
+  "archiveScenarios": [
+    "m5-pdf-export-desktop",
+    "m5-pdf-export-mobile",
+    "m5-report-pdf-export-desktop",
+    "m6-paper-minimum-desktop",
+    "m6-paper-minimum-mobile",
+    "m6-paper-minimum-telegram"
+  ],
+  "historicalArtifacts": [
+    {
+      "artifactId": 8615371480,
+      "fileName": "uimposition-m6-final-evidence-pre-focused-fix.zip"
+    },
+    {
+      "artifactId": 8615479063,
+      "fileName": "uimposition-m6-focused-check-with-collapsed-settings.zip"
+    },
+    {
+      "artifactId": 8615504287,
+      "fileName": "uimposition-m6-clean-focused-check.zip"
+    }
+  ],
+  "telegramText": "uImposition 0.6.0-alpha: программа сама нашла и доказала минимум бумаги — 3305 листов вместо 3395, без недопечатки. Экономия 90 листов, но форм стало 112 вместо 8: интерфейс честно показывает этот компромисс."
+}
