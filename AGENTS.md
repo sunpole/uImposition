@@ -19,9 +19,10 @@
 7. `src/config.js` — действующие производственные значения;
 8. `data/control-case.json` и milestone-контрольные данные;
 9. `docs/GITHUB_ONLY_DEVELOPMENT.md` — процесс разработки;
-10. активный milestone-план, например `docs/M3_IMPLEMENTATION_PLAN.md`;
+10. активный milestone-план;
 11. последние Pull Request, commit и GitHub Actions;
-12. `docs/NEWS_PUBLISHING.md` и `docs/SCREENSHOT_AUTOMATION.md`.
+12. `docs/NEWS_PUBLISHING.md` и `docs/SCREENSHOT_AUTOMATION.md`;
+13. `docs/DEVELOPMENT_HISTORY_POLICY.md` — сохранение полезной истории и artifacts.
 
 При противоречии между чатом и GitHub действует GitHub. При противоречии между документацией и рабочим кодом нельзя молча выбирать одну сторону: расхождение нужно зафиксировать и исправить.
 
@@ -59,6 +60,9 @@ ChatGPT должен:
 - После достижения стабильной версии создавать recovery-ветку, tag и настоящий GitHub Release.
 - Не утверждать, что GitHub Release создан, если создана только ветка.
 - Не утверждать, что функция работает, пока нет кода, теста, успешного Action и доказательного screenshot для пользовательского изменения.
+- Не удалять полезные планы, evidence, screenshots, PDF-artifacts, workflows, tests, fixtures или корректные milestone-документы только потому, что они стали историческими.
+- Удалять только заведомо неверное, небезопасное, повреждённое или вводящее в заблуждение содержимое; причину удаления фиксировать в commit или PR.
+- Массовую архивацию истории в ветку, каталог или отдельный репозиторий выполнять только по отдельному решению владельца.
 
 ## uNews и скриншоты
 
@@ -70,6 +74,8 @@ ChatGPT должен:
 - AI-картинка не доказывает реальную функцию.
 - Скриншот не должен показывать secrets, cookies, приватные данные и локальные пути.
 - Реальная отправка Telegram выполняется только uNews через GitHub Actions.
+- Длинные full-page screenshots можно сохранять как техническое доказательство.
+- Для Telegram предпочтителен отдельный крупный кадр новой функции, если он лучше объясняет изменение.
 
 ## Предпочтительная технология
 
@@ -109,4 +115,5 @@ ChatGPT должен:
 - Never derive the back independently from the front.
 - Never accept underproduction.
 - Synchronise all version sources in one patch.
+- Preserve useful development history and artifacts; delete only false, unsafe, corrupted, or irreparably misleading material.
 - An alpha milestone requires a recovery branch; a stable version requires a recovery branch, tag, and actual GitHub Release.
