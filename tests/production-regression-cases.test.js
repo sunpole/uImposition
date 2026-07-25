@@ -1,7 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createBackLayout } from "../src/back-layout.js";
+import { createFrontLayout } from "../src/front-layout.js";
 import { calculatePlacementOptions } from "../src/geometry.js";
+import {
+  createFrontLayoutInputFromCandidate,
+  createImpositionCandidate,
+} from "../src/imposition-candidate.js";
+import { validateImposition } from "../src/imposition-validation.js";
 import {
   createMixedFormatBack,
   createMixedFormatFront,
@@ -12,6 +19,10 @@ import {
   materializePaperSolution,
   minimizePhysicalPaper,
 } from "../src/paper-minimizer.js";
+import {
+  calculatePrintPlateMetrics,
+  createDuplexPrintSpecification,
+} from "../src/print-specification.js";
 import { buildProductionReport } from "../src/production-report.js";
 
 const regression = JSON.parse(
@@ -23,6 +34,42 @@ function placementFor(caseData) {
     printable: regression.sheet.printable,
     product: caseData.product,
   });
+}
+
+function materializeOneEachPair(caseData) {
+  const placement = placementFor(caseData);
+  const pagePairs = expandPagePairs([caseData]);
+  const candidate = createImpositionCandidate({
+    id: caseData.file,
+    rows: placement.best.rows,
+    columns: placement.best.columns,
+    rotation: placement.best.rotation,
+    pagePairs,
+    blocks: pagePairs.map((pair) => ({
+      file: pair.file,
+      frontPage: pair.frontPage,
+      count: 1,
+    })),
+  });
+  const front = createFrontLayout({
+    ...createFrontLayoutInputFromCandidate(candidate, caseData.quantity),
+    pagePairs,
+  });
+  const back = createBackLayout(front);
+  const validation = validateImposition({ front, back, pagePairs });
+  const report = buildProductionReport({
+    pagePairs,
+    impositions: [{ front, back, validation }],
+  });
+  const printSpecification = createDuplexPrintSpecification({
+    frontColors: caseData.colors.front,
+    backColors: caseData.colors.back,
+  });
+  const plates = calculatePrintPlateMetrics({
+    impositionCount: 1,
+    specification: printSpecification,
+  });
+  return { placement, pagePairs, candidate, front, back, validation, report, plates };
 }
 
 test("32-page A6 landscape 4+4 uses a 4 by 4 grid without rotation", () => {
@@ -64,6 +111,32 @@ test("32-page A6 portrait 4+4 rotates to the same 4 by 4 production grid", () =>
   assert.equal(unrotated.positions, 10);
 });
 
+test("both 32-page A6 orientations materialize one 16-pair 4+4 duplex run", () => {
+  [regression.a6Landscape32Pages, regression.a6Portrait32Pages].forEach((caseData) => {
+    const result = materializeOneEachPair(caseData);
+
+    assert.equal(result.candidate.pairCount, 16);
+    assert.equal(result.candidate.capacity, 16);
+    assert.equal(result.front.cells.length, 16);
+    assert.equal(result.back.cells.length, 16);
+    assert.equal(result.validation.valid, true);
+    assert.equal(result.report.valid, true);
+    assert.equal(result.report.totals.pairCount, 16);
+    assert.equal(result.report.totals.physicalSheets, 1000);
+    assert.equal(result.report.totals.forms, 2);
+    assert.equal(result.report.totals.pressPasses, 2000);
+    assert.equal(result.report.totals.underproduction, 0);
+    assert.equal(result.report.totals.overrun, 0);
+    assert.equal(result.plates.colorMode, "4+4");
+    assert.equal(result.plates.layoutForms, 2);
+    assert.equal(result.plates.colorPlates, 8);
+    assert.deepEqual(result.front.cells.map((cell) => cell.frontPage), [
+      1, 3, 5, 7, 9, 11, 13, 15,
+      17, 19, 21, 23, 25, 27, 29, 31,
+    ]);
+  });
+});
+
 test("one A4, two A5, and eight A6 fit one 4+4 mixed-format duplex sheet", () => {
   const caseData = regression.mixedFormatsDuplex;
   const front = createMixedFormatFront({
@@ -73,6 +146,13 @@ test("one A4, two A5, and eight A6 fit one 4+4 mixed-format duplex sheet", () =>
   });
   const back = createMixedFormatBack(front);
   const validation = validateMixedFormatDuplex({ front, back });
+  const plates = calculatePrintPlateMetrics({
+    impositionCount: 1,
+    specification: createDuplexPrintSpecification({
+      frontColors: caseData.colors.front,
+      backColors: caseData.colors.back,
+    }),
+  });
 
   assert.deepEqual(caseData.colors, { front: 4, back: 4 });
   assert.equal(front.placementCount, caseData.expectedItemCounts.total);
@@ -89,6 +169,8 @@ test("one A4, two A5, and eight A6 fit one 4+4 mixed-format duplex sheet", () =>
   assert.equal(back.derivedFromFront, true);
   assert.equal(back.mirrorAxis, "horizontal");
   assert.equal(back.placementCount, 11);
+  assert.equal(plates.layoutForms, 2);
+  assert.equal(plates.colorPlates, 8);
 
   const a4Front = front.placements.find((placement) => placement.id === "A4-1");
   const a4Back = back.placements.find((placement) => placement.id === "A4-1");
@@ -148,6 +230,13 @@ test("three two-page A5 4+4 orders 400, 700, and 4200 reach the proven 663-sheet
   });
   const impositions = materializePaperSolution({ solution, pagePairs });
   const report = buildProductionReport({ pagePairs, impositions });
+  const plates = calculatePrintPlateMetrics({
+    impositionCount: solution.metrics.impositionCount,
+    specification: createDuplexPrintSpecification({
+      frontColors: caseData.colors.front,
+      backColors: caseData.colors.back,
+    }),
+  });
 
   assert.equal(solution.proof.totalRequiredPairQuantity, caseData.expected.requiredPairQuantity);
   assert.equal(solution.proof.paperLowerBound, caseData.expected.paperLowerBound);
@@ -160,6 +249,8 @@ test("three two-page A5 4+4 orders 400, 700, and 4200 reach the proven 663-sheet
   assert.equal(solution.metrics.pressPasses, caseData.expected.pressPasses);
   assert.equal(solution.finalDemandState.remainingQuantity, 0);
   assert.deepEqual(solution.plannedRuns.map((run) => run.runLength).sort((a, b) => a - b), [50, 88, 525]);
+  assert.equal(plates.layoutForms, 6);
+  assert.equal(plates.colorPlates, 24);
 
   assert.equal(report.valid, true);
   assert.equal(report.totals.physicalSheets, 663);
