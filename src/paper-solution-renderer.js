@@ -84,8 +84,19 @@ function createElement(tagName, className = "", text = undefined) {
   return element;
 }
 
+function locale(language) {
+  return language === "en" ? "en-US" : "ru-RU";
+}
+
 function formatNumber(value, language) {
-  return Number(value).toLocaleString(language === "en" ? "en-US" : "ru-RU");
+  return Number(value).toLocaleString(locale(language));
+}
+
+function formatPercent(value, language) {
+  return Number(value).toLocaleString(locale(language), {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 function formatDelta(value, language) {
@@ -197,7 +208,12 @@ export function renderPaperSolution(container, solution, manualReport, { languag
   const summary = createElement("div", "result-grid paper-summary");
   summary.append(
     metricCard("paperOptimalSheets", text.physicalSheets, formatNumber(view.automatic.physicalSheets, language), text.comparedWithManual, true),
-    metricCard("paperSavings", text.paperSavings, `${formatNumber(view.paperSavings, language)} (${view.paperSavingsPercent.toFixed(2)}%)`), text.comparedWithManual),
+    metricCard(
+      "paperSavings",
+      text.paperSavings,
+      `${formatNumber(view.paperSavings, language)} (${formatPercent(view.paperSavingsPercent, language)}%)`,
+      text.comparedWithManual,
+    ),
     metricCard("paperOptimalForms", text.forms, formatNumber(view.automatic.forms, language)),
     metricCard("paperOptimalPressPasses", text.pressPasses, formatNumber(view.automatic.pressPasses, language)),
     metricCard("paperOptimalPairOverrun", text.pairOverrun, formatNumber(view.automatic.pairOverrun, language)),
