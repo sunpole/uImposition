@@ -13,6 +13,11 @@
     { "selector": "#paperOptimalProof", "text": "меньше бумаги невозможно" },
     { "selector": ".paper-warning", "text": "с 8 до 112" }
   ],
+  "beforeScreenshot": [
+    { "action": "click", "selector": "#settingsToggle" },
+    { "action": "waitForHidden", "selector": "#toast", "timeoutMs": 10000 },
+    { "action": "wait", "timeoutMs": 250 }
+  ],
   "screenshotSelector": "#paperSolution",
   "screenshot": "uimposition-v0-6-0-alpha-paper-minimum-telegram.png"
 }
