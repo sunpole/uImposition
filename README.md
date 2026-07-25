@@ -37,10 +37,14 @@ uImposition — статический браузерный инструмент
 
 M7 / `0.7.0-alpha`:
 
-- уменьшение числа форм;
-- многокритериальный поиск;
-- компактный набор Парето;
-- компромисс между бумагой, формами и перетиражем.
+- перетаскиваемая иерархия важности целей;
+- мгновенное изменение рекомендованного варианта без повторного перебора;
+- сравнение своего и чужого оборота;
+- минимум бумаги, форм, пластин, перетиража и листопрогонов;
+- полный раскрываемый набор существенно разных Pareto-вариантов;
+- точные дельты «что лучше / что хуже»;
+- компактная таблица вариантов вместо длинных крупных карточек;
+- контрольный кейс: четыре A6 1+1, 2 страницы, по 4000.
 
 </td>
 <td width="50%" valign="top">
@@ -65,7 +69,7 @@ uImposition is a static browser tool for planning complex gang-run offset imposi
 
 ### Next milestone
 
-M7 / `0.7.0-alpha`: reduce forms and present a compact multi-objective Pareto set across paper, forms, and overrun.
+M7 / `0.7.0-alpha`: draggable objective hierarchy, instant re-ranking, work-and-back/work-and-turn comparison, exact better/worse deltas, compact Pareto alternatives, and a four-A6 1+1 × 4000 own-back control case.
 
 </td>
 </tr>
@@ -82,6 +86,7 @@ M7 / `0.7.0-alpha`: reduce forms and present a compact multi-objective Pareto se
 
 ## Документация / Documentation
 
+- [План M7: приоритеты, свой оборот и варианты / M7 operator decision plan](docs/M7_IMPLEMENTATION_PLAN.md)
 - [План M6 / M6 implementation plan](docs/M6_IMPLEMENTATION_PLAN.md)
 - [План M5 / M5 implementation plan](docs/M5_IMPLEMENTATION_PLAN.md)
 - [Архитектура / Architecture](docs/ARCHITECTURE.md)
@@ -141,9 +146,10 @@ GitHub audit
 - A6 portrait `105×148`, 32 страницы, 4+4, поворот 90°, `4×4`;
 - ручной mixed duplex: `1×A4 + 2×A5 + 8×A6` на `608×431`;
 - A5, 8 позиций, тиражи `400 / 700 / 4200`: минимум `663` листа, перетираж `4`;
-- один монтаж 4+4: `2` layout-формы и `8` цветовых пластин.
+- один монтаж 4+4: `2` layout-формы и `8` цветовых пластин;
+- подготовленный M7-кейс: четыре A6 1+1 по 4000 — чужой и свой оборот дают по `1000` листов, но свой оборот сокращает формы и пластины `2 → 1`.
 
-32-страничный regression проверяет текущую модель последовательных пар, но не заявляет тетрадный фальцевальный спуск. Mixed-format regression проверяет заданную раскладку, а не автоматический rectangle packing.
+32-страничный regression проверяет текущую модель последовательных пар, но не заявляет тетрадный фальцевальный спуск. Mixed-format regression проверяет заданную раскладку, а не автоматический rectangle packing. M7 own-back fixture пока является утверждённым входом следующего этапа, а не готовой функцией M6.
 
 ## Лицензия / License
 
