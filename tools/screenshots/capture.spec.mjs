@@ -40,6 +40,13 @@ async function runBeforeScreenshotActions(page, actions = []) {
       await locator.click();
       continue;
     }
+    if (action.action === "hide") {
+      const locator = page.locator(action.selector);
+      await locator.evaluate((element) => {
+        element.style.setProperty("display", "none", "important");
+      });
+      continue;
+    }
     if (action.action === "waitForHidden") {
       await page.locator(action.selector).waitFor({ state: "hidden", timeout: action.timeoutMs ?? 10000 });
       continue;
