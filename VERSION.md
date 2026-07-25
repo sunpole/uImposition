@@ -29,7 +29,9 @@ Pull Request: **№10**
 - отдельный учёт цветовых пластин 4+4;
 - проверка заданного mixed-format duplex;
 - regression-кейсы A6 landscape/portrait и A5 `400/700/4200`;
-- прежние два PDF и их Chromium/Poppler-проверка сохранены.
+- прежние два PDF и их Chromium/Poppler-проверка сохранены;
+- отдельный крупный screenshot панели M6 для Telegram;
+- постоянный архив разработки и автоматическая публикация GitHub prerelease.
 
 ### Проверенный контрольный результат M6
 
@@ -88,7 +90,7 @@ Stage: **M6 — proven physical-paper minimum**
 
 ### Working now
 
-All verified M1–M5 functionality plus a pure candidate/demand model, exact first/completion event runs, the complete 8,960-candidate one/two-pair control space, automatic valid run construction, independent front/back/report rematerialisation, a proven 3,305-sheet paper minimum, explicit manual comparison, separate 4+4 plate metrics, fixed mixed-format duplex validation, and additional A6/A5 production regressions.
+All verified M1–M5 functionality plus a pure candidate/demand model, exact first/completion event runs, the complete 8,960-candidate one/two-pair control space, automatic valid run construction, independent front/back/report rematerialisation, a proven 3,305-sheet paper minimum, explicit manual comparison, separate 4+4 plate metrics, fixed mixed-format duplex validation, additional A6/A5 production regressions, a focused Telegram screenshot, a permanent development archive, and automatic GitHub prerelease publication.
 
 ### Verified M6 result
 
@@ -117,4 +119,4 @@ Reduce form count and present multi-objective trade-offs across paper, forms, an
 
 ## Релизы и откат / Releases and rollback
 
-`0.6.0-alpha` пока является проверяемым кандидатом в PR №10. После объединения создаётся recovery-ветка `release/v0.6.0-alpha`. Настоящий GitHub Release создаётся только для стабильной production-версии.
+`0.6.0-alpha` пока является проверяемым кандидатом в PR №10. После объединения автоматически создаются recovery-ветка `release/v0.6.0-alpha`, tag `v0.6.0-alpha` и настоящий GitHub **prerelease** с release notes, крупным PNG и ZIP доказательств. Патчноут и изображение одновременно входят в очередь uNews/Telegram.
