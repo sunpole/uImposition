@@ -77,7 +77,13 @@ for (const scenario of scenarios) {
     }
 
     const screenshotPath = path.join(outputDir, scenario.screenshot);
-    await page.screenshot({ path: screenshotPath, fullPage: Boolean(scenario.fullPage) });
+    if (scenario.screenshotSelector) {
+      const target = page.locator(scenario.screenshotSelector);
+      await expect(target).toBeVisible();
+      await target.screenshot({ path: screenshotPath });
+    } else {
+      await page.screenshot({ path: screenshotPath, fullPage: Boolean(scenario.fullPage) });
+    }
 
     const entry = {
       scenario: scenario.id,
@@ -86,6 +92,7 @@ for (const scenario of scenarios) {
       url: page.url(),
       viewport: scenario.viewport,
       screenshot: scenario.screenshot,
+      screenshotSelector: scenario.screenshotSelector || null,
       assertions: scenario.assertions,
       download: downloadEntry,
     };
