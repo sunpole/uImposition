@@ -51,8 +51,8 @@ function solutionId(solution, label = "solution") {
 
 function metricValue(solution, objectiveId) {
   const objective = getOptimizationObjective(objectiveId);
-  const value = Number(solution?.metrics?.[objective.metricKey]);
-  if (!Number.isFinite(value)) {
+  const value = solution?.metrics?.[objective.metricKey];
+  if (typeof value !== "number" || !Number.isFinite(value)) {
     throw new TypeError(`${solution?.id ?? "solution"}.${objective.metricKey} must be finite`);
   }
   return value;
