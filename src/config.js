@@ -97,6 +97,25 @@ export const CONFIG = Object.freeze({
     reportDocumentFileName: "uImposition-production-report.pdf",
   },
 
+  pricing: {
+    currency: "BYN",
+    sheetCostBasis: "source",
+    requiredInputs: [
+      "grammageGsm",
+      "paperPricePerKg",
+      "colorPlatePrice",
+    ],
+    optionalInputs: [
+      "layoutFormPreparationPrice",
+    ],
+    defaults: {
+      grammageGsm: null,
+      paperPricePerKg: null,
+      colorPlatePrice: null,
+      layoutFormPreparationPrice: 0,
+    },
+  },
+
   optimizer: {
     candidateGeneration: {
       minDistinctPairs: 1,
@@ -107,6 +126,7 @@ export const CONFIG = Object.freeze({
     decision: {
       defaultObjectiveOrder: [
         "physicalSheets",
+        "estimatedTotalCost",
         "layoutForms",
         "colorPlates",
         "fileOverrun",
