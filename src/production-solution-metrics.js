@@ -1,4 +1,5 @@
 import { calculateProductionCost } from "./production-cost.js";
+import { calculatePrintPlateMetrics } from "./print-specification.js";
 import { createSolutionMetrics } from "./solution-metrics.js";
 
 export const DEFAULT_COLOR_PLATES_PER_LAYOUT_FORM = 4;
@@ -42,6 +43,44 @@ export function calculateColorPlatesForReport(report, {
   return layoutForms * colors;
 }
 
+function productionShape({ totals, impositionCount, physicalSheets, printSpecification, colorsPerLayoutForm }) {
+  const reportLayoutForms = nonNegativeInteger(totals.forms, "report.totals.forms");
+  const reportPressPasses = nonNegativeInteger(totals.pressPasses, "report.totals.pressPasses");
+
+  if (!printSpecification) {
+    return Object.freeze({
+      layoutForms: reportLayoutForms,
+      colorPlates: calculateColorPlatesForReport({ totals }, { colorsPerLayoutForm }),
+      pressPasses: reportPressPasses,
+      colorMode: null,
+    });
+  }
+
+  const plateMetrics = calculatePrintPlateMetrics({
+    impositionCount,
+    specification: printSpecification,
+  });
+  const expectedPressPasses = physicalSheets * printSpecification.printedSideCount;
+
+  if (plateMetrics.layoutForms !== reportLayoutForms) {
+    throw new RangeError(
+      `Print specification requires ${plateMetrics.layoutForms} layout forms, but report contains ${reportLayoutForms}`,
+    );
+  }
+  if (expectedPressPasses !== reportPressPasses) {
+    throw new RangeError(
+      `Print specification requires ${expectedPressPasses} press passes, but report contains ${reportPressPasses}`,
+    );
+  }
+
+  return Object.freeze({
+    layoutForms: plateMetrics.layoutForms,
+    colorPlates: plateMetrics.colorPlates,
+    pressPasses: expectedPressPasses,
+    colorMode: plateMetrics.colorMode,
+  });
+}
+
 export function createProductionReportSolutionMetrics({
   report,
   sourceSheet,
@@ -54,13 +93,18 @@ export function createProductionReportSolutionMetrics({
   splitOrders = 0,
   fragmentedBlocks = 0,
   colorsPerLayoutForm = DEFAULT_COLOR_PLATES_PER_LAYOUT_FORM,
+  printSpecification = null,
 } = {}) {
   const totals = reportTotals(report);
   const physicalSheets = nonNegativeInteger(totals.physicalSheets, "report.totals.physicalSheets");
   const impositionCount = nonNegativeInteger(totals.impositionCount, "report.totals.impositionCount");
-  const layoutForms = nonNegativeInteger(totals.forms, "report.totals.forms");
-  const colorPlates = calculateColorPlatesForReport(report, { colorsPerLayoutForm });
-  const pressPasses = nonNegativeInteger(totals.pressPasses, "report.totals.pressPasses");
+  const shape = productionShape({
+    totals,
+    impositionCount,
+    physicalSheets,
+    printSpecification,
+    colorsPerLayoutForm,
+  });
   const fileOverrun = nonNegativeInteger(totals.fileOverrun, "report.totals.fileOverrun");
   const pairOverrun = nonNegativeInteger(totals.overrun, "report.totals.overrun");
   const fileUnderproduction = nonNegativeInteger(totals.fileUnderproduction, "report.totals.fileUnderproduction");
@@ -77,8 +121,8 @@ export function createProductionReportSolutionMetrics({
         height: positiveNumber(sourceSheet?.height, "sourceSheet.height"),
       },
       physicalSheets,
-      colorPlates,
-      layoutForms,
+      colorPlates: shape.colorPlates,
+      layoutForms: shape.layoutForms,
       orderedFinishedQuantity,
       pricing,
     })
@@ -91,9 +135,9 @@ export function createProductionReportSolutionMetrics({
     duplexMode: report.duplexMode,
     physicalSheets,
     impositionCount,
-    layoutForms,
-    colorPlates,
-    pressPasses,
+    layoutForms: shape.layoutForms,
+    colorPlates: shape.colorPlates,
+    pressPasses: shape.pressPasses,
     fileOverrun,
     pairOverrun,
     fileUnderproduction,
