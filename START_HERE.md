@@ -13,7 +13,8 @@
 - активная разработка: **M7.3 — существенно разные альтернативы и Pareto**;
 - Pareto foundation объединён через PR `#20`;
 - compact display alternatives объединены через PR `#25`;
-- real production alternatives реализуются через PR `#26`;
+- real production alternatives объединены через PR `#26`;
+- RU/EN explanations и component cost deltas реализуются через PR `#27`;
 - полный остаток до `1.0.0`: `docs/REMAINING_WORK.md`;
 - GitHub остаётся единственным источником истины.
 
@@ -29,15 +30,16 @@
 6. `docs/M7_IMPLEMENTATION_PLAN.md`;
 7. `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
 8. `docs/M7_3_PRODUCTION_ALTERNATIVES.md`;
-9. `docs/PRODUCTION_COSTING.md`;
-10. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-11. `docs/ARCHITECTURE.md`;
-12. `docs/TEST_PLAN.md`;
-13. `docs/DEVELOPMENT_HISTORY_POLICY.md`;
-14. `data/control-case.json`;
-15. `data/production-regression-cases.json`;
-16. `data/m7-decision-cases.json`;
-17. последние PR, Actions, branches, tags и Releases.
+9. `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`;
+10. `docs/PRODUCTION_COSTING.md`;
+11. `docs/TECHNICAL_SPECIFICATION_RU.md`;
+12. `docs/ARCHITECTURE.md`;
+13. `docs/TEST_PLAN.md`;
+14. `docs/DEVELOPMENT_HISTORY_POLICY.md`;
+15. `data/control-case.json`;
+16. `data/production-regression-cases.json`;
+17. `data/m7-decision-cases.json`;
+18. последние PR, Actions, branches, tags и Releases.
 
 ## Что завершено к M7.2
 
@@ -99,24 +101,35 @@ M7.2 добавляет:
 - реальные ручные монтажи и доказанный paper minimum переводятся в общие `SolutionMetrics`;
 - сырые candidate/layout структуры не попадают в decision/Pareto слой;
 - из фактического состава монтажей выводятся разные заказы, split orders и fragmented blocks;
-- проверяется общая валюта, лист, плотность и эффективные ставки прайса;
+- проверяется общая валюта, лист, плотность и явные операторские ставки;
 - стоимость исключается при неполной или несовместимой базе;
 - реальный контрольный pipeline подтверждает два Pareto-варианта:
   - compact manual: `3395` листов, `8` layout-форм, `972.5466 BYN`;
   - paper minimum: `3305` листов, `112` layout-форм, `7199.4894 BYN`;
 - paper-first рекомендует минимум бумаги, cost-first — compact manual без повторной генерации.
 
-Это ещё не завершённый `0.7.0-alpha.3`: пока нет RU/EN текстов компромиссов, component cost deltas, runtime/UI, focused evidence, news и release checkpoint.
+### PR #27 — explanations and component cost deltas
+
+- причины показа варианта локализованы на RU/EN;
+- для каждого варианта возвращаются преимущество, цена компромисса и решающая цель;
+- рекомендуемый вариант сравнивается не сам с собой, а со следующим ранжированным конкурентом;
+- reference-вариант можно менять без повторной генерации альтернатив;
+- component deltas показывают бумагу, цветовые пластины, подготовку layout-форм и итог;
+- денежные объяснения доступны только при совместимом `pricing ready`;
+- при `incomplete` или `incompatible` денежные значения полностью скрываются;
+- реальный paper-first breakdown показывает `−6226.9428 BYN` общей разницы compact manual против paper minimum.
+
+Это ещё не завершённый `0.7.0-alpha.3`: пока нет runtime state/event, компактного пользовательского UI, focused evidence, news и release checkpoint.
 
 ## Следующая безопасная задача — продолжение M7.3
 
-1. Работать от актуального `main` после объединения PR `#26`.
+1. Работать от актуального `main` после объединения PR `#27`.
 2. Не менять опубликованные tags `v0.7.0-alpha.1` и `v0.7.0-alpha.2`.
-3. Добавить pure RU/EN explanation model: преимущество, цена компромисса и решающая цель.
-4. Добавить совместимые component deltas: бумага, цветовые пластины, подготовка layout-форм и итог.
-5. Денежные объяснения показывать только при общей валюте и полностью совместимом `pricing ready`.
-6. Затем подключить alternative set к runtime state приложения и компактному UI.
-7. Только после UI-проверки готовить focused Chromium evidence, news/uNews/Telegram, archive и release `0.7.0-alpha.3`.
+3. Подключить real alternative set и explanation set к runtime state/event приложения.
+4. Добавить компактную read-only RU/EN демонстрацию двух реальных вариантов.
+5. Не переносить в UI сырые candidate/layout структуры.
+6. Проверить paper-first, cost-first, incomplete pricing и смену reference в Chromium.
+7. После UI-проверки подготовить focused screenshot, news/uNews/Telegram, evidence archive и release `0.7.0-alpha.3`.
 
 ## Главные правила
 
@@ -136,9 +149,9 @@ M7.2 добавляет:
 ```text
 Открой репозиторий sunpole/uImposition через GitHub.
 
-Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/REMAINING_WORK.md, docs/M7_IMPLEMENTATION_PLAN.md, docs/M7_3_DISPLAY_ALTERNATIVES.md, docs/M7_3_PRODUCTION_ALTERNATIVES.md, docs/PRODUCTION_COSTING.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/TEST_PLAN.md, docs/DEVELOPMENT_HISTORY_POLICY.md, data/control-case.json, data/production-regression-cases.json и data/m7-decision-cases.json. Проверь последние PR, Actions, branches, tags и Releases.
+Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/REMAINING_WORK.md, docs/M7_IMPLEMENTATION_PLAN.md, docs/M7_3_DISPLAY_ALTERNATIVES.md, docs/M7_3_PRODUCTION_ALTERNATIVES.md, docs/M7_3_ALTERNATIVE_EXPLANATIONS.md, docs/PRODUCTION_COSTING.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/TEST_PLAN.md, docs/DEVELOPMENT_HISTORY_POLICY.md, data/control-case.json, data/production-regression-cases.json и data/m7-decision-cases.json. Проверь последние PR, Actions, branches, tags и Releases.
 
 GitHub — единственный источник истины. Не требуй локальный клон.
 
-Подтверди, что опубликованный checkpoint 0.7.0-alpha.2 существует как recovery-ветка, immutable tag и GitHub prerelease. Затем продолжай M7.3 с последнего объединённого PR: Pareto foundation, compact display set и real production alternatives уже реализованы; следующая задача — pure RU/EN explanations и совместимые pricing-component deltas, затем runtime/UI. Не начинай work-and-turn из M7.4 раньше завершения M7.3.
+Подтверди, что опубликованный checkpoint 0.7.0-alpha.2 существует как recovery-ветка, immutable tag и GitHub prerelease. Затем продолжай M7.3 с последнего объединённого PR: Pareto foundation, compact display set, real production alternatives и RU/EN explanations уже реализованы; следующая задача — runtime state/event и компактная read-only демонстрация реальных вариантов, затем полный release checkpoint 0.7.0-alpha.3. Не начинай work-and-turn из M7.4 раньше завершения M7.3.
 ```
