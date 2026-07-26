@@ -1,0 +1,2 @@
+164b9c8a63d9972f3e74cfa7df40aefbedec3e6391eb7c59a0dec3490e706790  news/2026-07-27-uimposition-v0-7-0-alpha-4-work-and-turn.jpg
+c31190b6df04c317b97bff1c135c7d00f88e667845c8296db0d14bb1d3f5dc71  archive/development/0.7.0-alpha.4/uimposition-v0-7-0-alpha-4-evidence.zip
