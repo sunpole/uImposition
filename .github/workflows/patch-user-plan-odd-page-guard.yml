@@ -1,0 +1,88 @@
+name: Patch user-plan odd-page guard
+
+on:
+  push:
+    branches:
+      - m7.5/user-uniform-production-plans
+    paths:
+      - .github/workflows/patch-user-plan-odd-page-guard.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v5
+        with:
+          ref: m7.5/user-uniform-production-plans
+          fetch-depth: 0
+
+      - name: Apply exact guarded patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          source_path = Path('src/user-uniform-production-plans.js')
+          source = source_path.read_text(encoding='utf-8')
+          old = '''  createInitialDemandState(pagePairs);
+            return pagePairs;
+          }'''.replace('    return', '  return')
+          new = '''  const demandState = createInitialDemandState(pagePairs);
+            if (demandState.rows.some(({ backPage }) => backPage === null)) {
+              throw new RangeError(
+                "User uniform production plans currently require complete front/back page pairs",
+              );
+            }
+            return pagePairs;
+          }'''.replace('    if', '  if').replace('      throw', '    throw').replace('        "User', '      "User').replace('      );', '    );').replace('    }\n    return', '  }\n  return')
+          if old not in source:
+              raise SystemExit('Expected requirePagePairs block was not found')
+          source_path.write_text(source.replace(old, new, 1), encoding='utf-8')
+
+          test_path = Path('tests/user-uniform-production-plans.test.js')
+          tests = test_path.read_text(encoding='utf-8')
+          marker = '''test("user plan set rejects unsupported simplex pricing shape instead of inventing duplex totals", () => {'''
+          addition = '''test("user plan set rejects an incomplete front/back pair instead of pricing a blank side", () => {
+            const incompletePairs = expandPagePairs([{
+              file: "Odd",
+              quantity: 100,
+              pages: 3,
+            }]);
+
+            assert.throws(() => createUserUniformProductionPlanSet({
+              pagePairs: incompletePairs,
+              placementOptions,
+              sourceSheet,
+              printSpecification,
+              pricing,
+            }), /require complete front\/back page pairs/);
+          });
+
+          '''.replace('          ', '')
+          if marker not in tests:
+              raise SystemExit('Expected test insertion marker was not found')
+          test_path.write_text(tests.replace(marker, addition + marker, 1), encoding='utf-8')
+          PY
+
+          node --check src/user-uniform-production-plans.js
+          node --test tests/user-uniform-production-plans.test.js
+
+      - name: Commit guarded patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "uImposition patch automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/user-uniform-production-plans.js tests/user-uniform-production-plans.test.js
+          if git diff --cached --quiet; then
+            echo "Guard patch already applied."
+            exit 0
+          fi
+          git commit -m "M7.5: reject incomplete duplex pairs in user plans"
+          git push origin HEAD:m7.5/user-uniform-production-plans
