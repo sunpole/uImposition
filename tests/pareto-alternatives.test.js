@@ -130,7 +130,7 @@ test("describeMetricDelta exposes human-readable comparison data", () => {
   assert.equal(delta.metricKey, "estimatedTotalCost");
   assert.equal(delta.leftValue, 972.55);
   assert.equal(delta.rightValue, 7199.49);
-  assert.equal(delta.delta, -6226.9400000000005);
+  assert.equal(delta.delta, -6226.94);
   assert.equal(delta.better, "left");
-  assert.equal(delta.favorableDelta, 6226.9400000000005);
+  assert.equal(delta.favorableDelta, 6226.94);
 });
