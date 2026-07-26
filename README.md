@@ -1,7 +1,7 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.7.0-alpha.2</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.7.0-alpha.3</strong></p>
 <p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
 
 <table>
@@ -31,39 +31,36 @@ uImposition — статический браузерный инструмент
 - отдельный учёт layout-форм и цветовых пластин 4+4;
 - regression-тесты A6 landscape/portrait, mixed A4/A5/A6 и A5 `400/700/4200`.
 
-### Добавлено в M7.1
+### Добавлено в M7.1–M7.2
 
-- 11 изменяемых целей оптимизации;
-- жёсткие ограничения, которые нельзя перемещать;
-- мгновенное лексикографическое ранжирование без повторного перебора;
-- независимые цели: бумага, расчётная стоимость, формы, пластины, перетираж и листопрогоны;
-- вес закупаемого листа по исходному формату и плотности `г/м²`;
-- стоимость бумаги по `BYN/кг`;
-- стоимость цветовых печатных форм по цене за штуку;
-- необязательная стоимость подготовки layout-форм;
-- общая расчётная стоимость и себестоимость одного заказанного изделия;
-- компактная demo-проверка `Бумага / Стоимость / Формы`;
-- полный план из 17 release-патчей до `1.0.0`.
+- 11 изменяемых целей и отдельные жёсткие ограничения;
+- мгновенное лексикографическое ранжирование;
+- вес листа и прозрачная BYN-модель бумаги, цветовых форм и подготовки layout-форм;
+- единая guarded-модель `SolutionMetrics`;
+- ввод рабочего прайса на основной странице;
+- статусы `pricing incomplete / pricing inputs ready / pricing ready`;
+- production report → реальная стоимость решения;
+- защита от недопечатки, `null → 0` и несовместимой денежной базы.
 
-### Добавлено в M7.2
+### Добавлено в M7.3
 
-- единая нормализованная модель `SolutionMetrics`;
-- явный статус `pricing ready` / `pricing incomplete`;
-- запрет выдумывать рабочие цены: если прайс не задан, BYN-поля остаются `null`;
-- защитный адаптер перед decision ranking;
-- недопечатанные решения не могут попасть в рекомендацию;
-- `layoutCompactness: null` не превращается молча в `0`;
-- импортированный `productionCost` проверяется на совпадение с листами, формами и пластинами этого же решения;
-- главная страница показывает актуальную границу M7.2 и статус стоимости.
+- строгий Pareto-frontier с удалением дублей и доминируемых решений;
+- compact display set существенно разных вариантов;
+- реальные `compact manual` и доказанный `paper minimum` в общей модели метрик;
+- paper-first / cost-first без повторной генерации монтажей;
+- выбор базы сравнения;
+- RU/EN-объяснения преимущества, цены компромисса и решающей цели;
+- покомпонентные дельты стоимости;
+- денежные сравнения только при совместимом прайсе;
+- очищенный runtime event без сырых layouts/candidates/planned runs;
+- компактная read-only панель двух реальных вариантов на основной странице;
+- focused Chromium evidence реального cost-first результата.
 
 ### Дальше в M7
 
-- подключить реальные production report в `SolutionMetrics`;
-- ввод рабочих цен в основном интерфейсе;
-- полный раскрываемый набор существенно разных Pareto-вариантов;
-- точные дельты «что лучше / что хуже»;
-- сравнение своего и чужого оборота;
-- контрольный кейс: четыре A6 1+1, 2 страницы, по 4000.
+- M7.4: проверяемый свой оборот / work-and-turn;
+- M7.5: полный компактный редактор приоритетов и цен;
+- M7.6: итоговая таблица вариантов, раскрытие выбранных схем и экспорт выбранного решения.
 
 </td>
 <td width="50%" valign="top">
@@ -76,17 +73,17 @@ uImposition is a static browser tool for planning complex gang-run offset imposi
 
 Sheet/product geometry, exact pairs, validated front/back schemes, production totals, separate PDFs, complete control candidate generation, a proven 3,305-sheet paper minimum, separate side-layout and color-plate metrics, and production regressions.
 
-### Added in M7.1
+### Added in M7.1–M7.2
 
-Eleven reorderable objectives, immutable hard constraints, instant lexicographic re-ranking, source-sheet weight from size and gsm, BYN/kg paper cost, per-color-plate cost, optional layout preparation cost, total/unit cost, a focused Paper / Cost / Forms demo, and a 17-release roadmap to 1.0.
+Eleven reorderable objectives, immutable hard constraints, instant lexicographic ranking, transparent paper/plate/layout-preparation costing, guarded `SolutionMetrics`, main-page production pricing inputs, explicit pricing states, and production-report-backed solution cost.
 
-### Added in M7.2
+### Added in M7.3
 
-A normalized `SolutionMetrics` model, explicit `pricing ready` / `pricing incomplete` state, no invented production prices, guarded conversion before decision ranking, underproduction rejection, null compactness rejection, production-cost basis checks, and an updated main page that shows the active M7.2 boundary.
+A strict Pareto frontier, materially-different compact alternatives, the real compact-manual and proven paper-minimum solutions, instant paper/cost re-ranking, selectable comparison references, RU/EN benefit and tradeoff explanations, compatible component cost deltas, a sanitized runtime event, a compact read-only main-page panel, and focused Chromium evidence.
 
 ### Later M7 patches
 
-Connect real production reports into `SolutionMetrics`, add main-interface production pricing inputs, build compact Pareto alternatives, show exact better/worse deltas, and compare work-and-back/work-and-turn options.
+Validated work-and-turn, the full priority/pricing editor, and the final alternatives table with selected-solution detail and export.
 
 </td>
 </tr>
@@ -106,6 +103,7 @@ Connect real production reports into `SolutionMetrics`, add main-interface produ
 
 - [Что осталось до 1.0 / Remaining work to 1.0](docs/REMAINING_WORK.md)
 - [План M7: приоритеты, свой оборот и варианты / M7 operator decision plan](docs/M7_IMPLEMENTATION_PLAN.md)
+- [M7.3 runtime и UI альтернатив / M7.3 alternatives runtime and UI](docs/M7_3_RUNTIME_ALTERNATIVES_UI.md)
 - [Денежная оценка производства / Production costing](docs/PRODUCTION_COSTING.md)
 - [Архитектура / Architecture](docs/ARCHITECTURE.md)
 - [Справочник конфигурации / Configuration](docs/CONFIG_REFERENCE.md)
@@ -138,35 +136,43 @@ feature branch
 - физическая бумага: `3395`;
 - монтажи: `4`;
 - layout-формы: `8`;
+- цветовые пластины: `32`;
 - листопрогоны: `6790`;
 - недопечатка: `0`;
-- перетираж пар: `1450`.
+- перетираж пар: `1450`;
+- контрольная стоимость: `972,55 BYN`.
 
-### Доказанный минимум бумаги M6
+### Доказанный минимум бумаги
 
 - физическая бумага: `3305`;
 - экономия: `90` листов (`2,65%`);
 - монтажи: `56`;
 - layout-формы: `112`;
+- цветовые пластины: `448`;
 - листопрогоны: `6610`;
 - недопечатка: `0`;
-- перетираж пар: `10`.
+- перетираж пар: `10`;
+- контрольная стоимость: `7199,49 BYN`.
 
-### Иллюстративная денежная проверка M7.1
+### Проверенный компромисс M7.3
 
 При примере `620×450 мм`, `130 г/м²`, `4 BYN/кг` и `15 BYN` за цветовую форму:
 
-- минимум бумаги: около `7199,49 BYN`;
-- компактный вариант: около `972,55 BYN`.
+- paper-first выбирает минимум бумаги;
+- cost-first выбирает компактный ручной вариант;
+- минимум бумаги экономит `90` листов;
+- минимум бумаги дороже на `6226,94 BYN`.
 
 Это **не рабочий прайс**. Реальные цены вводит оператор. Пример доказывает, что минимум бумаги и минимум денег могут выбирать разные решения.
 
 ## Границы
 
+- свой оборот / work-and-turn начинается в M7.4;
+- полный редактор всех приоритетов и цен относится к M7.5;
+- итоговая таблица и экспорт выбранного варианта относятся к M7.6;
 - автоматический mixed-format packing ещё не реализован;
-- свой оборот пока только утверждён как контрольный кейс M7;
 - 32-страничный regression проверяет последовательные пары, но не заявляет готовый фальцевальный спуск;
-- основная страница ещё не содержит полного редактора приоритетов и цен — M7.1 использует отдельную проверочную demo-страницу, а M7.2 показывает статус готовности стоимости на главной.
+- полный импорт/экспорт проекта и постоянное хранение относятся к M8.
 
 ## Лицензия / License
 
