@@ -15,6 +15,7 @@ import {
   renderPaperSolutionEmpty,
 } from "./paper-solution-renderer.js";
 import { createPdfExportController } from "./pdf-export-ui.js";
+import "./work-and-turn-ui.js";
 
 const state = {
   records: null,
