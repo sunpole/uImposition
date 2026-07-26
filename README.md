@@ -1,7 +1,7 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.7.0-alpha.1</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.7.0-alpha.2</strong></p>
 <p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
 
 <table>
@@ -45,13 +45,24 @@ uImposition — статический браузерный инструмент
 - компактная demo-проверка `Бумага / Стоимость / Формы`;
 - полный план из 17 release-патчей до `1.0.0`.
 
+### Добавлено в M7.2
+
+- единая нормализованная модель `SolutionMetrics`;
+- явный статус `pricing ready` / `pricing incomplete`;
+- запрет выдумывать рабочие цены: если прайс не задан, BYN-поля остаются `null`;
+- защитный адаптер перед decision ranking;
+- недопечатанные решения не могут попасть в рекомендацию;
+- `layoutCompactness: null` не превращается молча в `0`;
+- импортированный `productionCost` проверяется на совпадение с листами, формами и пластинами этого же решения;
+- главная страница показывает актуальную границу M7.2 и статус стоимости.
+
 ### Дальше в M7
 
-- единая метрика всех вариантов;
-- сравнение своего и чужого оборота;
+- подключить реальные production report в `SolutionMetrics`;
+- ввод рабочих цен в основном интерфейсе;
 - полный раскрываемый набор существенно разных Pareto-вариантов;
 - точные дельты «что лучше / что хуже»;
-- ввод рабочих цен и компактная таблица вариантов;
+- сравнение своего и чужого оборота;
 - контрольный кейс: четыре A6 1+1, 2 страницы, по 4000.
 
 </td>
@@ -69,9 +80,13 @@ Sheet/product geometry, exact pairs, validated front/back schemes, production to
 
 Eleven reorderable objectives, immutable hard constraints, instant lexicographic re-ranking, source-sheet weight from size and gsm, BYN/kg paper cost, per-color-plate cost, optional layout preparation cost, total/unit cost, a focused Paper / Cost / Forms demo, and a 17-release roadmap to 1.0.
 
+### Added in M7.2
+
+A normalized `SolutionMetrics` model, explicit `pricing ready` / `pricing incomplete` state, no invented production prices, guarded conversion before decision ranking, underproduction rejection, null compactness rejection, production-cost basis checks, and an updated main page that shows the active M7.2 boundary.
+
 ### Later M7 patches
 
-Normalized metrics, work-and-back/work-and-turn comparison, exact better/worse deltas, production pricing inputs, and compact Pareto alternatives.
+Connect real production reports into `SolutionMetrics`, add main-interface production pricing inputs, build compact Pareto alternatives, show exact better/worse deltas, and compare work-and-back/work-and-turn options.
 
 </td>
 </tr>
@@ -151,7 +166,7 @@ feature branch
 - автоматический mixed-format packing ещё не реализован;
 - свой оборот пока только утверждён как контрольный кейс M7;
 - 32-страничный regression проверяет последовательные пары, но не заявляет готовый фальцевальный спуск;
-- основная страница ещё не содержит полного редактора приоритетов и цен — M7.1 использует отдельную проверочную demo-страницу.
+- основная страница ещё не содержит полного редактора приоритетов и цен — M7.1 использует отдельную проверочную demo-страницу, а M7.2 показывает статус готовности стоимости на главной.
 
 ## Лицензия / License
 

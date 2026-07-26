@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1200 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.7.0-alpha.1" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.2" },
     { "selector": "#productionPhysicalSheets", "text": "395" },
     { "selector": "#productionForms", "text": "8" },
     { "selector": "#productionPressPasses", "text": "790" },
@@ -15,12 +15,12 @@
   "download": {
     "selector": "#exportReportPdf",
     "fileName": "uImposition-production-report.pdf",
-    "artifact": "uimposition-v0-7-0-alpha-1-production-report.pdf",
+    "artifact": "uimposition-v0-7-0-alpha-2-production-report.pdf",
     "expectedPages": 6
   },
   "afterDownloadAssertions": [
     { "selector": "#pdfExportStatus", "text": "PDF отчёта создан: 6 страниц" }
   ],
-  "screenshot": "uimposition-v0-7-0-alpha-1-m5-report-pdf-export-desktop.png",
+  "screenshot": "uimposition-v0-7-0-alpha-2-m5-report-pdf-export-desktop.png",
   "fullPage": true
 }

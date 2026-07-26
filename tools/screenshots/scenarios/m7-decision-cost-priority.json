@@ -3,7 +3,7 @@
   "path": "/decision-profile-demo.html?demo=decision-profile",
   "viewport": { "width": 1280, "height": 960 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.7.0-alpha.1" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.2" },
     { "selector": "#decisionProfileDemo", "text": "Порядок целей меняет рекомендацию" },
     { "selector": "#decisionProfileDemo[data-first-objective=\"physicalSheets\"]", "text": "Минимум бумаги" },
     { "selector": "#decisionWinnerSheets", "text": "305" },
@@ -23,5 +23,5 @@
     { "selector": "#decisionReason", "text": "Расчётная стоимость" }
   ],
   "screenshotSelector": "#decisionProfileDemo",
-  "screenshot": "uimposition-v0-7-0-alpha-1-m7-decision-cost-priority.png"
+  "screenshot": "uimposition-v0-7-0-alpha-2-m7-decision-cost-priority.png"
 }
