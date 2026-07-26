@@ -1,0 +1,106 @@
+name: Generate alpha.4 release assets
+
+on:
+  push:
+    branches:
+      - release-publication/v0.7.0-alpha.4
+    paths:
+      - .github/workflows/generate-alpha4-release-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      RELEASE_COMMIT: a9bfb15492815851b89f5d1ba4b9786f26c4b7e1
+      SCREENSHOT_SCENARIOS: m7-work-and-turn-control
+      SCREENSHOT_COMMIT: a9bfb15492815851b89f5d1ba4b9786f26c4b7e1
+      NEWS_IMAGE: news/2026-07-27-uimposition-v0-7-0-alpha-4-work-and-turn.jpg
+      ARCHIVE_DIR: archive/development/0.7.0-alpha.4
+      ARCHIVE_FILE: archive/development/0.7.0-alpha.4/uimposition-v0-7-0-alpha-4-evidence.zip
+
+    steps:
+      - name: Checkout publication branch
+        uses: actions/checkout@v5
+        with:
+          ref: release-publication/v0.7.0-alpha.4
+          fetch-depth: 0
+
+      - name: Preserve publication evidence README and checkout exact release commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "$ARCHIVE_DIR/README.md" /tmp/uimposition-alpha4-evidence-README.md
+          git checkout --detach "$RELEASE_COMMIT"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Install pinned screenshot dependencies
+        working-directory: tools/screenshots
+        run: npm install --package-lock=false --ignore-scripts --no-audit --no-fund
+
+      - name: Install Chromium and asset tools
+        working-directory: tools/screenshots
+        run: |
+          npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick zip
+
+      - name: Capture exact focused panel from the release commit
+        working-directory: tools/screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run capture 2>&1 | tee "$GITHUB_WORKSPACE/capture.log"
+
+      - name: Build JPEG and permanent evidence ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          png="artifacts/screenshots/uimposition-m7-4-work-and-turn-control.png"
+          manifest="artifacts/screenshots/manifest.ndjson"
+          test -s "$png"
+          test -s "$manifest"
+
+          rm -rf /tmp/alpha4-evidence
+          mkdir -p /tmp/alpha4-evidence
+          convert "$png" -resize '1080x1080>' -strip -interlace Plane -sampling-factor 4:2:0 -quality 72 /tmp/uimposition-alpha4-release.jpg
+          identify /tmp/uimposition-alpha4-release.jpg
+
+          cp /tmp/uimposition-alpha4-release.jpg /tmp/alpha4-evidence/focused-playwright-release.jpg
+          grep '"scenario":"m7-work-and-turn-control"' "$manifest" > /tmp/alpha4-evidence/manifest.ndjson
+          cp capture.log /tmp/alpha4-evidence/capture.log
+          cp /tmp/uimposition-alpha4-evidence-README.md /tmp/alpha4-evidence/README.md
+          (
+            cd /tmp/alpha4-evidence
+            sha256sum focused-playwright-release.jpg manifest.ndjson capture.log README.md > SHA256SUMS
+            zip -X -q -9 /tmp/uimposition-alpha4-evidence.zip focused-playwright-release.jpg manifest.ndjson capture.log README.md SHA256SUMS
+          )
+          unzip -t /tmp/uimposition-alpha4-evidence.zip
+
+      - name: Restore publication branch and commit generated assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git checkout release-publication/v0.7.0-alpha.4
+          mkdir -p "$(dirname "$NEWS_IMAGE")" "$ARCHIVE_DIR"
+          cp /tmp/uimposition-alpha4-release.jpg "$NEWS_IMAGE"
+          cp /tmp/uimposition-alpha4-evidence.zip "$ARCHIVE_FILE"
+          sha256sum "$NEWS_IMAGE" "$ARCHIVE_FILE" > "$ARCHIVE_DIR/SHA256SUMS.txt"
+
+          git config user.name "uImposition release automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$NEWS_IMAGE" "$ARCHIVE_FILE" "$ARCHIVE_DIR/SHA256SUMS.txt"
+          if git diff --cached --quiet; then
+            echo "Release assets already match the focused scenario."
+            exit 0
+          fi
+          git commit -m "release: generate alpha.4 focused evidence assets"
+          git push origin HEAD:release-publication/v0.7.0-alpha.4
