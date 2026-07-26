@@ -1,0 +1,27 @@
+{
+  "id": "m7-decision-cost-priority",
+  "path": "/decision-profile-demo.html?demo=decision-profile",
+  "viewport": { "width": 1280, "height": 960 },
+  "assertions": [
+    { "selector": ".brand", "text": "v0.7.0-alpha.1" },
+    { "selector": "#decisionProfileDemo", "text": "Порядок целей меняет рекомендацию" },
+    { "selector": "#decisionProfileDemo[data-first-objective=\"physicalSheets\"]", "text": "Минимум бумаги" },
+    { "selector": "#decisionWinnerSheets", "text": "305" },
+    { "selector": "#decisionWinnerCost", "text": "199" },
+    { "selector": "#decisionWinnerForms", "text": "112" },
+    { "selector": "[data-priority-objective=\"estimatedTotalCost\"]", "text": "Расчётная стоимость" }
+  ],
+  "beforeScreenshot": [
+    { "action": "click", "selector": "[data-priority-objective=\"estimatedTotalCost\"]" },
+    { "action": "wait", "timeoutMs": 150 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "#decisionProfileDemo[data-first-objective=\"estimatedTotalCost\"]", "text": "Компактный ручной" },
+    { "selector": "#decisionWinnerSheets", "text": "395" },
+    { "selector": "#decisionWinnerCost", "text": "972" },
+    { "selector": "#decisionWinnerForms", "text": "8" },
+    { "selector": "#decisionReason", "text": "Расчётная стоимость" }
+  ],
+  "screenshotSelector": "#decisionProfileDemo",
+  "screenshot": "uimposition-v0-7-0-alpha-1-m7-decision-cost-priority.png"
+}

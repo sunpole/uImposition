@@ -1,123 +1,95 @@
 # Текущее состояние / Current State
 
-Последнее обновление: **25 июля 2026**  
-Last updated: **25 July 2026**
+Последнее обновление: **26 июля 2026**  
+Last updated: **26 July 2026**
 
-<table>
-<tr>
-<td width="50%" valign="top">
+## Версия и ветка
 
-## Русский
+- завершённый базовый checkpoint: `0.6.0-alpha` / M6;
+- текущий release-кандидат: **`0.7.0-alpha.1` / M7.1**;
+- рабочая ветка: `m7.1/0.7.0-alpha.1`;
+- implementation PR: `#12`;
+- следующий патч: `0.7.0-alpha.2` / M7.2;
+- полный план до `1.0.0`: `docs/REMAINING_WORK.md`;
+- фактическое состояние PR, Actions, `main`, rollback-ветки, tag, GitHub prerelease и uNews проверяется непосредственно в GitHub.
 
-### Версия и release checkpoint
+## Что работает после M6
 
-- версия этапа: **`0.6.0-alpha`**;
-- implementation Pull Request: **№10**;
-- milestone: **M6 — доказанный минимум физической бумаги**;
-- release manifest: `archive/development/0.6.0-alpha/release.json`;
-- checkpoint включает release news, крупный PNG, постоянный evidence ZIP и три сохранённых исторических ZIP;
-- ожидаемые GitHub-объекты: `release/v0.6.0-alpha`, tag `v0.6.0-alpha`, GitHub prerelease;
-- фактическое состояние PR, `main`, ветки, tag, Release и uNews queue проверять непосредственно в GitHub;
-- следующий этап после полного подтверждения checkpoint: M7.
+M6 сохраняет:
 
-### Что реально работает в M6
+- проверенную геометрию, пары страниц, лицо/оборот и production report;
+- отдельные PDF схем и отчёта;
+- полный набор `8960` ограниченных кандидатов;
+- доказанный минимум бумаги `3305` листов;
+- нулевую недопечатку;
+- отдельные layout-формы и цветовые пластины;
+- production regression fixtures;
+- Chromium, `pdfinfo`, Poppler, news и постоянные архивы.
 
-1. Геометрия листа, зачистка и непечатные поля.
-2. Формат изделия, выпуск, общий и раздельный рез.
-3. Сетки 0°/90° и максимальная вместимость.
-4. Ввод заказов и точные пары страниц.
-5. Проверенные лица и автоматически зеркальные обороты.
-6. Производственные итоги по парам и файлам.
-7. Физическая бумага, layout-формы, листопрогоны и запрет недопечатки.
-8. Отдельный PDF схем и отдельный PDF отчёта.
-9. Чистая модель кандидата и неизменяемого спроса.
-10. Полный контрольный набор `8960` кандидатов с одной или двумя парами.
-11. Автоматическая конструкция допустимого решения.
-12. Доказанный минимум физической бумаги `3305` листов.
-13. Сравнение с ручным вариантом `3395` листов.
-14. Явный компромисс: layout-формы `8 → 112`.
-15. Отдельный учёт цветовых пластин 4+4.
-16. Regression-кейсы A6 landscape/portrait, mixed A4/A5/A6 и A5 `400/700/4200`.
-17. Node, Chromium, `pdfinfo`, Poppler и ручная визуальная проверка.
-18. Крупный screenshot только панели M6 для Telegram.
-19. Release news и короткий Telegram-текст.
-20. Постоянная история разработки в `archive/development/0.6.0-alpha/`.
+## Что добавлено в M7.1
 
-### Проверенный результат M6
+1. `11` изменяемых целей оптимизации.
+2. Жёсткие ограничения, которые не входят в пользовательскую сортировку.
+3. Immutable decision profile.
+4. Перемещение целей по позиции или вверх/вниз.
+5. Лексикографическое сравнение и стабильное ранжирование.
+6. Объяснение первой метрики, определившей победителя.
+7. Полная проверка всех метрик до допуска варианта к сравнению.
+8. Денежная цель `estimatedTotalCost`.
+9. Площадь и вес исходного закупаемого листа.
+10. Плотность бумаги в `г/м²`.
+11. Стоимость бумаги в `BYN/кг`.
+12. Стоимость цветовых форм за штуку.
+13. Необязательная стоимость подготовки layout-форм.
+14. Итоговая расчётная стоимость и стоимость одного заказанного изделия.
+15. Отдельная короткая demo-страница с выбором `Бумага / Стоимость / Формы`.
+16. Фокусный Chromium screenshot только области M7.1.
+17. План из 17 release-патчей до стабильной `1.0.0`.
 
-```text
-Требуемое количество пар: 52870
-Вместимость листа:        16
-Нижняя граница:           ceil(52870 / 16) = 3305
-Построенный вариант:      3305
-```
+## Проверенный иллюстративный пример
 
-- бумага: `3305`;
-- экономия: `90` листов;
-- монтажи: `56`;
-- layout-формы: `112`;
-- листопрогоны: `6610`;
-- недопечатка: `0`;
-- перетираж пар: `10`;
-- перетираж готовых файлов: `0`.
-
-### Что ещё не реализовано
-
-- пользовательская перестановка приоритетов в интерфейсе;
-- мгновенная пересортировка решений;
-- автоматический свой оборот;
-- сравнение своего и чужого оборота;
-- полный Pareto-набор;
-- автоматический mixed-format packing;
-- тетрадный/фальцевальный спуск;
-- постоянное хранение полного рабочего проекта пользователя.
-
-### Следующий безопасный шаг — M7
-
-M7 начинается только после проверки, что PR №10 объединён, rollback-ветка, tag и GitHub prerelease существуют, а патчноут находится в очереди uNews.
-
-Сначала создаются чистые модели целей, профиля решений и лексикографического ранжирования. Затем добавляется свой оборот на контрольном кейсе:
+Числа ниже используются только для regression-теста и не являются рабочими ценами:
 
 ```text
-4 разных A6
-2 страницы
-1+1
-по 4000 экземпляров
+исходный лист: 620 × 450 мм
+плотность:     130 г/м²
+бумага:        4 BYN/кг
+цветовая форма:15 BYN
 ```
 
-Чужой и свой оборот должны оба дать `1000` физических листов и `2000` листопрогонов. Свой оборот должен уменьшить layout-формы и цветовые пластины `2 → 1`. Пользователь видит оба варианта, точные дельты и технологическое предупреждение.
+| Вариант | Листы | Layout-формы | Цветовые формы | Бумага | Итог |
+|---|---:|---:|---:|---:|---:|
+| Минимум бумаги | 3305 | 112 | 448 | 479.4894 BYN | 7199.4894 BYN |
+| Компактный | 3395 | 8 | 32 | 492.5466 BYN | 972.5466 BYN |
 
-Подробности: `docs/M7_IMPLEMENTATION_PLAN.md`.  
-Машинный fixture: `data/m7-decision-cases.json`.
+Следствие:
 
-</td>
-<td width="50%" valign="top">
+- приоритет бумаги выбирает `3305` листов;
+- приоритет стоимости выбирает компактный вариант;
+- приоритет форм также выбирает компактный вариант;
+- изменение приоритета пересортировывает готовый набор без повторной генерации.
 
-## English
+## Чего ещё нет
 
-### Version and release checkpoint
+- ввода рабочих цен в основном интерфейсе;
+- единой нормализованной модели всех вариантов;
+- Pareto-frontier;
+- автоматического своего оборота;
+- автоматического mixed-format packing;
+- фальцевального/тетрадного спуска;
+- полного сохранения и переноса рабочего проекта.
 
-- milestone version: **`0.6.0-alpha`**;
-- implementation PR: **#10**;
-- release manifest: `archive/development/0.6.0-alpha/release.json`;
-- the checkpoint includes release news, a focused PNG, a permanent evidence ZIP, and three preserved historical ZIPs;
-- verify the factual PR, main, rollback branch, tag, GitHub prerelease, and uNews queue state directly in GitHub before continuing.
+## Следующая безопасная задача — M7.2
 
-### Verified M6
+После фактического выпуска `0.7.0-alpha.1`:
 
-A complete 8,960-candidate control space, automatic valid run construction, a proven 3,305-sheet physical-paper minimum, 56 impositions, 112 side-layout forms, 6,610 passes, zero underproduction, 10 pair overrun, zero file overrun, separate color-plate metrics, production regressions, browser/PDF verification, focused Telegram evidence, release news, and permanent repository archives.
+- создать `m7.2/0.7.0-alpha.2` от финального `main`;
+- нормализовать все метрики ручного, бумажного и будущих решений;
+- подключить production report;
+- добавить статус `pricing ready / pricing incomplete`;
+- не использовать demo-цены как defaults;
+- не переходить к Pareto и своему обороту до завершения M7.2.
 
-### Not implemented yet
+## English summary
 
-Interactive objective ordering, instant re-ranking, automatic work-and-turn, work-and-back/work-and-turn comparison, a full Pareto set, automatic mixed-format packing, folded-signature pagination, and complete-project persistence.
-
-### Next safe step — M7
-
-After verifying the complete M6 checkpoint, implement pure objective/ranking models first, then the four-A6 1+1 × 4000 work-and-turn case. Both duplex strategies must use 1,000 sheets and 2,000 passes; work-and-turn must reduce side-layout forms and color plates from two to one while remaining an explicit operator choice.
-
-Details: `docs/M7_IMPLEMENTATION_PLAN.md`.  
-Fixture: `data/m7-decision-cases.json`.
-
-</td>
-</tr>
-</table>
+M7.1 adds eleven reorderable objectives, immutable hard constraints, complete metric validation, lexicographic ranking, transparent source-sheet weight and BYN costing, per-color-plate pricing, total/unit cost, and a focused Paper / Cost / Forms proof page. Actual pricing inputs, normalized solution metrics, Pareto alternatives, work-and-turn, automatic mixed-format packing, folded-signature pagination, and complete-project persistence remain later patches.

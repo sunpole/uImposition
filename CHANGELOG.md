@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.7.0-alpha.1 — 2026-07-26
+
+### Added
+
+- 11 explicit reorderable optimization objectives;
+- immutable hard constraints kept outside the user-controlled order;
+- pure decision-profile model with objective movement by index or offset;
+- lexicographic solution comparison and stable deterministic ranking;
+- first-difference explanation for the objective that selected a winner;
+- full metric validation before any solution can enter ranking;
+- `estimatedTotalCost` as an independent optimization objective;
+- source-sheet area and weight calculation from millimetres and gsm;
+- paper mass and paper cost from physical-sheet count and BYN/kg price;
+- per-color-plate/form cost;
+- optional side-layout preparation cost;
+- total estimated production cost and cost per ordered finished item;
+- illustrative BYN pricing fixture that is explicitly not a production default;
+- standalone focused decision demo with Paper / Cost / Forms priority buttons;
+- focused Chromium scenario that clicks the cost priority and verifies the changed recommendation;
+- `docs/PRODUCTION_COSTING.md`;
+- `docs/REMAINING_WORK.md` with 17 release patches from M7.1 to stable `1.0.0`.
+
+### Changed
+
+- the default objective order now places estimated cost immediately after physical sheets;
+- every candidate solution must provide all 11 finite metrics before comparison;
+- M7 planning now includes paper weight, BYN paper cost, form cost, total cost, and unit cost;
+- README exposes the active M7.1 work and the full remaining roadmap;
+- screenshot tooling can assert the DOM after its interaction actions;
+- visible and package versions are synchronized to `0.7.0-alpha.1`.
+
+### Verified
+
+Illustrative pricing only:
+
+- source sheet: `620 × 450 mm`;
+- grammage: `130 g/m²`;
+- paper price: `4 BYN/kg`;
+- color-plate price: `15 BYN`;
+- one source sheet weighs `0.03627 kg`;
+- compact solution paper: `123.13665 kg`, paper cost `492.5466 BYN`, plates `480 BYN`, total `972.5466 BYN`;
+- paper-minimum solution paper: `119.87235 kg`, paper cost `479.4894 BYN`, plates `6720 BYN`, total `7199.4894 BYN`;
+- paper priority selects `3305 sheets / 112 side-layout forms`;
+- cost priority selects `3395 sheets / 8 side-layout forms`;
+- side-layout-form priority also selects the compact solution;
+- changing only the objective order does not regenerate the solution set;
+- focused Chromium evidence shows the real click, reordered hierarchy, `3395`, `972.55 BYN`, and `8` forms.
+
+### Boundary
+
+M7.1 supplies the pure decision and costing foundation plus a standalone proof page. Actual pricing inputs in the main application, normalized metrics for every generated solution, Pareto alternatives, work-and-turn, and the compact production comparison table remain separate M7.2–M7.6 releases.
+
 ## 0.6.0-alpha — 2026-07-25
 
 ### Added

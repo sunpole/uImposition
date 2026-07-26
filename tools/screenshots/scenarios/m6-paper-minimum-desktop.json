@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1200 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.6.0-alpha" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.1" },
     { "selector": "#productionStatus", "text": "Недопечатки нет" },
     { "selector": "#paperSolutionStatus", "text": "Минимум бумаги доказан" },
     { "selector": "#paperOptimalSheets", "text": "305" },
@@ -18,6 +18,6 @@
     { "selector": "[data-paper-comparison=\"forms\"]", "text": "112" },
     { "selector": ".paper-runs > summary", "text": "56 автоматических монтажей" }
   ],
-  "screenshot": "uimposition-v0-6-0-alpha-m6-paper-minimum-desktop.png",
+  "screenshot": "uimposition-v0-7-0-alpha-1-m6-paper-minimum-desktop.png",
   "fullPage": true
 }
