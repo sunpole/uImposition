@@ -6,6 +6,7 @@ import { createUserUniformProductionPlanSet } from "./user-uniform-production-pl
 import {
   clearUserProductionPlanSet,
   setUserProductionPlanSet,
+  subscribeUserProductionPlanRuntime,
 } from "./user-production-plans-runtime.js";
 
 const sides = ["left", "right", "top", "bottom"];
@@ -476,3 +477,10 @@ ensureColorControls();
 ensurePanel();
 attachListeners();
 calculate();
+subscribeUserProductionPlanRuntime((runtimeSnapshot) => {
+  if (runtimeSnapshot.planSet === state.planSet) return;
+  state.planSet = runtimeSnapshot.planSet;
+  state.error = null;
+  if (!state.planSet) state.filter = FILTERS.ALL;
+  render();
+});
