@@ -1,6 +1,6 @@
-export const DUPLEX_MODES = Object.freeze({
-  SEPARATE_FRONT_BACK_FORMS: "separateFrontBackForms",
-});
+import { DUPLEX_STRATEGIES } from "./duplex-strategies.js";
+
+export const DUPLEX_MODES = DUPLEX_STRATEGIES;
 
 function requirePositiveInteger(value, label) {
   if (!Number.isInteger(value) || value <= 0) {
@@ -197,13 +197,24 @@ export function calculateFileMetrics(pairMetrics) {
   }));
 }
 
-export function calculateRunMetrics({ impositions, duplexMode = DUPLEX_MODES.SEPARATE_FRONT_BACK_FORMS }) {
+function formMetricsForDuplexMode(duplexMode) {
+  if (duplexMode === DUPLEX_MODES.SEPARATE_FRONT_BACK_FORMS) {
+    return Object.freeze({ frontForms: 1, backForms: 1, forms: 2 });
+  }
+  if (duplexMode === DUPLEX_MODES.WORK_AND_TURN) {
+    return Object.freeze({ frontForms: 1, backForms: 0, forms: 1 });
+  }
+  throw new RangeError(`Unsupported duplex mode: ${duplexMode}`);
+}
+
+export function calculateRunMetrics({
+  impositions,
+  duplexMode = DUPLEX_MODES.SEPARATE_FRONT_BACK_FORMS,
+}) {
   if (!Array.isArray(impositions) || impositions.length === 0) {
     throw new TypeError("impositions must be a non-empty array");
   }
-  if (duplexMode !== DUPLEX_MODES.SEPARATE_FRONT_BACK_FORMS) {
-    throw new RangeError(`Unsupported duplex mode: ${duplexMode}`);
-  }
+  const perImpositionForms = formMetricsForDuplexMode(duplexMode);
 
   const ids = new Set();
   const impositionMetrics = impositions.map((record, index) => {
@@ -225,16 +236,18 @@ export function calculateRunMetrics({ impositions, duplexMode = DUPLEX_MODES.SEP
       impositionId: front.id,
       runLength: front.runLength,
       physicalSheets: front.runLength,
-      frontForms: 1,
-      backForms: 1,
-      forms: 2,
+      frontForms: perImpositionForms.frontForms,
+      backForms: perImpositionForms.backForms,
+      forms: perImpositionForms.forms,
       pressPasses: front.runLength * 2,
     });
   });
 
   const physicalSheets = impositionMetrics.reduce((sum, metric) => sum + metric.physicalSheets, 0);
-  const frontForms = impositionMetrics.length;
-  const backForms = impositionMetrics.length;
+  const frontForms = impositionMetrics.reduce((sum, metric) => sum + metric.frontForms, 0);
+  const backForms = impositionMetrics.reduce((sum, metric) => sum + metric.backForms, 0);
+  const forms = impositionMetrics.reduce((sum, metric) => sum + metric.forms, 0);
+  const pressPasses = impositionMetrics.reduce((sum, metric) => sum + metric.pressPasses, 0);
 
   return Object.freeze({
     duplexMode,
@@ -242,8 +255,8 @@ export function calculateRunMetrics({ impositions, duplexMode = DUPLEX_MODES.SEP
     physicalSheets,
     frontForms,
     backForms,
-    forms: frontForms + backForms,
-    pressPasses: physicalSheets * 2,
+    forms,
+    pressPasses,
     impositions: Object.freeze(impositionMetrics),
   });
 }

@@ -148,7 +148,7 @@ test("duplicate pair definitions and unsupported duplex modes are rejected", () 
     () => buildProductionReport({
       pagePairs,
       impositions,
-      duplexMode: "workAndTurn",
+      duplexMode: "unsupportedDuplexMode",
     }),
     /Unsupported duplex mode/,
   );

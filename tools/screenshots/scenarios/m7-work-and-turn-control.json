@@ -1,0 +1,31 @@
+{
+  "id": "m7-work-and-turn-control",
+  "path": "/",
+  "viewport": { "width": 1440, "height": 1180 },
+  "assertions": [
+    { "selector": "#workAndTurnComparison", "text": "Свой оборот: одна форма, два прогона" },
+    { "selector": "#workTurnStatus", "text": "без денежного сравнения" },
+    { "selector": "#workTurnSummary", "text": "1 000 листов и 2 000 прогонов" },
+    { "selector": "#workTurnSummary", "text": "2 → 1" }
+  ],
+  "beforeScreenshot": [
+    { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },
+    { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
+    { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
+    { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "0" },
+    { "action": "hide", "selector": "#settingsPanel" },
+    { "action": "click", "selector": "[data-work-turn-mode='compareBoth']" },
+    { "action": "wait", "timeoutMs": 200 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "#workTurnStatus", "text": "прайс готов" },
+    { "selector": "#workAndTurnComparison[data-recommended-strategy='workAndTurn']", "text": "Рекомендуемый" },
+    { "selector": "#workTurnSummary", "text": "Экономия по текущему прайсу: 15 BYN" },
+    { "selector": "[data-duplex-strategy='separateFrontBackForms']", "text": "2 000" },
+    { "selector": "[data-duplex-strategy='workAndTurn']", "text": "1 000" },
+    { "selector": "#workTurnPlate", "text": "A · 1" },
+    { "selector": "#workTurnPlate", "text": "A · 2" }
+  ],
+  "screenshotSelector": "#workAndTurnComparison",
+  "screenshot": "uimposition-m7-4-work-and-turn-control.png"
+}
