@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "project": "uImposition",
-  "version": "0.7.0-alpha.1",
+  "version": "0.7.0-alpha.2",
   "semverCore": "0.7.0",
   "channel": "alpha",
-  "channelIteration": 1,
-  "versionSequence": 9,
+  "channelIteration": 2,
+  "versionSequence": 10,
   "releaseDate": "2026-07-26",
-  "status": "m7-1-objective-order-and-byn-cost-alpha",
-  "milestone": "M7.1",
-  "nextMilestone": "M7.2",
+  "status": "m7-2-normalized-solution-metrics-alpha",
+  "milestone": "M7.2",
+  "nextMilestone": "M7.3",
   "productionReady": false,
   "publicDemoReady": true,
   "capacityImplemented": true,
@@ -35,18 +35,21 @@
   "completeMetricValidationImplemented": true,
   "productionCostModelImplemented": true,
   "bynCostingImplemented": true,
+  "solutionMetricsImplemented": true,
+  "solutionMetricsGuardedBeforeDecisionRanking": true,
+  "mainFrontM7StatusAligned": true,
   "pricingInputUiImplemented": false,
   "paretoFrontierImplemented": false,
   "workAndTurnImplemented": false,
   "summary": {
-    "ru": "M7.1 добавляет 11 изменяемых целей, мгновенное лексикографическое ранжирование и прозрачную денежную оценку в BYN. Вес бумаги считается по исходному листу и плотности, стоимость — по цене бумаги за кг и цветовых форм за штуку. В демонстрации минимум бумаги выбирает 3305 листов, а приоритет стоимости выбирает компактный вариант 3395 листов и 8 форм.",
-    "en": "M7.1 adds 11 reorderable objectives, instant lexicographic ranking, and transparent BYN costing. Paper weight is calculated from the source sheet and gsm; cost uses paper price per kg and per-color-plate pricing. In the demo, paper priority selects 3,305 sheets while cost priority selects the compact 3,395-sheet, 8-form solution."
+    "ru": "M7.2 добавляет единую нормализованную модель SolutionMetrics и защитный слой перед ранжированием решений. Стоимость не подставляется по умолчанию: пока оператор не задал рабочий прайс, решение остаётся в статусе pricing incomplete, а BYN-поля равны null. Главная страница теперь показывает актуальную границу M7.2 вместо старого текста M6.",
+    "en": "M7.2 adds one normalized SolutionMetrics model and guarded conversion before decision ranking. No default production prices are invented: until the operator provides real pricing, a solution stays pricing incomplete and BYN fields remain null. The main page now shows the active M7.2 boundary instead of the old M6 copy."
   },
   "nextTarget": {
-    "version": "0.7.0-alpha.2",
-    "milestone": "M7.2",
-    "ru": "Создать единую нормализованную модель метрик всех решений, подключить реальные production report и pricing status без выдуманных цен.",
-    "en": "Create one normalized metrics model for every solution and connect real production-report and pricing readiness without invented prices."
+    "version": "0.7.0-alpha.3",
+    "milestone": "M7.3",
+    "ru": "Построить компактный набор существенно разных альтернатив и Pareto-frontier с человеческими объяснениями преимуществ и цены каждого варианта.",
+    "en": "Build a compact set of materially different alternatives and a Pareto frontier with human-readable explanations of each option's benefit and cost."
   },
   "versionSources": {
     "machine": "VERSION.json",
