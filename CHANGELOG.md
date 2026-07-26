@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.7.0-alpha.4 — 2026-07-26
+
+### Added
+
+- explicit `separateFrontBackForms` and `workAndTurn` duplex strategies;
+- operator search modes `separateOnly`, `compareBoth`, and `workAndTurnOnly`;
+- pure symmetric shared-plate model for horizontal work-and-turn;
+- mandatory mirrored file/page-pair, page-role, grid-coordinate, and direction validation;
+- materialization of the shared plate into canonical front/back layouts for independent finished-pair validation;
+- mode-aware production metrics for separate `1+1` forms versus one shared `1+0` form;
+- independent work-and-turn production-report validation with zero underproduction;
+- fixed four-A6, 2-page, 1+1, 4,000-copy control case;
+- sanitized `uimposition:work-and-turn` runtime state without raw reports, layouts, page pairs, or half-row construction data;
+- mode filtering over one prepared comparison without rebuilding geometry;
+- compact RU/EN work-and-turn comparison panel;
+- factual 4×4 shared-plate preview;
+- focused Chromium scenario `m7-work-and-turn-control`;
+- `docs/M7_4_WORK_AND_TURN.md` and synchronized project entry documentation;
+- regression coverage for valid and damaged mirrored pairs, odd-column rejection, production totals, search modes, pricing suppression, exact plate savings, and public-state boundaries.
+
+### Changed
+
+- production run metrics and validation now derive front forms, back forms, and total forms from the explicit duplex strategy instead of assuming separate forms unconditionally;
+- the previous unsupported-mode regression now rejects only genuinely unknown duplex modes;
+- main-page documentation now treats M7.3 as the prior checkpoint and M7.4 as the current release;
+- package, README, VERSION files, and runtime-visible site version are synchronized to `0.7.0-alpha.4`.
+
+### Verified control result
+
+| Metric | Separate front/back forms | Work-and-turn |
+|---|---:|---:|
+| Physical sheets | 1000 | 1000 |
+| Press passes | 2000 | 2000 |
+| Side-layout forms | 2 | 1 |
+| Color plates for 1+1 | 2 | 1 |
+| Underproduction | 0 | 0 |
+| Overrun | 0 | 0 |
+
+With the evidence profile `130 g/m²`, `4 BYN/kg`, `15 BYN/color plate`, and `0 BYN/layout preparation`, the separate strategy totals `175.08 BYN`, work-and-turn totals `160.08 BYN`, and the exact saving is `15 BYN`. These values are regression evidence, not production defaults.
+
+### Verified UI evidence
+
+The focused Chromium scenario confirms the initial no-pricing state, enters the evidence pricing profile, verifies `workAndTurn` as recommended, checks `1000` sheets and `2000` passes, checks forms and plates `2 → 1`, checks the `15 BYN` saving, verifies both `A·1` and `A·2` on the shared plate, and captures only the M7.4 comparison panel.
+
+### Boundary
+
+M7.4 validates horizontal work-and-turn for the fixed A6 control case. It does not claim a general arbitrary-order work-and-turn solver, vertical turning, automatic gripper/side-guide selection, or automatic compatibility with a specific press. Equal paper and press-pass totals remain visible; no paper saving is claimed.
+
 ## 0.7.0-alpha.3 — 2026-07-26
 
 ### Added
