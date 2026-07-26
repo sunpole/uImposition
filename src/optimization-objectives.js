@@ -15,6 +15,12 @@ export const OPTIMIZATION_OBJECTIVES = Object.freeze([
     label: Object.freeze({ ru: "Физическая бумага", en: "Physical sheets" }),
   }),
   freezeDefinition({
+    id: "estimatedTotalCost",
+    metricKey: "estimatedTotalCost",
+    direction: OBJECTIVE_DIRECTION.MINIMIZE,
+    label: Object.freeze({ ru: "Расчётная стоимость", en: "Estimated production cost" }),
+  }),
+  freezeDefinition({
     id: "layoutForms",
     metricKey: "layoutForms",
     direction: OBJECTIVE_DIRECTION.MINIMIZE,
