@@ -14,7 +14,8 @@ Last updated: **26 July 2026**
 - Pareto foundation объединён через PR `#20`;
 - compact display alternatives объединены через PR `#25`;
 - real production alternatives объединены через PR `#26`;
-- RU/EN explanations и component cost deltas реализуются через PR `#27`;
+- RU/EN explanations и component cost deltas объединены через PR `#27`;
+- runtime state/event и compact read-only UI реализуются через PR `#28`;
 - полный план до `1.0.0`: `docs/REMAINING_WORK.md`.
 
 `VERSION.json`, `VERSION.md`, package version и видимая версия сайта остаются `0.7.0-alpha.2`, пока M7.3 не пройдёт полный отдельный release checkpoint.
@@ -132,14 +133,30 @@ Last updated: **26 July 2026**
   - итог `−6226.9428 BYN`;
 - отдельный документ: `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`.
 
+### PR #28 — runtime state/event и compact read-only UI
+
+- pure runtime собирает real alternative set и explanation set без DOM;
+- controller кэширует подготовленное production-состояние и paper minimum;
+- при смене priority, языка или reference montage generation и paper minimizer не запускаются повторно;
+- UI получает только очищенный public state через `uimposition:alternatives`;
+- raw report, control case, layouts, candidates, planned runs и paper solution в public state отсутствуют;
+- команды `set-priority` и `set-reference` идут через `uimposition:alternatives-command`;
+- основная страница показывает два реальных варианта, recommendation, reference, метрики, advantage, tradeoff, deciding objective и component deltas;
+- cost-first доступен только при совместимом `pricing ready`;
+- при неполном прайсе paper-first остаётся рабочим, а денежные значения скрыты;
+- RU/EN состояние пересобирается из pure explanation model;
+- focused Chromium scenario `m7-real-alternatives-cost-first` проверяет recommendation `manual-compact` и дельту `6226,94 BYN`;
+- отдельный документ: `docs/M7_3_RUNTIME_ALTERNATIVES_UI.md`.
+
 ## Что ещё требуется для завершения M7.3
 
-- runtime event/state с реальным alternative set и explanation set;
-- компактная read-only RU/EN демонстрация или UI;
-- интерактивное подтверждение paper-first, cost-first и смены reference;
-- корректное состояние при `pricing incomplete / incompatible`;
-- focused Chromium evidence нового пользовательского результата;
-- release news, uNews/Telegram payload, permanent archive и release checkpoint `0.7.0-alpha.3`.
+- завершить Quality и focused Chromium/PDF checks PR `#28`;
+- объединить PR `#28`;
+- проверить и сохранить focused screenshot artifact;
+- создать release news и uNews/Telegram payload;
+- создать permanent evidence archive;
+- синхронизировать `VERSION.json`, `VERSION.md`, package и видимую версию;
+- создать recovery branch, immutable tag и GitHub prerelease `0.7.0-alpha.3`.
 
 ## Чего ещё нет
 
@@ -152,17 +169,17 @@ Last updated: **26 July 2026**
 
 ## Следующая безопасная задача
 
-После объединения PR `#27` создать отдельный M7.3 PR от актуального `main`:
+После объединения PR `#28` создать отдельный release PR от актуального `main`:
 
-1. подключить реальный `productionAlternativeSet` и explanation set к runtime state/event приложения;
-2. не передавать в UI сырые candidate/layout структуры;
-3. добавить компактную read-only RU/EN демонстрацию двух реальных вариантов;
-4. показать recommendation, преимущество, цену компромисса и component cost deltas;
-5. поддержать paper-first, cost-first и смену reference без повторной генерации;
-6. корректно показать отсутствие денежного сравнения при incomplete/incompatible pricing;
-7. доказать новый пользовательский результат focused Chromium-сценарием;
-8. после проверки подготовить news/uNews/Telegram, evidence archive и release checkpoint `0.7.0-alpha.3`.
+1. получить focused screenshot artifact успешного Chromium workflow;
+2. сохранить screenshot и manifest/hash evidence в permanent archive `0.7.0-alpha.3`;
+3. подготовить release news и uNews/Telegram queue;
+4. синхронизировать все источники версии на `0.7.0-alpha.3`;
+5. обновить README/CHANGELOG/current state;
+6. выполнить полный release workflow;
+7. проверить recovery branch, immutable tag и GitHub prerelease;
+8. только после этого переходить к M7.4 work-and-turn.
 
 ## English summary
 
-The latest published checkpoint remains `0.7.0-alpha.2`. M7.3 is unreleased development. PR #20 provides the Pareto foundation, PR #25 provides compact materially-different display selection, PR #26 integrates the real manual production report and proven paper-minimum solution, and PR #27 adds pure RU/EN advantage, tradeoff, deciding-objective, and compatible component-cost explanations. The next safe patch is runtime state/event plus a compact read-only real-alternatives UI, followed by focused evidence and the full `0.7.0-alpha.3` release checkpoint.
+The latest published checkpoint remains `0.7.0-alpha.2`. M7.3 is unreleased development. PR #20 provides the Pareto foundation, PR #25 provides compact materially-different display selection, PR #26 integrates the real manual production report and proven paper-minimum solution, PR #27 adds pure RU/EN advantage, tradeoff, deciding-objective, and compatible component-cost explanations, and PR #28 connects a sanitized runtime/controller event flow to a compact read-only RU/EN UI. The remaining work is focused evidence plus the full `0.7.0-alpha.3` release checkpoint.
