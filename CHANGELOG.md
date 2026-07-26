@@ -17,16 +17,33 @@
 - deterministic maximin range-normalized selection for additional tradeoff alternatives;
 - structured inclusion reasons, nearest-selected diversity evidence, advantages, tradeoffs, equal metrics, and exact deltas;
 - explicit `pricingComparable` behavior when cost is absent from the active Pareto objectives;
+- real imposition-distribution analysis for distinct orders, split orders, and fragmented blocks;
+- `paperSolution → SolutionMetrics` adapter based on real paper-minimizer output;
+- `productionAlternativeSet` integration from normalized production metrics through decision profile, Pareto frontier, and compact display set;
+- compatibility checks for currency, sheet basis, source-sheet geometry, grammage, sheet weight, and effective paper/plate/layout-preparation rates;
+- full control-pipeline integration that rebuilds the real manual report and paper-minimum result from repository data;
 - `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
-- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete pricing, invalid references, and metric coercion guards.
+- `docs/M7_3_PRODUCTION_ALTERNATIVES.md`;
+- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete/incompatible pricing, invalid references, metric coercion guards, real distribution metrics, and real production alternatives.
 
 ### Changed
 
-- Pareto and display metrics must now be actual finite JavaScript numbers; `null`, `undefined`, numeric strings, and empty strings can no longer become `0` through coercion.
+- Pareto and display metrics must be actual finite JavaScript numbers; `null`, `undefined`, numeric strings, and empty strings can no longer become `0` through coercion;
+- the production-report adapter now accepts measured `splitOrders` and `fragmentedBlocks` instead of hardcoding both to zero;
+- estimated cost enters a production alternative comparison only when every solution shares a compatible pricing basis and rates.
+
+### Verified real control alternatives
+
+| Priority | Recommended solution | Physical sheets | Layout forms | Color plates | Estimated total |
+|---|---|---:|---:|---:|---:|
+| Paper | paper minimum | 3305 | 112 | 448 | 7199.4894 BYN |
+| Cost | compact manual | 3395 | 8 | 32 | 972.5466 BYN |
+
+Both values are rebuilt from the real control order, layouts, production report, paper minimizer, source sheet, and a shared illustrative pricing profile. They are not production defaults.
 
 ### Boundary
 
-This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires real normalized alternatives from the production pipeline, human-readable RU/EN tradeoff copy, pricing-component breakdown, UI/evidence, news, archive, recovery branch, tag, and GitHub prerelease.
+This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires human-readable RU/EN tradeoff copy, component-cost deltas, runtime/UI integration, focused evidence, news, archive, recovery branch, tag, and GitHub prerelease.
 
 ## 0.7.0-alpha.2 — 2026-07-26
 
