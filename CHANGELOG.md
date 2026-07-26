@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased — M7.3 development
+
+### Added
+
+- pure `pareto-alternatives` foundation for full-metric duplicate removal;
+- objective-aware solution comparison for minimize and maximize directions;
+- strict Pareto dominance checks;
+- deterministic Pareto-frontier construction;
+- required extreme selection for physical sheets, estimated cost, layout forms, color plates, file/pair overrun, and press passes;
+- explicit `visibleFrontier` and `hiddenFrontierCount` metadata for limited displays;
+- structured per-objective metric deltas;
+- unit coverage for duplicates, dominance, tradeoffs, extrema, display limiting, and floating-point-safe delta expectations.
+
+### Boundary
+
+This work is merged into `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires a compact materially-different display set, human-readable tradeoff explanations, pricing-aware monetary deltas, real normalized alternatives, UI/evidence, news, archive, recovery branch, tag, and GitHub prerelease.
+
 ## 0.7.0-alpha.2 — 2026-07-26
 
 ### Added
@@ -16,16 +33,22 @@
 ### Changed
 
 - visible site fallback version, package version, README, and version manifest are synchronized to `0.7.0-alpha.2`;
-- the main hero and roadmap copy now describe the active M7.2 boundary instead of the old M6 boundary;
+- the main hero and roadmap copy describe the active M7.2 boundary instead of the old M6 boundary;
 - `estimatedTotalCost: null` remains incomplete and can no longer become `0` through JavaScript number coercion;
 - underproduced solutions cannot enter decision ranking;
 - `layoutCompactness: null` cannot enter decision ranking as a silent `0`;
 - imported production costs must match the candidate's physical sheets, color plates, and layout forms before normalization accepts them;
-- the main pricing panel now moves from `pricing incomplete` to `pricing inputs ready` after valid prices, and to `pricing ready` after the production report is available.
+- the main pricing panel moves from `pricing incomplete` to `pricing inputs ready` after valid prices, and to `pricing ready` after the production report is available.
+
+### Verified
+
+- control pricing path ends at `972.55 BYN` / `972,55 BYN`;
+- recovery branch `release/v0.7.0-alpha.2`, tag `v0.7.0-alpha.2`, GitHub prerelease, news/uNews/Telegram payload, and permanent evidence archive are published;
+- tag and recovery branch point to exact checkpoint commit `aafa7b3a7c2e83d00e9c54796593259e9ef147d8`.
 
 ### Boundary
 
-M7.2 now provides the guarded metrics foundation, operator pricing inputs, and real production-report cost for the current control solution. It still does not add Pareto alternatives, work-and-turn, or automatic mixed-format packing.
+M7.2 provides guarded metrics, operator pricing inputs, and real production-report cost for the current control solution. It does not include completed Pareto alternatives, work-and-turn, or automatic mixed-format packing.
 
 ## 0.7.0-alpha.1 — 2026-07-26
 
@@ -47,17 +70,38 @@ M7.2 now provides the guarded metrics foundation, operator pricing inputs, and r
 - standalone focused decision demo with Paper / Cost / Forms priority buttons;
 - focused Chromium scenario that clicks the cost priority and verifies the changed recommendation;
 - `docs/PRODUCTION_COSTING.md`;
-- `docs/REMAINING_WORK.md` with 17 release patches from M7.1 to stable `1.0.0`.
+- `docs/REMAINING_WORK.md` with the release sequence through stable `1.0.0`.
 
 ### Changed
 
-- the default objective order now places estimated cost immediately after physical sheets;
+- the default objective order places estimated cost immediately after physical sheets;
 - every candidate solution must provide all 11 finite metrics before comparison;
-- M7 planning now includes paper weight, BYN paper cost, form cost, total cost, and unit cost;
-- README exposes the active M7.1 work and the full remaining roadmap;
+- M7 planning includes paper weight, BYN paper cost, form cost, total cost, and unit cost;
+- README exposes the active M7 work and remaining roadmap;
 - screenshot tooling can assert the DOM after its interaction actions;
 - visible and package versions are synchronized to `0.7.0-alpha.1`.
 
+### Verified illustrative fixture
+
+| Priority | Recommended solution | Physical sheets | Layout forms | Color plates | Estimated total |
+|---|---|---:|---:|---:|---:|
+| Paper | paper minimum | 3305 | 112 | 448 | 7199.4894 BYN |
+| Cost | compact | 3395 | 8 | 32 | 972.5466 BYN |
+| Forms | compact | 3395 | 8 | 32 | 972.5466 BYN |
+
+The pricing values are regression fixtures only, not production defaults. The exact recovery branch, tag `v0.7.0-alpha.1`, GitHub prerelease, news, and evidence are published at commit `622248f9e38f811a02143b428e264176f848b0a4`.
+
+## 0.6.0-alpha — 2026-07-25
+
+### Added
+
+- exhaustive bounded uniform-grid candidate generation;
+- proof of the `3305` physical-sheet minimum for the control order set;
+- production validation with zero underproduction;
+- explicit physical sheets, press passes, layout forms, and color plates;
+- focused desktop/mobile/Telegram Chromium evidence;
+- permanent development evidence and release news.
+
 ### Verified
 
-Illustrative pricing only:
+The paper-minimum solution uses `3305` physical sheets instead of the compact manual fixture's `3395`, saving `90` sheets while increasing layout forms from `8` to `112`. The tradeoff is intentionally visible and is the foundation for M7 multi-objective decision support.
