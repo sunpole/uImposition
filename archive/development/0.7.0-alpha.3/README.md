@@ -69,7 +69,12 @@ The paper minimum saves `90` sheets but costs `6226.9428 BYN` more under this ev
 
 The original temporary Actions artifact is fixed by the artifact digest above.
 
-The repository publication assets are generated from the focused scenario by `.github/workflows/generate-alpha3-release-assets.yml`. Their SHA-256 values are committed in:
+Generated repository assets:
+
+- release JPEG SHA-256: `a41888279aa987f00af1a86721ae64094136e7fd4f51ecdb06fa3fb4a6edaf49`;
+- permanent evidence ZIP SHA-256: `2f46675c4bb39a7d8d8e3fe8c418928300ea1dc1c121d7aa7d346a4b365aeff6`.
+
+The same values are committed in:
 
 - `archive/development/0.7.0-alpha.3/SHA256SUMS.txt`.
 
