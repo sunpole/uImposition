@@ -27,10 +27,18 @@
 - localized reasons, primary advantage, primary tradeoff, and deciding-objective evidence;
 - component cost deltas for paper, color plates, layout-form preparation, and total estimated cost;
 - complete suppression of monetary text for incomplete or incompatible pricing;
+- pure `alternatives-runtime` state builder for real manual/paper alternatives;
+- separate `alternatives-controller` for production/pricing events and priority/reference commands;
+- sanitized public `uimposition:alternatives` state without raw reports, layouts, candidates, planned runs, or paper solutions;
+- compact read-only RU/EN alternatives panel on the main page;
+- paper-first and cost-first recommendation controls without regenerating impositions;
+- interactive comparison-reference selection;
+- focused Chromium scenario `m7-real-alternatives-cost-first`;
 - `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
 - `docs/M7_3_PRODUCTION_ALTERNATIVES.md`;
 - `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`;
-- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete/incompatible pricing, invalid references, metric coercion guards, real distribution metrics, real production alternatives, RU/EN copy, reference changes, and exact BYN component deltas.
+- `docs/M7_3_RUNTIME_ALTERNATIVES_UI.md`;
+- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete/incompatible pricing, invalid references, metric coercion guards, real distribution metrics, real production alternatives, RU/EN copy, reference changes, exact BYN component deltas, runtime waiting/ready states, priority changes, and invalid control geometry.
 
 ### Changed
 
@@ -38,7 +46,10 @@
 - the production-report adapter now accepts measured `splitOrders` and `fragmentedBlocks` instead of hardcoding both to zero;
 - normalized solution metrics retain explicit operator pricing rates;
 - estimated cost enters a production alternative comparison only when every solution shares a compatible pricing basis and rates;
-- the recommended/reference entry is compared with a real competing alternative instead of itself when explanations are generated.
+- the recommended/reference entry is compared with a real competing alternative instead of itself when explanations are generated;
+- the main page now describes and displays the active M7.3 real-alternatives boundary while the published version remains `0.7.0-alpha.2`;
+- priority, language, and reference changes rerun only decision/Pareto/explanation layers over cached production data;
+- the UI layer no longer reads raw production or paper-minimizer structures directly.
 
 ### Verified real control alternatives
 
@@ -56,9 +67,11 @@ For compact manual relative to paper minimum, the verified component deltas are:
 - layout-form preparation: `0 BYN`;
 - estimated total: `−6226.9428 BYN`.
 
+The focused main-page scenario enters the illustrative pricing profile, loads the real control order, selects cost-first, verifies `manual-compact` as recommended, verifies the paper advantage and cost tradeoff, and captures only the M7.3 alternatives panel.
+
 ### Boundary
 
-This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires runtime/UI integration, focused evidence, news, archive, recovery branch, tag, and GitHub prerelease.
+This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. After the runtime/UI PR passes and merges, M7.3 requires focused artifact preservation, release news/uNews/Telegram, permanent archive, synchronized `0.7.0-alpha.3` version sources, recovery branch, immutable tag, and GitHub prerelease.
 
 ## 0.7.0-alpha.2 — 2026-07-26
 
