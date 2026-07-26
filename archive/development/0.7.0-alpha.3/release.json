@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "project": "uImposition",
+  "version": "0.7.0-alpha.3",
+  "tag": "v0.7.0-alpha.3",
+  "title": "uImposition v0.7.0-alpha.3",
+  "prerelease": true,
+  "sourceCommit": "5de3a972b153d0dfa4924028d22068e59b521606",
+  "createdAt": "2026-07-26T19:55:35Z",
+  "patchnote": "news/2026-07-26-uimposition-v0-7-0-alpha-3-real-pareto-alternatives.md",
+  "image": "news/2026-07-26-uimposition-v0-7-0-alpha-3-real-pareto-alternatives.png",
+  "archive": "archive/development/0.7.0-alpha.3/uimposition-v0-7-0-alpha-3-evidence.zip",
+  "screenshotScenario": "m7-real-alternatives-cost-first",
+  "archiveScenarios": [
+    "m7-real-alternatives-cost-first",
+    "m7-pricing-inputs-ready",
+    "m7-decision-cost-priority",
+    "m6-paper-minimum-desktop",
+    "m6-paper-minimum-mobile",
+    "m5-pdf-export-desktop",
+    "m5-report-pdf-export-desktop"
+  ],
+  "historicalArtifacts": [],
+  "telegramText": "Обновление uImposition 0.7.0-alpha.3: программа показывает два реальных Pareto-варианта — compact manual и доказанный минимум бумаги. Приоритет бумаги или стоимости мгновенно меняет рекомендацию без повторной генерации, а оператор видит точные преимущества, компромиссы и разницу стоимости."
+}
