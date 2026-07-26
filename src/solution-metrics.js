@@ -50,13 +50,30 @@ function nullableCost(value, label) {
   return nonNegativeNumber(value, label);
 }
 
+function isActualFiniteNumber(value) {
+  return value !== null && value !== undefined && Number.isFinite(Number(value));
+}
+
 function pricingStatusFromCost(productionCost) {
   if (!productionCost) return PRICING_STATUS.INCOMPLETE;
-  if (Number.isFinite(Number(productionCost.estimatedTotalCost))) return PRICING_STATUS.READY;
+  if (isActualFiniteNumber(productionCost.estimatedTotalCost)) return PRICING_STATUS.READY;
   return PRICING_STATUS.INCOMPLETE;
 }
 
-function normalizeProductionCost(productionCost) {
+function assertMatchingInteger(actual, expected, label) {
+  const normalizedActual = nonNegativeInteger(actual, `productionCost.${label}`);
+  if (normalizedActual !== expected) {
+    throw new RangeError(`productionCost.${label} must match solution metrics ${label}`);
+  }
+}
+
+function assertProductionCostMatchesMetrics(productionCost, metrics) {
+  assertMatchingInteger(productionCost.physicalSheets, metrics.physicalSheets, "physicalSheets");
+  assertMatchingInteger(productionCost.colorPlates, metrics.colorPlates, "colorPlates");
+  assertMatchingInteger(productionCost.layoutForms, metrics.layoutForms, "layoutForms");
+}
+
+function normalizeProductionCost(productionCost, metrics) {
   if (!productionCost) {
     return Object.freeze({
       pricingStatus: PRICING_STATUS.INCOMPLETE,
@@ -87,6 +104,8 @@ function normalizeProductionCost(productionCost) {
       estimatedUnitCost: null,
     });
   }
+
+  assertProductionCostMatchesMetrics(productionCost, metrics);
 
   return Object.freeze({
     pricingStatus,
@@ -126,8 +145,7 @@ export function createSolutionMetrics({
   orderedFinishedQuantity = null,
   productionCost = null,
 } = {}) {
-  const normalizedCost = normalizeProductionCost(productionCost);
-  const normalized = Object.freeze({
+  const coreMetrics = Object.freeze({
     kind: SOLUTION_METRICS_KIND,
     id: requiredText(id, "id"),
     label: requiredText(label, "label"),
@@ -153,6 +171,10 @@ export function createSolutionMetrics({
       orderedFinishedQuantity,
       "orderedFinishedQuantity",
     ),
+  });
+  const normalizedCost = normalizeProductionCost(productionCost, coreMetrics);
+  const normalized = Object.freeze({
+    ...coreMetrics,
     pricingStatus: normalizedCost.pricingStatus,
     currency: normalizedCost.currency,
     sheetBasis: normalizedCost.sheetBasis,
@@ -175,8 +197,14 @@ export function createDecisionSolution({ id, label, metrics }) {
   if (!metrics || metrics.kind !== SOLUTION_METRICS_KIND) {
     throw new TypeError("metrics must be normalized SolutionMetrics");
   }
-  if (metrics.pricingStatus !== PRICING_STATUS.READY || metrics.estimatedTotalCost === null) {
+  if (!metrics.zeroUnderproduction) {
+    throw new RangeError("zero underproduction is required before decision ranking");
+  }
+  if (metrics.pricingStatus !== PRICING_STATUS.READY || !isActualFiniteNumber(metrics.estimatedTotalCost)) {
     throw new RangeError("pricing must be ready before estimatedTotalCost can enter decision ranking");
+  }
+  if (!isActualFiniteNumber(metrics.layoutCompactness)) {
+    throw new RangeError("layoutCompactness must be known before decision ranking");
   }
   return Object.freeze({
     id: requiredText(id ?? metrics.id, "id"),

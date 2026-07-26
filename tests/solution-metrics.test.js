@@ -45,6 +45,26 @@ const paperMinimumBaseMetrics = Object.freeze({
   orderedFinishedQuantity: 4200,
 });
 
+function createDemoPricing() {
+  return createPricingProfile({
+    currency: "BYN",
+    grammageGsm: 130,
+    paperPricePerKg: 4,
+    colorPlatePrice: 15,
+  });
+}
+
+function createDemoCost(baseMetrics) {
+  return calculateProductionCost({
+    sourceSheet: { width: 620, height: 450 },
+    physicalSheets: baseMetrics.physicalSheets,
+    colorPlates: baseMetrics.colorPlates,
+    layoutForms: baseMetrics.layoutForms,
+    orderedFinishedQuantity: baseMetrics.orderedFinishedQuantity,
+    pricing: createDemoPricing(),
+  });
+}
+
 test("SolutionMetrics keeps pricing incomplete without invented costs", () => {
   const metrics = createSolutionMetrics(compactBaseMetrics);
 
@@ -57,24 +77,28 @@ test("SolutionMetrics keeps pricing incomplete without invented costs", () => {
   assert.equal(metrics.zeroUnderproduction, true);
 });
 
-test("SolutionMetrics imports real BYN production cost when pricing is ready", () => {
-  const pricing = createPricingProfile({
-    currency: "BYN",
-    grammageGsm: 130,
-    paperPricePerKg: 4,
-    colorPlatePrice: 15,
-  });
-  const productionCost = calculateProductionCost({
-    sourceSheet: { width: 620, height: 450 },
-    physicalSheets: compactBaseMetrics.physicalSheets,
-    colorPlates: compactBaseMetrics.colorPlates,
-    layoutForms: compactBaseMetrics.layoutForms,
-    orderedFinishedQuantity: compactBaseMetrics.orderedFinishedQuantity,
-    pricing,
-  });
+test("SolutionMetrics keeps null estimatedTotalCost incomplete", () => {
+  const productionCost = {
+    ...createDemoCost(compactBaseMetrics),
+    estimatedTotalCost: null,
+  };
   const metrics = createSolutionMetrics({
     ...compactBaseMetrics,
     productionCost,
+  });
+
+  assert.equal(metrics.pricingStatus, PRICING_STATUS.INCOMPLETE);
+  assert.equal(metrics.estimatedTotalCost, null);
+  assert.throws(
+    () => createDecisionSolution({ metrics }),
+    /pricing must be ready/,
+  );
+});
+
+test("SolutionMetrics imports real BYN production cost when pricing is ready", () => {
+  const metrics = createSolutionMetrics({
+    ...compactBaseMetrics,
+    productionCost: createDemoCost(compactBaseMetrics),
   });
 
   assert.equal(metrics.pricingStatus, PRICING_STATUS.READY);
@@ -86,6 +110,16 @@ test("SolutionMetrics imports real BYN production cost when pricing is ready", (
   assert.equal(metrics.estimatedUnitCost, 0.231558714);
 });
 
+test("SolutionMetrics rejects production cost from another candidate", () => {
+  assert.throws(
+    () => createSolutionMetrics({
+      ...compactBaseMetrics,
+      productionCost: createDemoCost(paperMinimumBaseMetrics),
+    }),
+    /productionCost\.physicalSheets must match solution metrics physicalSheets/,
+  );
+});
+
 test("Decision solution refuses estimatedTotalCost when pricing is incomplete", () => {
   const metrics = createSolutionMetrics(compactBaseMetrics);
 
@@ -95,34 +129,42 @@ test("Decision solution refuses estimatedTotalCost when pricing is incomplete", 
   );
 });
 
-test("Ready normalized metrics can feed existing lexicographic decision ranking", () => {
-  const pricing = createPricingProfile({
-    currency: "BYN",
-    grammageGsm: 130,
-    paperPricePerKg: 4,
-    colorPlatePrice: 15,
+test("Decision solution refuses underproduced metrics", () => {
+  const metrics = createSolutionMetrics({
+    ...compactBaseMetrics,
+    fileUnderproduction: 1,
+    productionCost: createDemoCost(compactBaseMetrics),
   });
+
+  assert.equal(metrics.zeroUnderproduction, false);
+  assert.throws(
+    () => createDecisionSolution({ metrics }),
+    /zero underproduction is required/,
+  );
+});
+
+test("Decision solution refuses unknown layout compactness", () => {
+  const metrics = createSolutionMetrics({
+    ...compactBaseMetrics,
+    layoutCompactness: null,
+    productionCost: createDemoCost(compactBaseMetrics),
+  });
+
+  assert.equal(metrics.layoutCompactness, null);
+  assert.throws(
+    () => createDecisionSolution({ metrics }),
+    /layoutCompactness must be known/,
+  );
+});
+
+test("Ready normalized metrics can feed existing lexicographic decision ranking", () => {
   const compact = createSolutionMetrics({
     ...compactBaseMetrics,
-    productionCost: calculateProductionCost({
-      sourceSheet: { width: 620, height: 450 },
-      physicalSheets: compactBaseMetrics.physicalSheets,
-      colorPlates: compactBaseMetrics.colorPlates,
-      layoutForms: compactBaseMetrics.layoutForms,
-      orderedFinishedQuantity: compactBaseMetrics.orderedFinishedQuantity,
-      pricing,
-    }),
+    productionCost: createDemoCost(compactBaseMetrics),
   });
   const paperMinimum = createSolutionMetrics({
     ...paperMinimumBaseMetrics,
-    productionCost: calculateProductionCost({
-      sourceSheet: { width: 620, height: 450 },
-      physicalSheets: paperMinimumBaseMetrics.physicalSheets,
-      colorPlates: paperMinimumBaseMetrics.colorPlates,
-      layoutForms: paperMinimumBaseMetrics.layoutForms,
-      orderedFinishedQuantity: paperMinimumBaseMetrics.orderedFinishedQuantity,
-      pricing,
-    }),
+    productionCost: createDemoCost(paperMinimumBaseMetrics),
   });
 
   const costFirstProfile = createDecisionProfile({
