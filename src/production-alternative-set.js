@@ -65,13 +65,6 @@ function sameNumber(left, right) {
     && Math.abs(left - right) <= NUMBER_EPSILON;
 }
 
-function effectiveRate(total, quantity) {
-  if (typeof total !== "number" || !Number.isFinite(total)) return null;
-  if (typeof quantity !== "number" || !Number.isFinite(quantity) || quantity < 0) return null;
-  if (quantity === 0) return total === 0 ? 0 : null;
-  return total / quantity;
-}
-
 function pricingFingerprint(metrics) {
   return Object.freeze({
     currency: metrics.currency,
@@ -79,12 +72,9 @@ function pricingFingerprint(metrics) {
     sheetAreaM2: metrics.sheetAreaM2,
     grammageGsm: metrics.grammageGsm,
     sheetWeightKg: metrics.sheetWeightKg,
-    paperPricePerKg: effectiveRate(metrics.paperCost, metrics.paperWeightKg),
-    colorPlatePrice: effectiveRate(metrics.colorPlateCost, metrics.colorPlates),
-    layoutFormPreparationPrice: effectiveRate(
-      metrics.layoutFormPreparationCost,
-      metrics.layoutForms,
-    ),
+    paperPricePerKg: metrics.paperPricePerKg,
+    colorPlatePrice: metrics.colorPlatePrice,
+    layoutFormPreparationPrice: metrics.layoutFormPreparationPrice,
   });
 }
 
