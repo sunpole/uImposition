@@ -1,0 +1,29 @@
+{
+  "id": "m7-user-order-plan-catalog-mobile",
+  "path": "/",
+  "viewport": { "width": 390, "height": 844 },
+  "assertions": [
+    { "selector": "#userProductionPlans", "text": "Введите корректные строки заказа" }
+  ],
+  "beforeScreenshot": [
+    { "action": "fill", "selector": "#ordersInput", "value": "A | 100 | 2\nB | 100 | 2\nC | 100 | 2" },
+    { "action": "fill", "selector": "#userFrontColors", "value": "4" },
+    { "action": "fill", "selector": "#userBackColors", "value": "1" },
+    { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },
+    { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
+    { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
+    { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "2" },
+    { "action": "hide", "selector": "#settingsPanel" },
+    { "action": "wait", "timeoutMs": 500 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "#userProductionPlans", "text": "4 варианта" },
+    { "selector": "#userProductionPlans", "text": "Все · 4" },
+    { "selector": "#userProductionPlans", "text": "Показано" },
+    { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "20" },
+    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "21" },
+    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "доминируем" }
+  ],
+  "screenshotSelector": "#userProductionPlans",
+  "screenshot": "uimposition-m7-5-user-order-plan-catalog-mobile.png"
+}
