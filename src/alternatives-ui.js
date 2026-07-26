@@ -1,12 +1,9 @@
 import {
-  ALTERNATIVES_RUNTIME_STATUS,
-  createAlternativesRuntimeState,
-  prepareAlternativesProductionState,
-} from "./alternatives-runtime.js";
-import {
-  createDecisionProfile,
-  moveDecisionObjective,
-} from "./decision-profile.js";
+  ALTERNATIVES_COMMAND,
+  ALTERNATIVES_COMMAND_EVENT,
+  ALTERNATIVES_STATE_EVENT,
+} from "./alternatives-controller.js";
+import { ALTERNATIVES_RUNTIME_STATUS } from "./alternatives-runtime.js";
 
 const TEXT = Object.freeze({
   ru: Object.freeze({
@@ -30,7 +27,7 @@ const TEXT = Object.freeze({
     fileOverrun: "Перетираж файлов",
     pairOverrun: "Перетираж пар",
     splitOrders: "Разделённые заказы",
-    cost: "Итог",
+    cost: "Итого",
     unavailable: "—",
     componentTitle: "Разница стоимости относительно базы",
     noMoney: "Покомпонентная стоимость появится только после совместимого рабочего прайса.",
@@ -70,13 +67,14 @@ const SOLUTION_LABELS = Object.freeze({
   "paper-minimum": Object.freeze({ ru: "Минимум бумаги", en: "Paper minimum" }),
 });
 
-let productionState = window.__uimpositionProductionState ?? { report: null, controlCase: null };
-let pricingState = window.__uimpositionPricingState ?? { state: "incomplete", pricing: null };
-let decisionProfile = createDecisionProfile({ id: "m7-runtime" });
-let referenceSolutionId = null;
-let preparedProductionState = null;
-let preparedReport = null;
-let runtimeState = null;
+let runtimeState = window.__uimpositionAlternativesState ?? Object.freeze({
+  status: ALTERNATIVES_RUNTIME_STATUS.WAITING_PRODUCTION,
+  priorityObjectiveId: "physicalSheets",
+  pricingComparison: null,
+  alternativeSet: null,
+  explanations: null,
+  error: null,
+});
 
 function language() {
   return document.documentElement.lang === "en" ? "en" : "ru";
@@ -211,11 +209,7 @@ function alternativeCard(entry, metrics) {
   card.classList.toggle("is-reference", entry.reference);
 
   const heading = element("div", "alternative-card__heading");
-  const title = element(
-    "h3",
-    "",
-    localizedSolutionLabel(entry.solutionId, entry.label),
-  );
+  const title = element("h3", "", localizedSolutionLabel(entry.solutionId, entry.label));
   const badges = element("div", "alternative-card__badges");
   if (entry.recommended) badges.append(element("span", "alternative-badge is-recommended", t("recommended")));
   if (entry.reference) badges.append(element("span", "alternative-badge is-reference", t("reference")));
@@ -257,11 +251,6 @@ function alternativeCard(entry, metrics) {
   return card;
 }
 
-function publishRuntimeState(state) {
-  window.__uimpositionAlternativesState = state;
-  window.dispatchEvent(new CustomEvent("uimposition:alternatives", { detail: state }));
-}
-
 function updateStaticText() {
   ui.kicker.textContent = t("kicker");
   ui.title.textContent = t("title");
@@ -300,8 +289,8 @@ function renderError(state) {
 function renderReady(state) {
   const pricingReady = state.status === ALTERNATIVES_RUNTIME_STATUS.READY;
   ui.status.textContent = `${state.alternativeSet.pareto.frontier.length} Pareto · ${pricingReady ? t("ready") : t("readyWithoutPricing")}`;
-  ui.status.classList.toggle("status-chip--success", true);
-  ui.status.classList.toggle("status-chip--warning", false);
+  ui.status.classList.add("status-chip--success");
+  ui.status.classList.remove("status-chip--warning");
   ui.summary.textContent = state.explanations.summaryText;
   ui.empty.hidden = true;
   ui.error.hidden = true;
@@ -323,92 +312,41 @@ function renderReady(state) {
   panel.dataset.pricingComparable = String(Boolean(state.pricingComparison?.comparable));
 }
 
-function prepareProductionOnce() {
-  if (!productionState?.report || !productionState?.controlCase) {
-    preparedProductionState = null;
-    preparedReport = null;
-    return;
-  }
-  if (preparedProductionState && preparedReport === productionState.report) return;
-  preparedProductionState = prepareAlternativesProductionState(productionState);
-  preparedReport = productionState.report;
-}
-
 function render() {
   updateStaticText();
-  try {
-    prepareProductionOnce();
-  } catch (error) {
-    runtimeState = Object.freeze({
-      status: ALTERNATIVES_RUNTIME_STATUS.ERROR,
-      error,
-    });
-    renderError(runtimeState);
-    publishRuntimeState(runtimeState);
-    return;
-  }
-
-  runtimeState = createAlternativesRuntimeState({
-    productionState,
-    preparedProductionState,
-    pricingState,
-    decisionProfile,
-    language: language(),
-    referenceSolutionId,
-  });
   if (runtimeState.status === ALTERNATIVES_RUNTIME_STATUS.WAITING_PRODUCTION) {
     renderWaiting();
   } else if (runtimeState.status === ALTERNATIVES_RUNTIME_STATUS.ERROR) {
     renderError(runtimeState);
   } else {
-    if (!runtimeState.explanations.entries.some((entry) => entry.solutionId === referenceSolutionId)) {
-      referenceSolutionId = runtimeState.referenceSolutionId;
-    }
     renderReady(runtimeState);
   }
-  publishRuntimeState(runtimeState);
+}
+
+function command(detail) {
+  window.dispatchEvent(new CustomEvent(ALTERNATIVES_COMMAND_EVENT, { detail }));
 }
 
 ui.paperFirst.addEventListener("click", () => {
-  decisionProfile = moveDecisionObjective(decisionProfile, "physicalSheets", 0);
-  referenceSolutionId = null;
-  render();
+  command({ type: ALTERNATIVES_COMMAND.SET_PRIORITY, objectiveId: "physicalSheets" });
 });
 
 ui.costFirst.addEventListener("click", () => {
-  if (!runtimeState?.pricingComparison?.comparable) return;
-  decisionProfile = moveDecisionObjective(decisionProfile, "estimatedTotalCost", 0);
-  referenceSolutionId = null;
-  render();
+  command({ type: ALTERNATIVES_COMMAND.SET_PRIORITY, objectiveId: "estimatedTotalCost" });
 });
 
 ui.list.addEventListener("click", (event) => {
   const button = event.target.closest("[data-reference-solution-id]");
   if (!button) return;
-  referenceSolutionId = button.dataset.referenceSolutionId;
-  render();
+  command({
+    type: ALTERNATIVES_COMMAND.SET_REFERENCE,
+    solutionId: button.dataset.referenceSolutionId,
+  });
 });
 
-window.addEventListener("uimposition:production-report", (event) => {
-  productionState = event.detail ?? { report: null, controlCase: null };
-  preparedProductionState = null;
-  preparedReport = null;
-  referenceSolutionId = null;
+window.addEventListener(ALTERNATIVES_STATE_EVENT, (event) => {
+  runtimeState = event.detail ?? runtimeState;
   render();
-});
-
-window.addEventListener("uimposition:pricing", (event) => {
-  pricingState = event.detail ?? { state: "incomplete", pricing: null };
-  if (!pricingState.pricing && decisionProfile.objectiveOrder[0] === "estimatedTotalCost") {
-    decisionProfile = moveDecisionObjective(decisionProfile, "physicalSheets", 0);
-    referenceSolutionId = null;
-  }
-  render();
-});
-
-new MutationObserver(render).observe(document.documentElement, {
-  attributes: true,
-  attributeFilter: ["lang"],
 });
 
 render();
