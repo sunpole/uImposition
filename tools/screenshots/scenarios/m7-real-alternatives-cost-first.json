@@ -27,5 +27,6 @@
     { "selector": "[data-solution-id='paper-minimum'] .alternatives-cost-components", "text": "6 226,94 BYN" }
   ],
   "screenshotSelector": "#productionAlternatives",
-  "screenshot": "uimposition-m7-3-real-alternatives-cost-first.png"
+  "screenshot": "uimposition-m7-3-real-alternatives-cost-first.png",
+  "fullPage": false
 }
