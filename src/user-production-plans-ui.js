@@ -3,6 +3,10 @@ import { calculatePlacementOptions, calculateSheetGeometry } from "./geometry.js
 import { parseOrders } from "./orders.js";
 import { createDuplexPrintSpecification } from "./print-specification.js";
 import { createUserUniformProductionPlanSet } from "./user-uniform-production-plans.js";
+import {
+  clearUserProductionPlanSet,
+  setUserProductionPlanSet,
+} from "./user-production-plans-runtime.js";
 
 const sides = ["left", "right", "top", "bottom"];
 const ids = { left: "Left", right: "Right", top: "Top", bottom: "Bottom" };
@@ -251,12 +255,14 @@ function calculate() {
     const input = currentInput();
     if (input.orders.errors.length > 0 || input.orders.pagePairs.length === 0) {
       state.planSet = null;
+      clearUserProductionPlanSet();
       state.error = null;
       render();
       return;
     }
     if (input.orders.pagePairs.length > MAX_INTERACTIVE_PAGE_PAIRS) {
       state.planSet = null;
+      clearUserProductionPlanSet();
       state.error = new RangeError(t("tooManyPairs"));
       render();
       return;
@@ -266,6 +272,7 @@ function calculate() {
     const backColors = readPositiveInteger("#userBackColors");
     if (frontColors === null || backColors === null) {
       state.planSet = null;
+      clearUserProductionPlanSet();
       state.error = new RangeError(t("waitingColors"));
       render();
       return;
@@ -278,9 +285,11 @@ function calculate() {
       printSpecification: createDuplexPrintSpecification({ frontColors, backColors }),
       pricing: state.pricing,
     });
+    setUserProductionPlanSet(state.planSet);
     state.error = null;
   } catch (error) {
     state.planSet = null;
+    clearUserProductionPlanSet();
     state.error = error;
   }
   render();

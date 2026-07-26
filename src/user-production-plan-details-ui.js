@@ -457,7 +457,8 @@ function syncCardButtons() {
     const selected = runtimeSnapshot.selectedPlanId === planId;
     card.classList.toggle("is-operator-selected", selected);
     button.classList.toggle("button--quiet", !selected);
-    button.textContent = selected ? t("selected") : t("select");
+    const label = selected ? t("selected") : t("select");
+    if (button.textContent !== label) button.textContent = label;
     button.setAttribute("aria-pressed", String(selected));
   });
 }
@@ -484,9 +485,14 @@ ensureStylesheet();
 ensurePanel();
 attachCatalogController();
 subscribeUserProductionPlanRuntime((snapshot) => {
-  runtimeSnapshot = snapshot;
-  render();
-});
+      const selectionChanged = snapshot.selectedPlanId !== runtimeSnapshot.selectedPlanId;
+      runtimeSnapshot = snapshot;
+      if (selectionChanged) {
+        exportStatusKey = "exportReady";
+        exportStatusDetail = "";
+      }
+      render();
+    });
 new MutationObserver(refreshLanguage).observe(document.documentElement, {
   attributes: true,
   attributeFilter: ["lang"],
