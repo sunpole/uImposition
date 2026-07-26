@@ -1,14 +1,9 @@
-import {
-  OBJECTIVE_DIRECTION,
-  getOptimizationObjective,
-} from "./optimization-objectives.js";
+import { getOptimizationObjective } from "./optimization-objectives.js";
 import {
   compareSolutionsLexicographically,
   describeMetricDelta,
 } from "./pareto-alternatives.js";
-import {
-  DISPLAY_ALTERNATIVE_REASON,
-} from "./pareto-display-set.js";
+import { DISPLAY_ALTERNATIVE_REASON } from "./pareto-display-set.js";
 import {
   PRICING_COMPARISON_STATUS,
   PRODUCTION_ALTERNATIVE_SET_KIND,
@@ -35,7 +30,7 @@ const COST_COMPONENT_LABELS = Object.freeze({
     ru: "Подготовка layout-форм",
     en: "Side-layout preparation",
   }),
-  estimatedTotalCost: Object.freeze({ ru: "Итог", en: "Total" }),
+  estimatedTotalCost: Object.freeze({ ru: "Итого", en: "Total" }),
 });
 
 const TEXT = Object.freeze({
@@ -53,6 +48,8 @@ const TEXT = Object.freeze({
     noAdvantage: "Нет преимущества относительно выбранной базы сравнения.",
     noTradeoff: "Нет ухудшения относительно выбранной базы сравнения.",
     pricingUnavailable: "Денежное сравнение недоступно",
+    preferredCurrent: "текущий порядок предпочитает этот вариант",
+    preferredReference: "текущий порядок предпочитает базовый вариант",
     shown: "Показано вариантов",
     hidden: "Скрыто Pareto-вариантов",
   }),
@@ -70,6 +67,8 @@ const TEXT = Object.freeze({
     noAdvantage: "No advantage over the selected reference.",
     noTradeoff: "No downside relative to the selected reference.",
     pricingUnavailable: "Monetary comparison is unavailable",
+    preferredCurrent: "the current order prefers this alternative",
+    preferredReference: "the current order prefers the reference alternative",
     shown: "Alternatives shown",
     hidden: "Hidden Pareto alternatives",
   }),
@@ -142,7 +141,7 @@ function formatMetricValue(objectiveId, value, language, currency) {
   if (objectiveId === "layoutCompactness") {
     return `${formatNumber(value * 100, language, 2)}%`;
   }
-  return formatNumber(value, language, 6);
+  return formatNumber(value, language, Number.isInteger(value) ? 0 : 6);
 }
 
 function solutionById(solutions, solutionId, label) {
@@ -213,30 +212,12 @@ function firstDifferentDelta(solution, reference, objectiveOrder) {
   return null;
 }
 
-function decidingEvidenceForEntry({
-  solution,
-  reference,
-  recommendedSolutionId,
-  decisionSolutions,
-  objectiveOrder,
-}) {
-  if (solution.id !== reference.id) {
-    return firstDifferentDelta(solution, reference, objectiveOrder);
-  }
-
-  if (solution.id !== recommendedSolutionId) return null;
-  const ranked = [...decisionSolutions].sort((left, right) => (
-    compareSolutionsLexicographically(left, right, objectiveOrder)
-  ));
-  const challenger = ranked.find((candidate) => candidate.id !== solution.id);
-  return challenger ? firstDifferentDelta(solution, challenger, objectiveOrder) : null;
-}
-
 function decidingText(delta, language, currency) {
   if (!delta) return null;
   const text = TEXT[language];
   const formatted = formattedDelta(delta, language, currency);
-  return `${text.deciding}: ${formatted.label} — ${formatted.formattedLeftValue} ${text.versus} ${formatted.formattedRightValue}.`;
+  const preference = delta.better === "left" ? text.preferredCurrent : text.preferredReference;
+  return `${text.deciding}: ${formatted.label} — ${formatted.formattedLeftValue} ${text.versus} ${formatted.formattedRightValue}; ${preference}.`;
 }
 
 function reasonTexts(entry, language) {
@@ -317,6 +298,17 @@ function componentDeltas({
   });
 }
 
+function comparisonReferenceForEntry({
+  solution,
+  referenceSolution,
+  recommendedSolution,
+  rankedSolutions,
+}) {
+  if (solution.id !== referenceSolution.id) return referenceSolution;
+  if (recommendedSolution.id !== solution.id) return recommendedSolution;
+  return rankedSolutions.find((candidate) => candidate.id !== solution.id) ?? null;
+}
+
 export function createAlternativeExplanationSet(alternativeSetInput, {
   language = EXPLANATION_LANGUAGE.RU,
   referenceSolutionId = null,
@@ -332,9 +324,19 @@ export function createAlternativeExplanationSet(alternativeSetInput, {
     referenceId,
     "referenceSolutionId",
   );
+  const recommendedSolution = solutionById(
+    alternativeSet.decisionSolutions,
+    alternativeSet.display.recommendedSolutionId,
+    "recommendedSolutionId",
+  );
+  const rankedSolutions = Object.freeze([...alternativeSet.decisionSolutions].sort(
+    (left, right) => compareSolutionsLexicographically(
+      left,
+      right,
+      alternativeSet.objectiveOrder,
+    ),
+  ));
   const sourceMetrics = metricsById(alternativeSet.solutionMetrics);
-  const referenceMetrics = sourceMetrics.get(referenceSolution.id);
-  if (!referenceMetrics) throw new RangeError(`Missing source metrics: ${referenceSolution.id}`);
 
   const entries = Object.freeze(alternativeSet.display.entries.map((displayEntry) => {
     const solution = solutionById(
@@ -344,30 +346,45 @@ export function createAlternativeExplanationSet(alternativeSetInput, {
     );
     const metrics = sourceMetrics.get(solution.id);
     if (!metrics) throw new RangeError(`Missing source metrics: ${solution.id}`);
-    const comparison = buildComparison(
+    const comparisonReference = comparisonReferenceForEntry({
       solution,
       referenceSolution,
-      alternativeSet.objectiveOrder,
-    );
+      recommendedSolution,
+      rankedSolutions,
+    });
+    const comparisonReferenceMetrics = comparisonReference
+      ? sourceMetrics.get(comparisonReference.id)
+      : null;
+    if (comparisonReference && !comparisonReferenceMetrics) {
+      throw new RangeError(`Missing source metrics: ${comparisonReference.id}`);
+    }
+    const comparison = comparisonReference
+      ? buildComparison(solution, comparisonReference, alternativeSet.objectiveOrder)
+      : Object.freeze({
+        referenceSolutionId: null,
+        deltas: Object.freeze([]),
+        advantageObjectiveIds: Object.freeze([]),
+        tradeoffObjectiveIds: Object.freeze([]),
+        equalObjectiveIds: Object.freeze([...alternativeSet.objectiveOrder]),
+        primaryAdvantageObjectiveId: null,
+        primaryTradeoffObjectiveId: null,
+      });
     const advantageDelta = comparison.deltas.find(
       (delta) => delta.objectiveId === comparison.primaryAdvantageObjectiveId,
     ) ?? null;
     const tradeoffDelta = comparison.deltas.find(
       (delta) => delta.objectiveId === comparison.primaryTradeoffObjectiveId,
     ) ?? null;
-    const decidingDelta = decidingEvidenceForEntry({
-      solution,
-      reference: referenceSolution,
-      recommendedSolutionId: alternativeSet.display.recommendedSolutionId,
-      decisionSolutions: alternativeSet.decisionSolutions,
-      objectiveOrder: alternativeSet.objectiveOrder,
-    });
+    const decidingDelta = comparisonReference
+      ? firstDifferentDelta(solution, comparisonReference, alternativeSet.objectiveOrder)
+      : null;
 
     return Object.freeze({
       solutionId: solution.id,
       label: solution.label,
       recommended: displayEntry.recommended,
       reference: solution.id === referenceSolution.id,
+      comparisonReferenceSolutionId: comparisonReference?.id ?? null,
       reasonKinds: displayEntry.reasonKinds,
       reasonTexts: reasonTexts(displayEntry, normalizedLanguage),
       comparison,
@@ -378,13 +395,24 @@ export function createAlternativeExplanationSet(alternativeSetInput, {
       decidingObjective: decidingDelta
         ? formattedDelta(decidingDelta, normalizedLanguage, currency)
         : null,
+      decidingPreferredSolutionId: decidingDelta?.better === "left"
+        ? solution.id
+        : comparisonReference?.id ?? null,
       decidingText: decidingText(decidingDelta, normalizedLanguage, currency),
-      monetary: componentDeltas({
-        pricingComparison: alternativeSet.pricingComparison,
-        solutionMetrics: metrics,
-        referenceMetrics,
-        language: normalizedLanguage,
-      }),
+      monetary: comparisonReferenceMetrics
+        ? componentDeltas({
+          pricingComparison: alternativeSet.pricingComparison,
+          solutionMetrics: metrics,
+          referenceMetrics: comparisonReferenceMetrics,
+          language: normalizedLanguage,
+        })
+        : Object.freeze({
+          available: false,
+          reason: "no-comparison-reference",
+          currency: null,
+          components: Object.freeze([]),
+          text: `${TEXT[normalizedLanguage].pricingUnavailable}: no-comparison-reference.`,
+        }),
     });
   }));
 
@@ -393,7 +421,7 @@ export function createAlternativeExplanationSet(alternativeSetInput, {
     language: normalizedLanguage,
     locale: locale(normalizedLanguage),
     referenceSolutionId: referenceSolution.id,
-    recommendedSolutionId: alternativeSet.display.recommendedSolutionId,
+    recommendedSolutionId: recommendedSolution.id,
     pricingComparison: alternativeSet.pricingComparison,
     displayedCount: entries.length,
     hiddenFrontierCount: alternativeSet.display.hiddenFrontierCount,
