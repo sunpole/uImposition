@@ -16,6 +16,7 @@
     { "action": "wait", "timeoutMs": 500 },
     { "action": "click", "selector": "[data-plan-id='uniform-r90-paper-minimum'] [data-select-user-plan]" },
     { "action": "click", "selector": "#userObjectivePriorityEditor [data-objective-preset='costFirst']" },
+    { "action": "style", "selector": "#settingsPanel", "styles": { "position": "static", "max-height": "none", "overflow": "visible", "margin": "0", "width": "360px" } },
     { "action": "wait", "timeoutMs": 250 }
   ],
   "beforeScreenshotAssertions": [
