@@ -8,69 +8,68 @@
 
 ### Текущий release checkpoint
 
-**`0.7.0-alpha.3`**  
+**`0.7.0-alpha.4`**  
 Дата версии: **26 июля 2026**  
-Implementation Pull Requests: **№20, №25, №26, №27, №28**  
-Этап: **M7.3 — реальные Pareto-варианты и объяснение компромиссов**  
-Release manifest: `archive/development/0.7.0-alpha.3/release.json`
+Implementation Pull Request: **№39**  
+Этап: **M7.4 — проверяемый свой оборот / work-and-turn**  
+Release manifest: `archive/development/0.7.0-alpha.4/release.json`
 
-Фактическое состояние PR, `main`, rollback-ветки, tag и GitHub prerelease проверяется непосредственно в GitHub; документ не хранит переходный статус `draft/open/merged`.
+Фактическое состояние PR, `main`, recovery-ветки, tag и GitHub prerelease проверяется непосредственно в GitHub. Документ не заменяет независимую проверку Release card и assets.
 
-### Что добавлено в M7.3
+### Что добавлено в M7.4
 
-- строгая модель Pareto-frontier с удалением полных дублей и доминируемых решений;
-- компактный набор существенно разных вариантов с закреплённой рекомендацией и обязательными крайними решениями;
-- реальный compact manual из production report и доказанный paper minimum из paper minimizer;
-- общая guarded-модель `SolutionMetrics` для обоих вариантов;
-- мгновенная смена первого приоритета `Физическая бумага / Расчётная стоимость` без повторной генерации монтажей;
-- выбор reference-варианта для точного сравнения;
-- RU/EN-объяснения преимущества, цены компромисса и решающей цели;
-- отдельные денежные дельты: бумага, цветовые пластины, подготовка layout-форм и итог;
-- денежное сравнение только при общем совместимом прайсе;
-- read-only панель реальных альтернатив на основной странице;
-- очищенный runtime event без сырых layouts, candidates, planned runs и paper solution;
-- focused Chromium-сценарий реального cost-first выбора.
+- отдельные duplex-стратегии `separateFrontBackForms` и `workAndTurn`;
+- режимы `только чужой / сравнить оба / только свой`;
+- чистая модель одной симметричной общей формы;
+- обязательная проверка зеркальной пары страниц одного файла;
+- проверка направления и горизонтального переворота;
+- независимая материализация готовых front/back пар через существующий duplex validator;
+- mode-aware production metrics: отдельные формы `1+1` или одна общая форма `1+0`;
+- повторная проверка недопечатки через production report;
+- sanitized runtime без raw reports, layouts, pagePairs и halfRows;
+- смена разрешённого режима без повторной подготовки геометрии;
+- компактный RU/EN-блок сравнения и фактический preview общей формы `4 × 4`;
+- focused Chromium evidence и технологическое предупреждение для оператора.
 
 ### Проверенный контрольный пример
 
-Прайс используется только как regression/evidence-пример, а не как рабочее значение по умолчанию:
+Четыре разных A6, 2 страницы, `1+1`, по `4000` экземпляров:
 
-```text
-исходный лист:  620 × 450 мм
-плотность:      130 г/м²
-бумага:         4 BYN/кг
-цветовая форма: 15 BYN
-```
+| Метрика | Чужой оборот | Свой оборот |
+|---|---:|---:|
+| Физические листы | 1000 | 1000 |
+| Листопрогоны | 2000 | 2000 |
+| Layout-формы | 2 | 1 |
+| Цветовые пластины | 2 | 1 |
+| Недопечатка | 0 | 0 |
+| Перетираж | 0 | 0 |
 
-| Приоритет | Рекомендация | Листы | Layout-формы | Пластины | Итог |
-|---|---|---:|---:|---:|---:|
-| Бумага | Минимум бумаги | 3305 | 112 | 448 | 7199,49 BYN |
-| Стоимость | Компактный ручной | 3395 | 8 | 32 | 972,55 BYN |
+При evidence-прайсе `130 г/м²`, `4 BYN/кг`, `15 BYN` за пластину и `0 BYN` за подготовку:
 
-Минимум бумаги экономит `90` физических листов, но при контрольном прайсе дороже на `6226,94 BYN`. Программа показывает обе стороны компромисса и оставляет окончательное решение оператору.
+- чужой оборот: `175,08 BYN`;
+- свой оборот: `160,08 BYN`;
+- экономия: `15 BYN` — ровно одна цветовая пластина.
 
-### Что было добавлено в M7.2
+Эти цены используются только для regression/evidence и не являются рабочими значениями по умолчанию.
 
-- единая нормализованная модель `SolutionMetrics`;
-- рабочий ввод плотности, цены бумаги BYN/кг, цены цветовой формы и подготовки layout-форм;
-- статусы `pricing incomplete / pricing inputs ready / pricing ready`;
-- production report → реальная BYN-стоимость решения;
-- защита от `null → 0`, недопечатки и несовместимой денежной базы.
+### Технологическая граница
+
+M7.4 подтверждает горизонтальный work-and-turn и фиксированный A6-кейс. Он не заявляет общий автоматический work-and-turn solver для произвольных заказов, вертикальный переворот или автоматическую совместимость с конкретной машиной. Перед производством оператор проверяет захват, боковой упор, приводку и допустимость переворота.
 
 ### Что ещё не реализовано
 
-- автоматический свой оборот / work-and-turn;
-- полный редактор всех приоритетов;
-- полная таблица и экспорт выбранного варианта;
-- автоматическая упаковка смешанных форматов;
-- тетрадный/фальцевальный спуск полос;
-- импорт/экспорт полного проекта и постоянное хранение.
+- компактный редактор полного порядка приоритетов и цен;
+- итоговая таблица и экспорт выбранного решения;
+- automatic mixed-format packing;
+- общий work-and-turn search для произвольного набора;
+- тетрадный/фальцевальный спуск;
+- полный импорт/экспорт и постоянное хранение проекта.
 
 ### Следующая целевая версия
 
-**`0.7.0-alpha.4` — M7.4**
+**`0.7.0-alpha.5` — M7.5**
 
-Добавить проверяемый свой оборот / work-and-turn и сравнить его с отдельными формами лица и оборота на контрольном кейсе четырёх A6 1+1 по 4000 экземпляров.
+Добавить компактный доступный редактор порядка приоритетов и рабочих цен для desktop/mobile без повторной генерации готовых вариантов.
 
 </td>
 <td width="50%" valign="top">
@@ -79,29 +78,40 @@ Release manifest: `archive/development/0.7.0-alpha.3/release.json`
 
 ### Current release checkpoint
 
-**`0.7.0-alpha.3`**  
+**`0.7.0-alpha.4`**  
 Version date: **26 July 2026**  
-Implementation Pull Requests: **#20, #25, #26, #27, #28**  
-Stage: **M7.3 — real Pareto alternatives and transparent tradeoffs**  
-Release manifest: `archive/development/0.7.0-alpha.3/release.json`
+Implementation Pull Request: **#39**  
+Stage: **M7.4 — validated work-and-turn production**  
+Release manifest: `archive/development/0.7.0-alpha.4/release.json`
 
-### Added in M7.3
+### Added in M7.4
 
-A strict Pareto-frontier model, compact materially-different alternative selection, real compact-manual and proven paper-minimum solutions, shared guarded `SolutionMetrics`, instant paper/cost re-ranking without regenerating impositions, selectable comparison references, RU/EN benefit/tradeoff/deciding-objective explanations, compatible component-cost deltas, a sanitized runtime event, and a compact read-only alternatives panel on the main page.
+Separate `separateFrontBackForms` and `workAndTurn` strategies, three operator modes, one symmetric shared-plate model, mandatory mirrored page-pair and direction validation, independent materialization through the existing duplex validator, mode-aware production metrics, zero-underproduction production-report checks, a sanitized runtime, mode changes without rebuilding geometry, a compact RU/EN comparison panel, and a factual 4×4 shared-plate preview.
 
 ### Verified control example
 
-With the illustrative 620×450 mm source sheet, 130 gsm paper, 4 BYN/kg paper, and 15 BYN per color plate, paper-first recommends the 3,305-sheet solution while cost-first recommends the compact 3,395-sheet / 8-form solution. The paper minimum saves 90 sheets but costs 6,226.94 BYN more under this evidence pricing profile. These prices are not production defaults.
+Four different A6 jobs, 2 pages, 1+1, 4,000 copies each:
 
-### Not implemented yet
+| Metric | Separate forms | Work-and-turn |
+|---|---:|---:|
+| Physical sheets | 1000 | 1000 |
+| Press passes | 2000 | 2000 |
+| Side-layout forms | 2 | 1 |
+| Color plates | 2 | 1 |
+| Underproduction | 0 | 0 |
+| Overrun | 0 | 0 |
 
-Validated work-and-turn, the full priority editor, the final alternatives table and selected-solution export, automatic mixed-format packing, folded-signature pagination, and complete-project persistence.
+With the evidence profile of 130 gsm, 4 BYN/kg, 15 BYN per plate, and zero layout-preparation cost, work-and-turn saves exactly 15 BYN. These values are not production defaults.
+
+### Technology boundary
+
+M7.4 validates horizontal work-and-turn for the fixed A6 control case. It does not claim a general arbitrary-order solver, vertical turning, or automatic press compatibility. The operator must still verify gripper, side guide, registration, and press constraints.
 
 ### Next target version
 
-**`0.7.0-alpha.4` — M7.4**
+**`0.7.0-alpha.5` — M7.5**
 
-Add validated work-and-turn production and compare it with separate front/back forms using the four-A6 1+1 control case.
+Add an accessible compact priority-order and production-pricing editor for desktop and mobile without regenerating prepared alternatives.
 
 </td>
 </tr>
