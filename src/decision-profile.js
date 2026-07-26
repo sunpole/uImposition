@@ -47,6 +47,27 @@ function metricValue(solution, objectiveId) {
   return { objective, value };
 }
 
+function validateSolutionForProfile(solution, profile) {
+  for (const objectiveId of profile.objectiveOrder) {
+    metricValue(solution, objectiveId);
+  }
+  return solution;
+}
+
+function compareValidatedSolutions(left, right, profile) {
+  for (const objectiveId of profile.objectiveOrder) {
+    const leftMetric = metricValue(left, objectiveId);
+    const rightMetric = metricValue(right, objectiveId);
+    const result = compareObjectiveValues(
+      leftMetric.value,
+      rightMetric.value,
+      leftMetric.objective.direction,
+    );
+    if (result !== 0) return result;
+  }
+  return 0;
+}
+
 export function createDecisionProfile({
   id = "default",
   objectiveOrder = DEFAULT_OBJECTIVE_ORDER,
@@ -97,26 +118,27 @@ export function moveDecisionObjectiveBy(profile, objectiveId, offset) {
 
 export function compareSolutions(leftSolution, rightSolution, profile) {
   const normalizedProfile = requireProfile(profile);
-  const left = requireSolution(leftSolution, "leftSolution");
-  const right = requireSolution(rightSolution, "rightSolution");
-
-  for (const objectiveId of normalizedProfile.objectiveOrder) {
-    const leftMetric = metricValue(left, objectiveId);
-    const rightMetric = metricValue(right, objectiveId);
-    const result = compareObjectiveValues(
-      leftMetric.value,
-      rightMetric.value,
-      leftMetric.objective.direction,
-    );
-    if (result !== 0) return result;
-  }
-  return 0;
+  const left = validateSolutionForProfile(
+    requireSolution(leftSolution, "leftSolution"),
+    normalizedProfile,
+  );
+  const right = validateSolutionForProfile(
+    requireSolution(rightSolution, "rightSolution"),
+    normalizedProfile,
+  );
+  return compareValidatedSolutions(left, right, normalizedProfile);
 }
 
 export function explainSolutionPreference(leftSolution, rightSolution, profile) {
   const normalizedProfile = requireProfile(profile);
-  const left = requireSolution(leftSolution, "leftSolution");
-  const right = requireSolution(rightSolution, "rightSolution");
+  const left = validateSolutionForProfile(
+    requireSolution(leftSolution, "leftSolution"),
+    normalizedProfile,
+  );
+  const right = validateSolutionForProfile(
+    requireSolution(rightSolution, "rightSolution"),
+    normalizedProfile,
+  );
 
   for (let index = 0; index < normalizedProfile.objectiveOrder.length; index += 1) {
     const objectiveId = normalizedProfile.objectiveOrder[index];
@@ -161,7 +183,10 @@ export function rankSolutions(solutions, profile) {
 
   const normalized = solutions.map((solution, sourceIndex) => Object.freeze({
     sourceIndex,
-    solution: requireSolution(solution, `solutions[${sourceIndex}]`),
+    solution: validateSolutionForProfile(
+      requireSolution(solution, `solutions[${sourceIndex}]`),
+      normalizedProfile,
+    ),
   }));
   const ids = new Set();
   normalized.forEach(({ solution }) => {
@@ -170,7 +195,11 @@ export function rankSolutions(solutions, profile) {
   });
 
   const sorted = [...normalized].sort((left, right) => {
-    const comparison = compareSolutions(left.solution, right.solution, normalizedProfile);
+    const comparison = compareValidatedSolutions(
+      left.solution,
+      right.solution,
+      normalizedProfile,
+    );
     return comparison || left.sourceIndex - right.sourceIndex;
   });
 
@@ -178,7 +207,7 @@ export function rankSolutions(solutions, profile) {
   let currentRank = 0;
   const ranked = sorted.map(({ solution }, index) => {
     const tiedWithPrevious = previous
-      ? compareSolutions(previous, solution, normalizedProfile) === 0
+      ? compareValidatedSolutions(previous, solution, normalizedProfile) === 0
       : false;
     if (!tiedWithPrevious) currentRank = index + 1;
     const entry = Object.freeze({
