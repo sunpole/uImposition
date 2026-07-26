@@ -43,12 +43,13 @@ jobs:
           import fs from 'node:fs';
           const manifestPath = process.argv[2];
           const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-          const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
+          const quote = (value) => `'${String(value).replaceAll("'", "'\''")}'`;
           console.log(`VERSION=${quote(data.version)}`);
           console.log(`TAG=${quote(data.tag)}`);
           console.log(`TITLE=${quote(data.title)}`);
           console.log(`PRERELEASE=${quote(Boolean(data.prerelease) ? 'true' : 'false')}`);
           console.log(`SOURCE_COMMIT=${quote(data.sourceCommit)}`);
+          console.log(`RELEASE_COMMIT=${quote(data.releaseCommit ?? '')}`);
           console.log(`PATCHNOTE=${quote(data.patchnote)}`);
           console.log(`IMAGE=${quote(data.image)}`);
           console.log(`ARCHIVE=${quote(data.archive)}`);
@@ -58,6 +59,12 @@ jobs:
             if ! git merge-base --is-ancestor "$SOURCE_COMMIT" "$GITHUB_SHA"; then
               echo "Skip $VERSION: source commit $SOURCE_COMMIT is not part of $GITHUB_SHA."
               continue
+            fi
+
+            target_commit="${RELEASE_COMMIT:-$GITHUB_SHA}"
+            if ! git merge-base --is-ancestor "$target_commit" "$GITHUB_SHA"; then
+              echo "Release commit $target_commit for $VERSION is not part of $GITHUB_SHA."
+              exit 1
             fi
 
             for required in "$PATCHNOTE" "$IMAGE" "$ARCHIVE"; do
@@ -80,36 +87,41 @@ jobs:
 
             rollback_branch="release/v${VERSION}"
             remote_branch_sha="$(git ls-remote origin "refs/heads/${rollback_branch}" | cut -f1)"
+
+            if [ "$release_exists" = "true" ]; then
+              if [ -z "$remote_tag_sha" ] || [ -z "$remote_branch_sha" ]; then
+                echo "GitHub Release $TAG exists but its tag or rollback branch is missing."
+                exit 1
+              fi
+              echo "GitHub Release $TAG already exists; checkpoint is unchanged."
+              continue
+            fi
+
             if [ -z "$remote_branch_sha" ]; then
-              git push origin "$GITHUB_SHA:refs/heads/${rollback_branch}"
-              echo "Created rollback branch ${rollback_branch} at ${GITHUB_SHA}."
-            elif [ "$remote_branch_sha" = "$GITHUB_SHA" ]; then
-              echo "Rollback branch ${rollback_branch} already matches ${GITHUB_SHA}."
-            elif [ -n "$remote_tag_sha" ] || [ "$release_exists" = "true" ]; then
-              echo "Rollback branch differs after tag or Release publication; refusing to move it."
+              git push origin "$target_commit:refs/heads/${rollback_branch}"
+              echo "Created rollback branch ${rollback_branch} at ${target_commit}."
+            elif [ "$remote_branch_sha" = "$target_commit" ]; then
+              echo "Rollback branch ${rollback_branch} already matches ${target_commit}."
+            elif [ -n "$remote_tag_sha" ]; then
+              echo "Rollback branch differs after tag publication; refusing to move it."
               exit 1
-            elif git merge-base --is-ancestor "$remote_branch_sha" "$GITHUB_SHA"; then
-              git push origin "$GITHUB_SHA:refs/heads/${rollback_branch}"
-              echo "Fast-forwarded unpublished rollback branch ${rollback_branch} to ${GITHUB_SHA}."
+            elif git merge-base --is-ancestor "$remote_branch_sha" "$target_commit"; then
+              git push origin "$target_commit:refs/heads/${rollback_branch}"
+              echo "Fast-forwarded unpublished rollback branch ${rollback_branch} to ${target_commit}."
             else
-              echo "Rollback branch ${rollback_branch} is not an ancestor of ${GITHUB_SHA}; refusing to rewrite it."
+              echo "Rollback branch ${rollback_branch} is not an ancestor of ${target_commit}; refusing to rewrite it."
               exit 1
             fi
 
             if [ -z "$remote_tag_sha" ]; then
-              git tag -a "$TAG" "$GITHUB_SHA" -m "$TITLE"
+              git tag -a "$TAG" "$target_commit" -m "$TITLE"
               git push origin "refs/tags/${TAG}"
-              echo "Created tag ${TAG}."
-            elif [ "$remote_tag_commit" != "$GITHUB_SHA" ]; then
-              echo "Tag ${TAG} already points to ${remote_tag_commit}; refusing to move it to ${GITHUB_SHA}."
+              echo "Created tag ${TAG} at ${target_commit}."
+            elif [ "$remote_tag_commit" != "$target_commit" ]; then
+              echo "Tag ${TAG} already points to ${remote_tag_commit}; refusing to move it to ${target_commit}."
               exit 1
             else
-              echo "Tag ${TAG} already matches ${GITHUB_SHA}."
-            fi
-
-            if [ "$release_exists" = "true" ]; then
-              echo "GitHub Release ${TAG} already exists."
-              continue
+              echo "Tag ${TAG} already matches ${target_commit}."
             fi
 
             release_args=(
