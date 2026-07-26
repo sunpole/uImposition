@@ -49,6 +49,25 @@ function buildPlanSet(withPricing) {
   });
 }
 
+test("pricing introduced after an unpriced calculation enters the default second position", () => {
+  clearUserProductionPlanSet();
+  resetUserProductionObjectivePreference();
+
+  const withoutPricing = setUserProductionPlanSet(buildPlanSet(false));
+  assert.equal(withoutPricing.planSet.catalog.objectiveOrder[0], "physicalSheets");
+  assert.equal(withoutPricing.planSet.catalog.objectiveOrder.includes("estimatedTotalCost"), false);
+
+  const withPricing = setUserProductionPlanSet(buildPlanSet(true));
+  assert.deepEqual(withPricing.planSet.catalog.objectiveOrder.slice(0, 3), [
+    "physicalSheets",
+    "estimatedTotalCost",
+    "layoutForms",
+  ]);
+
+  clearUserProductionPlanSet();
+  resetUserProductionObjectivePreference();
+});
+
 test("cost priority survives temporary removal and restoration of pricing", () => {
   clearUserProductionPlanSet();
   resetUserProductionObjectivePreference();
