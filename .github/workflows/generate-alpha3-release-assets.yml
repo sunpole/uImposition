@@ -1,9 +1,9 @@
 name: Generate alpha.3 release assets
 
 on:
-  push:
+  pull_request:
     branches:
-      - release-publication/v0.7.0-alpha.3
+      - main
     paths:
       - .github/workflows/generate-alpha3-release-assets.yml
 
@@ -12,12 +12,13 @@ permissions:
 
 jobs:
   generate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     env:
       SCREENSHOT_SCENARIOS: m7-real-alternatives-cost-first
-      SCREENSHOT_COMMIT: ${{ github.sha }}
+      SCREENSHOT_COMMIT: ${{ github.event.pull_request.head.sha }}
       NEWS_IMAGE: news/2026-07-26-uimposition-v0-7-0-alpha-3-real-alternatives.jpg
       ARCHIVE_DIR: archive/development/0.7.0-alpha.3
       ARCHIVE_FILE: archive/development/0.7.0-alpha.3/uimposition-v0-7-0-alpha-3-evidence.zip
@@ -26,19 +27,32 @@ jobs:
       - name: Checkout publication branch
         uses: actions/checkout@v5
         with:
-          ref: release-publication/v0.7.0-alpha.3
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
+      - name: Stop when assets already exist
+        id: existing
+        shell: bash
+        run: |
+          if [ -s "$NEWS_IMAGE" ] && [ -s "$ARCHIVE_FILE" ] && [ -s "$ARCHIVE_DIR/SHA256SUMS.txt" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node.js
+        if: steps.existing.outputs.ready != 'true'
         uses: actions/setup-node@v6
         with:
           node-version: "22"
 
       - name: Install pinned screenshot dependencies
+        if: steps.existing.outputs.ready != 'true'
         working-directory: tools/screenshots
         run: npm install --package-lock=false --ignore-scripts --no-audit --no-fund
 
       - name: Install Chromium and asset tools
+        if: steps.existing.outputs.ready != 'true'
         working-directory: tools/screenshots
         run: |
           npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
@@ -46,6 +60,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends imagemagick zip
 
       - name: Capture exact focused panel
+        if: steps.existing.outputs.ready != 'true'
         working-directory: tools/screenshots
         shell: bash
         run: |
@@ -53,6 +68,7 @@ jobs:
           npm run capture 2>&1 | tee ../../capture.log
 
       - name: Build JPEG, evidence ZIP and hashes
+        if: steps.existing.outputs.ready != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -78,15 +94,12 @@ jobs:
           unzip -t "$ARCHIVE_FILE"
 
       - name: Commit generated binary assets
+        if: steps.existing.outputs.ready != 'true'
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "uImposition release automation"
           git config user.email "actions@users.noreply.github.com"
           git add "$NEWS_IMAGE" "$ARCHIVE_FILE" "$ARCHIVE_DIR/SHA256SUMS.txt"
-          if git diff --cached --quiet; then
-            echo "Release assets already match the focused scenario."
-            exit 0
-          fi
           git commit -m "release: generate alpha.3 focused evidence assets"
-          git push origin HEAD:release-publication/v0.7.0-alpha.3
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
