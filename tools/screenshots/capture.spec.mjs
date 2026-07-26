@@ -32,6 +32,14 @@ function countPdfPages(bytes) {
   return (text.match(/\/Type\s*\/Page\b/g) ?? []).length;
 }
 
+async function runAssertions(page, assertions = []) {
+  for (const assertion of assertions) {
+    const locator = page.locator(assertion.selector);
+    await expect(locator).toBeVisible();
+    await expect(locator).toContainText(assertion.text);
+  }
+}
+
 async function runBeforeScreenshotActions(page, actions = []) {
   for (const action of actions) {
     if (action.action === "click") {
@@ -64,11 +72,7 @@ for (const scenario of scenarios) {
     await page.setViewportSize(scenario.viewport);
     await page.goto(scenario.path, { waitUntil: "networkidle" });
 
-    for (const assertion of scenario.assertions) {
-      const locator = page.locator(assertion.selector);
-      await expect(locator).toBeVisible();
-      await expect(locator).toContainText(assertion.text);
-    }
+    await runAssertions(page, scenario.assertions);
 
     let downloadEntry = null;
     if (scenario.download) {
@@ -96,14 +100,11 @@ for (const scenario of scenarios) {
         pageCount,
       };
 
-      for (const assertion of scenario.afterDownloadAssertions ?? []) {
-        const locator = page.locator(assertion.selector);
-        await expect(locator).toBeVisible();
-        await expect(locator).toContainText(assertion.text);
-      }
+      await runAssertions(page, scenario.afterDownloadAssertions);
     }
 
     await runBeforeScreenshotActions(page, scenario.beforeScreenshot);
+    await runAssertions(page, scenario.beforeScreenshotAssertions);
 
     const screenshotPath = path.join(outputDir, scenario.screenshot);
     if (scenario.screenshotSelector) {
@@ -123,6 +124,7 @@ for (const scenario of scenarios) {
       screenshot: scenario.screenshot,
       screenshotSelector: scenario.screenshotSelector || null,
       beforeScreenshot: scenario.beforeScreenshot ?? [],
+      beforeScreenshotAssertions: scenario.beforeScreenshotAssertions ?? [],
       assertions: scenario.assertions,
       download: downloadEntry,
     };
