@@ -8,77 +8,88 @@
 
 ### Текущий release checkpoint
 
-**`0.6.0-alpha`**  
-Дата версии: **25 июля 2026**  
-Implementation Pull Request: **№10**  
-Этап: **M6 — доказанный минимум физической бумаги**  
-Release manifest: `archive/development/0.6.0-alpha/release.json`
+**`0.7.0-alpha.1`**  
+Дата версии: **26 июля 2026**  
+Implementation Pull Request: **№12**  
+Этап: **M7.1 — приоритеты решений и денежная оценка BYN**  
+Release manifest: `archive/development/0.7.0-alpha.1/release.json`
 
 Фактическое состояние PR, `main`, rollback-ветки, tag и GitHub prerelease проверяется непосредственно в GitHub; документ не хранит переходный статус `draft/open/merged`.
 
-### Что работает
+### Что добавлено после M6
 
-- весь проверенный функционал M1–M5;
-- чистая модель кандидата и неизменяемого остаточного спроса;
-- отдельные `T_first` и `T_complete`;
-- точный контрольный набор из `8960` полных кандидатов с 1–2 парами;
-- явное сообщение об усечении для слишком большого пространства;
-- автоматическая конструкция допустимых тиражей;
-- повторная материализация лица, зеркального оборота и production report;
-- доказанный бумажный минимум `3305` листов;
-- интерфейс сравнения с ручной раскладкой `3395` листов;
-- предупреждение о росте layout-форм `8 → 112`;
-- отдельный учёт цветовых пластин 4+4;
-- проверка заданного mixed-format duplex;
-- regression-кейсы A6 landscape/portrait и A5 `400/700/4200`;
-- прежние два PDF и их Chromium/Poppler-проверка сохранены;
-- отдельный крупный screenshot панели M6 для Telegram;
-- release news и короткий Telegram-текст;
-- три исторических Action ZIP и общий evidence ZIP сохранены в репозитории;
-- автоматическая публикация rollback-ветки, immutable tag и GitHub prerelease после входа manifest в `main`.
+- 11 изменяемых целей оптимизации;
+- отдельный неизменяемый набор жёстких ограничений;
+- immutable decision profile;
+- перемещение цели на произвольную позицию и вверх/вниз;
+- лексикографическое сравнение;
+- детерминированное стабильное ранжирование;
+- объяснение первой метрики, которая определила победителя;
+- обязательная проверка полного набора метрик до сравнения;
+- цель `estimatedTotalCost`;
+- расчёт площади и веса исходного закупаемого листа;
+- плотность бумаги в `г/м²`;
+- стоимость бумаги в `BYN/кг`;
+- стоимость цветовых печатных форм/пластин за штуку;
+- необязательная стоимость подготовки layout-форм;
+- итоговая расчётная стоимость и стоимость одного заказанного изделия;
+- отдельная demo-страница `Бумага / Стоимость / Формы`;
+- фокусный Chromium screenshot без длинной страницы;
+- полный план из 17 release-патчей до `1.0.0`.
 
-### Проверенный контрольный результат M6
+### Проверенный денежный пример
+
+Пример предназначен для проверки логики, а не является рабочим прайсом:
 
 ```text
-Сумма требуемых пар: 52870
-Вместимость листа:   16
-Нижняя граница:      ceil(52870 / 16) = 3305
-Построенный вариант: 3305
+исходный лист:  620 × 450 мм
+плотность:      130 г/м²
+бумага:         4 BYN/кг
+цветовая форма: 15 BYN
 ```
 
-- физическая бумага: `3305`;
-- экономия относительно ручного варианта: `90` листов (`2,65%`);
-- монтажи: `56`;
-- layout-формы: `112`;
-- листопрогоны: `6610`;
-- недопечатка: `0`;
-- перетираж пар: `10`;
-- перетираж готовых файлов: `0`.
+#### Минимум бумаги
 
-Допустимый вариант достигает универсальной нижней границы, поэтому `3305` — доказанный глобальный минимум физической бумаги для контрольного uniform-grid входа. Это не минимум форм.
+```text
+physicalSheets:    3305
+layoutForms:       112
+colorPlates:       448
+paperCost:         479.4894 BYN
+estimatedTotalCost:7199.4894 BYN
+```
 
-### Дополнительные regression-кейсы
+#### Компактный вариант
 
-- A6 `148×105`, 32 страницы, 4+4: `4×4`, один тираж 1000;
-- A6 `105×148`, 32 страницы, 4+4: поворот 90°, `4×4`;
-- `1×A4 + 2×A5 + 8×A6` на одном зеркальном duplex-листе;
-- A5, 8 позиций, тиражи `400 / 700 / 4200`: минимум `663`, перетираж `4`;
-- один монтаж 4+4: `2` layout-формы, `8` цветовых пластин.
+```text
+physicalSheets:    3395
+layoutForms:       8
+colorPlates:       32
+paperCost:         492.5466 BYN
+estimatedTotalCost:972.5466 BYN
+```
 
-### Ещё не реализовано
+Поэтому:
 
-- автоматическая упаковка смешанных форматов;
-- минимум форм и многокритериальный компромисс;
+- при первом приоритете `Физическая бумага` выигрывает вариант `3305`;
+- при первом приоритете `Расчётная стоимость` выигрывает компактный вариант;
+- при первом приоритете `Layout-формы` также выигрывает компактный вариант;
+- исходные варианты не пересчитываются при простой перестановке целей.
+
+### Что ещё не реализовано
+
+- ввод рабочих цен в основном интерфейсе;
+- единая нормализованная модель всех метрик решения;
 - набор Парето;
 - автоматический свой оборот;
+- автоматическая упаковка смешанных форматов;
 - тетрадный/фальцевальный спуск полос;
 - импорт/экспорт полного проекта и постоянное хранение.
 
 ### Следующая целевая версия
 
-**`0.7.0-alpha` — M7**
+**`0.7.0-alpha.2` — M7.2**
 
-Сократить число форм, добавить изменяемую иерархию, свой/чужой оборот и показать многокритериальный набор вариантов между бумагой, формами и перетиражем.
+Создать единую модель метрик для ручного, бумажного и будущих вариантов; подключить production report и явный статус готовности цен без выдуманных defaults.
 
 </td>
 <td width="50%" valign="top">
@@ -87,31 +98,29 @@ Release manifest: `archive/development/0.6.0-alpha/release.json`
 
 ### Current release checkpoint
 
-**`0.6.0-alpha`**  
-Version date: **25 July 2026**  
-Implementation PR: **#10**  
-Stage: **M6 — proven physical-paper minimum**  
-Release manifest: `archive/development/0.6.0-alpha/release.json`
+**`0.7.0-alpha.1`**  
+Version date: **26 July 2026**  
+Implementation PR: **#12**  
+Stage: **M7.1 — decision priorities and BYN costing**  
+Release manifest: `archive/development/0.7.0-alpha.1/release.json`
 
-The factual PR, main, rollback branch, tag, and GitHub prerelease state is verified directly in GitHub rather than stored as transient draft/open/merged wording in this document.
+### Added after M6
 
-### Working now
+Eleven reorderable objectives, immutable hard constraints, decision profiles, lexicographic comparison, stable ranking, full metric validation, source-sheet area/weight, gsm, BYN/kg paper pricing, per-color-plate pricing, optional layout preparation cost, total/unit cost, a focused Paper / Cost / Forms demo, Chromium evidence, and a 17-release roadmap to 1.0.
 
-All verified M1–M5 functionality plus a pure candidate/demand model, exact first/completion event runs, the complete 8,960-candidate one/two-pair control space, automatic valid run construction, independent front/back/report rematerialisation, a proven 3,305-sheet paper minimum, explicit manual comparison, separate 4+4 plate metrics, fixed mixed-format duplex validation, additional A6/A5 production regressions, a focused Telegram screenshot, permanent historical archives, release news, and automatic rollback branch/tag/GitHub prerelease publication.
+### Verified example
 
-### Verified M6 result
-
-The universal capacity lower bound is `ceil(52870 / 16) = 3305`. The constructed valid solution reaches 3305, proving the global physical-paper minimum for the control uniform-grid input. It uses 56 impositions, 112 side-layout forms, 6,610 press passes, zero underproduction, 10 pair overrun, and zero complete-file overrun.
+With an illustrative 620×450 mm source sheet, 130 gsm paper, 4 BYN/kg paper, and 15 BYN per color plate, paper priority selects the 3,305-sheet solution while cost or side-layout-form priority selects the compact 3,395-sheet / 8-form solution. The example prices are not production defaults.
 
 ### Not implemented yet
 
-Automatic mixed-format packing, form minimisation, objective reordering, work-and-turn, multi-objective Pareto alternatives, folded-signature pagination, and complete-project persistence.
+Main-interface pricing inputs, normalized metrics for every solution, Pareto alternatives, work-and-turn, automatic mixed-format packing, folded-signature pagination, and complete-project persistence.
 
 ### Next target version
 
-**`0.7.0-alpha` — M7**
+**`0.7.0-alpha.2` — M7.2**
 
-Reduce form count, add objective ordering and work-and-turn/work-and-back comparison, and present multi-objective trade-offs across paper, forms, and overrun.
+Create one normalized metrics model for manual, paper-minimum, and future solutions, connected to production reporting and explicit pricing readiness.
 
 </td>
 </tr>
@@ -123,8 +132,8 @@ Reduce form count, add objective ordering and work-and-turn/work-and-back compar
 - `VERSION.md` — понятное состояние;
 - `CHANGELOG.md` — история;
 - `docs/VERSIONING.md` — правила;
-- `archive/development/0.6.0-alpha/release.json` — machine-readable release checkpoint.
+- `archive/development/0.7.0-alpha.1/release.json` — machine-readable release checkpoint.
 
 ## Релизы и откат / Releases and rollback
 
-Checkpoint `0.6.0-alpha` определяет recovery-ветку `release/v0.6.0-alpha`, immutable tag `v0.6.0-alpha` и настоящий GitHub **prerelease** с release notes, крупным PNG и ZIP доказательств. Патчноут и изображение одновременно входят в очередь uNews/Telegram. Их фактическое существование проверяется через GitHub после merge.
+Checkpoint `0.7.0-alpha.1` определяет recovery-ветку `release/v0.7.0-alpha.1`, immutable tag `v0.7.0-alpha.1` и настоящий GitHub **prerelease** с release notes, фокусным PNG и ZIP доказательств. Патчноут и изображение одновременно входят в очередь uNews/Telegram. Их фактическое существование проверяется через GitHub после merge.
