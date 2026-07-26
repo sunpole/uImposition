@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1200 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.7.0-alpha.3" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.4" },
     { "selector": "#productionPhysicalSheets", "text": "395" },
     { "selector": "#productionForms", "text": "8" },
     { "selector": "#productionPressPasses", "text": "790" },
