@@ -22,7 +22,7 @@
     { "selector": "#userProductionPlans", "text": "показано" },
     { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "20" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "21" },
-    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "доминируем" }
+    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "Pareto" }
   ],
   "screenshotSelector": "#userProductionPlans",
   "screenshot": "uimposition-m7-5-user-order-plan-catalog-mobile.png"
