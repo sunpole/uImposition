@@ -3,13 +3,19 @@ import {
   createAlternativeExplanationSet,
 } from "./alternative-explanations.js";
 import { DECISION_PROFILE_KIND } from "./decision-profile.js";
+import { analyzeImpositionOrderDistribution } from "./imposition-distribution.js";
+import { expandPagePairs } from "./orders.js";
+import { minimizePhysicalPaper } from "./paper-minimizer.js";
+import { createPaperSolutionMetrics } from "./paper-solution-metrics.js";
 import {
   PRICING_COMPARISON_STATUS,
   PRODUCTION_ALTERNATIVE_SET_KIND,
-  buildManualAndPaperAlternativeSet,
+  buildProductionAlternativeSet,
 } from "./production-alternative-set.js";
+import { createProductionReportSolutionMetrics } from "./production-solution-metrics.js";
 
 export const ALTERNATIVES_RUNTIME_KIND = "alternativesRuntimeState";
+export const PREPARED_ALTERNATIVES_PRODUCTION_KIND = "preparedAlternativesProduction";
 
 export const ALTERNATIVES_RUNTIME_STATUS = Object.freeze({
   WAITING_PRODUCTION: "waiting-production",
@@ -17,6 +23,12 @@ export const ALTERNATIVES_RUNTIME_STATUS = Object.freeze({
   READY_WITHOUT_PRICING: "ready-without-pricing",
   ERROR: "error",
 });
+
+function requiredText(value, label) {
+  const text = String(value ?? "").trim();
+  if (!text) throw new RangeError(`${label} is required`);
+  return text;
+}
 
 function actualPositiveNumber(value, label) {
   if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
@@ -40,13 +52,7 @@ function requireDecisionProfile(profile) {
 }
 
 function hasCompleteProductionState(productionState) {
-  return Boolean(
-    productionState?.report
-    && Array.isArray(productionState?.impositions)
-    && productionState.impositions.length > 0
-    && productionState?.paperSolution
-    && productionState?.controlCase,
-  );
+  return Boolean(productionState?.report && productionState?.controlCase);
 }
 
 function waitingState(profile, language) {
@@ -58,6 +64,7 @@ function waitingState(profile, language) {
     priorityObjectiveId: profile.objectiveOrder[0],
     referenceSolutionId: null,
     pricingComparison: null,
+    preparedProductionState: null,
     alternativeSet: null,
     explanations: null,
     error: null,
@@ -73,6 +80,7 @@ function errorState(profile, language, error) {
     priorityObjectiveId: profile.objectiveOrder[0],
     referenceSolutionId: null,
     pricingComparison: null,
+    preparedProductionState: null,
     alternativeSet: null,
     explanations: null,
     error,
@@ -109,8 +117,116 @@ function sourceSheetFromControlCase(controlCase) {
   });
 }
 
+function distributionRowsFromReport(report) {
+  if (!Array.isArray(report?.pairMetrics) || report.pairMetrics.length === 0) {
+    throw new TypeError("report.pairMetrics must be a non-empty array");
+  }
+  const byImposition = new Map();
+  report.pairMetrics.forEach((metric, metricIndex) => {
+    const file = requiredText(metric?.file, `report.pairMetrics[${metricIndex}].file`);
+    if (!Array.isArray(metric?.contributions) || metric.contributions.length === 0) {
+      throw new TypeError(
+        `report.pairMetrics[${metricIndex}].contributions must be a non-empty array`,
+      );
+    }
+    metric.contributions.forEach((contribution, contributionIndex) => {
+      const id = requiredText(
+        contribution?.impositionId,
+        `report.pairMetrics[${metricIndex}].contributions[${contributionIndex}].impositionId`,
+      );
+      if (!byImposition.has(id)) byImposition.set(id, []);
+      byImposition.get(id).push(file);
+    });
+  });
+  return Object.freeze([...byImposition.entries()].map(([id, files]) => Object.freeze({
+    id,
+    files: Object.freeze(files),
+  })));
+}
+
+function paperSolutionFromControlCase(controlCase) {
+  const pagePairs = expandPagePairs(controlCase?.orders ?? []);
+  const rotation = Number(controlCase?.verifiedM2?.bestRotation);
+  const grid = rotation === 90
+    ? controlCase?.verifiedM2?.orientation90
+    : rotation === 0
+      ? controlCase?.verifiedM2?.orientation0
+      : null;
+  if (!grid) throw new RangeError("Control case does not contain a supported best rotation");
+  return minimizePhysicalPaper({
+    pagePairs,
+    rows: actualPositiveInteger(grid.rows, "verifiedM2.bestGrid.rows"),
+    columns: actualPositiveInteger(grid.columns, "verifiedM2.bestGrid.columns"),
+    rotation,
+    duplexMode: controlCase.duplexMode,
+  });
+}
+
+export function prepareAlternativesProductionState(productionState) {
+  if (!hasCompleteProductionState(productionState)) {
+    throw new TypeError("A production report and control case are required");
+  }
+  const controlCase = productionState.controlCase;
+  const report = productionState.report;
+  const paperSolution = productionState.paperSolution ?? paperSolutionFromControlCase(controlCase);
+  const manualDistribution = analyzeImpositionOrderDistribution(
+    distributionRowsFromReport(report),
+  );
+  return Object.freeze({
+    kind: PREPARED_ALTERNATIVES_PRODUCTION_KIND,
+    report,
+    controlCase,
+    paperSolution,
+    manualDistribution,
+    sourceSheet: sourceSheetFromControlCase(controlCase),
+    layoutCompactness: calculateControlLayoutCompactness(controlCase),
+  });
+}
+
+function requirePreparedProductionState(prepared) {
+  if (!prepared || prepared.kind !== PREPARED_ALTERNATIVES_PRODUCTION_KIND) {
+    throw new TypeError("A prepared alternatives production state is required");
+  }
+  return prepared;
+}
+
+function buildAlternativeSet({
+  prepared,
+  pricing,
+  decisionProfile,
+  displayLimit,
+}) {
+  const manualMetrics = createProductionReportSolutionMetrics({
+    report: prepared.report,
+    sourceSheet: prepared.sourceSheet,
+    pricing,
+    id: "manual-compact",
+    label: "Compact manual",
+    source: "production-report",
+    layoutCompactness: prepared.layoutCompactness,
+    distinctOrdersPerImposition: prepared.manualDistribution.distinctOrdersPerImposition,
+    splitOrders: prepared.manualDistribution.splitOrders,
+    fragmentedBlocks: prepared.manualDistribution.fragmentedBlocks,
+  });
+  const paperMetrics = createPaperSolutionMetrics({
+    solution: prepared.paperSolution,
+    sourceSheet: prepared.sourceSheet,
+    pricing,
+    id: "paper-minimum",
+    label: "Paper minimum",
+    source: "paper-minimizer",
+    layoutCompactness: prepared.layoutCompactness,
+  });
+  return buildProductionAlternativeSet({
+    solutionMetrics: [manualMetrics, paperMetrics],
+    decisionProfile,
+    displayLimit,
+  });
+}
+
 export function createAlternativesRuntimeState({
   productionState = null,
+  preparedProductionState = null,
   pricingState = null,
   decisionProfile,
   language = "ru",
@@ -118,22 +234,19 @@ export function createAlternativesRuntimeState({
   displayLimit = 5,
 } = {}) {
   const profile = requireDecisionProfile(decisionProfile);
-  if (!hasCompleteProductionState(productionState)) {
+  if (!preparedProductionState && !hasCompleteProductionState(productionState)) {
     return waitingState(profile, language);
   }
 
   try {
-    const compactness = calculateControlLayoutCompactness(productionState.controlCase);
-    const alternativeSet = buildManualAndPaperAlternativeSet({
-      report: productionState.report,
-      impositions: productionState.impositions,
-      paperSolution: productionState.paperSolution,
-      sourceSheet: sourceSheetFromControlCase(productionState.controlCase),
+    const prepared = preparedProductionState
+      ? requirePreparedProductionState(preparedProductionState)
+      : prepareAlternativesProductionState(productionState);
+    const alternativeSet = buildAlternativeSet({
+      prepared,
       pricing: pricingState?.pricing ?? null,
       decisionProfile: profile,
       displayLimit,
-      manualLayoutCompactness: compactness,
-      paperLayoutCompactness: compactness,
     });
     if (alternativeSet.kind !== PRODUCTION_ALTERNATIVE_SET_KIND) {
       throw new TypeError("Production alternative set was not created");
@@ -159,6 +272,7 @@ export function createAlternativesRuntimeState({
       priorityObjectiveId: profile.objectiveOrder[0],
       referenceSolutionId: explanations.referenceSolutionId,
       pricingComparison: alternativeSet.pricingComparison,
+      preparedProductionState: prepared,
       alternativeSet,
       explanations,
       error: null,
