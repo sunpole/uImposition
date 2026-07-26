@@ -104,6 +104,28 @@ export const CONFIG = Object.freeze({
       maxCandidates: 10000,
       idPrefix: "AUTO",
     },
+    decision: {
+      defaultObjectiveOrder: [
+        "physicalSheets",
+        "layoutForms",
+        "colorPlates",
+        "fileOverrun",
+        "pairOverrun",
+        "pressPasses",
+        "splitOrders",
+        "impositionCount",
+        "layoutCompactness",
+        "distinctOrdersPerImposition",
+      ],
+      hardConstraints: [
+        "zeroUnderproduction",
+        "validPrintableGeometry",
+        "validFrontBackMapping",
+        "validOrientation",
+        "validDuplexStrategy",
+        "validatedProductionReport",
+      ],
+    },
   },
 
   i18n: {
