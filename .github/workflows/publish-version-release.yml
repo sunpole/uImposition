@@ -114,9 +114,12 @@ jobs:
             fi
 
             if [ -z "$remote_tag_sha" ]; then
-              git tag -a "$TAG" "$target_commit" -m "$TITLE"
-              git push origin "refs/tags/${TAG}"
-              echo "Created tag ${TAG} at ${target_commit}."
+              gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+                -f ref="refs/tags/${TAG}" \
+                -f sha="$target_commit" >/dev/null
+              remote_tag_sha="$target_commit"
+              remote_tag_commit="$target_commit"
+              echo "Created immutable tag ${TAG} at ${target_commit} through the GitHub API."
             elif [ "$remote_tag_commit" != "$target_commit" ]; then
               echo "Tag ${TAG} already points to ${remote_tag_commit}; refusing to move it to ${target_commit}."
               exit 1
