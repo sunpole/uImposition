@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1200 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.6.0-alpha" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.1" },
     { "selector": "#impositionStatus", "text": "4 лица" },
     { "selector": "#productionStatus", "text": "Недопечатки нет" },
     { "selector": "#paperSolutionStatus", "text": "Минимум бумаги доказан" },
@@ -16,12 +16,12 @@
   "download": {
     "selector": "#exportSchemesPdf",
     "fileName": "uImposition-schemes.pdf",
-    "artifact": "uimposition-v0-6-0-alpha-control-schemes.pdf",
+    "artifact": "uimposition-v0-7-0-alpha-1-control-schemes.pdf",
     "expectedPages": 8
   },
   "afterDownloadAssertions": [
     { "selector": "#pdfExportStatus", "text": "PDF схем создан: 8 страниц" }
   ],
-  "screenshot": "uimposition-v0-6-0-alpha-m5-pdf-export-desktop.png",
+  "screenshot": "uimposition-v0-7-0-alpha-1-m5-pdf-export-desktop.png",
   "fullPage": true
 }
