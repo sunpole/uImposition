@@ -73,37 +73,28 @@ function assertProductionCostMatchesMetrics(productionCost, metrics) {
   assertMatchingInteger(productionCost.layoutForms, metrics.layoutForms, "layoutForms");
 }
 
+function emptyCost(pricingStatus = PRICING_STATUS.INCOMPLETE) {
+  return Object.freeze({
+    pricingStatus,
+    currency: null,
+    sheetBasis: null,
+    sheetAreaM2: null,
+    grammageGsm: null,
+    sheetWeightKg: null,
+    paperWeightKg: null,
+    paperCost: null,
+    colorPlateCost: null,
+    layoutFormPreparationCost: null,
+    estimatedTotalCost: null,
+    estimatedUnitCost: null,
+  });
+}
+
 function normalizeProductionCost(productionCost, metrics) {
-  if (!productionCost) {
-    return Object.freeze({
-      pricingStatus: PRICING_STATUS.INCOMPLETE,
-      currency: null,
-      sheetBasis: null,
-      grammageGsm: null,
-      paperWeightKg: null,
-      paperCost: null,
-      colorPlateCost: null,
-      layoutFormPreparationCost: null,
-      estimatedTotalCost: null,
-      estimatedUnitCost: null,
-    });
-  }
+  if (!productionCost) return emptyCost();
 
   const pricingStatus = pricingStatusFromCost(productionCost);
-  if (pricingStatus !== PRICING_STATUS.READY) {
-    return Object.freeze({
-      pricingStatus,
-      currency: null,
-      sheetBasis: null,
-      grammageGsm: null,
-      paperWeightKg: null,
-      paperCost: null,
-      colorPlateCost: null,
-      layoutFormPreparationCost: null,
-      estimatedTotalCost: null,
-      estimatedUnitCost: null,
-    });
-  }
+  if (pricingStatus !== PRICING_STATUS.READY) return emptyCost(pricingStatus);
 
   assertProductionCostMatchesMetrics(productionCost, metrics);
 
@@ -111,7 +102,9 @@ function normalizeProductionCost(productionCost, metrics) {
     pricingStatus,
     currency: requiredText(productionCost.currency, "productionCost.currency"),
     sheetBasis: requiredText(productionCost.sheetBasis, "productionCost.sheetBasis"),
+    sheetAreaM2: nonNegativeNumber(productionCost.sheetAreaM2, "productionCost.sheetAreaM2"),
     grammageGsm: nonNegativeNumber(productionCost.grammageGsm, "productionCost.grammageGsm"),
+    sheetWeightKg: nonNegativeNumber(productionCost.sheetWeightKg, "productionCost.sheetWeightKg"),
     paperWeightKg: nonNegativeNumber(productionCost.paperWeightKg, "productionCost.paperWeightKg"),
     paperCost: nonNegativeNumber(productionCost.paperCost, "productionCost.paperCost"),
     colorPlateCost: nonNegativeNumber(productionCost.colorPlateCost, "productionCost.colorPlateCost"),
@@ -178,7 +171,9 @@ export function createSolutionMetrics({
     pricingStatus: normalizedCost.pricingStatus,
     currency: normalizedCost.currency,
     sheetBasis: normalizedCost.sheetBasis,
+    sheetAreaM2: normalizedCost.sheetAreaM2,
     grammageGsm: normalizedCost.grammageGsm,
+    sheetWeightKg: normalizedCost.sheetWeightKg,
     paperWeightKg: normalizedCost.paperWeightKg,
     paperCost: normalizedCost.paperCost,
     colorPlateCost: normalizedCost.colorPlateCost,

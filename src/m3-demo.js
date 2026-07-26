@@ -122,6 +122,15 @@ const pdfExport = createPdfExportController({
   getLanguage: language,
 });
 
+function publishProductionReportState() {
+  const detail = Object.freeze({
+    report: state.report,
+    controlCase: state.controlCase,
+  });
+  window.__uimpositionProductionState = detail;
+  window.dispatchEvent(new CustomEvent("uimposition:production-report", { detail }));
+}
+
 function syncLanguageContent() {
   const current = language();
   panel.querySelectorAll("[data-lang]").forEach((element) => {
@@ -165,6 +174,7 @@ function clearControlLayouts() {
   state.report = null;
   state.paperSolution = null;
   state.controlCase = null;
+  publishProductionReportState();
   ui.schemes.replaceChildren();
   ui.error.hidden = true;
   ui.error.textContent = "";
@@ -237,6 +247,7 @@ async function loadControlLayouts() {
     state.report = report;
     state.paperSolution = paperSolution;
     state.controlCase = controlCase;
+    publishProductionReportState();
     renderSchemePairs(ui.schemes, records, { language: current });
     renderProductionReport(ui.production, report, { language: current });
     renderPaperSolution(ui.paperSolution, paperSolution, report, { language: current });
@@ -249,6 +260,7 @@ async function loadControlLayouts() {
     state.report = null;
     state.paperSolution = null;
     state.controlCase = null;
+    publishProductionReportState();
     ui.schemes.replaceChildren();
     ui.status.textContent = current === "ru" ? "Ошибка M3–M6" : "M3–M6 error";
     ui.error.textContent = error.message;
@@ -271,6 +283,7 @@ new MutationObserver(syncLanguageContent).observe(document.documentElement, {
 });
 
 syncLanguageContent();
+publishProductionReportState();
 if (new URLSearchParams(location.search).get(CONFIG.demo.queryParameter) === "control") {
   loadControlLayouts();
 }

@@ -1,6 +1,7 @@
 import { CONFIG } from "./config.js";
 import { calculateSheetGeometry } from "./geometry.js";
 import { calculateSheetWeightKg, createPricingProfile } from "./production-cost.js";
+import { createProductionReportSolutionMetrics } from "./production-solution-metrics.js";
 
 const sides = ["left", "right", "top", "bottom"];
 const ids = { left: "Left", right: "Right", top: "Top", bottom: "Bottom" };
@@ -16,20 +17,24 @@ const TEXT = Object.freeze({
     hint: "Поля прайса не подставляют демонстрационные значения. Пока обязательные цены пустые, стоимость решения остаётся недоступной.",
     incomplete: "pricing incomplete",
     ready: "pricing inputs ready",
+    costReady: "pricing ready",
     invalid: "pricing invalid",
     profileLabel: "Прайс-профиль",
     sheetWeightLabel: "Вес исходного листа",
-    rankingLabel: "Ранжирование по стоимости",
+    costLabel: "Стоимость решения",
     nextStepLabel: "Следующий шаг",
     nullValue: "null",
     dash: "—",
     blocked: "заблокировано",
     waitingReport: "ожидает отчёт",
     enterPrices: "введите цены",
+    loadReport: "загрузите заказ",
     calculateCost: "расчёт стоимости",
+    costReadyNext: "сравнение вариантов",
     missingPrices: "Введите плотность, цену бумаги и цену цветовой формы. До этого SolutionMetrics сохраняет стоимость как null.",
-    invalidPrices: "Проверьте прайс: плотность должна быть больше 0, цены — не меньше 0.",
-    readyExplanation: "Прайс-профиль готов. Вес исходного листа считается по текущей геометрии. Ранжирование по стоимости включится после подключения production report к SolutionMetrics.",
+    invalidPrices: "Проверьте прайс или отчёт: плотность должна быть больше 0, цены — не меньше 0, а cost object должен совпадать с production report.",
+    readyExplanation: "Прайс-профиль готов. Вес исходного листа считается по текущей геометрии. Стоимость включится после загрузки production report.",
+    costReadyExplanation: "Production report подключён к SolutionMetrics. Стоимость считается по реальному числу листов, layout-форм и цветовых форм; следующий шаг — сравнение нескольких вариантов.",
   }),
   en: Object.freeze({
     title: "Production pricing",
@@ -41,24 +46,29 @@ const TEXT = Object.freeze({
     hint: "Pricing fields do not inject illustrative defaults. Until required prices are present, solution cost remains unavailable.",
     incomplete: "pricing incomplete",
     ready: "pricing inputs ready",
+    costReady: "pricing ready",
     invalid: "pricing invalid",
     profileLabel: "Pricing profile",
     sheetWeightLabel: "Source sheet weight",
-    rankingLabel: "Cost ranking",
+    costLabel: "Solution cost",
     nextStepLabel: "Next step",
     nullValue: "null",
     dash: "—",
     blocked: "blocked",
     waitingReport: "waiting report",
     enterPrices: "enter prices",
+    loadReport: "load order",
     calculateCost: "cost calculation",
+    costReadyNext: "compare variants",
     missingPrices: "Enter grammage, paper price, and color-plate price. Until then, SolutionMetrics keeps cost as null.",
-    invalidPrices: "Check pricing: grammage must be greater than 0, prices must be at least 0.",
-    readyExplanation: "The pricing profile is ready. Source-sheet weight is calculated from the current geometry. Cost ranking will turn on after the production report is connected to SolutionMetrics.",
+    invalidPrices: "Check pricing or report: grammage must be greater than 0, prices must be at least 0, and the cost object must match the production report.",
+    readyExplanation: "The pricing profile is ready. Source-sheet weight is calculated from the current geometry. Cost turns on after the production report is loaded.",
+    costReadyExplanation: "The production report is connected to SolutionMetrics. Cost is calculated from real sheets, side-layout forms, and color plates; the next step is comparing multiple variants.",
   }),
 });
 
 const $ = (selector) => document.querySelector(selector);
+let productionState = window.__uimpositionProductionState ?? { report: null, controlCase: null };
 
 function language() {
   return document.documentElement.lang === "en" ? "en" : "ru";
@@ -120,6 +130,8 @@ function trimValues() {
 }
 
 function readSourceSheet() {
+  const sourceSheet = productionState.controlCase?.verifiedM2?.sourceSheet;
+  if (sourceSheet) return sourceSheet;
   const geometry = calculateSheetGeometry({
     width: $("#sheetWidth")?.value,
     height: $("#sheetHeight")?.value,
@@ -136,6 +148,10 @@ function formatNumber(value, maximumFractionDigits = 2) {
     minimumFractionDigits: 0,
     maximumFractionDigits,
   });
+}
+
+function formatCurrency(value, currency) {
+  return `${formatNumber(value, 2)} ${currency}`;
 }
 
 function formatKg(value) {
@@ -182,7 +198,7 @@ function replaceMilestonePanel() {
     <div class="result-grid result-grid--m7-status">
       <article class="metric metric--accent"><span data-lang="ru">Прайс-профиль</span><span data-lang="en" hidden>Pricing profile</span><strong id="pricingProfileResult">null</strong></article>
       <article class="metric"><span data-lang="ru">Вес исходного листа</span><span data-lang="en" hidden>Source sheet weight</span><strong id="pricingSheetWeightResult">—</strong></article>
-      <article class="metric"><span data-lang="ru">Ранжирование по стоимости</span><span data-lang="en" hidden>Cost ranking</span><strong id="pricingCostRankingResult" data-lang="ru">заблокировано</strong><strong id="pricingCostRankingResultEn" data-lang="en" hidden>blocked</strong></article>
+      <article class="metric"><span data-lang="ru">Стоимость решения</span><span data-lang="en" hidden>Solution cost</span><strong id="pricingCostRankingResult" data-lang="ru">заблокировано</strong><strong id="pricingCostRankingResultEn" data-lang="en" hidden>blocked</strong></article>
       <article class="metric"><span data-lang="ru">Следующий шаг</span><span data-lang="en" hidden>Next step</span><strong id="pricingNextStepResult" data-lang="ru">введите цены</strong><strong id="pricingNextStepResultEn" data-lang="en" hidden>enter prices</strong></article>
     </div>
     <div class="formula-card">
@@ -198,42 +214,71 @@ function readPricingProfile() {
   const layoutFormPreparationPrice = readNumberOrNull($("#pricingLayoutFormPreparationPrice")) ?? 0;
 
   if (grammageGsm === null || paperPricePerKg === null || colorPlatePrice === null) {
-    return { state: "incomplete", pricing: null, error: null };
+    return { state: "incomplete", pricing: null, metrics: null, error: null };
   }
 
   try {
-    return {
-      state: "ready",
-      pricing: createPricingProfile({
-        currency: CONFIG.pricing.currency,
-        grammageGsm,
-        paperPricePerKg,
-        colorPlatePrice,
-        layoutFormPreparationPrice,
-      }),
-      error: null,
-    };
+    const pricing = createPricingProfile({
+      currency: CONFIG.pricing.currency,
+      grammageGsm,
+      paperPricePerKg,
+      colorPlatePrice,
+      layoutFormPreparationPrice,
+    });
+    if (!productionState.report) return { state: "ready", pricing, metrics: null, error: null };
+    const metrics = createProductionReportSolutionMetrics({
+      report: productionState.report,
+      sourceSheet: readSourceSheet(),
+      pricing,
+      label: "Current production report",
+      layoutCompactness: null,
+    });
+    return { state: "costReady", pricing, metrics, error: null };
   } catch (error) {
-    return { state: "invalid", pricing: null, error };
+    return { state: "invalid", pricing: null, metrics: null, error };
   }
 }
 
 function setChip(state) {
   const chip = $("#pricingProfileStatus");
-  chip.classList.toggle("status-chip--success", state === "ready");
-  chip.classList.toggle("status-chip--warning", state !== "ready");
-  chip.textContent = t(state === "ready" ? "ready" : state === "invalid" ? "invalid" : "incomplete");
+  const ready = state === "ready" || state === "costReady";
+  chip.classList.toggle("status-chip--success", ready);
+  chip.classList.toggle("status-chip--warning", !ready);
+  chip.textContent = t(state === "costReady" ? "costReady" : state === "ready" ? "ready" : state === "invalid" ? "invalid" : "incomplete");
 }
 
-function setStatusText({ state, pricing }) {
+function publishPricingState(result) {
+  const detail = Object.freeze({
+    state: result.state,
+    pricing: result.pricing,
+    metrics: result.metrics,
+  });
+  window.__uimpositionPricingState = detail;
+  window.dispatchEvent(new CustomEvent("uimposition:pricing", { detail }));
+}
+
+function setStatusText(result) {
+  const { state, pricing, metrics } = result;
   setChip(state);
   const profile = $("#pricingProfileResult");
   const sheetWeight = $("#pricingSheetWeightResult");
-  const rankingRu = $("#pricingCostRankingResult");
-  const rankingEn = $("#pricingCostRankingResultEn");
+  const costRu = $("#pricingCostRankingResult");
+  const costEn = $("#pricingCostRankingResultEn");
   const nextRu = $("#pricingNextStepResult");
   const nextEn = $("#pricingNextStepResultEn");
   const explanation = $("#pricingStatusExplanation");
+
+  if (state === "costReady") {
+    profile.textContent = metrics.currency;
+    sheetWeight.textContent = formatKg(metrics.sheetWeightKg);
+    costRu.textContent = formatCurrency(metrics.estimatedTotalCost, metrics.currency);
+    costEn.textContent = formatCurrency(metrics.estimatedTotalCost, metrics.currency);
+    nextRu.textContent = TEXT.ru.costReadyNext;
+    nextEn.textContent = TEXT.en.costReadyNext;
+    explanation.textContent = t("costReadyExplanation");
+    publishPricingState(result);
+    return;
+  }
 
   if (state === "ready") {
     profile.textContent = pricing.currency;
@@ -248,21 +293,23 @@ function setStatusText({ state, pricing }) {
     } catch {
       sheetWeight.textContent = t("dash");
     }
-    rankingRu.textContent = TEXT.ru.waitingReport;
-    rankingEn.textContent = TEXT.en.waitingReport;
-    nextRu.textContent = TEXT.ru.calculateCost;
-    nextEn.textContent = TEXT.en.calculateCost;
+    costRu.textContent = TEXT.ru.waitingReport;
+    costEn.textContent = TEXT.en.waitingReport;
+    nextRu.textContent = TEXT.ru.loadReport;
+    nextEn.textContent = TEXT.en.loadReport;
     explanation.textContent = t("readyExplanation");
+    publishPricingState(result);
     return;
   }
 
   profile.textContent = state === "invalid" ? t("invalid") : t("nullValue");
   sheetWeight.textContent = t("dash");
-  rankingRu.textContent = TEXT.ru.blocked;
-  rankingEn.textContent = TEXT.en.blocked;
+  costRu.textContent = TEXT.ru.blocked;
+  costEn.textContent = TEXT.en.blocked;
   nextRu.textContent = TEXT.ru.enterPrices;
   nextEn.textContent = TEXT.en.enterPrices;
   explanation.textContent = t(state === "invalid" ? "invalidPrices" : "missingPrices");
+  publishPricingState(result);
 }
 
 function renderPricingStatus() {
@@ -293,6 +340,11 @@ function attachPricingListeners() {
     const input = $(selector);
     if (input) input.addEventListener("input", renderPricingStatus);
     if (input) input.addEventListener("change", renderPricingStatus);
+  });
+
+  window.addEventListener("uimposition:production-report", (event) => {
+    productionState = event.detail ?? { report: null, controlCase: null };
+    renderPricingStatus();
   });
 
   new MutationObserver(refreshLocalizedPricingText).observe(document.documentElement, {
