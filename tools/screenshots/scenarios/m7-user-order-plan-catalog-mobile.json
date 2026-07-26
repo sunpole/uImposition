@@ -19,7 +19,7 @@
   "beforeScreenshotAssertions": [
     { "selector": "#userProductionPlans", "text": "4 варианта" },
     { "selector": "#userProductionPlans", "text": "Все · 4" },
-    { "selector": "#userProductionPlans", "text": "Показано" },
+    { "selector": "#userProductionPlans", "text": "показано" },
     { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "20" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "21" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "доминируем" }
