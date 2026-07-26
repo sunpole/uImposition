@@ -1,6 +1,6 @@
 {
   "name": "uimposition",
-  "version": "0.7.0-alpha.3",
+  "version": "0.7.0-alpha.4",
   "private": true,
   "type": "module",
   "description": "Browser-based offset imposition planner.",
