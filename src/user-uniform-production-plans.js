@@ -248,10 +248,13 @@ function paperMinimumPlan({ pagePairs, grid, sourceSheet, pricing, printSpecific
     runLength,
   })));
   const records = materializePaperSolution({ solution: paperSolution, pagePairs });
+  const label = paperSolution.proof.lowerBoundReached
+    ? `Proven paper minimum · ${grid.rotation}° · ${grid.columns}×${grid.rows}`
+    : `Paper-focused feasible plan · ${grid.rotation}° · ${grid.columns}×${grid.rows}`;
 
   return createPlan({
     id,
-    label: `Paper minimum · ${grid.rotation}° · ${grid.columns}×${grid.rows}`,
+    label,
     family: USER_UNIFORM_PLAN_FAMILY.PAPER_MINIMUM,
     grid,
     pagePairs,
