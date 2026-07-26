@@ -33,14 +33,20 @@ uImposition — статический браузерный инструмент
 - отдельный учёт layout-форм и цветовых пластин 4+4;
 - regression-тесты A6 landscape/portrait, mixed A4/A5/A6 и A5 `400/700/4200`.
 
-### Следующий этап
+### Сейчас разрабатывается M7.1
 
-M7 / `0.7.0-alpha`:
-
-- перетаскиваемая иерархия важности целей;
+- изменяемая иерархия важности целей;
 - мгновенное изменение рекомендованного варианта без повторного перебора;
+- независимые цели: бумага, расчётная стоимость, формы, пластины, перетираж и листопрогоны;
+- вес листа по исходному формату и плотности `г/м²`;
+- стоимость бумаги по `BYN/кг`;
+- стоимость цветовых печатных форм по цене за штуку;
+- общая расчётная стоимость и себестоимость одного заказанного изделия;
+- компактная demo-проверка `Бумага / Стоимость / Формы`.
+
+### Дальше в M7
+
 - сравнение своего и чужого оборота;
-- минимум бумаги, форм, пластин, перетиража и листопрогонов;
 - полный раскрываемый набор существенно разных Pareto-вариантов;
 - точные дельты «что лучше / что хуже»;
 - компактная таблица вариантов вместо длинных крупных карточек;
@@ -67,9 +73,13 @@ uImposition is a static browser tool for planning complex gang-run offset imposi
 - separate side-layout form and 4+4 color-plate metrics;
 - A6 orientation, mixed-format, and variable-run A5 regression tests.
 
-### Next milestone
+### M7.1 in progress
 
-M7 / `0.7.0-alpha`: draggable objective hierarchy, instant re-ranking, work-and-back/work-and-turn comparison, exact better/worse deltas, compact Pareto alternatives, and a four-A6 1+1 × 4000 own-back control case.
+Pure objective ordering, instant re-ranking, paper weight from source-sheet size and gsm, BYN/kg paper cost, per-color-plate cost, total estimated production cost, unit cost, and a focused Paper / Cost / Forms demo.
+
+### Later M7 patches
+
+Work-and-back/work-and-turn comparison, exact better/worse deltas, compact Pareto alternatives, and a four-A6 1+1 × 4000 own-back control case.
 
 </td>
 </tr>
@@ -86,7 +96,9 @@ M7 / `0.7.0-alpha`: draggable objective hierarchy, instant re-ranking, work-and-
 
 ## Документация / Documentation
 
+- [Что осталось до 1.0 / Remaining work to 1.0](docs/REMAINING_WORK.md)
 - [План M7: приоритеты, свой оборот и варианты / M7 operator decision plan](docs/M7_IMPLEMENTATION_PLAN.md)
+- [Денежная оценка производства / Production costing](docs/PRODUCTION_COSTING.md)
 - [План M6 / M6 implementation plan](docs/M6_IMPLEMENTATION_PLAN.md)
 - [План M5 / M5 implementation plan](docs/M5_IMPLEMENTATION_PLAN.md)
 - [Архитектура / Architecture](docs/ARCHITECTURE.md)
