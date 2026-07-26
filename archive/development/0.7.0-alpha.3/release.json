@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "project": "uImposition",
+  "version": "0.7.0-alpha.3",
+  "tag": "v0.7.0-alpha.3",
+  "title": "uImposition v0.7.0-alpha.3",
+  "prerelease": true,
+  "sourceCommit": "a511af06e9e0c420134795637fab3d2825d21fa4",
+  "releaseCommit": "d7767aa6ec3b875864ea7d8ef8110b4c3ca8686e",
+  "createdAt": "2026-07-26T19:55:00Z",
+  "patchnote": "news/2026-07-26-uimposition-v0-7-0-alpha-3-real-alternatives.md",
+  "image": "news/2026-07-26-uimposition-v0-7-0-alpha-3-real-alternatives.jpg",
+  "archive": "archive/development/0.7.0-alpha.3/uimposition-v0-7-0-alpha-3-evidence.zip",
+  "screenshotScenario": "m7-real-alternatives-cost-first",
+  "archiveScenarios": [
+    "m7-real-alternatives-cost-first"
+  ],
+  "historicalArtifacts": [],
+  "telegramText": "uImposition 0.7.0-alpha.3: на основной странице появились два реальных Pareto-варианта — минимум бумаги и компактный ручной монтаж. Приоритет бумаги выбирает 3305 листов, приоритет стоимости — компактный вариант 3395 листов / 8 форм / 972,55 BYN. Интерфейс честно показывает компромисс: экономия 90 листов увеличивает стоимость на 6226,94 BYN при контрольном прайсе. Рабочие цены по-прежнему вводит оператор."
+}
