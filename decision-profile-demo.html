@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="uImposition M7.1 — проверка изменяемой иерархии оптимизации">
+  <title>uImposition · M7.1 decision profile</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="m7-decision-demo.css">
+</head>
+<body>
+  <header class="hero decision-demo-page__hero">
+    <nav class="nav" aria-label="Основная навигация">
+      <a class="brand" href="./" aria-label="uImposition — главная страница">
+        <span class="brand__name">uImposition</span>
+        <span class="brand__version">v<span data-project-version>0.6.0-alpha</span></span>
+      </a>
+      <button id="languageButton" class="language-button" type="button" aria-label="Switch to English">EN</button>
+    </nav>
+    <div class="hero__content">
+      <p class="eyebrow">M7.1 · Decision profile</p>
+      <h1 data-lang="ru">Один набор вариантов — разные рекомендации.</h1>
+      <h1 data-lang="en" hidden>One solution set — different recommendations.</h1>
+      <p data-lang="ru">Проверяем чистую модель изменения приоритетов до создания полного редактора M7.</p>
+      <p data-lang="en" hidden>Verifying the pure priority-order model before the full M7 editor is built.</p>
+    </div>
+  </header>
+
+  <main class="workspace"></main>
+
+  <footer>
+    <a href="./" class="footer-brand">uImposition · M7.1</a>
+    <span>© 2026 Anton Magomedov</span>
+  </footer>
+
+  <script type="module">
+    const button = document.querySelector("#languageButton");
+    button.addEventListener("click", () => {
+      const next = document.documentElement.lang === "ru" ? "en" : "ru";
+      document.documentElement.lang = next;
+      document.querySelectorAll("[data-lang]").forEach((element) => {
+        element.hidden = element.dataset.lang !== next;
+      });
+      button.textContent = next === "ru" ? "EN" : "RU";
+      button.ariaLabel = next === "ru" ? "Switch to English" : "Переключить на русский";
+    });
+
+    try {
+      const response = await fetch("./VERSION.json", { cache: "no-store" });
+      const data = response.ok ? await response.json() : null;
+      if (data?.version) {
+        document.querySelectorAll("[data-project-version]").forEach((element) => {
+          element.textContent = data.version;
+        });
+      }
+    } catch {
+      // The static fallback remains visible.
+    }
+  </script>
+  <script type="module" src="src/m7-decision-demo.js"></script>
+</body>
+</html>
