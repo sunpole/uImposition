@@ -1,0 +1,51 @@
+.selected-user-plan-details { display: grid; gap: 24px; }
+.selected-user-plan-details > .section-heading { margin-bottom: 0; }
+.selected-plan-summary { display: grid; gap: 16px; }
+.selected-plan-summary > .section-heading { margin-bottom: 0; align-items: center; }
+.selected-plan-clear { margin-left: auto; }
+.selected-plan-summary__metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.selected-plan-summary__metrics .metric { min-height: 100px; padding: 14px; }
+.selected-plan-summary__metrics .metric strong { font-size: clamp(1.05rem, 2vw, 1.5rem); }
+.selected-plan-meta { margin: 0; color: #616161; font-size: .84rem; overflow-wrap: anywhere; }
+
+.production-plan-card.is-operator-selected { outline: 4px solid #171717; outline-offset: 3px; }
+.select-user-plan-button { margin-left: auto; padding: 6px 11px; font-size: .8rem; }
+
+.selected-plan-section { border-top: 1px solid #cfcfcf; padding-top: 22px; display: grid; gap: 14px; }
+.selected-plan-section > h3 { margin: 0; font-size: 1.3rem; }
+.selected-plan-section > p { margin: 0; color: #555; }
+.selected-plan-preview-note { border-left: 4px solid #171717; background: #f1f1f1; padding: 10px 12px; font-size: .84rem; }
+.selected-plan-schemes { max-width: 100%; }
+
+.selected-plan-report > .section-heading { margin-bottom: 0; }
+.selected-plan-report__metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.selected-plan-report__metrics .metric { min-height: 104px; padding: 14px; }
+.selected-plan-report__metrics .metric strong { font-size: clamp(1.05rem, 2vw, 1.55rem); }
+.selected-plan-details-block { border: 1px solid #c8c8c8; border-radius: 12px; padding: 0; overflow: hidden; }
+.selected-plan-details-block > summary { padding: 12px 14px; background: #f5f5f5; }
+.selected-plan-details-block[open] > summary { border-bottom: 1px solid #d7d7d7; }
+.selected-plan-details-block .table-wrap { border: 0; border-radius: 0; }
+.selected-plan-table { min-width: 680px; }
+.selected-plan-table--pairs { min-width: 920px; }
+.selected-plan-contributions { min-width: 260px; white-space: normal; }
+
+.selected-plan-export__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.selected-plan-export__status { margin-left: auto; }
+
+@media (max-width: 900px) {
+  .selected-plan-summary__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .selected-plan-report__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .selected-user-plan-details { gap: 18px; }
+  .selected-plan-summary > .section-heading { display: grid; }
+  .selected-plan-clear { margin-left: 0; width: 100%; }
+  .selected-plan-summary__metrics,
+  .selected-plan-report__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .selected-plan-summary__metrics .metric,
+  .selected-plan-report__metrics .metric { min-height: 88px; padding: 10px; }
+  .select-user-plan-button { width: 100%; margin-left: 0; }
+  .selected-plan-export__actions { display: grid; grid-template-columns: 1fr; }
+  .selected-plan-export__status { margin-left: 0; justify-content: center; text-align: center; }
+}
