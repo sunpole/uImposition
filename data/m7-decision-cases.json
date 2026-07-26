@@ -1,8 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "M7 operator decision cases",
   "defaultObjectiveOrder": [
     "physicalSheets",
+    "estimatedTotalCost",
     "layoutForms",
     "colorPlates",
     "fileOverrun",
@@ -21,10 +22,45 @@
     "validDuplexStrategy",
     "validatedProductionReport"
   ],
+  "illustrativePricing": {
+    "status": "example only; operator must enter actual prices",
+    "currency": "BYN",
+    "sheetCostBasis": "source",
+    "sourceSheet": { "width": 620, "height": 450 },
+    "grammageGsm": 130,
+    "paperPricePerKg": 4,
+    "colorPlatePrice": 15,
+    "layoutFormPreparationPrice": 0,
+    "orderedFinishedQuantity": 29225,
+    "manualCompact": {
+      "physicalSheets": 3395,
+      "layoutForms": 8,
+      "colorPlates": 32,
+      "expectedPaperWeightKg": 123.13665,
+      "expectedPaperCost": 492.5466,
+      "expectedColorPlateCost": 480,
+      "expectedTotalCost": 972.5466
+    },
+    "paperMinimum": {
+      "physicalSheets": 3305,
+      "layoutForms": 112,
+      "colorPlates": 448,
+      "expectedPaperWeightKg": 119.87235,
+      "expectedPaperCost": 479.4894,
+      "expectedColorPlateCost": 6720,
+      "expectedTotalCost": 7199.4894
+    },
+    "expectedDecision": {
+      "paperFirst": "paperMinimum",
+      "costFirst": "manualCompact",
+      "formsFirst": "manualCompact"
+    }
+  },
   "a6FourKindsOwnBack": {
     "id": "M7-A6-FOUR-KINDS-OWN-BACK",
     "description": "Four different two-page A6 1+1 orders, 4000 copies each",
     "sheet": {
+      "source": { "width": 620, "height": 450 },
       "postTrim": { "width": 616, "height": 446 },
       "printable": { "width": 608, "height": 431 }
     },
@@ -86,6 +122,7 @@
       "paperPriorityOnly": "tie",
       "paperThenForms": "ownBack",
       "paperThenColorPlates": "ownBack",
+      "paperThenCost": "ownBack",
       "mustShowBothVariants": true,
       "mustShowTechnologyWarning": true
     }
