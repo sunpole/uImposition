@@ -23,8 +23,7 @@ function activeObjectiveIds(value = planSet) {
 function initializeObjectivePreference(value) {
   const activeOrder = value?.catalog?.objectiveOrder ?? [];
   if (!objectivePreference) {
-    objectivePreference = Object.freeze([...activeOrder]);
-    return;
+    objectivePreference = Object.freeze([...DEFAULT_OBJECTIVE_ORDER]);
   }
   const known = new Set(objectivePreference);
   const additions = activeOrder.filter((objectiveId) => !known.has(objectiveId));
@@ -36,8 +35,7 @@ function initializeObjectivePreference(value) {
 function rememberActiveObjectiveOrder(order) {
   const active = new Set(order);
   if (!objectivePreference) {
-    objectivePreference = Object.freeze([...order]);
-    return;
+    objectivePreference = Object.freeze([...DEFAULT_OBJECTIVE_ORDER]);
   }
 
   const queued = [...order];
