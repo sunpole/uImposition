@@ -14,9 +14,9 @@
     { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
     { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
     { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "0" },
+    { "action": "hide", "selector": "#settingsPanel" },
     { "action": "click", "selector": "#loadControlCase" },
     { "action": "wait", "timeoutMs": 1000 },
-    { "action": "hide", "selector": "#settingsPanel" },
     { "action": "wait", "timeoutMs": 150 }
   ],
   "beforeScreenshotAssertions": [
