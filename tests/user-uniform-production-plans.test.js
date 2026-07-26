@@ -96,7 +96,10 @@ test("user plan set builds both supported plan families for every fitting orient
     (plan) => plan.grid.rotation === 90
       && plan.family === USER_UNIFORM_PLAN_FAMILY.DEDICATED_PAIR_FORMS,
   );
-  assert.equal(paper90.metrics.physicalSheets, 19);
+  assert.equal(paper90.metrics.physicalSheets, 20);
+  assert.equal(paper90.proof.paperLowerBound, 19);
+  assert.equal(paper90.proof.lowerBoundReached, false);
+  assert.match(paper90.label, /Paper-focused feasible plan/);
   assert.equal(dedicated90.metrics.physicalSheets, 21);
 });
 
