@@ -51,6 +51,8 @@ export function createProductionReportSolutionMetrics({
   source = "production-report",
   layoutCompactness = null,
   distinctOrdersPerImposition = 1,
+  splitOrders = 0,
+  fragmentedBlocks = 0,
   colorsPerLayoutForm = DEFAULT_COLOR_PLATES_PER_LAYOUT_FORM,
 } = {}) {
   const totals = reportTotals(report);
@@ -96,8 +98,8 @@ export function createProductionReportSolutionMetrics({
     pairOverrun,
     fileUnderproduction,
     pairUnderproduction,
-    splitOrders: 0,
-    fragmentedBlocks: 0,
+    splitOrders: nonNegativeInteger(splitOrders, "splitOrders"),
+    fragmentedBlocks: nonNegativeInteger(fragmentedBlocks, "fragmentedBlocks"),
     distinctOrdersPerImposition: optionalNonNegativeNumber(
       distinctOrdersPerImposition,
       "distinctOrdersPerImposition",

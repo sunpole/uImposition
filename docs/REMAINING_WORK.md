@@ -4,13 +4,14 @@
 
 - последний завершённый release checkpoint: **`0.7.0-alpha.2` / M7.2**;
 - `release/v0.7.0-alpha.2`, tag `v0.7.0-alpha.2` и GitHub prerelease проверены на точном commit `aafa7b3a7c2e83d00e9c54796593259e9ef147d8`;
-- предыдущий checkpoint `0.7.0-alpha.1` также восстановлен и проверен на commit `622248f9e38f811a02143b428e264176f848b0a4`;
+- предыдущий checkpoint `0.7.0-alpha.1` восстановлен и проверен на commit `622248f9e38f811a02143b428e264176f848b0a4`;
 - доказан минимум физической бумаги `3305` листов для контрольного uniform-grid набора;
-- рабочая стоимость текущего compact-контрольного решения после явного ввода тестовых цен: `972,55 BYN`;
+- рабочая стоимость compact-контрольного решения после явного ввода тестовых цен: `972,55 BYN`;
 - активный патч: **`0.7.0-alpha.3` / M7.3**;
 - Pareto foundation объединён через PR `#20`;
-- compact materially-different display set реализуется через PR `#25`;
-- следующая задача: реальные нормализованные alternatives, RU/EN объяснения и pricing-component deltas.
+- compact materially-different display set объединён через PR `#25`;
+- real production alternatives реализуются через PR `#26`;
+- следующая задача: pure RU/EN explanations и совместимые pricing-component deltas.
 
 Каждый пункт ниже является отдельным публикуемым патчем: PR, проверки, фокусный Chromium screenshot, news/uNews/Telegram, постоянный evidence-архив, recovery-ветка, tag и GitHub prerelease/release.
 
@@ -49,8 +50,6 @@
 - отдельная demo-страница `Бумага / Стоимость / Формы`;
 - exact recovery branch, immutable tag и GitHub prerelease.
 
-Не входит: основной UI ввода цен, Pareto и свой оборот.
-
 ## M7.2 — `0.7.0-alpha.2`: нормализованные метрики решения
 
 **Статус: завершено и опубликовано.**
@@ -73,7 +72,7 @@
 
 ## M7.3 — `0.7.0-alpha.3`: существенно разные альтернативы и Pareto
 
-**Статус: в работе. PR `#20` завершил Pareto foundation; PR `#25` добавляет compact display set. Новый release ещё не создан.**
+**Статус: в работе. PR `#20` завершил Pareto foundation; PR `#25` — compact display set; PR `#26` — реальные production alternatives. Новый release ещё не создан.**
 
 Уже реализовано:
 
@@ -96,17 +95,27 @@
 - [x] явные omitted IDs и факт усечения;
 - [x] запрет coercion `null`, `undefined` и строк в нулевые Pareto-метрики;
 - [x] работа без денежной цели при `pricing incomplete`;
-- [x] отдельная документация `docs/M7_3_DISPLAY_ALTERNATIVES.md`.
+- [x] отдельная документация `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
+- [x] реальные normalized alternatives из существующих manual production report и paper-minimizer pipelines;
+- [x] граница raw layouts/candidates → `SolutionMetrics` → decision/Pareto/display;
+- [x] реальные `distinctOrdersPerImposition`, `splitOrders` и `fragmentedBlocks`;
+- [x] отдельный `paperSolution → SolutionMetrics` adapter;
+- [x] current decision profile → objective order → recommendation/frontier/display set;
+- [x] проверка совместимости валюты, листа, плотности, веса и эффективных ставок;
+- [x] состояния pricing comparison `ready / incomplete / incompatible`;
+- [x] реальный integration test: `3395/8/972.5466 BYN` против `3305/112/7199.4894 BYN`;
+- [x] paper-first и cost-first reranking без повторной генерации;
+- [x] отдельная документация `docs/M7_3_PRODUCTION_ALTERNATIVES.md`.
 
 Остаётся:
 
-- [ ] реальный набор нормализованных alternatives из существующих production pipelines, а не только unit fixtures;
-- [ ] интеграция current decision profile → objective order → recommendation/frontier/display set;
-- [ ] чистая RU/EN модель человеческих объяснений преимущества и цены каждого варианта;
-- [ ] отдельные денежные дельты по бумаге, цветовым пластинам, подготовке layout-форм и итогу;
-- [ ] проверка совместимости валюты и базы расчёта перед денежным сравнением;
+- [ ] чистая RU/EN модель человеческих объяснений преимущества, цены компромисса и решающей цели;
+- [ ] отдельные component deltas по бумаге, цветовым пластинам, подготовке layout-форм и итогу;
+- [ ] денежные фразы только при совместимом `pricing ready`;
+- [ ] runtime event/state с реальным alternative set;
 - [ ] компактная RU/EN демонстрация или UI;
-- [ ] Chromium evidence, news/uNews/Telegram, archive, recovery-ветка, tag и GitHub prerelease `0.7.0-alpha.3`.
+- [ ] focused Chromium evidence нового пользовательского результата;
+- [ ] news/uNews/Telegram, archive, recovery-ветка, tag и GitHub prerelease `0.7.0-alpha.3`.
 
 ## M7.4 — `0.7.0-alpha.4`: свой оборот / work-and-turn
 
