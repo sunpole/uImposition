@@ -1,3 +1,7 @@
+import {
+  applyUserObjectivePreset,
+  rerankUserProductionPlanSet,
+} from "./user-objective-priority.js";
 import { USER_UNIFORM_PRODUCTION_PLAN_SET_KIND } from "./user-uniform-production-plans.js";
 
 export const USER_PRODUCTION_PLAN_RUNTIME_KIND = "userProductionPlanRuntime";
@@ -36,6 +40,16 @@ function publicPlanSummary(plan) {
   });
 }
 
+function publicReranking(value) {
+  if (!value) return null;
+  return Object.freeze({
+    reusedGeneratedPlans: value.reusedGeneratedPlans === true,
+    regeneratedPlanCount: Number(value.regeneratedPlanCount ?? 0),
+    previousRecommendedId: value.previousRecommendedId ?? null,
+    recommendedId: value.recommendedId ?? null,
+  });
+}
+
 function internalSnapshot() {
   const selectedPlan = planById(selectedPlanId);
   return Object.freeze({
@@ -53,6 +67,9 @@ function publicSnapshot() {
     kind: snapshot.kind,
     ready: snapshot.ready,
     feasibleSolutionCount: snapshot.planSet?.catalog?.summary?.feasibleSolutionCount ?? 0,
+    objectiveOrder: Object.freeze([...(snapshot.planSet?.catalog?.objectiveOrder ?? [])]),
+    recommendedId: snapshot.planSet?.catalog?.recommendedId ?? null,
+    reranking: publicReranking(snapshot.planSet?.reranking),
     selectedPlanId: snapshot.selectedPlanId,
     selectedPlan: publicPlanSummary(snapshot.selectedPlan),
   });
@@ -88,6 +105,26 @@ export function setUserProductionPlanSet(nextPlanSet) {
 export function clearUserProductionPlanSet() {
   planSet = null;
   selectedPlanId = null;
+  notify();
+  return internalSnapshot();
+}
+
+export function rerankUserProductionPlans(objectiveOrder) {
+  if (!planSet) throw new Error("User production plan set is not ready");
+  planSet = rerankUserProductionPlanSet(planSet, objectiveOrder);
+  if (!planById(selectedPlanId)) selectedPlanId = null;
+  notify();
+  return internalSnapshot();
+}
+
+export function applyUserProductionObjectivePreset(presetId) {
+  if (!planSet) throw new Error("User production plan set is not ready");
+  planSet = applyUserObjectivePreset(
+    planSet,
+    presetId,
+    planSet.catalog.objectiveOrder,
+  );
+  if (!planById(selectedPlanId)) selectedPlanId = null;
   notify();
   return internalSnapshot();
 }
