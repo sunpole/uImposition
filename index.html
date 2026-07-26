@@ -259,10 +259,10 @@
     </section>
 
     <section class="panel roadmap-panel">
-      <h2 data-lang="ru">Текущая граница M7.4</h2><h2 data-lang="en" hidden>Current M7.4 boundary</h2>
+      <h2 data-lang="ru">Текущая граница M7.5</h2><h2 data-lang="en" hidden>Current M7.5 boundary</h2>
       <div class="two-column-copy">
-        <div data-lang="ru"><p><strong>Работает:</strong> реальные Pareto-варианты M7.3 и отдельное проверенное сравнение чужого оборота со своим оборотом. Контрольный work-and-turn сохраняет 1000 листов и 2000 прогонов, но сокращает формы и пластины с 2 до 1.</p><p><strong>Граница:</strong> это горизонтальный фиксированный A6-кейс, а не общий автоматический solver. Совместимость с захватом, боковым упором и конкретной машиной проверяет оператор.</p><p><strong>Следом:</strong> M7.5 — компактный редактор порядка приоритетов и рабочих цен.</p></div>
-        <div data-lang="en" hidden><p><strong>Working:</strong> the real M7.3 Pareto alternatives plus a separately validated comparison of separate front/back forms and work-and-turn. The control work-and-turn case keeps 1,000 sheets and 2,000 passes while reducing forms and plates from 2 to 1.</p><p><strong>Boundary:</strong> this is a fixed horizontal A6 control case, not a general automatic solver. The operator must confirm gripper, side-lay, and press compatibility.</p><p><strong>Next:</strong> M7.5 adds the compact priority-order and production-pricing editor.</p></div>
+        <div data-lang="ru"><p><strong>Работает:</strong> пользовательские размеры листа и изделия, строки заказа, общая цветность и рабочий прайс теперь строят проверенные production plans для обеих fitting uniform-grid ориентаций. Все планы сохраняются; Pareto, рекомендация и доминирование являются метками, а не удалением вариантов.</p><p><strong>Граница:</strong> полный набор относится к текущей явно ограниченной области — 0°/90° и две plan-family. Mixed-format, смешанные повороты, произвольные последовательности форм и общий work-and-turn search ещё не заявлены.</p><p><strong>Следом:</strong> расширять генератор семей планов и подключать выбранный пользовательский вариант к подробным схемам и PDF.</p></div>
+        <div data-lang="en" hidden><p><strong>Working:</strong> user sheet/product sizes, order rows, shared colors, and operator pricing now build validated production plans for both fitting uniform-grid orientations. Every plan is retained; Pareto, recommendation, and domination are annotations rather than deletion.</p><p><strong>Boundary:</strong> completeness applies only to the explicitly bounded 0°/90° × two-family scope. Mixed formats, mixed rotations, arbitrary form sequences, and general work-and-turn search are not claimed yet.</p><p><strong>Next:</strong> expand plan families and connect the operator-selected user plan to detailed schemes and PDF export.</p></div>
       </div>
     </section>
   </main>
@@ -272,6 +272,7 @@
   <script type="module" src="src/app.js"></script>
   <script type="module" src="src/m3-demo.js"></script>
   <script type="module" src="src/pricing-ui.js"></script>
+  <script type="module" src="src/user-production-plans-ui.js"></script>
   <script type="module" src="src/alternatives-ui.js"></script>
 </body>
 </html>
