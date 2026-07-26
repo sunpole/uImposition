@@ -94,7 +94,12 @@ This checkpoint proves the horizontal work-and-turn model and the fixed A6 contr
 
 ## Integrity records
 
-Generated repository asset hashes are stored in:
+Generated repository assets:
+
+- release JPEG SHA-256: `164b9c8a63d9972f3e74cfa7df40aefbedec3e6391eb7c59a0dec3490e706790`;
+- permanent evidence ZIP SHA-256: `c31190b6df04c317b97bff1c135c7d00f88e667845c8296db0d14bb1d3f5dc71`.
+
+The same hashes are stored in:
 
 - `archive/development/0.7.0-alpha.4/SHA256SUMS.txt`.
 
