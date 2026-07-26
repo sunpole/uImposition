@@ -29,7 +29,11 @@ function requireSolution(solution, label) {
   if (!solution.metrics || typeof solution.metrics !== "object") {
     throw new TypeError(`${label}.metrics must be an object`);
   }
-  return { ...solution, id };
+  return Object.freeze({
+    ...solution,
+    id,
+    metrics: Object.freeze({ ...solution.metrics }),
+  });
 }
 
 function metricValue(solution, objectiveId) {
@@ -157,7 +161,7 @@ export function rankSolutions(solutions, profile) {
 
   const normalized = solutions.map((solution, sourceIndex) => Object.freeze({
     sourceIndex,
-    solution: Object.freeze(requireSolution(solution, `solutions[${sourceIndex}]`)),
+    solution: requireSolution(solution, `solutions[${sourceIndex}]`),
   }));
   const ids = new Set();
   normalized.forEach(({ solution }) => {
