@@ -1,0 +1,92 @@
+name: Generate alpha.3 release assets
+
+on:
+  push:
+    branches:
+      - release-publication/v0.7.0-alpha.3
+    paths:
+      - .github/workflows/generate-alpha3-release-assets.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      SCREENSHOT_SCENARIOS: m7-real-alternatives-cost-first
+      SCREENSHOT_COMMIT: ${{ github.sha }}
+      NEWS_IMAGE: news/2026-07-26-uimposition-v0-7-0-alpha-3-real-alternatives.jpg
+      ARCHIVE_DIR: archive/development/0.7.0-alpha.3
+      ARCHIVE_FILE: archive/development/0.7.0-alpha.3/uimposition-v0-7-0-alpha-3-evidence.zip
+
+    steps:
+      - name: Checkout publication branch
+        uses: actions/checkout@v5
+        with:
+          ref: release-publication/v0.7.0-alpha.3
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Install pinned screenshot dependencies
+        working-directory: tools/screenshots
+        run: npm install --package-lock=false --ignore-scripts --no-audit --no-fund
+
+      - name: Install Chromium and asset tools
+        working-directory: tools/screenshots
+        run: |
+          npx playwright install --with-deps chromium > /tmp/playwright-install.log 2>&1
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick zip
+
+      - name: Capture exact focused panel
+        working-directory: tools/screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run capture 2>&1 | tee ../../capture.log
+
+      - name: Build JPEG, evidence ZIP and hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          png="artifacts/screenshots/uimposition-m7-3-real-alternatives-cost-first.png"
+          manifest="artifacts/screenshots/manifest.ndjson"
+          test -s "$png"
+          test -s "$manifest"
+
+          mkdir -p "$(dirname "$NEWS_IMAGE")" "$ARCHIVE_DIR" /tmp/alpha3-evidence
+          convert "$png" -resize '720x720>' -strip -interlace Plane -sampling-factor 4:2:0 -quality 55 "$NEWS_IMAGE"
+          identify "$NEWS_IMAGE"
+
+          cp "$NEWS_IMAGE" /tmp/alpha3-evidence/focused-playwright-release.jpg
+          grep '"scenarioId":"m7-real-alternatives-cost-first"' "$manifest" > /tmp/alpha3-evidence/manifest.ndjson
+          cp capture.log /tmp/alpha3-evidence/capture.log
+          cp "$ARCHIVE_DIR/README.md" /tmp/alpha3-evidence/README.md
+          (
+            cd /tmp/alpha3-evidence
+            sha256sum focused-playwright-release.jpg manifest.ndjson capture.log README.md > SHA256SUMS
+            zip -X -q -9 "$GITHUB_WORKSPACE/$ARCHIVE_FILE" focused-playwright-release.jpg manifest.ndjson capture.log README.md SHA256SUMS
+          )
+          sha256sum "$NEWS_IMAGE" "$ARCHIVE_FILE" > "$ARCHIVE_DIR/SHA256SUMS.txt"
+          unzip -t "$ARCHIVE_FILE"
+
+      - name: Commit generated binary assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "uImposition release automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add "$NEWS_IMAGE" "$ARCHIVE_FILE" "$ARCHIVE_DIR/SHA256SUMS.txt"
+          if git diff --cached --quiet; then
+            echo "Release assets already match the focused scenario."
+            exit 0
+          fi
+          git commit -m "release: generate alpha.3 focused evidence assets"
+          git push origin HEAD:release-publication/v0.7.0-alpha.3
