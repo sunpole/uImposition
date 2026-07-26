@@ -23,7 +23,7 @@ This archive records the evidence for M7.2.
 - Artifact: `uimposition-screenshots-18-1`
 - Captured at: `2026-07-26T16:58:42Z`
 - Original PNG SHA-256: `28cdeb14ed0b148fad294691920aedb18a9362527de60e784d08627f4751c71c`
-- Queue JPEG SHA-256: `4a01862a20dbb76d66b9b95afdbfabd7421cfe4741af2c901e819ef7a02177b`
+- Queue JPEG SHA-256: `08c1d6523fbf221c9e9cb928101acd6374b661cbf57649db7f6959cfc0009197`
 
 ## Checks before PR #18 merge
 
