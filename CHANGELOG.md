@@ -20,17 +20,25 @@
 - real imposition-distribution analysis for distinct orders, split orders, and fragmented blocks;
 - `paperSolution → SolutionMetrics` adapter based on real paper-minimizer output;
 - `productionAlternativeSet` integration from normalized production metrics through decision profile, Pareto frontier, and compact display set;
-- compatibility checks for currency, sheet basis, source-sheet geometry, grammage, sheet weight, and effective paper/plate/layout-preparation rates;
+- compatibility checks for currency, sheet basis, source-sheet geometry, grammage, sheet weight, and explicit paper/plate/layout-preparation rates;
 - full control-pipeline integration that rebuilds the real manual report and paper-minimum result from repository data;
+- pure RU/EN alternative-explanation model;
+- meaningful comparison references for recommended, reference, and ordinary alternatives;
+- localized reasons, primary advantage, primary tradeoff, and deciding-objective evidence;
+- component cost deltas for paper, color plates, layout-form preparation, and total estimated cost;
+- complete suppression of monetary text for incomplete or incompatible pricing;
 - `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
 - `docs/M7_3_PRODUCTION_ALTERNATIVES.md`;
-- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete/incompatible pricing, invalid references, metric coercion guards, real distribution metrics, and real production alternatives.
+- `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`;
+- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete/incompatible pricing, invalid references, metric coercion guards, real distribution metrics, real production alternatives, RU/EN copy, reference changes, and exact BYN component deltas.
 
 ### Changed
 
 - Pareto and display metrics must be actual finite JavaScript numbers; `null`, `undefined`, numeric strings, and empty strings can no longer become `0` through coercion;
 - the production-report adapter now accepts measured `splitOrders` and `fragmentedBlocks` instead of hardcoding both to zero;
-- estimated cost enters a production alternative comparison only when every solution shares a compatible pricing basis and rates.
+- normalized solution metrics retain explicit operator pricing rates;
+- estimated cost enters a production alternative comparison only when every solution shares a compatible pricing basis and rates;
+- the recommended/reference entry is compared with a real competing alternative instead of itself when explanations are generated.
 
 ### Verified real control alternatives
 
@@ -41,9 +49,16 @@
 
 Both values are rebuilt from the real control order, layouts, production report, paper minimizer, source sheet, and a shared illustrative pricing profile. They are not production defaults.
 
+For compact manual relative to paper minimum, the verified component deltas are:
+
+- paper: `+13.0572 BYN`;
+- color plates: `−6240 BYN`;
+- layout-form preparation: `0 BYN`;
+- estimated total: `−6226.9428 BYN`.
+
 ### Boundary
 
-This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires human-readable RU/EN tradeoff copy, component-cost deltas, runtime/UI integration, focused evidence, news, archive, recovery branch, tag, and GitHub prerelease.
+This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires runtime/UI integration, focused evidence, news, archive, recovery branch, tag, and GitHub prerelease.
 
 ## 0.7.0-alpha.2 — 2026-07-26
 
