@@ -9,6 +9,7 @@ import {
 import {
   applyUserProductionObjectivePreset,
   rerankUserProductionPlans,
+  resetUserProductionObjectivePreference,
   subscribeUserProductionPlanRuntime,
 } from "./user-production-plans-runtime.js";
 
@@ -18,6 +19,7 @@ const TEXT = Object.freeze({
     subtitle: "Что важнее оператору",
     waiting: "Введите корректный заказ. После построения вариантов здесь появятся все доступные цели.",
     hint: "Порядок применяется лексикографически: первая различающаяся цель решает, какой вариант рекомендован. Варианты не удаляются.",
+    defaultOrder: "По умолчанию",
     paperFirst: "Бумага",
     costFirst: "Стоимость",
     formsFirst: "Формы",
@@ -44,6 +46,7 @@ const TEXT = Object.freeze({
     subtitle: "What matters to the operator",
     waiting: "Enter a valid order. Every active objective will appear after alternatives are built.",
     hint: "The order is lexicographic: the first differing objective decides the recommendation. Alternatives are never deleted.",
+    defaultOrder: "Default",
     paperFirst: "Paper",
     costFirst: "Cost",
     formsFirst: "Forms",
@@ -68,6 +71,7 @@ const TEXT = Object.freeze({
 });
 
 const PRESETS = Object.freeze([
+  Object.freeze({ id: "default", label: "defaultOrder", reset: true }),
   Object.freeze({ id: USER_OBJECTIVE_PRESETS.PAPER_FIRST, label: "paperFirst" }),
   Object.freeze({ id: USER_OBJECTIVE_PRESETS.COST_FIRST, label: "costFirst", requires: "estimatedTotalCost" }),
   Object.freeze({ id: USER_OBJECTIVE_PRESETS.FORMS_FIRST, label: "formsFirst" }),
@@ -179,8 +183,10 @@ function applyOrder(order) {
 
 function applyPreset(presetId) {
   try {
-    const next = applyUserProductionObjectivePreset(presetId);
-    setMessage(rankingMessage(next.planSet));
+    const next = presetId === "default"
+    ? resetUserProductionObjectivePreference()
+    : applyUserProductionObjectivePreset(presetId);
+  setMessage(rankingMessage(next.planSet));
   } catch (error) {
     console.error(error);
     setMessage(
