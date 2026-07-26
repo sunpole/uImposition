@@ -3,7 +3,7 @@
   "path": "/",
   "viewport": { "width": 1280, "height": 960 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.7.0-alpha.2" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.3" },
     { "selector": "#pricingInputHint", "text": "Поля прайса" },
     { "selector": "#pricingProfileStatus", "text": "pricing incomplete" },
     { "selector": "#pricingProfileResult", "text": "null" },
@@ -27,5 +27,5 @@
     { "selector": "#pricingNextStepResult", "text": "сравнение вариантов" }
   ],
   "screenshotSelector": ".milestone-panel",
-  "screenshot": "uimposition-v0-7-0-alpha-2-m7-pricing-ready-with-report.png"
+  "screenshot": "uimposition-v0-7-0-alpha-3-m7-pricing-ready-with-report.png"
 }
