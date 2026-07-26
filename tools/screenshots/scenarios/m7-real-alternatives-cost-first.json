@@ -1,0 +1,30 @@
+{
+  "id": "m7-real-alternatives-cost-first",
+  "path": "/",
+  "viewport": { "width": 1440, "height": 1100 },
+  "assertions": [
+    { "selector": "#productionAlternatives", "text": "Реальные варианты производства" },
+    { "selector": "#alternativesStatus", "text": "Загрузите контрольный заказ" }
+  ],
+  "beforeScreenshot": [
+    { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },
+    { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
+    { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
+    { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "0" },
+    { "action": "hide", "selector": "#settingsPanel" },
+    { "action": "click", "selector": "#loadControlCase" },
+    { "action": "wait", "timeoutMs": 1200 },
+    { "action": "click", "selector": "#alternativesCostFirst" },
+    { "action": "wait", "timeoutMs": 150 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "#alternativesStatus", "text": "2 Pareto · pricing ready" },
+    { "selector": "#productionAlternatives[data-recommended-solution-id='manual-compact']", "text": "Компактный ручной" },
+    { "selector": "[data-solution-id='manual-compact'] .alternative-badge.is-recommended", "text": "Рекомендуемый" },
+    { "selector": "[data-solution-id='paper-minimum'] .alternative-advantage", "text": "Преимущество: Физическая бумага" },
+    { "selector": "[data-solution-id='paper-minimum'] .alternative-tradeoff", "text": "Цена компромисса: Расчётная стоимость" },
+    { "selector": "[data-solution-id='paper-minimum'] .alternatives-cost-components", "text": "6 226,94 BYN" }
+  ],
+  "screenshotSelector": "#productionAlternatives",
+  "screenshot": "uimposition-m7-3-real-alternatives-cost-first.png"
+}
