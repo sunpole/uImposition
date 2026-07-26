@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 1280, "height": 900 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.7.0-alpha.1" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.2" },
     { "selector": "#paperSolutionStatus", "text": "Минимум бумаги доказан" },
     { "selector": "#paperOptimalSheets", "text": "305" },
     { "selector": "#paperSavings", "text": "90" },
@@ -19,5 +19,5 @@
     { "action": "wait", "timeoutMs": 250 }
   ],
   "screenshotSelector": "#paperSolution",
-  "screenshot": "uimposition-v0-7-0-alpha-1-m6-paper-minimum-regression.png"
+  "screenshot": "uimposition-v0-7-0-alpha-2-m6-paper-minimum-regression.png"
 }
