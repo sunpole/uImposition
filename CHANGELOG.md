@@ -11,11 +11,22 @@
 - required extreme selection for physical sheets, estimated cost, layout forms, color plates, file/pair overrun, and press passes;
 - explicit `visibleFrontier` and `hiddenFrontierCount` metadata for limited displays;
 - structured per-objective metric deltas;
-- unit coverage for duplicates, dominance, tradeoffs, extrema, display limiting, and floating-point-safe delta expectations.
+- pure `pareto-display-set` model for a compact materially-different alternative set;
+- mandatory recommendation and unique extrema that cannot be hidden by a small display limit;
+- explicit requested/effective limits and `limitExpandedBy` metadata;
+- deterministic maximin range-normalized selection for additional tradeoff alternatives;
+- structured inclusion reasons, nearest-selected diversity evidence, advantages, tradeoffs, equal metrics, and exact deltas;
+- explicit `pricingComparable` behavior when cost is absent from the active Pareto objectives;
+- `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
+- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete pricing, invalid references, and metric coercion guards.
+
+### Changed
+
+- Pareto and display metrics must now be actual finite JavaScript numbers; `null`, `undefined`, numeric strings, and empty strings can no longer become `0` through coercion.
 
 ### Boundary
 
-This work is merged into `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires a compact materially-different display set, human-readable tradeoff explanations, pricing-aware monetary deltas, real normalized alternatives, UI/evidence, news, archive, recovery branch, tag, and GitHub prerelease.
+This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires real normalized alternatives from the production pipeline, human-readable RU/EN tradeoff copy, pricing-component breakdown, UI/evidence, news, archive, recovery branch, tag, and GitHub prerelease.
 
 ## 0.7.0-alpha.2 — 2026-07-26
 
