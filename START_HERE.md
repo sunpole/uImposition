@@ -6,19 +6,12 @@
 ## Текущее состояние
 
 - репозиторий: `sunpole/uImposition`;
-- последний полностью опубликованный checkpoint: **`0.7.0-alpha.2` / M7.2**;
-- recovery-ветка: `release/v0.7.0-alpha.2`;
-- immutable tag: `v0.7.0-alpha.2`;
-- GitHub prerelease, news/uNews/Telegram и evidence archive для M7.2 проверены;
-- активная разработка: **M7.3 — существенно разные альтернативы и Pareto**;
-- Pareto foundation объединён через PR `#20`;
-- compact display alternatives объединены через PR `#25`;
-- real production alternatives объединены через PR `#26`;
-- RU/EN explanations и component cost deltas реализуются через PR `#27`;
+- текущий release checkpoint: **`0.7.0-alpha.3` / M7.3**;
+- release manifest: `archive/development/0.7.0-alpha.3/release.json`;
+- обязательные recovery-ветка, immutable tag, GitHub prerelease, news/uNews/Telegram и evidence проверяются непосредственно в GitHub;
+- следующий этап: **M7.4 — свой оборот / work-and-turn**;
 - полный остаток до `1.0.0`: `docs/REMAINING_WORK.md`;
 - GitHub остаётся единственным источником истины.
-
-Фактическое состояние PR, Actions, branches, tags и Releases всегда проверять непосредственно в GitHub. Незавершённый код в `main` не является опубликованной версией, пока не выполнен полный release checkpoint.
 
 ## Что обязательно прочитать
 
@@ -31,105 +24,78 @@
 7. `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
 8. `docs/M7_3_PRODUCTION_ALTERNATIVES.md`;
 9. `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`;
-10. `docs/PRODUCTION_COSTING.md`;
-11. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-12. `docs/ARCHITECTURE.md`;
-13. `docs/TEST_PLAN.md`;
-14. `docs/DEVELOPMENT_HISTORY_POLICY.md`;
-15. `data/control-case.json`;
-16. `data/production-regression-cases.json`;
-17. `data/m7-decision-cases.json`;
-18. последние PR, Actions, branches, tags и Releases.
+10. `docs/M7_3_RUNTIME_UI.md`;
+11. `docs/PRODUCTION_COSTING.md`;
+12. `docs/TECHNICAL_SPECIFICATION_RU.md`;
+13. `docs/ARCHITECTURE.md`;
+14. `docs/TEST_PLAN.md`;
+15. `docs/DEVELOPMENT_HISTORY_POLICY.md`;
+16. `data/control-case.json`;
+17. `data/production-regression-cases.json`;
+18. `data/m7-decision-cases.json`;
+19. последние PR, Actions, branches, tags и Releases.
 
-## Что завершено к M7.2
+## Что завершено к M7.3
 
-M6 сохраняет:
+### M1–M6
 
-- проверенную геометрию листа и изделия;
-- точные пары страниц, лицо и зеркальный оборот;
-- production report и отдельные PDF схемы/отчёта;
+- геометрия листа и изделия;
+- точные пары страниц;
+- проверенные лица и зеркальные обороты;
+- production report;
+- отдельные PDF схемы и отчёта;
 - полный набор `8960` ограниченных кандидатов;
-- доказанный минимум физической бумаги `3305` листов;
-- нулевую недопечатку;
-- отдельные layout-формы и цветовые пластины;
-- производственные regression-кейсы и постоянные evidence-архивы.
+- доказанный минимум бумаги `3305` листов;
+- нулевая недопечатка;
+- раздельные layout-формы и цветовые пластины.
 
-M7.1 добавляет:
+### M7.1–M7.2
 
-- `11` изменяемых целей и отдельные жёсткие ограничения;
-- immutable decision profile;
-- лексикографическое ранжирование и объяснение первой решающей цели;
-- прозрачный расчёт веса бумаги, стоимости бумаги, форм, общей стоимости и стоимости изделия;
-- отдельный regression fixture `Бумага / Стоимость / Формы`.
+- `11` изменяемых целей и жёсткие ограничения;
+- immutable decision profile и лексикографическое ранжирование;
+- единая guarded-модель `SolutionMetrics`;
+- ввод рабочих цен без demo-defaults;
+- стоимость бумаги, пластин, подготовки layout-форм и итог;
+- состояния `pricing incomplete / inputs ready / ready`;
+- production report → реальная BYN-стоимость.
 
-M7.2 добавляет:
+### M7.3
 
-- единую guarded-модель `SolutionMetrics`;
-- рабочие поля плотности, `BYN/кг`, цены цветовой формы и необязательной подготовки layout-форм;
-- явные состояния `pricing incomplete`, `pricing inputs ready`, `pricing ready`;
-- подключение production report к реальному BYN-расчёту;
-- защиту от `null → 0`, недопечатки и несовпадения базы стоимости;
-- контрольный итог `972,55 BYN` только после ввода оператором проверенных цен.
+- Pareto-frontier, удаление дублей и доминируемых вариантов;
+- обязательные крайние решения;
+- compact materially-different display set;
+- реальные compact manual и paper minimum в общей модели;
+- строгая совместимость валюты, листа, плотности и ставок;
+- RU/EN-объяснения преимущества, цены компромисса и решающей цели;
+- component cost deltas;
+- runtime state/event и compact read-only панель;
+- paper-first / cost-first без повторной генерации;
+- выбор reference-варианта;
+- focused Chromium evidence.
 
-Рабочие цены не имеют выдуманных значений по умолчанию. Числа demo-fixture используются только для тестов и объяснения поведения.
+Проверенный контрольный результат:
 
-## Что уже сделано в M7.3
+| Метрика | Compact manual | Paper minimum |
+|---|---:|---:|
+| Физические листы | 3395 | 3305 |
+| Layout-формы | 8 | 112 |
+| Цветовые пластины | 32 | 448 |
+| Листопрогоны | 6790 | 6610 |
+| Перетираж пар | 1450 | 10 |
+| Разделённые заказы | 2 | 19 |
+| Иллюстративная стоимость | 972.5466 BYN | 7199.4894 BYN |
 
-### PR #20 — Pareto foundation
+Рабочие цены вводит оператор. Контрольные значения используются только для regression/evidence.
 
-- удаление полных дублей по метрикам;
-- сравнение по отдельной цели;
-- определение доминирования;
-- построение Pareto-frontier;
-- детерминированная сортировка frontier;
-- обязательные крайние варианты по бумаге, стоимости, формам, пластинам, перетиражу и прогонам;
-- явное число скрытых frontier-вариантов при display limit;
-- структурированные дельты метрик.
+## Следующая безопасная задача — M7.4
 
-### PR #25 — compact display alternatives
-
-- рекомендация и уникальные extrema закрепляются в отображаемом наборе;
-- слишком малый лимит расширяется прозрачно;
-- одно решение с несколькими extreme-причинами не дублируется;
-- дополнительные компромиссы выбираются детерминированным maximin-методом;
-- причины включения, преимущества, компромиссы и точные дельты структурированы;
-- `null`, `undefined`, строки и пустые значения запрещены как активные Pareto-метрики;
-- при `pricing incomplete` денежная цель исключается, а нулевая стоимость не выдумывается.
-
-### PR #26 — real production alternatives
-
-- реальные ручные монтажи и доказанный paper minimum переводятся в общие `SolutionMetrics`;
-- сырые candidate/layout структуры не попадают в decision/Pareto слой;
-- из фактического состава монтажей выводятся разные заказы, split orders и fragmented blocks;
-- проверяется общая валюта, лист, плотность и явные операторские ставки;
-- стоимость исключается при неполной или несовместимой базе;
-- реальный контрольный pipeline подтверждает два Pareto-варианта:
-  - compact manual: `3395` листов, `8` layout-форм, `972.5466 BYN`;
-  - paper minimum: `3305` листов, `112` layout-форм, `7199.4894 BYN`;
-- paper-first рекомендует минимум бумаги, cost-first — compact manual без повторной генерации.
-
-### PR #27 — explanations and component cost deltas
-
-- причины показа варианта локализованы на RU/EN;
-- для каждого варианта возвращаются преимущество, цена компромисса и решающая цель;
-- рекомендуемый вариант сравнивается не сам с собой, а со следующим ранжированным конкурентом;
-- reference-вариант можно менять без повторной генерации альтернатив;
-- component deltas показывают бумагу, цветовые пластины, подготовку layout-форм и итог;
-- денежные объяснения доступны только при совместимом `pricing ready`;
-- при `incomplete` или `incompatible` денежные значения полностью скрываются;
-- реальный paper-first breakdown показывает `−6226.9428 BYN` общей разницы compact manual против paper minimum.
-
-Это ещё не завершённый `0.7.0-alpha.3`: пока нет runtime state/event, компактного пользовательского UI, focused evidence, news и release checkpoint.
-
-## Следующая безопасная задача — продолжение M7.3
-
-1. Работать от актуального `main` после объединения PR `#27`.
-2. Не менять опубликованные tags `v0.7.0-alpha.1` и `v0.7.0-alpha.2`.
-3. Подключить real alternative set и explanation set к runtime state/event приложения.
-4. Добавить компактную read-only RU/EN демонстрацию двух реальных вариантов.
-5. Не переносить в UI сырые candidate/layout структуры.
-6. Проверить paper-first, cost-first, incomplete pricing и смену reference в Chromium.
-7. После UI-проверки подготовить focused screenshot, news/uNews/Telegram, evidence archive и release `0.7.0-alpha.3`.
+1. Подтвердить фактический checkpoint `0.7.0-alpha.3`: `release/v0.7.0-alpha.3`, tag `v0.7.0-alpha.3`, GitHub prerelease, news и archive.
+2. Создать отдельную ветку M7.4 от окончательного `main`.
+3. Реализовать чистую модель work-and-turn без DOM.
+4. Проверить геометрическую симметрию, направление переворота и повторное использование формы.
+5. Контрольный кейс: четыре A6 1+1, 2 страницы, по 4000.
+6. Ожидаемо: оба режима дают 1000 листов и 2000 прогонов; work-and-turn уменьшает layout-формы и пластины `2 → 1`.
+7. Не начинать M7.5 до отдельного release checkpoint M7.4.
 
 ## Главные правила
 
@@ -137,21 +103,20 @@ M7.2 добавляет:
 - минимум бумаги не равен минимуму денег или форм;
 - стоимость — прозрачная отдельная цель;
 - layout-формы и цветовые пластины не смешиваются;
-- рабочие цены вводит оператор;
-- программа показывает компромиссы и оставляет окончательный выбор оператору;
+- программа показывает компромиссы и оставляет выбор оператору;
 - mixed-format manual fixture не выдаётся за automatic packing;
-- последовательные пары 32-страничного изделия не выдаются за фальцевальный спуск;
+- последовательные пары не выдаются за готовый фальцевальный спуск;
 - полезная история и архивы сохраняются;
-- каждый завершённый опубликованный патч получает PR, проверки, Chromium evidence, news/uNews/Telegram, evidence archive, recovery-ветку, immutable tag и настоящий GitHub prerelease/release.
+- каждый опубликованный патч получает PR, проверки, Chromium evidence, news/uNews/Telegram, archive, recovery-ветку, immutable tag и настоящий GitHub release.
 
 ## Prompt для нового чата
 
 ```text
 Открой репозиторий sunpole/uImposition через GitHub.
 
-Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/REMAINING_WORK.md, docs/M7_IMPLEMENTATION_PLAN.md, docs/M7_3_DISPLAY_ALTERNATIVES.md, docs/M7_3_PRODUCTION_ALTERNATIVES.md, docs/M7_3_ALTERNATIVE_EXPLANATIONS.md, docs/PRODUCTION_COSTING.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/TEST_PLAN.md, docs/DEVELOPMENT_HISTORY_POLICY.md, data/control-case.json, data/production-regression-cases.json и data/m7-decision-cases.json. Проверь последние PR, Actions, branches, tags и Releases.
+Сначала прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/REMAINING_WORK.md, docs/M7_IMPLEMENTATION_PLAN.md, docs/M7_3_DISPLAY_ALTERNATIVES.md, docs/M7_3_PRODUCTION_ALTERNATIVES.md, docs/M7_3_ALTERNATIVE_EXPLANATIONS.md, docs/M7_3_RUNTIME_UI.md, docs/PRODUCTION_COSTING.md, docs/TECHNICAL_SPECIFICATION_RU.md, docs/ARCHITECTURE.md, docs/TEST_PLAN.md, docs/DEVELOPMENT_HISTORY_POLICY.md, data/control-case.json, data/production-regression-cases.json и data/m7-decision-cases.json. Проверь последние PR, Actions, branches, tags и Releases.
 
 GitHub — единственный источник истины. Не требуй локальный клон.
 
-Подтверди, что опубликованный checkpoint 0.7.0-alpha.2 существует как recovery-ветка, immutable tag и GitHub prerelease. Затем продолжай M7.3 с последнего объединённого PR: Pareto foundation, compact display set, real production alternatives и RU/EN explanations уже реализованы; следующая задача — runtime state/event и компактная read-only демонстрация реальных вариантов, затем полный release checkpoint 0.7.0-alpha.3. Не начинай work-and-turn из M7.4 раньше завершения M7.3.
+Подтверди полный release checkpoint 0.7.0-alpha.3. Затем продолжай только M7.4: чистая модель work-and-turn и контрольный кейс четырёх A6 1+1 по 4000. Не начинай M7.5 раньше завершения и выпуска M7.4.
 ```
