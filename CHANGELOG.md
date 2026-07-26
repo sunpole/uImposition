@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — M7.3 development
+## 0.7.0-alpha.3 — 2026-07-26
 
 ### Added
 
@@ -9,14 +9,12 @@
 - strict Pareto dominance checks;
 - deterministic Pareto-frontier construction;
 - required extreme selection for physical sheets, estimated cost, layout forms, color plates, file/pair overrun, and press passes;
-- explicit `visibleFrontier` and `hiddenFrontierCount` metadata for limited displays;
+- explicit frontier truncation metadata;
 - structured per-objective metric deltas;
 - pure `pareto-display-set` model for a compact materially-different alternative set;
 - mandatory recommendation and unique extrema that cannot be hidden by a small display limit;
-- explicit requested/effective limits and `limitExpandedBy` metadata;
 - deterministic maximin range-normalized selection for additional tradeoff alternatives;
-- structured inclusion reasons, nearest-selected diversity evidence, advantages, tradeoffs, equal metrics, and exact deltas;
-- explicit `pricingComparable` behavior when cost is absent from the active Pareto objectives;
+- structured inclusion reasons, advantages, tradeoffs, equal metrics, and exact deltas;
 - real imposition-distribution analysis for distinct orders, split orders, and fragmented blocks;
 - `paperSolution → SolutionMetrics` adapter based on real paper-minimizer output;
 - `productionAlternativeSet` integration from normalized production metrics through decision profile, Pareto frontier, and compact display set;
@@ -27,18 +25,26 @@
 - localized reasons, primary advantage, primary tradeoff, and deciding-objective evidence;
 - component cost deltas for paper, color plates, layout-form preparation, and total estimated cost;
 - complete suppression of monetary text for incomplete or incompatible pricing;
-- `docs/M7_3_DISPLAY_ALTERNATIVES.md`;
-- `docs/M7_3_PRODUCTION_ALTERNATIVES.md`;
-- `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`;
-- regression coverage for duplicates, dominance, tradeoffs, extrema, limit expansion, deterministic diversity, incomplete/incompatible pricing, invalid references, metric coercion guards, real distribution metrics, real production alternatives, RU/EN copy, reference changes, and exact BYN component deltas.
+- pure alternatives runtime state builder;
+- separate controller for production/pricing events and priority/reference commands;
+- sanitized public `uimposition:alternatives` state without raw reports, layouts, candidates, planned runs, or paper solutions;
+- compact read-only RU/EN alternatives panel on the main page;
+- paper-first and cost-first recommendation controls without regenerating impositions;
+- interactive comparison-reference selection;
+- focused Chromium scenario `m7-real-alternatives-cost-first`;
+- M7.3 architecture, production-alternative, explanation, display-set, and runtime/UI documentation;
+- regression coverage for duplicates, dominance, tradeoffs, extrema, deterministic diversity, incomplete/incompatible pricing, invalid references, real distribution metrics, real production alternatives, RU/EN copy, exact BYN component deltas, runtime states, priority changes, reference changes, and invalid control geometry.
 
 ### Changed
 
-- Pareto and display metrics must be actual finite JavaScript numbers; `null`, `undefined`, numeric strings, and empty strings can no longer become `0` through coercion;
-- the production-report adapter now accepts measured `splitOrders` and `fragmentedBlocks` instead of hardcoding both to zero;
+- Pareto and display metrics must be actual finite JavaScript numbers; `null`, `undefined`, numeric strings, and empty strings cannot become `0` through coercion;
+- the production-report adapter now accepts measured `splitOrders` and `fragmentedBlocks`;
 - normalized solution metrics retain explicit operator pricing rates;
-- estimated cost enters a production alternative comparison only when every solution shares a compatible pricing basis and rates;
-- the recommended/reference entry is compared with a real competing alternative instead of itself when explanations are generated.
+- estimated cost enters a comparison only when every solution shares a compatible pricing basis and rates;
+- the recommended/reference entry is compared with a real competing alternative instead of itself;
+- priority, language, and reference changes rerun only decision/Pareto/explanation layers over cached production data;
+- the UI layer no longer reads raw production or paper-minimizer structures directly;
+- package, README, VERSION files, and the runtime-visible site version are synchronized to `0.7.0-alpha.3`.
 
 ### Verified real control alternatives
 
@@ -47,7 +53,7 @@
 | Paper | paper minimum | 3305 | 112 | 448 | 7199.4894 BYN |
 | Cost | compact manual | 3395 | 8 | 32 | 972.5466 BYN |
 
-Both values are rebuilt from the real control order, layouts, production report, paper minimizer, source sheet, and a shared illustrative pricing profile. They are not production defaults.
+Both values are rebuilt from the real control order, layouts, production report, paper minimizer, source sheet, and one shared illustrative pricing profile. They are not production defaults.
 
 For compact manual relative to paper minimum, the verified component deltas are:
 
@@ -56,9 +62,13 @@ For compact manual relative to paper minimum, the verified component deltas are:
 - layout-form preparation: `0 BYN`;
 - estimated total: `−6226.9428 BYN`.
 
+### Verified UI evidence
+
+The focused Chromium scenario enters the illustrative pricing profile, loads the real control order, selects cost-first, verifies `manual-compact` as recommended, verifies the paper advantage and cost tradeoff, and captures only the M7.3 alternatives panel.
+
 ### Boundary
 
-This work is merged or proposed for `main` but is **not yet a published version**. The visible and released checkpoint remains `0.7.0-alpha.2`. M7.3 still requires runtime/UI integration, focused evidence, news, archive, recovery branch, tag, and GitHub prerelease.
+M7.3 provides real Pareto alternatives and a read-only decision panel. It does not include validated work-and-turn, the full priority editor, the final alternatives table/export, or automatic mixed-format packing.
 
 ## 0.7.0-alpha.2 — 2026-07-26
 
@@ -68,30 +78,23 @@ This work is merged or proposed for `main` but is **not yet a published version*
 - explicit `pricing ready` / `pricing incomplete` status;
 - guarded conversion from normalized metrics into decision-rankable solutions;
 - regression coverage for incomplete pricing, BYN costing, cost-first ranking, null-cost guards, underproduction guards, compactness guards, and production-cost basis mismatches;
-- main-page M7.2 status panel that explains why cost remains unavailable until production prices are provided;
 - main-page production pricing inputs for paper grammage, BYN/kg paper price, BYN color-plate price, and optional layout-form preparation cost;
 - production-report-to-`SolutionMetrics` adapter that calculates real BYN solution cost from report totals;
-- screenshot coverage for the full path: enter pricing, load the control production report, and show `pricing ready` with the calculated solution cost.
+- screenshot coverage for the full path from operator prices to `pricing ready`.
 
 ### Changed
 
-- visible site fallback version, package version, README, and version manifest are synchronized to `0.7.0-alpha.2`;
-- the main hero and roadmap copy describe the active M7.2 boundary instead of the old M6 boundary;
-- `estimatedTotalCost: null` remains incomplete and can no longer become `0` through JavaScript number coercion;
+- visible site fallback version, package version, README, and version manifest were synchronized to `0.7.0-alpha.2`;
+- `estimatedTotalCost: null` remains incomplete and cannot become `0`;
 - underproduced solutions cannot enter decision ranking;
 - `layoutCompactness: null` cannot enter decision ranking as a silent `0`;
-- imported production costs must match the candidate's physical sheets, color plates, and layout forms before normalization accepts them;
-- the main pricing panel moves from `pricing incomplete` to `pricing inputs ready` after valid prices, and to `pricing ready` after the production report is available.
+- imported production costs must match the candidate's physical sheets, color plates, and layout forms.
 
 ### Verified
 
 - control pricing path ends at `972.55 BYN` / `972,55 BYN`;
 - recovery branch `release/v0.7.0-alpha.2`, tag `v0.7.0-alpha.2`, GitHub prerelease, news/uNews/Telegram payload, and permanent evidence archive are published;
 - tag and recovery branch point to exact checkpoint commit `aafa7b3a7c2e83d00e9c54796593259e9ef147d8`.
-
-### Boundary
-
-M7.2 provides guarded metrics, operator pricing inputs, and real production-report cost for the current control solution. It does not include completed Pareto alternatives, work-and-turn, or automatic mixed-format packing.
 
 ## 0.7.0-alpha.1 — 2026-07-26
 
@@ -114,15 +117,6 @@ M7.2 provides guarded metrics, operator pricing inputs, and real production-repo
 - focused Chromium scenario that clicks the cost priority and verifies the changed recommendation;
 - `docs/PRODUCTION_COSTING.md`;
 - `docs/REMAINING_WORK.md` with the release sequence through stable `1.0.0`.
-
-### Changed
-
-- the default objective order places estimated cost immediately after physical sheets;
-- every candidate solution must provide all 11 finite metrics before comparison;
-- M7 planning includes paper weight, BYN paper cost, form cost, total cost, and unit cost;
-- README exposes the active M7 work and remaining roadmap;
-- screenshot tooling can assert the DOM after its interaction actions;
-- visible and package versions are synchronized to `0.7.0-alpha.1`.
 
 ### Verified illustrative fixture
 
