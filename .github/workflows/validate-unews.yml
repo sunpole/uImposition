@@ -36,18 +36,29 @@ jobs:
       - name: Dry-run every prepared uImposition patchnote
         shell: bash
         run: |
+          set -o pipefail
           shopt -s nullglob
           files=(news/*.md)
           checked=0
+          : > unews-validation.log
           for file in "${files[@]}"; do
             if [ "$(basename "$file")" = "README.md" ]; then
               continue
             fi
-            node .unews-validator/scripts/publish-from-projects.js "$file" --check
+            echo "== $file ==" | tee -a unews-validation.log
+            node .unews-validator/scripts/publish-from-projects.js "$file" --check 2>&1 | tee -a unews-validation.log
             checked=$((checked + 1))
           done
           if [ "$checked" -eq 0 ]; then
-            echo "No uImposition patchnotes found" >&2
+            echo "No uImposition patchnotes found" | tee -a unews-validation.log >&2
             exit 1
           fi
-          echo "Validated $checked uImposition patchnote(s) with current uNews"
+          echo "Validated $checked uImposition patchnote(s) with current uNews" | tee -a unews-validation.log
+
+      - name: Upload uNews validation diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: uimposition-unews-validation-${{ github.event.pull_request.number }}-${{ github.run_attempt }}
+          path: unews-validation.log
+          if-no-files-found: ignore
