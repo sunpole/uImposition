@@ -1,3 +1,5 @@
+import { DUPLEX_STRATEGIES } from "./duplex-strategies.js";
+
 function isNonNegativeInteger(value) {
   return Number.isInteger(value) && value >= 0;
 }
@@ -8,6 +10,16 @@ function isPositiveInteger(value) {
 
 function addMismatch(errors, label, actual, expected) {
   if (actual !== expected) errors.push(`${label}: expected ${expected}, received ${actual}`);
+}
+
+function expectedFormsForMode(duplexMode) {
+  if (duplexMode === DUPLEX_STRATEGIES.SEPARATE_FRONT_BACK_FORMS) {
+    return { frontForms: 1, backForms: 1, forms: 2 };
+  }
+  if (duplexMode === DUPLEX_STRATEGIES.WORK_AND_TURN) {
+    return { frontForms: 1, backForms: 0, forms: 1 };
+  }
+  return null;
 }
 
 export function validateProductionReport(report) {
@@ -89,15 +101,49 @@ export function validateProductionReport(report) {
   });
 
   if (runMetrics && Array.isArray(runMetrics.impositions)) {
+    const expectedForms = expectedFormsForMode(runMetrics.duplexMode);
+    if (!expectedForms) errors.push(`Unsupported duplex mode: ${runMetrics.duplexMode}`);
+    if (report?.duplexMode !== runMetrics.duplexMode) {
+      errors.push("Production report duplexMode does not match run metrics");
+    }
+
+    runMetrics.impositions.forEach((metric, index) => {
+      const prefix = `Run metric ${index + 1}`;
+      if (!isPositiveInteger(metric?.runLength)) errors.push(`${prefix} has invalid runLength`);
+      addMismatch(errors, `${prefix} physicalSheets`, metric?.physicalSheets, metric?.runLength);
+      addMismatch(errors, `${prefix} pressPasses`, metric?.pressPasses, Number(metric?.runLength ?? 0) * 2);
+      if (expectedForms) {
+        addMismatch(errors, `${prefix} frontForms`, metric?.frontForms, expectedForms.frontForms);
+        addMismatch(errors, `${prefix} backForms`, metric?.backForms, expectedForms.backForms);
+        addMismatch(errors, `${prefix} forms`, metric?.forms, expectedForms.forms);
+      }
+    });
+
     const physicalSheets = runMetrics.impositions.reduce(
       (sum, metric) => sum + Number(metric?.physicalSheets ?? 0),
       0,
     );
+    const frontForms = runMetrics.impositions.reduce(
+      (sum, metric) => sum + Number(metric?.frontForms ?? 0),
+      0,
+    );
+    const backForms = runMetrics.impositions.reduce(
+      (sum, metric) => sum + Number(metric?.backForms ?? 0),
+      0,
+    );
+    const forms = runMetrics.impositions.reduce(
+      (sum, metric) => sum + Number(metric?.forms ?? 0),
+      0,
+    );
+    const pressPasses = runMetrics.impositions.reduce(
+      (sum, metric) => sum + Number(metric?.pressPasses ?? 0),
+      0,
+    );
     addMismatch(errors, "Run metrics physicalSheets", runMetrics.physicalSheets, physicalSheets);
-    addMismatch(errors, "Run metrics frontForms", runMetrics.frontForms, runMetrics.impositions.length);
-    addMismatch(errors, "Run metrics backForms", runMetrics.backForms, runMetrics.impositions.length);
-    addMismatch(errors, "Run metrics forms", runMetrics.forms, runMetrics.frontForms + runMetrics.backForms);
-    addMismatch(errors, "Run metrics pressPasses", runMetrics.pressPasses, physicalSheets * 2);
+    addMismatch(errors, "Run metrics frontForms", runMetrics.frontForms, frontForms);
+    addMismatch(errors, "Run metrics backForms", runMetrics.backForms, backForms);
+    addMismatch(errors, "Run metrics forms", runMetrics.forms, forms);
+    addMismatch(errors, "Run metrics pressPasses", runMetrics.pressPasses, pressPasses);
   }
 
   if (totals) {
