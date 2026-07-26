@@ -142,6 +142,22 @@ test("metric-equivalent but structurally distinct plans remain in the lossless c
   });
 });
 
+test("user plan set rejects an incomplete front/back pair instead of pricing a blank side", () => {
+  const incompletePairs = expandPagePairs([{
+    file: "Odd",
+    quantity: 100,
+    pages: 3,
+  }]);
+
+  assert.throws(() => createUserUniformProductionPlanSet({
+    pagePairs: incompletePairs,
+    placementOptions,
+    sourceSheet,
+    printSpecification,
+    pricing,
+  }), /require complete front\/back page pairs/);
+});
+
 test("user plan set rejects unsupported simplex pricing shape instead of inventing duplex totals", () => {
   const simplex = createDuplexPrintSpecification({ frontColors: 4, backColors: 0 });
 

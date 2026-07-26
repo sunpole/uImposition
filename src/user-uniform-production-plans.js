@@ -52,7 +52,12 @@ function requirePagePairs(pagePairs) {
   if (!Array.isArray(pagePairs) || pagePairs.length === 0) {
     throw new TypeError("pagePairs must be a non-empty array");
   }
-  createInitialDemandState(pagePairs);
+  const demandState = createInitialDemandState(pagePairs);
+  if (demandState.rows.some(({ backPage }) => backPage === null)) {
+    throw new RangeError(
+      "User uniform production plans currently require complete front/back page pairs",
+    );
+  }
   return pagePairs;
 }
 
