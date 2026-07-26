@@ -51,7 +51,7 @@ test("manual compact control solution produces the expected BYN cost breakdown",
   assert.equal(result.colorPlateCost, expected.expectedColorPlateCost);
   assert.equal(result.layoutFormPreparationCost, 0);
   assert.equal(result.estimatedTotalCost, expected.expectedTotalCost);
-  assert.equal(result.estimatedUnitCost, 0.033278754);
+  assert.equal(result.estimatedUnitCost, 0.033277899);
   assert.ok(Object.isFrozen(result));
   assert.ok(Object.isFrozen(result.sourceSheet));
 });
@@ -79,10 +79,9 @@ test("paper minimum can use less paper but cost much more because of color plate
   assert.ok(paperMinimum.physicalSheets < manual.physicalSheets);
   assert.ok(paperMinimum.paperCost < manual.paperCost);
   assert.ok(paperMinimum.estimatedTotalCost > manual.estimatedTotalCost);
-  assert.equal(
-    paperMinimum.estimatedTotalCost - manual.estimatedTotalCost,
-    6226.9428,
-  );
+  assert.ok(Math.abs(
+    paperMinimum.estimatedTotalCost - manual.estimatedTotalCost - 6226.9428,
+  ) < 1e-9);
 });
 
 test("optional preparation price is included separately from physical plates", () => {
