@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   test:
@@ -39,3 +39,81 @@ jobs:
           path: quality-check.log
           if-no-files-found: warn
           retention-days: 30
+
+  recover-alpha-releases:
+    if: github.event_name == 'pull_request' && github.head_ref == 'repair/recover-alpha-releases'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout exact main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Recover alpha release checkpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for version in 0.7.0-alpha.1 0.7.0-alpha.2; do
+            manifest="archive/development/${version}/release.json"
+            eval "$(node --input-type=module - "$manifest" <<'NODE'
+          import fs from 'node:fs';
+          const data = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+          const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
+          console.log(`TAG=${quote(data.tag)}`);
+          console.log(`TITLE=${quote(data.title)}`);
+          console.log(`TARGET=${quote(data.releaseCommit)}`);
+          console.log(`PATCHNOTE=${quote(data.patchnote)}`);
+          console.log(`IMAGE=${quote(data.image)}`);
+          console.log(`ARCHIVE=${quote(data.archive)}`);
+          NODE
+          )"
+
+            branch="release/v${version}"
+            branch_sha="$(git ls-remote origin "refs/heads/${branch}" | cut -f1)"
+            if [ -z "$branch_sha" ]; then
+              gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+                -f ref="refs/heads/${branch}" \
+                -f sha="$TARGET" >/dev/null
+              branch_sha="$TARGET"
+            fi
+            if [ "$branch_sha" != "$TARGET" ]; then
+              echo "$branch points to $branch_sha, expected $TARGET"
+              exit 1
+            fi
+
+            tag_sha="$(git ls-remote origin "refs/tags/${TAG}" | head -n1 | cut -f1)"
+            tag_commit="$(git ls-remote origin "refs/tags/${TAG}^{}" | head -n1 | cut -f1)"
+            if [ -z "$tag_commit" ]; then
+              tag_commit="$tag_sha"
+            fi
+            if [ -z "$tag_sha" ]; then
+              gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+                -f ref="refs/tags/${TAG}" \
+                -f sha="$TARGET" >/dev/null
+              tag_commit="$TARGET"
+            fi
+            if [ "$tag_commit" != "$TARGET" ]; then
+              echo "$TAG points to $tag_commit, expected $TARGET"
+              exit 1
+            fi
+
+            if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              gh release create "$TAG" \
+                "$ARCHIVE#Development evidence archive" \
+                "$IMAGE#Focused feature screenshot" \
+                --repo "$GITHUB_REPOSITORY" \
+                --verify-tag \
+                --title "$TITLE" \
+                --notes-file "$PATCHNOTE" \
+                --prerelease
+            fi
+
+            gh release view "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --json tagName,isPrerelease,name \
+              --jq '{tag: .tagName, prerelease: .isPrerelease, name: .name}'
+          done
