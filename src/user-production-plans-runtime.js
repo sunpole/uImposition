@@ -55,8 +55,11 @@ function preferredActiveOrder(value) {
 }
 
 function applyStoredPreference(value) {
+  const current = value?.catalog?.objectiveOrder;
+  const objectiveIds = value?.catalog?.objectiveIds;
+  if (!Array.isArray(current) || !Array.isArray(objectiveIds)) return value;
+
   const order = preferredActiveOrder(value);
-  const current = value.catalog.objectiveOrder;
   const unchanged = current.length === order.length
     && current.every((objectiveId, index) => objectiveId === order[index]);
   return unchanged ? value : rerankUserProductionPlanSet(value, order);
