@@ -31,6 +31,7 @@ h1 { max-width: 920px; margin: 8px 0 20px; font-size: clamp(2.5rem, 7vw, 6rem); 
 .section-kicker { margin: 0; }
 .status-chip { display: inline-flex; align-items: center; min-height: 32px; border: 1px solid #b7b7b7; border-radius: 999px; padding: 5px 12px; font-size: .82rem; background: #f4f4f4; }
 .status-chip--warning { border-color: #171717; background: #fff2b8; color: #171717; font-weight: 850; }
+.status-chip--success { border-color: #171717; background: #dff7df; color: #171717; font-weight: 850; }
 
 .result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .result-grid--capacity { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -66,6 +67,8 @@ details { border-top: 1px solid #e0e0e0; padding-top: 10px; }
 summary { cursor: pointer; font-weight: 750; font-size: .9rem; }
 .four-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .four-sides label { display: grid; grid-template-columns: 20px 1fr; align-items: center; gap: 4px; }
+.pricing-controls { display: grid; gap: 12px; }
+.pricing-controls__hint { margin: 0; }
 
 .button-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .button { border: 1px solid #171717; border-radius: 9px; background: #171717; color: #fff; padding: 9px 13px; }

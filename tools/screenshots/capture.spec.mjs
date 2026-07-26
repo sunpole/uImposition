@@ -48,6 +48,12 @@ async function runBeforeScreenshotActions(page, actions = []) {
       await locator.click();
       continue;
     }
+    if (action.action === "fill") {
+      const locator = page.locator(action.selector);
+      await expect(locator).toBeVisible();
+      await locator.fill(String(action.value ?? ""));
+      continue;
+    }
     if (action.action === "hide") {
       const locator = page.locator(action.selector);
       await locator.evaluate((element) => {
@@ -129,33 +135,7 @@ for (const scenario of scenarios) {
       download: downloadEntry,
     };
 
-    await writeFile(
-      path.join(outputDir, "entries", `${scenario.id}.json`),
-      `${JSON.stringify(entry, null, 2)}\n`,
-      "utf8",
-    );
+    const manifestPath = path.join(outputDir, "manifest.ndjson");
+    await writeFile(manifestPath, `${JSON.stringify(entry)}\n`, { flag: "a" });
   });
 }
-
-test.afterAll(async () => {
-  const entryFiles = (await readdir(path.join(outputDir, "entries")))
-    .filter((name) => name.endsWith(".json"))
-    .sort();
-  const entries = [];
-  for (const fileName of entryFiles) {
-    entries.push(JSON.parse(await readFile(path.join(outputDir, "entries", fileName), "utf8")));
-  }
-
-  const manifest = {
-    project: "uImposition",
-    generatedAt: new Date().toISOString(),
-    commit: process.env.SCREENSHOT_COMMIT || "local-uncommitted",
-    entries,
-  };
-
-  await writeFile(
-    path.join(outputDir, "manifest.json"),
-    `${JSON.stringify(manifest, null, 2)}\n`,
-    "utf8",
-  );
-});

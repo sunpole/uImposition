@@ -1,0 +1,29 @@
+{
+  "id": "m7-pricing-inputs-ready",
+  "path": "/",
+  "viewport": { "width": 1280, "height": 960 },
+  "assertions": [
+    { "selector": ".brand", "text": "v0.7.0-alpha.2" },
+    { "selector": "#pricingInputHint", "text": "Поля прайса" },
+    { "selector": "#pricingProfileStatus", "text": "pricing incomplete" },
+    { "selector": "#pricingProfileResult", "text": "null" },
+    { "selector": "#pricingCostRankingResult", "text": "заблокировано" }
+  ],
+  "beforeScreenshot": [
+    { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },
+    { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
+    { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
+    { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "0" },
+    { "action": "hide", "selector": "#settingsPanel" },
+    { "action": "wait", "timeoutMs": 150 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "#pricingProfileStatus", "text": "pricing inputs ready" },
+    { "selector": "#pricingProfileResult", "text": "BYN" },
+    { "selector": "#pricingSheetWeightResult", "text": "0,03627" },
+    { "selector": "#pricingCostRankingResult", "text": "ожидает отчёт" },
+    { "selector": "#pricingNextStepResult", "text": "расчёт стоимости" }
+  ],
+  "screenshotSelector": ".milestone-panel",
+  "screenshot": "uimposition-v0-7-0-alpha-2-m7-pricing-inputs-ready.png"
+}
