@@ -43,7 +43,7 @@ jobs:
           import fs from 'node:fs';
           const manifestPath = process.argv[2];
           const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-          const quote = (value) => `'${String(value).replaceAll("'", "'\''")}'`;
+          const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`;
           console.log(`VERSION=${quote(data.version)}`);
           console.log(`TAG=${quote(data.tag)}`);
           console.log(`TITLE=${quote(data.title)}`);
