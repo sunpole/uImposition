@@ -5,11 +5,36 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "../..");
 const markerPath = path.join(root, "news/.prepare-release.json");
-const manifestPath = path.join(root, "artifacts/screenshots/manifest.json");
+const manifestJsonPath = path.join(root, "artifacts/screenshots/manifest.json");
+const manifestNdjsonPath = path.join(root, "artifacts/screenshots/manifest.ndjson");
+
+async function readScreenshotEntries() {
+  try {
+    const manifest = JSON.parse(await readFile(manifestJsonPath, "utf8"));
+    if (Array.isArray(manifest)) return manifest;
+    if (Array.isArray(manifest.entries)) return manifest.entries;
+    throw new TypeError("Screenshot manifest.json must contain an entries array");
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+
+  const ndjson = await readFile(manifestNdjsonPath, "utf8");
+  return ndjson
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      try {
+        return JSON.parse(line);
+      } catch (error) {
+        throw new SyntaxError(`Invalid screenshot manifest.ndjson line ${index + 1}: ${error.message}`);
+      }
+    });
+}
 
 const marker = JSON.parse(await readFile(markerPath, "utf8"));
-const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-const entry = manifest.entries.find((item) => item.scenario === marker.scenario);
+const entries = await readScreenshotEntries();
+const entry = entries.find((item) => item.scenario === marker.scenario);
 const expectedCommit = process.env.SCREENSHOT_COMMIT || process.env.GITHUB_SHA;
 
 if (!entry) throw new Error(`Screenshot scenario not found: ${marker.scenario}`);
