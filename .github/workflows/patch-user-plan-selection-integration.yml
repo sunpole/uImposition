@@ -1,0 +1,161 @@
+name: Patch user plan selection integration
+
+on:
+  push:
+    branches:
+      - m7.5/user-plan-selection-export
+    paths:
+      - .github/workflows/patch-user-plan-selection-integration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v5
+        with:
+          ref: m7.5/user-plan-selection-export
+          fetch-depth: 0
+
+      - name: Apply exact integration patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          plans_ui = Path('src/user-production-plans-ui.js')
+          source = plans_ui.read_text(encoding='utf-8')
+          import_marker = 'import { createUserUniformProductionPlanSet } from "./user-uniform-production-plans.js";\n'
+          runtime_import = '''import {
+            clearUserProductionPlanSet,
+            setUserProductionPlanSet,
+          } from "./user-production-plans-runtime.js";
+          '''.replace('          ', '')
+          if runtime_import not in source:
+              if import_marker not in source:
+                  raise SystemExit('Plans UI import marker not found')
+              source = source.replace(import_marker, import_marker + runtime_import, 1)
+
+          source = source.replace(
+              '''      state.planSet = null;
+                    state.error = null;'''.replace('        state', '      state').replace('      state.error', '      state.error'),
+              '''      state.planSet = null;
+                    clearUserProductionPlanSet();
+                    state.error = null;'''.replace('        clear', '      clear').replace('        state.error', '      state.error'),
+              1,
+          )
+          source = source.replace(
+              '''      state.planSet = null;
+                    state.error = new RangeError(t("tooManyPairs"));'''.replace('        state', '      state').replace('      state.error', '      state.error'),
+              '''      state.planSet = null;
+                    clearUserProductionPlanSet();
+                    state.error = new RangeError(t("tooManyPairs"));'''.replace('        clear', '      clear').replace('        state.error', '      state.error'),
+              1,
+          )
+          source = source.replace(
+              '''      state.planSet = null;
+                    state.error = new RangeError(t("waitingColors"));'''.replace('        state', '      state').replace('      state.error', '      state.error'),
+              '''      state.planSet = null;
+                    clearUserProductionPlanSet();
+                    state.error = new RangeError(t("waitingColors"));'''.replace('        clear', '      clear').replace('        state.error', '      state.error'),
+              1,
+          )
+          creation = '''    state.planSet = createUserUniformProductionPlanSet({
+              pagePairs: input.orders.pagePairs,
+              placementOptions: input.placementOptions,
+              sourceSheet: input.geometry.source,
+              printSpecification: createDuplexPrintSpecification({ frontColors, backColors }),
+              pricing: state.pricing,
+            });
+            state.error = null;'''.replace('      pagePairs', '      pagePairs').replace('      placementOptions', '      placementOptions').replace('      sourceSheet', '      sourceSheet').replace('      printSpecification', '      printSpecification').replace('      pricing', '      pricing').replace('    });', '    });').replace('    state.error', '    state.error')
+          replacement = creation.replace('    state.error = null;', '    setUserProductionPlanSet(state.planSet);\n    state.error = null;')
+          if creation not in source:
+              raise SystemExit('Plans UI plan creation block not found')
+          source = source.replace(creation, replacement, 1)
+          catch_block = '''  } catch (error) {
+              state.planSet = null;
+              state.error = error;
+            }'''.replace('    state', '    state').replace('  }', '  }')
+          catch_replacement = '''  } catch (error) {
+              state.planSet = null;
+              clearUserProductionPlanSet();
+              state.error = error;
+            }'''.replace('    clear', '    clear').replace('    state', '    state').replace('  }', '  }')
+          if catch_block not in source:
+              raise SystemExit('Plans UI catch block not found')
+          source = source.replace(catch_block, catch_replacement, 1)
+          plans_ui.write_text(source, encoding='utf-8')
+
+          details = Path('src/user-production-plan-details-ui.js')
+          source = details.read_text(encoding='utf-8')
+          old_label = '''    button.classList.toggle("button--quiet", !selected);
+            button.textContent = selected ? t("selected") : t("select");
+            button.setAttribute("aria-pressed", String(selected));'''.replace('    button.textContent', '    button.textContent').replace('    button.setAttribute', '    button.setAttribute')
+          new_label = '''    button.classList.toggle("button--quiet", !selected);
+            const label = selected ? t("selected") : t("select");
+            if (button.textContent !== label) button.textContent = label;
+            button.setAttribute("aria-pressed", String(selected));'''.replace('    const', '    const').replace('    if', '    if').replace('    button.setAttribute', '    button.setAttribute')
+          if old_label not in source:
+              raise SystemExit('Details UI button label block not found')
+          source = source.replace(old_label, new_label, 1)
+          old_subscription = '''subscribeUserProductionPlanRuntime((snapshot) => {
+            runtimeSnapshot = snapshot;
+            render();
+          });'''.replace('  runtime', '  runtime').replace('  render', '  render')
+          new_subscription = '''subscribeUserProductionPlanRuntime((snapshot) => {
+            const selectionChanged = snapshot.selectedPlanId !== runtimeSnapshot.selectedPlanId;
+            runtimeSnapshot = snapshot;
+            if (selectionChanged) {
+              exportStatusKey = "exportReady";
+              exportStatusDetail = "";
+            }
+            render();
+          });'''.replace('  const', '  const').replace('  runtime', '  runtime').replace('  if', '  if').replace('    export', '    export').replace('  }', '  }').replace('  render', '  render')
+          if old_subscription not in source:
+              raise SystemExit('Details UI subscription block not found')
+          details.write_text(source.replace(old_subscription, new_subscription, 1), encoding='utf-8')
+
+          index = Path('index.html')
+          html = index.read_text(encoding='utf-8')
+          script_marker = '  <script type="module" src="src/user-production-plans-ui.js"></script>\n'
+          details_script = '  <script type="module" src="src/user-production-plan-details-ui.js"></script>\n'
+          if details_script not in html:
+              if script_marker not in html:
+                  raise SystemExit('Index script marker not found')
+              html = html.replace(script_marker, script_marker + details_script, 1)
+          index.write_text(html, encoding='utf-8')
+
+          package_path = Path('package.json')
+          package = package_path.read_text(encoding='utf-8')
+          marker = 'node --check src/user-production-plans-ui.js'
+          replacement = marker + ' && node --check src/user-production-plans-runtime.js && node --check src/user-production-plan-details-ui.js'
+          if replacement not in package:
+              if marker not in package:
+                  raise SystemExit('Package source-check marker not found')
+              package = package.replace(marker, replacement, 1)
+          package_path.write_text(package, encoding='utf-8')
+          PY
+
+          node --check src/user-production-plans-ui.js
+          node --check src/user-production-plans-runtime.js
+          node --check src/user-production-plan-details-ui.js
+          node --test tests/user-production-plans-runtime.test.js
+
+      - name: Commit integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "uImposition patch automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/user-production-plans-ui.js src/user-production-plan-details-ui.js index.html package.json
+          if git diff --cached --quiet; then
+            echo "Selection integration already applied."
+            exit 0
+          fi
+          git commit -m "M7.5: connect explicit plan selection and details UI"
+          git push origin HEAD:m7.5/user-plan-selection-export
