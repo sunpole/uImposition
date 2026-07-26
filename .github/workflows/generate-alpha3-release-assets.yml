@@ -82,7 +82,7 @@ jobs:
           identify "$NEWS_IMAGE"
 
           cp "$NEWS_IMAGE" /tmp/alpha3-evidence/focused-playwright-release.jpg
-          grep '"scenarioId":"m7-real-alternatives-cost-first"' "$manifest" > /tmp/alpha3-evidence/manifest.ndjson
+          grep '"scenario":"m7-real-alternatives-cost-first"' "$manifest" > /tmp/alpha3-evidence/manifest.ndjson
           cp capture.log /tmp/alpha3-evidence/capture.log
           cp "$ARCHIVE_DIR/README.md" /tmp/alpha3-evidence/README.md
           (
