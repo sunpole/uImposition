@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 430, "height": 932 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.6.0-alpha" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.1" },
     { "selector": "#impositionStatus", "text": "4 лица" },
     { "selector": "#productionStatus", "text": "Недопечатки нет" },
     { "selector": "#paperSolutionStatus", "text": "Минимум бумаги доказан" },
@@ -12,6 +12,6 @@
     { "selector": "#exportSchemesPdf", "text": "Скачать PDF схем" },
     { "selector": "#exportReportPdf", "text": "Скачать PDF отчёта" }
   ],
-  "screenshot": "uimposition-v0-6-0-alpha-m5-pdf-export-mobile.png",
+  "screenshot": "uimposition-v0-7-0-alpha-1-m5-pdf-export-mobile.png",
   "fullPage": true
 }
