@@ -12,7 +12,8 @@ Last updated: **26 July 2026**
 - предыдущий tag `v0.7.0-alpha.1` восстановлен на точном commit `622248f9e38f811a02143b428e264176f848b0a4`;
 - активная разработка: **M7.3 / будущий `0.7.0-alpha.3`**;
 - Pareto foundation объединён через PR `#20`;
-- compact display alternatives реализуются через PR `#25`;
+- compact display alternatives объединены через PR `#25`;
+- real production alternatives реализуются через PR `#26`;
 - полный план до `1.0.0`: `docs/REMAINING_WORK.md`.
 
 `VERSION.json`, `VERSION.md`, package version и видимая версия сайта остаются `0.7.0-alpha.2`, пока M7.3 не пройдёт полный отдельный release checkpoint.
@@ -69,38 +70,58 @@ Last updated: **26 July 2026**
 ### PR #20 — Pareto foundation
 
 - полная метрик-сигнатура решения;
-- удаление полных дублей с сохранением первого решения;
-- сравнение решений по отдельной цели с учётом minimize/maximize;
-- проверка доминирования: не хуже по всем целям и строго лучше хотя бы по одной;
-- построение Pareto-frontier;
-- детерминированная лексикографическая сортировка frontier;
-- display limit, `visibleFrontier` и явный `hiddenFrontierCount`;
-- крайние решения по бумаге, стоимости, layout-формам, цветовым пластинам, перетиражу и листопрогонам;
+- удаление полных дублей;
+- objective-aware сравнение и доминирование;
+- Pareto-frontier и детерминированная сортировка;
+- крайние решения и явное усечение;
 - структурированные metric deltas.
 
 ### PR #25 — compact display alternatives
 
-- рекомендация закрепляется в отображаемом наборе;
-- уникальные обязательные extrema не скрываются малым лимитом;
-- одно решение с несколькими extreme-причинами не дублируется;
-- слишком малый лимит расширяется явно через `effectiveDisplayLimit` и `limitExpandedBy`;
-- свободные места заполняются детерминированным maximin-отбором по нормализованным диапазонам целей;
-- скрытый суммарный score и скрытые веса не используются;
-- возвращаются причины включения, nearest-selected diversity evidence, преимущества, компромиссы и точные дельты;
-- факт усечения, число и идентификаторы скрытых frontier-вариантов остаются явными;
-- `pricing incomplete` поддерживается только через явное исключение денежной цели;
-- `null`, `undefined`, числовые строки и пустые строки не могут стать нулевой Pareto-метрикой;
-- добавлен `docs/M7_3_DISPLAY_ALTERNATIVES.md` и regression-проверки.
+- рекомендация и уникальные обязательные extrema закрепляются;
+- слишком малый display limit расширяется явно;
+- одно решение с несколькими причинами не дублируется;
+- дополнительные tradeoff-варианты выбираются детерминированным maximin-методом;
+- причины включения, преимущества, компромиссы и точные дельты структурированы;
+- неполная стоимость исключается, а не подменяется нулём;
+- активные Pareto-метрики обязаны быть настоящими конечными числами.
+
+### PR #26 — real production alternatives
+
+- ручной production report и доказанный paper minimum переводятся в общие `SolutionMetrics`;
+- сырые layouts/candidates/planned runs остаются за границей decision/Pareto слоя;
+- реальные `distinctOrdersPerImposition`, `splitOrders` и `fragmentedBlocks` выводятся из состава монтажей;
+- paper minimum получает отдельный строгий адаптер;
+- production report adapter принимает измеренные split/fragmentation metrics вместо нулевых заглушек;
+- `productionAlternativeSet` применяет current decision profile, Pareto и compact display set к нормализованным решениям;
+- сравнение стоимости разрешается только при общей валюте, листе, плотности, весе и эффективных ставках;
+- состояния прайса: `ready`, `incomplete`, `incompatible`;
+- полный integration test заново строит реальные схемы, report и paper solution из repository data.
+
+Проверенный реальный контрольный результат:
+
+| Метрика | Compact manual | Paper minimum |
+|---|---:|---:|
+| Физические листы | 3395 | 3305 |
+| Монтажи | 4 | 56 |
+| Layout-формы | 8 | 112 |
+| Цветовые пластины | 32 | 448 |
+| Листопрогоны | 6790 | 6610 |
+| Перетираж файлов | 930 | 0 |
+| Перетираж пар | 1450 | 10 |
+| Разделённые заказы | 2 | 19 |
+| Стоимость | 972.5466 BYN | 7199.4894 BYN |
+
+Оба решения имеют нулевую недопечатку и входят в Pareto-frontier. При paper-first рекомендуется paper minimum; при cost-first — compact manual без повторной генерации.
 
 ## Что ещё требуется для завершения M7.3
 
-- сформировать реальный набор нормализованных alternatives из production pipeline, а не только unit fixtures;
-- связать recommendations/Pareto/display set с текущим decision profile приложения;
-- человекочитаемые RU/EN объяснения `преимущество / цена компромисса`;
-- отдельный monetary breakdown: бумага, цветовые пластины, подготовка layout-форм и итог;
-- денежные дельты показывать только при `pricing ready` и общей валюте/базе расчёта;
+- pure RU/EN объяснения `преимущество / цена компромисса / решающая цель`;
+- component monetary deltas: бумага, цветовые пластины, подготовка layout-форм и итог;
+- денежные объяснения только при совместимом `pricing ready`;
+- runtime event/state с реальным alternative set;
 - компактная RU/EN демонстрация или UI;
-- фокусный Chromium evidence нового пользовательского результата;
+- focused Chromium evidence нового пользовательского результата;
 - release news, uNews/Telegram payload, permanent archive и release checkpoint `0.7.0-alpha.3`.
 
 ## Чего ещё нет
@@ -114,17 +135,16 @@ Last updated: **26 July 2026**
 
 ## Следующая безопасная задача
 
-После объединения PR `#25` создать следующий отдельный M7.3 PR от актуального `main`:
+После объединения PR `#26` создать отдельный M7.3 PR от актуального `main`:
 
-1. определить источник нескольких реальных нормализованных решений из существующих manual/paper candidate pipelines;
-2. не смешивать `SolutionMetrics` с сырыми candidate-структурами;
-3. собрать Pareto-frontier и compact display set на реальных решениях;
-4. передать текущий decision profile как objective order;
-5. добавить pure formatter человеческих RU/EN объяснений;
-6. добавить pricing-component deltas только при совместимом `pricing ready`;
-7. покрыть несовместимые валюты/базы, отсутствующую стоимость и смену recommendation тестами;
-8. UI и release не начинать до проверки этой интеграции.
+1. построить pure RU/EN explanation model поверх display entries и source `SolutionMetrics`;
+2. не смешивать форматирование текста с выбором вариантов;
+3. возвращать преимущество, цену компромисса и решающую цель;
+4. добавить component deltas по `paperCost`, `colorPlateCost`, `layoutFormPreparationCost` и `estimatedTotalCost`;
+5. проверять общую валюту и pricing fingerprint перед денежными фразами;
+6. покрыть смену reference/recommendation, равенство, incomplete и incompatible pricing тестами;
+7. runtime/UI начинать только после проверки pure explanation model.
 
 ## English summary
 
-The latest complete published checkpoint remains `0.7.0-alpha.2` / M7.2. M7.3 is active unreleased development. PR #20 provides duplicate removal, dominance checks, Pareto-frontier construction, extrema, truncation metadata, and metric deltas. PR #25 adds a compact display-set model that pins the recommendation and unique extrema, transparently expands an insufficient limit, selects additional tradeoffs through deterministic maximin range-normalized distance, exposes structured comparison evidence, and rejects coercible missing metrics. The next safe patch is integration with real normalized production alternatives plus pure RU/EN and pricing-component explanation models.
+The latest published checkpoint remains `0.7.0-alpha.2`. M7.3 is unreleased development. PR #20 provides the Pareto foundation, PR #25 provides compact materially-different display selection, and PR #26 integrates the real manual production report and proven paper-minimum solution through normalized `SolutionMetrics`. The real control pipeline validates both Pareto alternatives and instant paper-first/cost-first reranking while excluding incomplete or incompatible pricing. The next safe patch is a pure RU/EN tradeoff and component-cost explanation model, followed by runtime/UI integration.
