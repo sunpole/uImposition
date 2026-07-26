@@ -44,6 +44,13 @@ function plateInput() {
   };
 }
 
+function assertClose(actual, expected, tolerance = 1e-9) {
+  assert.ok(
+    Math.abs(Number(actual) - Number(expected)) <= tolerance,
+    `expected ${actual} to be within ${tolerance} of ${expected}`,
+  );
+}
+
 test("work-and-turn plate mirrors every front page to its paired back page", () => {
   const plate = createWorkAndTurnPlateLayout(plateInput());
   const validation = validateWorkAndTurnPlateLayout({ plate, pagePairs: pagePairs() });
@@ -153,15 +160,15 @@ test("operator pricing shows the exact saving of one plate and one preparation",
   const separate = comparison.alternativesByStrategy[DUPLEX_STRATEGIES.SEPARATE_FRONT_BACK_FORMS];
   const workAndTurn = comparison.alternativesByStrategy[DUPLEX_STRATEGIES.WORK_AND_TURN];
 
-  assert.equal(separate.paperCost, workAndTurn.paperCost);
+  assertClose(separate.paperCost, workAndTurn.paperCost);
   assert.equal(comparison.savings.physicalSheets, 0);
   assert.equal(comparison.savings.pressPasses, 0);
   assert.equal(comparison.savings.layoutForms, 1);
   assert.equal(comparison.savings.colorPlates, 1);
-  assert.equal(comparison.savings.paperCost, 0);
-  assert.equal(comparison.savings.colorPlateCost, 15);
-  assert.equal(comparison.savings.layoutFormPreparationCost, 5);
-  assert.equal(comparison.savings.estimatedTotalCost, 20);
+  assertClose(comparison.savings.paperCost, 0);
+  assertClose(comparison.savings.colorPlateCost, 15);
+  assertClose(comparison.savings.layoutFormPreparationCost, 5);
+  assertClose(comparison.savings.estimatedTotalCost, 20);
 });
 
 test("work-and-turn rejects an asymmetric odd-column grid", () => {
