@@ -1,0 +1,33 @@
+{
+  "id": "m7-objective-priority-editor",
+  "path": "/",
+  "viewport": { "width": 1440, "height": 1180 },
+  "assertions": [
+    { "selector": "#userObjectivePriorityEditor", "text": "Введите корректный заказ" }
+  ],
+  "beforeScreenshot": [
+    { "action": "fill", "selector": "#ordersInput", "value": "A | 100 | 2\nB | 100 | 2\nC | 100 | 2" },
+    { "action": "fill", "selector": "#userFrontColors", "value": "4" },
+    { "action": "fill", "selector": "#userBackColors", "value": "1" },
+    { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },
+    { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
+    { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
+    { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "2" },
+    { "action": "wait", "timeoutMs": 500 },
+    { "action": "click", "selector": "[data-plan-id='uniform-r90-paper-minimum'] [data-select-user-plan]" },
+    { "action": "click", "selector": "#userObjectivePriorityEditor [data-objective-preset='costFirst']" },
+    { "action": "wait", "timeoutMs": 250 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "#userObjectivePriorityEditor", "text": "По умолчанию" },
+    { "selector": "[data-objective-id='estimatedTotalCost']", "text": "Расчётная стоимость" },
+    { "selector": "[data-objective-id='estimatedTotalCost'] .objective-priority-position", "text": "1" },
+    { "selector": "#userObjectivePriorityEditor", "text": "4 готовых планов использовано повторно" },
+    { "selector": "#userObjectivePriorityEditor", "text": "0 планов построено заново" },
+    { "selector": "#userObjectivePriorityEditor", "text": "uniform-r90-dedicated-pairs" },
+    { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "Выбран" },
+    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "рекомендован" }
+  ],
+  "screenshotSelector": "#userObjectivePriorityEditor",
+  "screenshot": "uimposition-m7-5-objective-priority-editor.png"
+}
