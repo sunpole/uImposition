@@ -1,5 +1,6 @@
 name: Publish uImposition version release
 
+# Updating this workflow intentionally retries every missing manifest checkpoint.
 on:
   push:
     branches: [main]
