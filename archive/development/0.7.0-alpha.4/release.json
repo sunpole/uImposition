@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "project": "uImposition",
+  "version": "0.7.0-alpha.4",
+  "tag": "v0.7.0-alpha.4",
+  "title": "uImposition v0.7.0-alpha.4",
+  "prerelease": true,
+  "sourceCommit": "a0ed7da1bebaf607dbb9f0a2059d86d93e8ebc5f",
+  "releaseCommit": "a9bfb15492815851b89f5d1ba4b9786f26c4b7e1",
+  "createdAt": "2026-07-26T21:35:00Z",
+  "patchnote": "news/2026-07-27-uimposition-v0-7-0-alpha-4-work-and-turn.md",
+  "image": "news/2026-07-27-uimposition-v0-7-0-alpha-4-work-and-turn.jpg",
+  "archive": "archive/development/0.7.0-alpha.4/uimposition-v0-7-0-alpha-4-evidence.zip",
+  "screenshotScenario": "m7-work-and-turn-control",
+  "archiveScenarios": [
+    "m7-work-and-turn-control"
+  ],
+  "historicalArtifacts": [],
+  "telegramText": "uImposition 0.7.0-alpha.4: добавлено проверенное сравнение чужого и своего оборота. В контрольном заказе оба способа требуют 1000 листов и 2000 прогонов, но свой оборот использует одну layout-форму и одну пластину вместо двух. При контрольной цене это экономит 15 BYN без недопечатки и перетиража. Совместимость с захватом, боковым упором и конкретной машиной проверяет оператор."
+}
