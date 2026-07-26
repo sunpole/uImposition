@@ -10,8 +10,9 @@
 - активный патч: **`0.7.0-alpha.3` / M7.3**;
 - Pareto foundation объединён через PR `#20`;
 - compact materially-different display set объединён через PR `#25`;
-- real production alternatives реализуются через PR `#26`;
-- следующая задача: pure RU/EN explanations и совместимые pricing-component deltas.
+- real production alternatives объединены через PR `#26`;
+- RU/EN explanations и component cost deltas реализуются через PR `#27`;
+- следующая задача: runtime state/event и компактная read-only демонстрация реальных вариантов.
 
 Каждый пункт ниже является отдельным публикуемым патчем: PR, проверки, фокусный Chromium screenshot, news/uNews/Telegram, постоянный evidence-архив, recovery-ветка, tag и GitHub prerelease/release.
 
@@ -24,7 +25,7 @@
 - beta/RC — 4 патча: производственная проверка и стабилизация;
 - stable — 1 патч: `1.0.0`.
 
-Это рабочая оценка. Новый реальный граничный случай может добавить патч, но уже утверждённая функция не должна исчезать из плана молча.
+Это рабочая оценка. Новый реальный граничный случай может добавить патч, но уже утверждённая функция не должна исчезнуть из плана молча.
 
 ---
 
@@ -72,7 +73,7 @@
 
 ## M7.3 — `0.7.0-alpha.3`: существенно разные альтернативы и Pareto
 
-**Статус: в работе. PR `#20` завершил Pareto foundation; PR `#25` — compact display set; PR `#26` — реальные production alternatives. Новый release ещё не создан.**
+**Статус: в работе. PR `#20` завершил Pareto foundation; PR `#25` — compact display set; PR `#26` — реальные production alternatives; PR `#27` — RU/EN explanations и component deltas. Новый release ещё не создан.**
 
 Уже реализовано:
 
@@ -101,19 +102,27 @@
 - [x] реальные `distinctOrdersPerImposition`, `splitOrders` и `fragmentedBlocks`;
 - [x] отдельный `paperSolution → SolutionMetrics` adapter;
 - [x] current decision profile → objective order → recommendation/frontier/display set;
-- [x] проверка совместимости валюты, листа, плотности, веса и эффективных ставок;
+- [x] проверка совместимости валюты, листа, плотности, веса и явных операторских ставок;
 - [x] состояния pricing comparison `ready / incomplete / incompatible`;
 - [x] реальный integration test: `3395/8/972.5466 BYN` против `3305/112/7199.4894 BYN`;
 - [x] paper-first и cost-first reranking без повторной генерации;
-- [x] отдельная документация `docs/M7_3_PRODUCTION_ALTERNATIVES.md`.
+- [x] отдельная документация `docs/M7_3_PRODUCTION_ALTERNATIVES.md`;
+- [x] чистая RU/EN модель человеческих объяснений преимущества, цены компромисса и решающей цели;
+- [x] смена reference-варианта без повторной генерации alternatives;
+- [x] component deltas по бумаге, цветовым пластинам, подготовке layout-форм и итогу;
+- [x] денежные фразы только при совместимом `pricing ready`;
+- [x] полное скрытие денежных значений при `pricing incomplete / incompatible`;
+- [x] локализованное форматирование `ru-RU / en-US`;
+- [x] regression tests paper-first, cost-first, reference override, incomplete/incompatible pricing;
+- [x] отдельная документация `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`.
 
 Остаётся:
 
-- [ ] чистая RU/EN модель человеческих объяснений преимущества, цены компромисса и решающей цели;
-- [ ] отдельные component deltas по бумаге, цветовым пластинам, подготовке layout-форм и итогу;
-- [ ] денежные фразы только при совместимом `pricing ready`;
-- [ ] runtime event/state с реальным alternative set;
-- [ ] компактная RU/EN демонстрация или UI;
+- [ ] runtime event/state с реальным alternative set и explanation set;
+- [ ] компактная read-only RU/EN демонстрация или UI;
+- [ ] интерактивная смена paper-first / cost-first без повторной генерации;
+- [ ] интерактивная смена reference-варианта;
+- [ ] корректный UI при `pricing incomplete / incompatible`;
 - [ ] focused Chromium evidence нового пользовательского результата;
 - [ ] news/uNews/Telegram, archive, recovery-ветка, tag и GitHub prerelease `0.7.0-alpha.3`.
 

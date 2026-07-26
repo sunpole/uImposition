@@ -13,7 +13,8 @@ Last updated: **26 July 2026**
 - активная разработка: **M7.3 / будущий `0.7.0-alpha.3`**;
 - Pareto foundation объединён через PR `#20`;
 - compact display alternatives объединены через PR `#25`;
-- real production alternatives реализуются через PR `#26`;
+- real production alternatives объединены через PR `#26`;
+- RU/EN explanations и component cost deltas реализуются через PR `#27`;
 - полный план до `1.0.0`: `docs/REMAINING_WORK.md`.
 
 `VERSION.json`, `VERSION.md`, package version и видимая версия сайта остаются `0.7.0-alpha.2`, пока M7.3 не пройдёт полный отдельный release checkpoint.
@@ -94,7 +95,7 @@ Last updated: **26 July 2026**
 - paper minimum получает отдельный строгий адаптер;
 - production report adapter принимает измеренные split/fragmentation metrics вместо нулевых заглушек;
 - `productionAlternativeSet` применяет current decision profile, Pareto и compact display set к нормализованным решениям;
-- сравнение стоимости разрешается только при общей валюте, листе, плотности, весе и эффективных ставках;
+- сравнение стоимости разрешается только при общей валюте, листе, плотности, весе и явных операторских ставках;
 - состояния прайса: `ready`, `incomplete`, `incompatible`;
 - полный integration test заново строит реальные схемы, report и paper solution из repository data.
 
@@ -114,13 +115,29 @@ Last updated: **26 July 2026**
 
 Оба решения имеют нулевую недопечатку и входят в Pareto-frontier. При paper-first рекомендуется paper minimum; при cost-first — compact manual без повторной генерации.
 
+### PR #27 — explanations and component cost deltas
+
+- причины показа варианта локализованы на RU/EN;
+- для каждого варианта возвращаются преимущество, цена компромисса и решающая цель;
+- рекомендуемый вариант объясняется сравнением со следующим ранжированным конкурентом;
+- reference-вариант можно менять без повторной генерации alternatives;
+- локали `ru-RU` и `en-US` форматируют числа независимо от DOM;
+- component deltas включают `paperCost`, `colorPlateCost`, `layoutFormPreparationCost` и `estimatedTotalCost`;
+- денежные объяснения доступны только при совместимом `pricing ready`;
+- при `pricing incomplete` или `pricing incompatible` денежные значения полностью скрываются;
+- реальный paper-first breakdown показывает для compact manual относительно paper minimum:
+  - бумага `+13.0572 BYN`;
+  - цветовые пластины `−6240 BYN`;
+  - подготовка layout-форм `0 BYN`;
+  - итог `−6226.9428 BYN`;
+- отдельный документ: `docs/M7_3_ALTERNATIVE_EXPLANATIONS.md`.
+
 ## Что ещё требуется для завершения M7.3
 
-- pure RU/EN объяснения `преимущество / цена компромисса / решающая цель`;
-- component monetary deltas: бумага, цветовые пластины, подготовка layout-форм и итог;
-- денежные объяснения только при совместимом `pricing ready`;
-- runtime event/state с реальным alternative set;
-- компактная RU/EN демонстрация или UI;
+- runtime event/state с реальным alternative set и explanation set;
+- компактная read-only RU/EN демонстрация или UI;
+- интерактивное подтверждение paper-first, cost-first и смены reference;
+- корректное состояние при `pricing incomplete / incompatible`;
 - focused Chromium evidence нового пользовательского результата;
 - release news, uNews/Telegram payload, permanent archive и release checkpoint `0.7.0-alpha.3`.
 
@@ -135,16 +152,17 @@ Last updated: **26 July 2026**
 
 ## Следующая безопасная задача
 
-После объединения PR `#26` создать отдельный M7.3 PR от актуального `main`:
+После объединения PR `#27` создать отдельный M7.3 PR от актуального `main`:
 
-1. построить pure RU/EN explanation model поверх display entries и source `SolutionMetrics`;
-2. не смешивать форматирование текста с выбором вариантов;
-3. возвращать преимущество, цену компромисса и решающую цель;
-4. добавить component deltas по `paperCost`, `colorPlateCost`, `layoutFormPreparationCost` и `estimatedTotalCost`;
-5. проверять общую валюту и pricing fingerprint перед денежными фразами;
-6. покрыть смену reference/recommendation, равенство, incomplete и incompatible pricing тестами;
-7. runtime/UI начинать только после проверки pure explanation model.
+1. подключить реальный `productionAlternativeSet` и explanation set к runtime state/event приложения;
+2. не передавать в UI сырые candidate/layout структуры;
+3. добавить компактную read-only RU/EN демонстрацию двух реальных вариантов;
+4. показать recommendation, преимущество, цену компромисса и component cost deltas;
+5. поддержать paper-first, cost-first и смену reference без повторной генерации;
+6. корректно показать отсутствие денежного сравнения при incomplete/incompatible pricing;
+7. доказать новый пользовательский результат focused Chromium-сценарием;
+8. после проверки подготовить news/uNews/Telegram, evidence archive и release checkpoint `0.7.0-alpha.3`.
 
 ## English summary
 
-The latest published checkpoint remains `0.7.0-alpha.2`. M7.3 is unreleased development. PR #20 provides the Pareto foundation, PR #25 provides compact materially-different display selection, and PR #26 integrates the real manual production report and proven paper-minimum solution through normalized `SolutionMetrics`. The real control pipeline validates both Pareto alternatives and instant paper-first/cost-first reranking while excluding incomplete or incompatible pricing. The next safe patch is a pure RU/EN tradeoff and component-cost explanation model, followed by runtime/UI integration.
+The latest published checkpoint remains `0.7.0-alpha.2`. M7.3 is unreleased development. PR #20 provides the Pareto foundation, PR #25 provides compact materially-different display selection, PR #26 integrates the real manual production report and proven paper-minimum solution, and PR #27 adds pure RU/EN advantage, tradeoff, deciding-objective, and compatible component-cost explanations. The next safe patch is runtime state/event plus a compact read-only real-alternatives UI, followed by focused evidence and the full `0.7.0-alpha.3` release checkpoint.
