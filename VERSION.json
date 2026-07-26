@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "project": "uImposition",
-  "version": "0.7.0-alpha.3",
+  "version": "0.7.0-alpha.4",
   "semverCore": "0.7.0",
   "channel": "alpha",
-  "channelIteration": 3,
-  "versionSequence": 11,
+  "channelIteration": 4,
+  "versionSequence": 12,
   "releaseDate": "2026-07-26",
-  "status": "m7-3-pareto-alternatives-alpha",
-  "milestone": "M7.3",
-  "nextMilestone": "M7.4",
+  "status": "m7-4-work-and-turn-alpha",
+  "milestone": "M7.4",
+  "nextMilestone": "M7.5",
   "productionReady": false,
   "publicDemoReady": true,
   "capacityImplemented": true,
@@ -47,16 +47,21 @@
   "componentCostDeltasImplemented": true,
   "alternativesRuntimeImplemented": true,
   "alternativesReadOnlyUiImplemented": true,
-  "workAndTurnImplemented": false,
+  "workAndTurnImplemented": true,
+  "workAndTurnHorizontalAxisImplemented": true,
+  "workAndTurnSearchModesImplemented": true,
+  "workAndTurnRuntimeImplemented": true,
+  "workAndTurnReadOnlyUiImplemented": true,
+  "automaticWorkAndTurnSearchImplemented": false,
   "summary": {
-    "ru": "M7.3 добавляет реальные compact manual и paper minimum как два нормализованных Pareto-варианта, мгновенную смену приоритета бумага/стоимость, выбор базы сравнения, RU/EN-объяснения преимуществ и цены компромисса, а также покомпонентные денежные дельты только при совместимом рабочем прайсе.",
-    "en": "M7.3 adds the real compact-manual and paper-minimum results as two normalized Pareto alternatives, instant paper/cost priority changes, comparison-reference selection, RU/EN benefit and tradeoff explanations, and component cost deltas only when production pricing is compatible."
+    "ru": "M7.4 добавляет отдельно проверяемый свой оборот / work-and-turn: одну симметричную форму для двух прогонов, три режима допуска стратегии, независимый production report и компактное RU/EN-сравнение. Контрольный кейс четырёх A6 1+1 по 4000 подтверждает одинаковые 1000 листов и 2000 прогонов, но уменьшение layout-форм и цветовых пластин с 2 до 1 без недопечатки.",
+    "en": "M7.4 adds separately validated work-and-turn production: one symmetric plate for two passes, three operator strategy modes, an independent production report, and a compact RU/EN comparison. The four-A6 1+1 control case confirms equal 1,000 sheets and 2,000 passes while reducing side-layout forms and color plates from 2 to 1 with zero underproduction."
   },
   "nextTarget": {
-    "version": "0.7.0-alpha.4",
-    "milestone": "M7.4",
-    "ru": "Добавить проверяемый свой оборот / work-and-turn и сравнить его с отдельными формами лица и оборота.",
-    "en": "Add validated work-and-turn production and compare it with separate front/back forms."
+    "version": "0.7.0-alpha.5",
+    "milestone": "M7.5",
+    "ru": "Добавить компактный редактор порядка приоритетов и рабочих цен с доступным desktop/mobile управлением без повторной генерации готовых вариантов.",
+    "en": "Add a compact priority-order and production-pricing editor with accessible desktop/mobile controls and no regeneration of prepared alternatives."
   },
   "versionSources": {
     "machine": "VERSION.json",
