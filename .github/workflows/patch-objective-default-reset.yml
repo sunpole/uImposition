@@ -1,0 +1,96 @@
+name: Patch objective default reset
+
+on:
+  push:
+    branches:
+      - m7.5/objective-priority-editor
+    paths:
+      - .github/workflows/patch-objective-default-reset.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: m7.5/objective-priority-editor
+          fetch-depth: 0
+
+      - name: Apply reset button patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/user-objective-priority-ui.js')
+          text = path.read_text(encoding='utf-8')
+
+          old_import = '''import {
+            applyUserProductionObjectivePreset,
+            rerankUserProductionPlans,
+            subscribeUserProductionPlanRuntime,
+          } from "./user-production-plans-runtime.js";
+          '''.replace('          ', '')
+          new_import = '''import {
+            applyUserProductionObjectivePreset,
+            rerankUserProductionPlans,
+            resetUserProductionObjectivePreference,
+            subscribeUserProductionPlanRuntime,
+          } from "./user-production-plans-runtime.js";
+          '''.replace('          ', '')
+          if new_import not in text:
+              if old_import not in text:
+                  raise SystemExit('runtime import block missing')
+              text = text.replace(old_import, new_import, 1)
+
+          text = text.replace(
+              '    paperFirst: "Бумага",\n',
+              '    defaultOrder: "По умолчанию",\n    paperFirst: "Бумага",\n',
+              1,
+          )
+          text = text.replace(
+              '    paperFirst: "Paper",\n',
+              '    defaultOrder: "Default",\n    paperFirst: "Paper",\n',
+              1,
+          )
+
+          marker = 'const PRESETS = Object.freeze([\n'
+          addition = '  Object.freeze({ id: "default", label: "defaultOrder", reset: true }),\n'
+          if addition not in text:
+              if marker not in text:
+                  raise SystemExit('preset marker missing')
+              text = text.replace(marker, marker + addition, 1)
+
+          old_apply = '''    const next = applyUserProductionObjectivePreset(presetId);
+              setMessage(rankingMessage(next.planSet));'''.replace('      set', '    set')
+          new_apply = '''    const next = presetId === "default"
+              ? resetUserProductionObjectivePreference()
+              : applyUserProductionObjectivePreset(presetId);
+            setMessage(rankingMessage(next.planSet));'''.replace('      ? ', '      ? ').replace('      : ', '      : ').replace('    set', '    set')
+          if old_apply not in text:
+              raise SystemExit('apply preset block missing')
+          text = text.replace(old_apply, new_apply, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          node --check src/user-objective-priority-ui.js
+          node --test tests/user-objective-priority.test.js tests/user-objective-priority-runtime.test.js tests/user-objective-preference-persistence.test.js
+
+      - name: Commit reset button
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "uImposition patch automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/user-objective-priority-ui.js
+          if git diff --cached --quiet; then
+            echo "Default reset already applied."
+            exit 0
+          fi
+          git commit -m "M7.5: add default objective order reset"
+          git push origin HEAD:m7.5/objective-priority-editor
