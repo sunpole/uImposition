@@ -1,7 +1,7 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.7.0-alpha.2</strong></p>
+<p align="center"><strong>Текущая версия / Current version: 0.7.0-alpha.3</strong></p>
 <p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
 
 <table>
@@ -17,53 +17,43 @@ uImposition — статический браузерный инструмент
 - реальные и произвольные форматы листов;
 - зачистка и непечатные поля как отдельные этапы;
 - A4, A5, A6 и произвольный формат изделия;
-- выпуск, общий рез и дополнительный зазор;
-- сетки 0°/90° и выбор максимальной вместимости;
+- выпуск, общий и раздельный рез;
+- сетки 0°/90° и выбор вместимости;
 - точные пары страниц;
-- проверенные лица и автоматически зеркальные обороты;
-- напечатанное количество, недопечатка и перетираж;
-- физическая бумага, layout-формы и листопрогоны;
+- проверенные лица и зеркальные обороты;
 - производственный отчёт по файлам и парам;
-- отдельный PDF схем и отдельный PDF отчёта;
-- полный набор из `8960` контрольных кандидатов с одной или двумя парами;
-- автоматическая конструкция варианта без недопечатки;
-- доказанный минимум физической бумаги `3305` листов;
-- отдельный учёт layout-форм и цветовых пластин 4+4;
-- regression-тесты A6 landscape/portrait, mixed A4/A5/A6 и A5 `400/700/4200`.
+- отдельные PDF схем и отчёта;
+- полный набор `8960` контрольных кандидатов;
+- доказанный минимум бумаги `3305` листов;
+- раздельный учёт layout-форм и цветовых пластин.
 
-### Добавлено в M7.1
+### Добавлено в M7.1–M7.2
 
-- 11 изменяемых целей оптимизации;
-- жёсткие ограничения, которые нельзя перемещать;
-- мгновенное лексикографическое ранжирование без повторного перебора;
-- независимые цели: бумага, расчётная стоимость, формы, пластины, перетираж и листопрогоны;
-- вес закупаемого листа по исходному формату и плотности `г/м²`;
-- стоимость бумаги по `BYN/кг`;
-- стоимость цветовых печатных форм по цене за штуку;
-- необязательная стоимость подготовки layout-форм;
-- общая расчётная стоимость и себестоимость одного заказанного изделия;
-- компактная demo-проверка `Бумага / Стоимость / Формы`;
-- полный план из 17 release-патчей до `1.0.0`.
+- 11 изменяемых целей и неизменяемые жёсткие ограничения;
+- лексикографическое ранжирование без повторного перебора;
+- единая guarded-модель `SolutionMetrics`;
+- вес закупаемого листа, `BYN/кг`, стоимость пластин и итоговая стоимость;
+- рабочий ввод прайса без demo-defaults;
+- состояния `pricing incomplete / inputs ready / ready`;
+- production report → реальная BYN-стоимость.
 
-### Добавлено в M7.2
+### Добавлено в M7.3
 
-- единая нормализованная модель `SolutionMetrics`;
-- явный статус `pricing ready` / `pricing incomplete`;
-- запрет выдумывать рабочие цены: если прайс не задан, BYN-поля остаются `null`;
-- защитный адаптер перед decision ranking;
-- недопечатанные решения не могут попасть в рекомендацию;
-- `layoutCompactness: null` не превращается молча в `0`;
-- импортированный `productionCost` проверяется на совпадение с листами, формами и пластинами этого же решения;
-- главная страница показывает актуальную границу M7.2 и статус стоимости.
+- реальные compact manual и доказанный paper minimum в общей модели;
+- удаление дублей и доминируемых решений;
+- детерминированный Pareto-frontier;
+- обязательные крайние решения и компактный materially-different набор;
+- мгновенная смена `Сначала бумага / Сначала стоимость`;
+- выбор базы сравнения;
+- RU/EN-объяснения преимущества, цены компромисса и решающей цели;
+- дельты бумаги, пластин, подготовки layout-форм и итога;
+- денежное сравнение только при совместимом рабочем прайсе;
+- compact read-only панель на основной странице;
+- focused Chromium evidence реального пользовательского сценария.
 
-### Дальше в M7
+### Следующий этап
 
-- подключить реальные production report в `SolutionMetrics`;
-- ввод рабочих цен в основном интерфейсе;
-- полный раскрываемый набор существенно разных Pareto-вариантов;
-- точные дельты «что лучше / что хуже»;
-- сравнение своего и чужого оборота;
-- контрольный кейс: четыре A6 1+1, 2 страницы, по 4000.
+M7.4 — технологически проверяемый свой оборот / work-and-turn и честное сравнение с отдельными формами лица и оборота.
 
 </td>
 <td width="50%" valign="top">
@@ -74,19 +64,19 @@ uImposition is a static browser tool for planning complex gang-run offset imposi
 
 ### Working through M6
 
-Sheet/product geometry, exact pairs, validated front/back schemes, production totals, separate PDFs, complete control candidate generation, a proven 3,305-sheet paper minimum, separate side-layout and color-plate metrics, and production regressions.
+Sheet/product geometry, exact page pairs, validated front/back schemes, production totals, separate PDFs, complete control candidate generation, a proven 3,305-sheet paper minimum, separate side-layout/color-plate metrics, and production regressions.
 
-### Added in M7.1
+### Added in M7.1–M7.2
 
-Eleven reorderable objectives, immutable hard constraints, instant lexicographic re-ranking, source-sheet weight from size and gsm, BYN/kg paper cost, per-color-plate cost, optional layout preparation cost, total/unit cost, a focused Paper / Cost / Forms demo, and a 17-release roadmap to 1.0.
+Eleven reorderable objectives, immutable hard constraints, instant lexicographic reranking, guarded `SolutionMetrics`, source-sheet weight, BYN production costing, production pricing inputs, and a production-report connection to real solution cost.
 
-### Added in M7.2
+### Added in M7.3
 
-A normalized `SolutionMetrics` model, explicit `pricing ready` / `pricing incomplete` state, no invented production prices, guarded conversion before decision ranking, underproduction rejection, null compactness rejection, production-cost basis checks, and an updated main page that shows the active M7.2 boundary.
+Real compact-manual and paper-minimum alternatives, deterministic Pareto filtering, required extremes, a compact materially different display set, instant paper-first/cost-first reranking, reference selection, RU/EN advantage and tradeoff explanations, component cost deltas, strict pricing compatibility, and a compact main-page panel with focused Chromium evidence.
 
-### Later M7 patches
+### Next stage
 
-Connect real production reports into `SolutionMetrics`, add main-interface production pricing inputs, build compact Pareto alternatives, show exact better/worse deltas, and compare work-and-back/work-and-turn options.
+M7.4 — technologically validated work-and-turn and a transparent comparison with separate front and back forms.
 
 </td>
 </tr>
@@ -105,13 +95,15 @@ Connect real production reports into `SolutionMetrics`, add main-interface produ
 ## Документация / Documentation
 
 - [Что осталось до 1.0 / Remaining work to 1.0](docs/REMAINING_WORK.md)
-- [План M7: приоритеты, свой оборот и варианты / M7 operator decision plan](docs/M7_IMPLEMENTATION_PLAN.md)
+- [План M7 / M7 operator decision plan](docs/M7_IMPLEMENTATION_PLAN.md)
+- [M7.3: compact display alternatives](docs/M7_3_DISPLAY_ALTERNATIVES.md)
+- [M7.3: real production alternatives](docs/M7_3_PRODUCTION_ALTERNATIVES.md)
+- [M7.3: alternative explanations](docs/M7_3_ALTERNATIVE_EXPLANATIONS.md)
+- [M7.3: runtime and UI](docs/M7_3_RUNTIME_UI.md)
 - [Денежная оценка производства / Production costing](docs/PRODUCTION_COSTING.md)
 - [Архитектура / Architecture](docs/ARCHITECTURE.md)
-- [Справочник конфигурации / Configuration](docs/CONFIG_REFERENCE.md)
 - [План тестирования / Test plan](docs/TEST_PLAN.md)
-- [Дорожная карта / Roadmap](docs/ROADMAP.md)
-- [Автоматизация скриншотов и PDF / Screenshot and PDF verification](docs/SCREENSHOT_AUTOMATION.md)
+- [Автоматизация evidence / Screenshot and PDF verification](docs/SCREENSHOT_AUTOMATION.md)
 
 ## Разработка / Development model
 
@@ -129,44 +121,27 @@ feature branch
 → GitHub prerelease/release
 ```
 
-Локальный терминал необязателен и не является источником истины.
+## Контрольные решения / Control alternatives
 
-## Контрольные решения / Control solutions
+| Метрика | Compact manual | Paper minimum |
+|---|---:|---:|
+| Физическая бумага | 3395 | 3305 |
+| Монтажи | 4 | 56 |
+| Layout-формы | 8 | 112 |
+| Цветовые пластины | 32 | 448 |
+| Листопрогоны | 6790 | 6610 |
+| Недопечатка | 0 | 0 |
+| Перетираж пар | 1450 | 10 |
+| Иллюстративная стоимость | 972,55 BYN | 7199,49 BYN |
 
-### Ручной компактный вариант
-
-- физическая бумага: `3395`;
-- монтажи: `4`;
-- layout-формы: `8`;
-- листопрогоны: `6790`;
-- недопечатка: `0`;
-- перетираж пар: `1450`.
-
-### Доказанный минимум бумаги M6
-
-- физическая бумага: `3305`;
-- экономия: `90` листов (`2,65%`);
-- монтажи: `56`;
-- layout-формы: `112`;
-- листопрогоны: `6610`;
-- недопечатка: `0`;
-- перетираж пар: `10`.
-
-### Иллюстративная денежная проверка M7.1
-
-При примере `620×450 мм`, `130 г/м²`, `4 BYN/кг` и `15 BYN` за цветовую форму:
-
-- минимум бумаги: около `7199,49 BYN`;
-- компактный вариант: около `972,55 BYN`.
-
-Это **не рабочий прайс**. Реальные цены вводит оператор. Пример доказывает, что минимум бумаги и минимум денег могут выбирать разные решения.
+Контрольный прайс не является рабочим default. Реальные цены вводит оператор. Пример доказывает, что минимум бумаги и минимум денег могут выбирать разные решения.
 
 ## Границы
 
-- автоматический mixed-format packing ещё не реализован;
-- свой оборот пока только утверждён как контрольный кейс M7;
+- автоматический work-and-turn ещё не реализован;
+- automatic mixed-format packing ещё не реализован;
 - 32-страничный regression проверяет последовательные пары, но не заявляет готовый фальцевальный спуск;
-- основная страница ещё не содержит полного редактора приоритетов и цен — M7.1 использует отдельную проверочную demo-страницу, а M7.2 показывает статус готовности стоимости на главной.
+- полный редактор всех приоритетов и экспорт выбранного варианта относятся к M7.5–M7.6.
 
 ## Лицензия / License
 
