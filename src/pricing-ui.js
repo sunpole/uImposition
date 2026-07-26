@@ -182,8 +182,8 @@ function replaceMilestonePanel() {
     <div class="result-grid result-grid--m7-status">
       <article class="metric metric--accent"><span data-lang="ru">Прайс-профиль</span><span data-lang="en" hidden>Pricing profile</span><strong id="pricingProfileResult">null</strong></article>
       <article class="metric"><span data-lang="ru">Вес исходного листа</span><span data-lang="en" hidden>Source sheet weight</span><strong id="pricingSheetWeightResult">—</strong></article>
-      <article class="metric"><span data-lang="ru">Ранжирование по стоимости</span><span data-lang="en" hidden>Cost ranking</span><strong id="pricingCostRankingResult" data-lang="ru">заблокировано</strong><strong data-lang="en" hidden>blocked</strong></article>
-      <article class="metric"><span data-lang="ru">Следующий шаг</span><span data-lang="en" hidden>Next step</span><strong id="pricingNextStepResult" data-lang="ru">введите цены</strong><strong data-lang="en" hidden>enter prices</strong></article>
+      <article class="metric"><span data-lang="ru">Ранжирование по стоимости</span><span data-lang="en" hidden>Cost ranking</span><strong id="pricingCostRankingResult" data-lang="ru">заблокировано</strong><strong id="pricingCostRankingResultEn" data-lang="en" hidden>blocked</strong></article>
+      <article class="metric"><span data-lang="ru">Следующий шаг</span><span data-lang="en" hidden>Next step</span><strong id="pricingNextStepResult" data-lang="ru">введите цены</strong><strong id="pricingNextStepResultEn" data-lang="en" hidden>enter prices</strong></article>
     </div>
     <div class="formula-card">
       <p id="pricingStatusExplanation"></p>
@@ -229,10 +229,10 @@ function setStatusText({ state, pricing }) {
   setChip(state);
   const profile = $("#pricingProfileResult");
   const sheetWeight = $("#pricingSheetWeightResult");
-  const rankingRu = $("#pricingCostRankingResult[data-lang='ru']");
-  const rankingEn = $("#pricingCostRankingResult[data-lang='en']");
-  const nextRu = $("#pricingNextStepResult[data-lang='ru']");
-  const nextEn = $("#pricingNextStepResult[data-lang='en']");
+  const rankingRu = $("#pricingCostRankingResult");
+  const rankingEn = $("#pricingCostRankingResultEn");
+  const nextRu = $("#pricingNextStepResult");
+  const nextEn = $("#pricingNextStepResultEn");
   const explanation = $("#pricingStatusExplanation");
 
   if (state === "ready") {
