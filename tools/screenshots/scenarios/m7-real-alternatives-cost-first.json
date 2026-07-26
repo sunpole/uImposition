@@ -15,6 +15,7 @@
     { "action": "click", "selector": "#loadControlCase" },
     { "action": "wait", "timeoutMs": 1200 },
     { "action": "click", "selector": "#alternativesCostFirst" },
+    { "action": "hide", "selector": "#toast" },
     { "action": "wait", "timeoutMs": 150 }
   ],
   "beforeScreenshotAssertions": [
