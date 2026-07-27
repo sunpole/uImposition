@@ -11,9 +11,11 @@ const marker = JSON.parse(await readFile(markerPath, "utf8"));
 const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
 const entry = manifest.entries.find((item) => item.scenario === marker.scenario);
 const expectedCommit = process.env.SCREENSHOT_COMMIT || process.env.GITHUB_SHA;
+const releaseCommit = String(marker.releaseCommit ?? "");
 
 if (!entry) throw new Error(`Screenshot scenario not found: ${marker.scenario}`);
 if (!expectedCommit) throw new Error("Expected screenshot commit is not available");
+if (!/^[0-9a-f]{40}$/i.test(releaseCommit)) throw new Error("releaseCommit must be a full 40-character commit SHA");
 if (!entry.commit || entry.commit !== expectedCommit) {
   throw new Error(`Screenshot commit ${entry.commit} does not match expected commit ${expectedCommit}`);
 }
@@ -88,6 +90,7 @@ const releaseManifest = {
   title: `uImposition v${marker.version}`,
   prerelease,
   sourceCommit: entry.commit,
+  releaseCommit,
   createdAt: queuedAt,
   patchnote: path.relative(root, targetPatchnote).replaceAll("\\", "/"),
   image: path.relative(root, targetImage).replaceAll("\\", "/"),
