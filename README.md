@@ -25,8 +25,11 @@ uImposition — статический браузерный калькулято
 - GitHub: `https://github.com/sunpole/uImposition`;
 - GitHub Pages: `https://sunpole.github.io/uImposition/`;
 - функциональный baseline M7.5: merge commit PR `#46` `009451cce94d5cde05ee72305f30447aa65a646c`;
-- текущий version checkpoint: `0.7.0-alpha.5` / M7.5;
+- опубликованный prerelease: `0.7.0-alpha.5` / M7.5;
+- release commit, recovery branch и immutable tag: `195d6496a291095a69cc9089a64154561ffbb1fa`, `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
+- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
 - функциональность объединена через PR `#44`, `#45`, `#46`;
+- version/publication объединены через PR `#49`, `#50`;
 - следующий milestone: M7.6 / `0.7.0-alpha.6`;
 - полный handoff: [`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md).
 
@@ -73,7 +76,7 @@ uImposition — статический браузерный калькулято
 - forms/plates comparison;
 - focused Chromium evidence.
 
-### M7.5 / `0.7.0-alpha.5` — текущий version checkpoint
+### M7.5 / `0.7.0-alpha.5` — опубликовано
 
 #### Пользовательские production plans
 
@@ -140,8 +143,8 @@ uImposition — статический браузерный калькулято
 
 ## Следующий порядок
 
-1. Завершить publication package `0.7.0-alpha.5`: focused image, patchnote, uNews/Telegram, permanent evidence, recovery branch, immutable tag и GitHub prerelease.
-2. После независимо проверенного prerelease реализовать M7.6 — компактную lossless comparison table.
+1. Реализовать M7.6 отдельными небольшими патчами, начав с pure comparison-table model и tests.
+2. Добавить компактную lossless comparison table без regeneration при сортировке/фильтрах.
 3. После M7.6 расширять search space отдельными plan-family патчами.
 4. Затем mixed-format, full order rows, persistence, profitability и heavy-search worker.
 
