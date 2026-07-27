@@ -1,292 +1,412 @@
-# uImposition — что осталось до 1.0 / Remaining work to 1.0
+# uImposition — актуальный остаток до 1.0
 
-Дата актуализации: 2026-07-26.
+Дата актуализации: **27 июля 2026**.
 
-## Текущая точка
+## 1. Текущая точка
 
-- последний кодовый checkpoint: **`0.7.0-alpha.3` / M7.3**;
-- exact functional commit M7.3: `d7767aa6ec3b875864ea7d8ef8110b4c3ca8686e`;
-- recovery-ветка: `release/v0.7.0-alpha.3`;
-- immutable tag: `v0.7.0-alpha.3`;
-- release package, patchnote, uNews/Telegram payload и permanent evidence объединены через PR `#36`;
-- GitHub Release card и приложенные assets должны всегда проверяться отдельно, а не выводиться только из manifest/tag;
-- доказан минимум физической бумаги `3305` листов для контрольного uniform-grid набора;
-- evidence-стоимость compact manual после явного ввода цен: `972.5466 BYN`;
-- активный патч: **M7.4 / будущий `0.7.0-alpha.4`**;
-- рабочая ветка: `m7.4/work-and-turn`;
-- functional PR: `#39`.
+- опубликованный checkpoint: `0.7.0-alpha.4` / M7.4;
+- текущий `main`: `009451cce94d5cde05ee72305f30447aa65a646c`;
+- функциональный M7.5 уже объединён через PR `#44`, `#45`, `#46`;
+- M7.5 ещё не получил version/release checkpoint;
+- следующий обязательный релиз: `0.7.0-alpha.5`;
+- следующий функциональный milestone после release: M7.6;
+- полный handoff: `docs/CODEX_HANDOFF.md`.
 
-Каждый пункт ниже является отдельным публикуемым патчем: feature PR, проверки, focused Chromium evidence, patchnote, uNews/Telegram, permanent evidence archive, recovery-ветка, immutable tag и настоящий GitHub prerelease/release.
+## 2. Что уже завершено
 
-## Сводка объёма
+### M1–M6
 
-Исходный план до стабильной `1.0.0` содержит **17 release-патчей**.
+- sheet/product geometry;
+- trim и press margins;
+- page pairs;
+- front/back layouts;
+- imposition validation;
+- production report;
+- PDF schemes/report;
+- bounded uniform candidate generation;
+- paper minimizer;
+- доказанный minimum `3305` листов для контрольного набора;
+- manual mixed-format fixture validation;
+- production regression fixtures.
 
-Завершены M7.1, M7.2 и M7.3. Остаётся **14 release-патчей**:
+### M7.1–M7.3
 
-- M7 — 3 патча: M7.4–M7.6;
-- M8 — 6 патчей;
-- beta/RC — 4 патча;
-- stable — 1 патч.
-
-Это рабочая оценка. Новый реальный граничный случай может добавить патч, но утверждённая функция не должна исчезать из плана молча.
-
----
-
-# M7 — система решений оператора
-
-## M7.1 — `0.7.0-alpha.1`: модель целей, порядка и базовой стоимости
-
-**Статус: завершено и опубликовано.**
-
-- изменяемые цели и отдельные жёсткие ограничения;
+- optimization objectives;
 - immutable decision profile;
-- лексикографическое ранжирование;
-- расчёт веса, бумаги, форм, итога и цены изделия;
-- demo `Бумага / Стоимость / Формы`;
-- recovery branch, immutable tag и GitHub prerelease checkpoint.
+- lexicographic ranking;
+- guarded solution metrics;
+- operator pricing;
+- production cost model;
+- Pareto frontier;
+- materially different alternatives;
+- RU/EN explanations и component deltas;
+- sanitized alternatives runtime/UI.
 
-## M7.2 — `0.7.0-alpha.2`: нормализованные метрики решения
+### M7.4 / `0.7.0-alpha.4`
 
-**Статус: завершено и опубликовано.**
+- separate front/back forms;
+- work-and-turn control model;
+- horizontal axis;
+- symmetric shared form validation;
+- strategy modes;
+- independent reports;
+- forms/plates comparison;
+- release checkpoint опубликован.
 
-- единая guarded-модель `SolutionMetrics`;
-- бумага, монтажи, layout-формы, цветовые пластины и прогоны;
-- перетираж, split orders и fragmented blocks;
-- paper/form/total cost;
-- независимая повторная проверка production report;
-- `pricing ready / pricing incomplete` без выдуманных цен;
-- основной UI рабочего прайса;
-- защита от `null → 0`, недопечатки и несовместимой базы стоимости;
-- recovery branch, immutable tag и GitHub prerelease checkpoint.
+### M7.5 functional scope — объединён, но не выпущен
 
-## M7.3 — `0.7.0-alpha.3`: существенно разные альтернативы и Pareto
+PR `#44`:
 
-**Статус: функциональность, документация и release package завершены.**
+- user orders → verified production plans;
+- fitting `0°/90°`;
+- `paperMinimum` и `dedicatedPairForms`;
+- lossless catalog;
+- dynamic cost.
 
-- PR `#20` — Pareto foundation;
-- PR `#25` — materially-different compact display set;
-- PR `#26` — реальные production alternatives;
-- PR `#27` — RU/EN explanations и component deltas;
-- PR `#28` — runtime/controller/read-only UI;
-- PR `#30` — documentation sync;
-- PR `#33` — version checkpoint;
-- PR `#36` — patchnote, uNews/Telegram, focused image, permanent evidence и release manifest.
+PR `#45`:
 
-Проверенный результат:
+- explicit operator selection;
+- real front/back schemes;
+- selected production report;
+- selected scheme/report PDF;
+- mobile details view.
 
-- compact manual: `3395` листов, `8` layout-форм, `32` пластины, `972.5466 BYN`;
-- paper minimum: `3305` листов, `112` layout-форм, `448` пластин, `7199.4894 BYN`;
-- paper-first рекомендует paper minimum;
-- cost-first рекомендует compact manual;
-- priority/reference меняются без повторной генерации;
-- стоимость полностью скрывается при incomplete/incompatible pricing.
+PR `#46`:
 
-Release hygiene:
+- 11 objectives;
+- presets;
+- arrows и drag-and-drop;
+- persistent objective preference;
+- reranking without regeneration;
+- selected plan independent from recommendation;
+- `173/173` tests и full Chromium/PDF evidence.
 
-- exact recovery branch и tag подтверждены;
-- Release card и assets проверять непосредственно в GitHub перед любым утверждением о полностью опубликованном prerelease.
+## 3. Срочно: release checkpoint `0.7.0-alpha.5`
 
-## M7.4 — `0.7.0-alpha.4`: свой оборот / work-and-turn
+Это первый обязательный этап перед новым функциональным кодом.
 
-**Статус: functional PR `#39` в работе. Версия `0.7.0-alpha.4` ещё не опубликована.**
+### Version audit
 
-Реализовано в рабочей ветке:
+- [ ] проверить фактический `main` и последние PR;
+- [ ] обновить `VERSION.json`;
+- [ ] обновить `VERSION.md`;
+- [ ] обновить `CHANGELOG.md`;
+- [ ] обновить README;
+- [ ] обновить видимую версию сайта;
+- [ ] обновить screenshot assertions;
+- [ ] обновить status/milestone/nextTarget.
 
-- [x] стратегии `separateFrontBackForms` и `workAndTurn`;
-- [x] режимы `separateOnly / compareBoth / workAndTurnOnly`;
-- [x] чистая модель симметричной общей формы;
-- [x] обязательное чётное число колонок;
-- [x] горизонтальный turn axis как единственный поддержанный вариант;
-- [x] проверка зеркальной пары front/back одного файла;
-- [x] проверка направления после переворота;
-- [x] materialization через существующий duplex validator;
-- [x] независимый production report после двух прогонов;
-- [x] mode-aware `frontForms / backForms / forms`;
-- [x] контрольный кейс: 4 разных A6, 2 страницы, 1+1, по 4000;
-- [x] оба режима: `1000` листов и `2000` прогонов;
-- [x] формы и пластины `2 → 1`;
-- [x] нулевая недопечатка и нулевой перетираж;
-- [x] денежная экономия одной пластины и одной подготовки только по операторскому прайсу;
-- [x] sanitized runtime без raw reports/layouts/pagePairs;
-- [x] смена режима без повторной подготовки геометрии;
-- [x] компактный RU/EN UI и preview общей формы `4 × 4`;
-- [x] focused Chromium scenario;
-- [x] отдельная документация `docs/M7_4_WORK_AND_TURN.md`;
-- [x] unit/regression tests.
+### Release evidence
 
-До release checkpoint остаётся:
+- [ ] выбрать focused M7.5 scenario;
+- [ ] снять реальный Chromium screenshot точного release commit;
+- [ ] визуально проверить image;
+- [ ] сохранить manifest, capture log и quality log;
+- [ ] создать permanent evidence ZIP;
+- [ ] посчитать SHA-256 assets;
+- [ ] создать release manifest.
 
-- [ ] зелёные exact-head Quality и Chromium/PDF checks PR `#39`;
-- [ ] проверка downloaded focused screenshot;
-- [ ] окончательный review functional diff;
-- [ ] merge PR `#39`;
-- [ ] version sync до `0.7.0-alpha.4`;
-- [ ] patchnote;
-- [ ] uNews/Telegram payload;
-- [ ] permanent evidence archive и release manifest;
-- [ ] recovery branch `release/v0.7.0-alpha.4`;
-- [ ] immutable tag `v0.7.0-alpha.4`;
-- [ ] настоящий GitHub prerelease с assets;
-- [ ] независимая проверка Release card и каждого asset.
+### Publication
 
-Граница M7.4:
+- [ ] patchnote `news/*.md`;
+- [ ] новое release image;
+- [ ] короткий uNews/Telegram payload;
+- [ ] version PR exact-head checks;
+- [ ] publication PR checks;
+- [ ] merge version/publication;
+- [ ] recovery branch `release/v0.7.0-alpha.5`;
+- [ ] immutable tag `v0.7.0-alpha.5`;
+- [ ] настоящий GitHub prerelease;
+- [ ] image и evidence ZIP как assets;
+- [ ] независимая проверка Release card;
+- [ ] независимая проверка каждого asset;
+- [ ] подтверждение очереди/публикации uNews.
 
-- не заявлять общий automatic work-and-turn search для произвольных заказов;
-- не заявлять вертикальный переворот;
-- не подменять проверку конкретной машины математической симметрией;
-- не заявлять экономию бумаги, когда оба варианта используют `1000` листов.
+## 4. M7.6 — завершение операторской системы решений
 
-## M7.5 — `0.7.0-alpha.5`: компактный редактор приоритетов и цен
+Предлагаемая версия: `0.7.0-alpha.6`.
 
-- desktop drag-and-drop;
-- доступные кнопки вверх/вниз;
-- мобильное управление без обязательного drag-and-drop;
-- жёсткие ограничения визуально отделены и недоступны для перемещения;
-- изменение порядка мгновенно пересортировывает готовые варианты;
-- повторная генерация не запускается, если изменился только порядок целей;
-- ввод валюты, плотности, цены бумаги за кг и цены формы;
-- краткая проверка веса одного листа перед применением;
-- рабочие цены не подменяются demo-значениями.
+### Compact comparison table
 
-## M7.6 — `0.7.0-alpha.6`: таблица вариантов и завершение M7
+- [ ] одна строка на каждый допустимый план;
+- [ ] lossless `Все` по умолчанию;
+- [ ] filters `Pareto / Recommended / Dominated`;
+- [ ] режим `Только различия`;
+- [ ] sorting по любой метрике;
+- [ ] фильтр plan-family;
+- [ ] фильтр duplex strategy;
+- [ ] выбранный оператором plan выделен отдельно;
+- [ ] recommendation не заменяет selection.
 
-- одна компактная строка на вариант;
-- рекомендованный вариант по текущей иерархии;
-- переключатель `Только различия`;
-- точные дельты «что лучше / что хуже»;
-- отдельные колонки: бумага, формы, пластины, вес, стоимость бумаги, стоимость форм, итог BYN и цена изделия;
-- раскрытие схем и вкладов только выбранного варианта;
-- фильтр способа оборота;
-- экспорт выбранного варианта в существующие отчёт/PDF;
-- desktop/mobile Chromium evidence;
-- полный M7 release checkpoint.
+### Columns
 
----
+- [ ] physical sheets;
+- [ ] paper weight;
+- [ ] layout forms;
+- [ ] color plates;
+- [ ] press passes;
+- [ ] pair overrun;
+- [ ] file overrun;
+- [ ] split orders;
+- [ ] imposition count;
+- [ ] paper cost;
+- [ ] form/plate cost;
+- [ ] preparation cost;
+- [ ] total cost;
+- [ ] unit cost;
+- [ ] proof/feasible status;
+- [ ] orientation/grid;
+- [ ] plan-family и duplex strategy.
 
-# M8 — реальные неоднородные заказы и полный рабочий цикл
+### Explanation
 
-## M8.1 — `0.8.0-alpha.1`: автоматический mixed-format packing
+- [ ] exact component deltas;
+- [ ] первая цель, по которой recommendation победила;
+- [ ] что лучше и что хуже;
+- [ ] равные метрики;
+- [ ] technical boundaries.
 
-- автоматическое размещение прямоугольников разных форматов;
-- обязательные границы, выпуск и промежутки;
-- контроль `1×A4 + 2×A5 + 8×A6`;
-- отсутствие пересечений;
-- детерминированный результат и объяснение свободной площади;
-- денежное сравнение mixed packing и uniform-grid.
+### Quality
 
-## M8.2 — `0.8.0-alpha.2`: смешанные повороты и резка
+- [ ] pure table model tests;
+- [ ] no recalculation on filter/sort;
+- [ ] desktop Chromium evidence;
+- [ ] mobile Chromium evidence;
+- [ ] selected scheme/report/PDF regression;
+- [ ] release checkpoint.
 
-- 0° и 90° на одном листе;
-- общий рез как явное ограничение;
-- раздельный рез и зазор;
-- группировка одинаковых изделий;
-- метрики удобства резки/сборки;
-- сравнение uniform-grid и mixed packing;
-- будущая стоимость резки только как отдельный явный компонент.
+## 5. Расширение search space после M7.6
 
-## M8.3 — `0.8.0-alpha.3`: полноценная модель строки заказа
+Нельзя выполнять одним гигантским PR. Каждый новый plan-family — отдельный bounded patch с собственной полнотой и validation.
 
-- индивидуальные ширина, высота и выпуск для каждого файла;
-- страницы и тираж;
-- цветность лица/оборота;
-- разрешённый способ оборота;
-- примечание;
-- редактирование, дублирование, удаление и сортировка строк;
-- ошибки одной строки не удаляют корректные строки.
+### 5.1 Additional uniform plan-family
 
-## M8.4 — `0.8.0-alpha.4`: сохранение и перенос проекта
+- [ ] частично заполненные формы;
+- [ ] controlled pair mixing;
+- [ ] несколько event run lengths;
+- [ ] bounded sequences of forms;
+- [ ] explicit search limits;
+- [ ] truncation status;
+- [ ] deterministic signatures;
+- [ ] no duplicate production-equivalent plans;
+- [ ] lossless retention of materially different plans.
 
-- versioned project schema;
-- `localStorage` последнего состояния;
-- экспорт/импорт JSON;
-- pricing profile вместе с проектом;
-- миграции старых форматов;
-- безопасная очистка;
-- тест повреждённого или несовместимого проекта.
+### 5.2 User-driven work-and-turn
 
-## M8.5 — `0.8.0-alpha.5`: выбранное решение как полноценный проект
+- [ ] eligibility detection;
+- [ ] symmetric shared-form candidates;
+- [ ] horizontal axis search;
+- [ ] separate vs work-and-turn in one user catalog;
+- [ ] exact forms/plates/passes/cost;
+- [ ] operator machine warning;
+- [ ] no automatic compatibility claim;
+- [ ] later vertical axis as separate patch.
 
-- сохранение и восстановление выбранного варианта;
-- схемы/PDF выбранного решения;
-- production report и cost breakdown выбранного решения;
-- режим `Только схема`;
-- безопасные имена файлов и пакетный экспорт.
+### 5.3 Search completeness contract
 
-## M8.6 — `0.8.0-alpha.6`: завершение alpha-функциональности
+- [ ] describe each bounded search family;
+- [ ] expose candidate counts;
+- [ ] expose truncation/time limits;
+- [ ] distinguish `complete within scope`, `feasible`, `lower bound reached`;
+- [ ] never label partial search as global all-options search.
 
-- компактность всей страницы;
-- клавиатурная навигация и доступность;
-- ясные ошибки и предупреждения;
-- производительность на больших заказах;
-- одинаковая функциональность RU/EN;
-- полный alpha audit;
-- решение об исторических материалах без удаления истории.
+## 6. M8.1 — automatic mixed-format packing
 
----
+- [ ] different product rectangles on one sheet;
+- [ ] sheet/printable boundaries;
+- [ ] individual bleed/gap;
+- [ ] no overlap;
+- [ ] deterministic result;
+- [ ] free-area explanation;
+- [ ] control fixture `1×A4 + 2×A5 + 8×A6`;
+- [ ] compare mixed packing with uniform plans;
+- [ ] multiple valid packings retained.
 
-# Beta, RC и stable
+## 7. M8.2 — mixed rotations and cutting
 
-## B1 — `0.9.0-beta.1`: производственная матрица
+- [ ] `0°` и `90°` на одном sheet;
+- [ ] common-cut constraints;
+- [ ] separate-cut constraints;
+- [ ] grouping identical products;
+- [ ] cutting complexity metrics;
+- [ ] assembly convenience metrics;
+- [ ] optional explicit cutting cost;
+- [ ] no hidden heuristic penalty.
 
-- все действующие форматы листов;
-- A4/A5/A6 и произвольные изделия;
-- разные плотности бумаги и цены;
-- bleed 0/2/5;
-- общий и раздельный рез;
-- свой/чужой оборот;
-- короткие, нечётные и многостраничные файлы;
-- одинаковые и резко разные тиражи;
-- нулевые/максимальные поля и зачистка;
-- реальные рабочие заказы без приватных данных.
+## 8. M8.3 — full order-row model
 
-## B2 — `0.9.0-beta.2`: пагинация и технологические границы
+Каждая строка должна иметь собственные:
 
-- окончательно решить границу 32-страничных изделий;
-- либо реализовать тетрадный/фальцевальный спуск;
-- либо явно ограничить 1.0 последовательными парами;
-- отдельные проверки направления переворота и совместимости машин.
+- [ ] file/name;
+- [ ] quantity;
+- [ ] pages;
+- [ ] width/height;
+- [ ] bleed;
+- [ ] gap/cutting mode;
+- [ ] front colors;
+- [ ] back colors;
+- [ ] allowed duplex strategy;
+- [ ] paper/material profile;
+- [ ] note;
+- [ ] status/errors.
 
-## B3 — `0.9.0-beta.3`: устойчивость и миграции
+UI:
 
-- стресс-тесты;
-- ограничение времени/памяти поиска;
-- отмена или безопасное прерывание тяжёлого расчёта;
-- восстановление после ошибки;
-- миграции проектов и pricing profile;
-- проверка браузеров и GitHub Pages.
+- [ ] add/edit;
+- [ ] duplicate;
+- [ ] delete;
+- [ ] reorder;
+- [ ] bulk paste/import;
+- [ ] one invalid row does not delete valid rows.
 
-## RC1 — `1.0.0-rc.1`: кандидат стабильного релиза
+## 9. M8.4 — one-sided, odd and folded products
 
-- feature freeze;
-- полный аудит геометрии, производства и стоимости;
-- аудит секретов, workflow и архивов;
-- руководство пользователя;
-- примеры рабочих проектов;
-- чистая публичная страница;
-- финальный release evidence.
+### One-sided and odd pages
 
-## Stable — `1.0.0`
+- [ ] explicit one-sided job;
+- [ ] intentional blank back;
+- [ ] correct plates/forms/cost;
+- [ ] odd final page;
+- [ ] no fake back plate.
 
-- только исправления RC-блокеров;
-- стабильный tag и GitHub Release;
-- recovery-ветка;
-- финальная новость uNews/Telegram;
-- решение об архивной ветке/репозитории;
-- политика следующих версий.
+### Multi-page imposition
 
----
+- [ ] decide 1.0 boundary for 8/16/32 pages;
+- [ ] either implement signature/folding imposition;
+- [ ] or explicitly limit stable to sequential pairs;
+- [ ] page-order validation after folding;
+- [ ] orientation/turn validation.
 
-# Что не должно потеряться
+## 10. M8.5 — project persistence and portability
 
-- пользователь выбирает решение, программа не скрывает альтернативы;
-- приоритеты меняются в реальном времени;
-- стоимость — отдельная прозрачная цель, а не скрытый коэффициент;
-- рабочие цены вводит оператор, demo-цены не становятся defaults;
-- свой и чужой оборот сравниваются честно;
-- недопечатка всегда запрещена;
-- layout-формы и цветовые пластины не смешиваются;
-- mixed-format manual fixture не выдаётся за automatic packing;
-- 32-страничные последовательные пары не выдаются за готовый фальцевальный спуск;
-- полезная история разработки и архивы сохраняются;
-- каждый опубликованный патч получает самостоятельный Release checkpoint.
+- [ ] versioned project schema;
+- [ ] auto-save latest state;
+- [ ] `localStorage`;
+- [ ] export JSON;
+- [ ] import JSON;
+- [ ] validation and migration;
+- [ ] pricing profile;
+- [ ] objective preference;
+- [ ] selected plan reference;
+- [ ] safe recovery from corrupted/incompatible file;
+- [ ] clear/reset workflow.
+
+## 11. M8.6 — profitability model
+
+Сейчас есть cost, но нет revenue/profit.
+
+- [ ] sale price or order revenue;
+- [ ] profit/loss;
+- [ ] margin percent;
+- [ ] minimum margin threshold;
+- [ ] cost of cutting;
+- [ ] folding/binding/finishing costs;
+- [ ] transport/other explicit components;
+- [ ] unprofitable status;
+- [ ] unprofitable plans remain visible;
+- [ ] no hidden business coefficient;
+- [ ] exact explanation of loss.
+
+## 12. M8.7 — heavy search worker
+
+- [ ] Web Worker or equivalent isolated search;
+- [ ] progress events;
+- [ ] cancel;
+- [ ] time budget;
+- [ ] memory/candidate budget;
+- [ ] partial results marked incomplete;
+- [ ] deterministic resume/retry if feasible;
+- [ ] UI remains responsive;
+- [ ] safe error recovery;
+- [ ] no private data upload.
+
+## 13. M8.8 — compactness, accessibility and parity
+
+- [ ] super-compact mobile mode;
+- [ ] dense desktop operator mode;
+- [ ] collapsible sections;
+- [ ] keyboard navigation;
+- [ ] visible focus;
+- [ ] screen-reader labels;
+- [ ] color-independent states;
+- [ ] large touch targets;
+- [ ] RU/EN feature parity;
+- [ ] no horizontal overflow except local dense tables;
+- [ ] performance on large catalogs.
+
+## 14. Beta matrix
+
+### B1 — production combinations
+
+- [ ] all current sheet presets;
+- [ ] arbitrary sheet sizes;
+- [ ] A4/A5/A6 and custom products;
+- [ ] grammage/price variations;
+- [ ] bleed `0/2/5`;
+- [ ] common/separate cut;
+- [ ] separate/work-and-turn;
+- [ ] one-sided/duplex;
+- [ ] odd/multipage;
+- [ ] equal and very different quantities;
+- [ ] zero/max margins and trim;
+- [ ] real anonymized work orders.
+
+### B2 — technology boundaries
+
+- [ ] machine profiles or explicit operator-only checks;
+- [ ] gripper/side-lay rules;
+- [ ] work-and-turn compatibility warnings;
+- [ ] folding boundary;
+- [ ] printable geometry edge cases.
+
+### B3 — stability
+
+- [ ] stress tests;
+- [ ] browser matrix;
+- [ ] GitHub Pages verification;
+- [ ] project migrations;
+- [ ] worker failure recovery;
+- [ ] performance budgets.
+
+## 15. RC and stable
+
+### RC1
+
+- [ ] feature freeze;
+- [ ] full geometry/production/cost audit;
+- [ ] security/workflow/secret audit;
+- [ ] user guide;
+- [ ] real examples;
+- [ ] clean public page;
+- [ ] final evidence package.
+
+### 1.0.0
+
+- [ ] only RC blockers;
+- [ ] recovery branch;
+- [ ] immutable tag;
+- [ ] GitHub Release;
+- [ ] final uNews/Telegram post;
+- [ ] archive policy;
+- [ ] next-version policy.
+
+## 16. Known non-blocking debt
+
+- [ ] issue `#40`: replace bad image of Telegram message `@uNewsLog/76` for `0.7.0-alpha.2` using uNews `edit:media`;
+- [ ] do not delete/repost the Telegram message;
+- [ ] verify final media visually and update uNews state.
+
+## 17. Principles that must survive every milestone
+
+- user chooses; software recommends;
+- all feasible variants inside stated scope remain available;
+- filters never delete catalog data;
+- underproduction is forbidden;
+- back is derived from front;
+- pricing is explicit;
+- missing money is not zero;
+- layout forms and color plates stay separate;
+- paper minimum is not global business optimum;
+- manual fixtures are not automatic solvers;
+- truncated search is visibly truncated;
+- every published patch gets full release evidence and immutable recovery checkpoint.
