@@ -5,10 +5,12 @@
 ## 1. Текущая точка
 
 - функциональный baseline M7.5: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- текущий version checkpoint: `0.7.0-alpha.5` / M7.5;
+- опубликованный prerelease: `0.7.0-alpha.5` / M7.5;
 - функциональный M7.5 объединён через PR `#44`, `#45`, `#46`;
-- до полного release остаётся publication package, recovery branch, immutable tag, GitHub prerelease и независимая asset/uNews-проверка;
-- следующий функциональный milestone после release: M7.6 / `0.7.0-alpha.6`;
+- version/publication объединены через PR `#49`, `#50`;
+- release commit, recovery branch и tag: `195d6496a291095a69cc9089a64154561ffbb1fa`, `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
+- GitHub prerelease и оба asset независимо проверены;
+- следующий функциональный milestone: M7.6 / `0.7.0-alpha.6`;
 - полный handoff: `docs/CODEX_HANDOFF.md`.
 
 ## 2. Что уже завершено
@@ -52,7 +54,7 @@
 - forms/plates comparison;
 - release checkpoint опубликован.
 
-### M7.5 / `0.7.0-alpha.5` — version checkpoint
+### M7.5 / `0.7.0-alpha.5` — опубликованный prerelease
 
 PR `#44`:
 
@@ -80,9 +82,7 @@ PR `#46`:
 - selected plan independent from recommendation;
 - `173/173` tests и full Chromium/PDF evidence.
 
-## 3. Срочно: publication checkpoint `0.7.0-alpha.5`
-
-Это первый обязательный этап перед новым функциональным кодом.
+## 3. Publication checkpoint `0.7.0-alpha.5` — завершён
 
 ### Version audit
 
@@ -93,33 +93,33 @@ PR `#46`:
 - [x] обновить README;
 - [x] обновить видимую версию сайта;
 - [x] обновить screenshot assertions;
-- [ ] обновить status/milestone/nextTarget.
+- [x] обновить status/milestone/nextTarget.
 
 ### Release evidence
 
-- [ ] выбрать focused M7.5 scenario;
-- [ ] снять реальный Chromium screenshot точного release commit;
-- [ ] визуально проверить image;
-- [ ] сохранить manifest, capture log и quality log;
-- [ ] создать permanent evidence ZIP;
-- [ ] посчитать SHA-256 assets;
-- [ ] создать release manifest.
+- [x] выбрать focused M7.5 scenario;
+- [x] снять реальный Chromium screenshot точного source commit;
+- [x] визуально проверить image;
+- [x] сохранить manifest, capture log и quality log;
+- [x] создать permanent evidence ZIP;
+- [x] посчитать SHA-256 assets;
+- [x] создать release manifest.
 
 ### Publication
 
-- [ ] patchnote `news/*.md`;
-- [ ] новое release image;
-- [ ] короткий uNews/Telegram payload;
-- [ ] version PR exact-head checks;
-- [ ] publication PR checks;
-- [ ] merge version/publication;
-- [ ] recovery branch `release/v0.7.0-alpha.5`;
-- [ ] immutable tag `v0.7.0-alpha.5`;
-- [ ] настоящий GitHub prerelease;
-- [ ] image и evidence ZIP как assets;
-- [ ] независимая проверка Release card;
-- [ ] независимая проверка каждого asset;
-- [ ] подтверждение очереди/публикации uNews.
+- [x] patchnote `news/*.md`;
+- [x] новое release image;
+- [x] короткий uNews/Telegram payload;
+- [x] version PR exact-head checks;
+- [x] publication PR checks;
+- [x] merge version/publication;
+- [x] recovery branch `release/v0.7.0-alpha.5`;
+- [x] immutable tag `v0.7.0-alpha.5`;
+- [x] настоящий GitHub prerelease;
+- [x] image и evidence ZIP как assets;
+- [x] независимая проверка Release card;
+- [x] независимая проверка каждого asset;
+- [x] состояние uNews проверено: patchnote имеет `queued_at`, но последний scan предшествовал merge; Telegram URL появится после внешнего FIFO scan.
 
 ## 4. M7.6 — завершение операторской системы решений
 
