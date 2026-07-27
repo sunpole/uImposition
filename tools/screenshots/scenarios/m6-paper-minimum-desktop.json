@@ -3,7 +3,7 @@
   "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1200 },
   "assertions": [
-    { "selector": ".brand", "text": "v0.7.0-alpha.4" },
+    { "selector": ".brand", "text": "v0.7.0-alpha.5" },
     { "selector": "#productionStatus", "text": "Недопечатки нет" },
     { "selector": "#paperSolutionStatus", "text": "Минимум бумаги доказан" },
     { "selector": "#paperOptimalSheets", "text": "305" },
