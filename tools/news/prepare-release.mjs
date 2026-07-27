@@ -116,7 +116,9 @@ if (!evidenceReadmeTemplate.trim()) throw new Error("evidenceReadme is required"
 const evidenceReadme = evidenceReadmeTemplate
   .replaceAll("{{SOURCE_COMMIT}}", entry.commit)
   .replaceAll("{{RELEASE_COMMIT}}", releaseCommit)
-  .replaceAll("{{QUEUED_AT}}", queuedAt);
+  .replaceAll("{{QUEUED_AT}}", queuedAt)
+  .replaceAll("{{CAPTURED_AT}}", entry.capturedAt)
+  .replaceAll("{{PREPARE_RUN_ID}}", String(process.env.GITHUB_RUN_ID ?? "local"));
 await writeFile(evidenceReadmePath, evidenceReadme.endsWith("\n") ? evidenceReadme : `${evidenceReadme}\n`, "utf8");
 
 async function sha256(filePath) {
