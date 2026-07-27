@@ -8,9 +8,11 @@
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - актуальная ветка: `main`;
 - функциональный baseline после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- текущий version checkpoint: **`0.7.0-alpha.5` / M7.5**;
-- publication package alpha.5 должен добавить evidence, news, recovery branch, immutable tag и настоящий GitHub prerelease;
-- следующий функциональный milestone после publication: **M7.6 / `0.7.0-alpha.6`**;
+- опубликованный prerelease: **`0.7.0-alpha.5` / M7.5**;
+- release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
+- recovery branch и immutable tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
+- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
+- следующий функциональный milestone: **M7.6 / `0.7.0-alpha.6`**;
 - основной документ передачи в Codex: `docs/CODEX_HANDOFF.md`;
 - полный актуальный остаток: `docs/REMAINING_WORK.md`.
 
@@ -19,6 +21,8 @@
 - `#44` — пользовательские production plans из реальных полей;
 - `#45` — явный выбор, схемы, production report и PDF выбранного плана;
 - `#46` — полный desktop/mobile редактор порядка целей без повторной генерации.
+- `#49` — version checkpoint `0.7.0-alpha.5`;
+- `#50` — patchnote, focused image, permanent evidence, hashes и GitHub prerelease.
 
 PR `#46` прошёл `173/173` теста, полный Chromium/PDF workflow и визуальную проверку desktop/mobile evidence.
 
@@ -98,14 +102,15 @@ PR `#46` прошёл `173/173` теста, полный Chromium/PDF workflow �
 - heavy-search worker, progress и cancel;
 - полная production matrix до 1.0.
 
-## Текущий обязательный шаг release-сессии
+## Release alpha.5 завершён
 
-1. Подтвердить фактический `main` и version checkpoint `0.7.0-alpha.5`.
-2. Проверить exact-head Quality и Chromium/PDF workflows.
-3. Сгенерировать новый focused screenshot из явно записанного `sourceCommit`.
-4. Подготовить patchnote, uNews/Telegram payload и permanent evidence archive.
-5. Создать recovery branch, immutable tag и настоящий GitHub prerelease на точном `releaseCommit`.
-6. Не начинать M7.6 до независимой проверки Release card, assets и uNews state.
+- exact-head Quality: `173/173`;
+- полный Chromium/PDF: `16/16`, PDF `8 + 6` A4 страниц;
+- focused source commit: `a8db529c29e7b71a7809bb5f857d48cfde115597`;
+- Release card и оба приложенных asset независимо проверены;
+- release PNG SHA-256: `bb5686efa1d0f75990885b6f5e8736c1c4c93233eae181c3ae68f81397cf5a6e`;
+- evidence ZIP SHA-256: `9ac0cfb4c01c34e530b4f734e499e6184cf2d6ab78f2157ea1216e6ee5742ec9`;
+- patchnote имеет `queued_at`; фактическая Telegram-публикация остаётся ответственностью внешнего FIFO `sunpole/uNews`.
 
 ## После alpha.5
 
@@ -137,5 +142,5 @@ PR `#46` прошёл `173/173` теста, полный Chromium/PDF workflow �
 Актуальный готовый запрос находится в `docs/CODEX_HANDOFF.md`, разделы 10–12. Пользовательский вариант запроса также можно начинать так:
 
 ```text
-Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub-состоянию. Сначала прочитай AGENTS.md, START_HERE.md и docs/CODEX_HANDOFF.md. Проверь version checkpoint 0.7.0-alpha.5, exact-head Actions, source/release commits, recovery branch, immutable tag, GitHub prerelease, assets и uNews state. Не начинай M7.6, пока publication alpha.5 не проверена полностью.
+Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub-состоянию. Сначала прочитай AGENTS.md, START_HERE.md и docs/CODEX_HANDOFF.md. Проверь опубликованный prerelease 0.7.0-alpha.5 и актуальный main. Следующий этап — M7.6: начинай с pure comparison-table model и tests, не с большого нового solver.
 ```
