@@ -154,7 +154,7 @@ Select a real focused scenario that best demonstrates M7.5 as a working user too
 - `reused plans > 0` and `regenerated plans = 0`;
 - mobile or desktop readability.
 
-Use the exact release commit in real Chromium. Do not reuse an older image. Visually inspect the final focused PNG/JPEG.
+Use an explicitly recorded exact evidence/source commit in real Chromium. The generated manifest must keep this `sourceCommit` separate from the later publication `releaseCommit`. Do not reuse an older image. Visually inspect the final focused PNG/JPEG.
 
 ### Permanent evidence
 
@@ -167,7 +167,7 @@ archive/development/0.7.0-alpha.5/
 Include or reference:
 
 - release manifest;
-- exact release commit;
+- exact `sourceCommit` used for focused Chromium evidence and the later exact `releaseCommit`;
 - focused screenshot;
 - screenshot manifest;
 - capture log;

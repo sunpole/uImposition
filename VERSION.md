@@ -6,112 +6,95 @@
 
 ## Русский
 
-### Текущий release checkpoint
+### Текущий version checkpoint
 
-**`0.7.0-alpha.4`**  
-Дата версии: **26 июля 2026**  
-Implementation Pull Request: **№39**  
-Этап: **M7.4 — проверяемый свой оборот / work-and-turn**  
-Release manifest: `archive/development/0.7.0-alpha.4/release.json`
+**`0.7.0-alpha.5`**  
+Дата версии: **27 июля 2026**  
+Функциональные Pull Request: **№44, №45, №46**  
+Этап: **M7.5 — пользовательские производственные планы, выбор, экспорт и приоритеты**  
+Release manifest после publication PR: `archive/development/0.7.0-alpha.5/release.json`
 
-Фактическое состояние PR, `main`, recovery-ветки, tag и GitHub prerelease проверяется непосредственно в GitHub. Документ не заменяет независимую проверку Release card и assets.
+Фактическое состояние `main`, recovery-ветки, tag и GitHub prerelease проверяется непосредственно в GitHub. Version checkpoint не заменяет publication package и независимую проверку Release card и assets.
 
-### Что добавлено в M7.4
+### Что добавлено в M7.5
 
-- отдельные duplex-стратегии `separateFrontBackForms` и `workAndTurn`;
-- режимы `только чужой / сравнить оба / только свой`;
-- чистая модель одной симметричной общей формы;
-- обязательная проверка зеркальной пары страниц одного файла;
-- проверка направления и горизонтального переворота;
-- независимая материализация готовых front/back пар через существующий duplex validator;
-- mode-aware production metrics: отдельные формы `1+1` или одна общая форма `1+0`;
-- повторная проверка недопечатки через production report;
-- sanitized runtime без raw reports, layouts, pagePairs и halfRows;
-- смена разрешённого режима без повторной подготовки геометрии;
-- компактный RU/EN-блок сравнения и фактический preview общей формы `4 × 4`;
-- focused Chromium evidence и технологическое предупреждение для оператора.
+- реальные пользовательские размеры листа и изделия, строки заказов и page pairs подключены к production pipeline;
+- для каждой fitting orientation `0°/90°` создаются проверенные plan-family `paperMinimum` и `dedicatedPairForms`;
+- каждый план materialize-ится в front/back layouts, проходит независимую validation и production report;
+- недопечатка всегда блокирует план;
+- считаются физические листы, layout-формы, цветовые пластины, прогоны, перетираж и BYN-себестоимость;
+- все допустимые варианты внутри текущей области остаются в lossless-каталоге;
+- Pareto, recommended и dominated являются аннотациями, а не удалением;
+- оператор может выбрать любой план независимо от рекомендации;
+- выбранный план получает реальные схемы, production report, PDF схем и PDF отчёта;
+- доступны 11 целей при готовом прайсе, presets, кнопки вверх/вниз и desktop drag-and-drop;
+- reranking повторно использует готовые планы и сообщает `regeneratedPlanCount = 0`;
+- выбранный оператором план не заменяется новой рекомендацией.
 
 ### Проверенный контрольный пример
 
-Четыре разных A6, 2 страницы, `1+1`, по `4000` экземпляров:
+Три двухстраничных A6 по `100`, общая цветность `4+1`, evidence-прайс:
 
-| Метрика | Чужой оборот | Свой оборот |
-|---|---:|---:|
-| Физические листы | 1000 | 1000 |
-| Листопрогоны | 2000 | 2000 |
-| Layout-формы | 2 | 1 |
-| Цветовые пластины | 2 | 1 |
-| Недопечатка | 0 | 0 |
-| Перетираж | 0 | 0 |
+| Вариант | Листы | Статус |
+|---|---:|---|
+| `uniform-r90-paper-minimum` | 20 | выбран оператором |
+| `uniform-r90-dedicated-pairs` | 21 | рекомендован при cost-first |
 
-При evidence-прайсе `130 г/м²`, `4 BYN/кг`, `15 BYN` за пластину и `0 BYN` за подготовку:
+Все четыре допустимых плана остаются в каталоге. После переключения приоритета используются повторно `4` готовых плана и строится заново `0`.
 
-- чужой оборот: `175,08 BYN`;
-- свой оборот: `160,08 BYN`;
-- экономия: `15 BYN` — ровно одна цветовая пластина.
+Evidence-прайс служит только regression/Chromium-проверке. Рабочие цены вводит оператор.
 
-Эти цены используются только для regression/evidence и не являются рабочими значениями по умолчанию.
+### Честная граница
 
-### Технологическая граница
+Каталог полный только внутри:
 
-M7.4 подтверждает горизонтальный work-and-turn и фиксированный A6-кейс. Он не заявляет общий автоматический work-and-turn solver для произвольных заказов, вертикальный переворот или автоматическую совместимость с конкретной машиной. Перед производством оператор проверяет захват, боковой упор, приводку и допустимость переворота.
+```text
+один общий формат изделия
+× uniform grid
+× fitting rotation 0°/90°
+× paperMinimum/dedicatedPairForms
+× separate front/back forms
+× одна общая duplex-цветность
+× полные front/back page pairs
+```
 
-### Что ещё не реализовано
-
-- компактный редактор полного порядка приоритетов и цен;
-- итоговая таблица и экспорт выбранного решения;
-- automatic mixed-format packing;
-- общий work-and-turn search для произвольного набора;
-- тетрадный/фальцевальный спуск;
-- полный импорт/экспорт и постоянное хранение проекта.
+M7.5 не заявляет общий solver всех монтажей, automatic work-and-turn для пользовательских заказов, mixed-format packing, mixed rotations, индивидуальную геометрию каждой строки, simplex/odd-page production, фальцевальный спуск, прибыльность, persistence или совместимость с конкретной машиной.
 
 ### Следующая целевая версия
 
-**`0.7.0-alpha.5` — M7.5**
+**`0.7.0-alpha.6` — M7.6**
 
-Добавить компактный доступный редактор порядка приоритетов и рабочих цен для desktop/mobile без повторной генерации готовых вариантов.
+Компактная lossless-таблица всех вариантов: одна строка на вариант, `Только различия`, точные component deltas, сортировка и фильтры без удаления plan data.
 
 </td>
 <td width="50%" valign="top">
 
 ## English
 
-### Current release checkpoint
+### Current version checkpoint
 
-**`0.7.0-alpha.4`**  
-Version date: **26 July 2026**  
-Implementation Pull Request: **#39**  
-Stage: **M7.4 — validated work-and-turn production**  
-Release manifest: `archive/development/0.7.0-alpha.4/release.json`
+**`0.7.0-alpha.5`**  
+Version date: **27 July 2026**  
+Functional Pull Requests: **#44, #45, #46**  
+Stage: **M7.5 — user production plans, selection, export, and objective priority**
 
-### Added in M7.4
+The actual `main`, recovery branch, tag, prerelease, and attached assets must be verified directly in GitHub. A version checkpoint does not replace the publication package.
 
-Separate `separateFrontBackForms` and `workAndTurn` strategies, three operator modes, one symmetric shared-plate model, mandatory mirrored page-pair and direction validation, independent materialization through the existing duplex validator, mode-aware production metrics, zero-underproduction production-report checks, a sanitized runtime, mode changes without rebuilding geometry, a compact RU/EN comparison panel, and a factual 4×4 shared-plate preview.
+### Added in M7.5
 
-### Verified control example
+Real user geometry and order rows now build validated production plans. Each fitting orientation `0°/90°` retains both `paperMinimum` and `dedicatedPairForms` families. Every plan is materialized, validated, independently reported, and rejected on underproduction. The lossless catalog retains feasible plans while Pareto, recommendation, and dominance remain annotations. The operator selects any plan, inspects its real front/back schemes and report, and exports both PDFs. Eleven objectives, presets, arrow controls, and desktop drag-and-drop rerank the same plan objects without regenerating geometry or replacing explicit selection.
 
-Four different A6 jobs, 2 pages, 1+1, 4,000 copies each:
+### Verified control result
 
-| Metric | Separate forms | Work-and-turn |
-|---|---:|---:|
-| Physical sheets | 1000 | 1000 |
-| Press passes | 2000 | 2000 |
-| Side-layout forms | 2 | 1 |
-| Color plates | 2 | 1 |
-| Underproduction | 0 | 0 |
-| Overrun | 0 | 0 |
+For three two-page A6 jobs of 100 copies at `4+1`, paper-first keeps the 20-sheet plan selected while cost-first recommends the 21-sheet dedicated plan. Four prepared plans are reused and zero plans are regenerated.
 
-With the evidence profile of 130 gsm, 4 BYN/kg, 15 BYN per plate, and zero layout-preparation cost, work-and-turn saves exactly 15 BYN. These values are not production defaults.
+### Scope boundary
 
-### Technology boundary
+Completeness applies only to one shared product format, uniform grids at `0°/90°`, two plan families, separate front/back forms, one shared duplex color specification, and complete page pairs. No global all-impositions claim is made.
 
-M7.4 validates horizontal work-and-turn for the fixed A6 control case. It does not claim a general arbitrary-order solver, vertical turning, or automatic press compatibility. The operator must still verify gripper, side guide, registration, and press constraints.
+### Next target
 
-### Next target version
-
-**`0.7.0-alpha.5` — M7.5**
-
-Add an accessible compact priority-order and production-pricing editor for desktop and mobile without regenerating prepared alternatives.
+**`0.7.0-alpha.6` — M7.6:** compact lossless comparison table with differences-only mode, component deltas, and view-only sorting/filtering.
 
 </td>
 </tr>

@@ -6,11 +6,11 @@
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - рабочая ветка: `main`;
-- точный текущий commit после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- опубликованный version checkpoint: **`0.7.0-alpha.4` / M7.4**;
-- VERSION-файлы ещё показывают alpha.4;
-- `main` содержит объединённый, но ещё не опубликованный **M7.5**;
-- следующий обязательный release checkpoint: **`0.7.0-alpha.5` / M7.5**;
+- функциональный baseline после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
+- текущий version checkpoint: **`0.7.0-alpha.5` / M7.5**;
+- VERSION-файлы синхронизированы с M7.5;
+- publication package должен отдельно добавить evidence/news, recovery branch, immutable tag и настоящий GitHub prerelease;
+- следующий функциональный milestone: **M7.6 / `0.7.0-alpha.6`**;
 - `productionReady` остаётся `false`;
 - GitHub — единственный источник истины.
 
