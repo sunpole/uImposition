@@ -7,17 +7,21 @@ GitHub — единственный источник истины.
 ## 1. Точная точка передачи
 
 - актуальная ветка разработки: `main`;
-- точный commit после объединения PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- опубликованный version checkpoint: `0.7.0-alpha.4` / M7.4;
-- `main` уже содержит **неопубликованный функциональный объём M7.5**, поэтому код находится впереди VERSION-файлов;
-- следующий обязательный release checkpoint: **`0.7.0-alpha.5` / M7.5**;
-- до нового функционального milestone сначала нужно проверить и опубликовать M7.5 по правилам проекта.
+- функциональный baseline M7.5 после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
+- опубликованный prerelease: `0.7.0-alpha.5` / M7.5;
+- release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
+- focused screenshot source: `a8db529c29e7b71a7809bb5f857d48cfde115597`;
+- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
+- recovery branch и immutable tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
+- следующий функциональный milestone: **`0.7.0-alpha.6` / M7.6**.
 
 Последние объединённые функциональные PR:
 
 - `#44` — пользовательские uniform-grid production plans;
 - `#45` — явный выбор любого плана, реальные схемы, production report и PDF выбранного плана;
 - `#46` — полный редактор порядка целей без повторной генерации планов.
+- `#49` — version checkpoint alpha.5;
+- `#50` — publication package, evidence и prerelease alpha.5.
 
 Проверенный head PR `#46`: `ca89cd0f6a7243fb78c3c5ec04a44635c8d75007`.
 
@@ -357,26 +361,18 @@ Preview ограничен первыми восемью монтажами, н�
 - `tools/screenshots/scenarios/*.json`;
 - `pdfinfo` и Poppler внутри Actions.
 
-## 10. Первый обязательный этап для Codex
+## 10. Release checkpoint M7.5 — завершён
 
-Не начинать новый большой solver сразу.
+- version PR `#49` и publication PR `#50` объединены;
+- exact-head Quality: `173/173`;
+- exact-head Chromium/PDF: `16/16`;
+- focused image и permanent evidence ZIP опубликованы;
+- release PNG SHA-256: `bb5686efa1d0f75990885b6f5e8736c1c4c93233eae181c3ae68f81397cf5a6e`;
+- evidence ZIP SHA-256: `9ac0cfb4c01c34e530b4f734e499e6184cf2d6ab78f2157ea1216e6ee5742ec9`;
+- recovery branch, immutable tag и GitHub prerelease проверены;
+- patchnote ожидает следующего внешнего uNews FIFO scan, если Telegram-публикация ещё не появилась.
 
-Сначала выполнить release checkpoint M7.5:
-
-1. проверить `main` на commit `009451cce94d5cde05ee72305f30447aa65a646c`;
-2. проверить последние PR `#44`, `#45`, `#46` и их Actions;
-3. провести documentation/version audit;
-4. синхронизировать `VERSION.json`, `VERSION.md`, `CHANGELOG.md`, README, `START_HERE.md`, видимую версию сайта и screenshot assertions до `0.7.0-alpha.5`;
-5. создать focused release screenshot реальной новой функции;
-6. создать patchnote и uNews/Telegram payload;
-7. создать permanent evidence archive и release manifest;
-8. пройти exact-head Quality и Chromium/PDF;
-9. объединить version/publication PR;
-10. создать recovery branch `release/v0.7.0-alpha.5`;
-11. создать immutable tag `v0.7.0-alpha.5`;
-12. создать настоящий GitHub prerelease с image и evidence ZIP;
-13. независимо проверить Release card и каждый asset;
-14. только после этого начинать M7.6.
+Следующую работу начинать с небольшого pure-model патча M7.6, не с расширения solver/search space.
 
 ## 11. Следующий функциональный этап после alpha.5
 
