@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.7.0-alpha.5 — 2026-07-27
+
+### Added
+
+- user-entered sheet/product geometry and order rows connected to verified production-plan generation;
+- `paperMinimum` and `dedicatedPairForms` plan families for every fitting `0°/90°` orientation;
+- full front/back materialization, independent imposition validation, production reports, and zero-underproduction guards for every plan;
+- lossless feasible catalog that retains dominated, expensive, and metric-equivalent but structurally distinct plans;
+- Pareto, recommendation, dominance, and rank annotations without deleting catalog data;
+- explicit operator selection of any plan independently from recommendation;
+- real selected-plan front/back previews, production details, scheme PDF, and report PDF;
+- complete operator objective editor with 11 pricing-ready objectives, six presets, accessible arrow controls, and desktop drag-and-drop;
+- persistent objective preference and reranking over the same plan objects with `regeneratedPlanCount = 0`;
+- desktop/mobile Chromium scenarios for catalog, selection/details/export, and objective-priority behavior.
+
+### Changed
+
+- the main page now represents M7.5 as the current version checkpoint;
+- version sources, package metadata, runtime-visible fallbacks, and screenshot assertions are synchronized to `0.7.0-alpha.5`;
+- M7.6 / `0.7.0-alpha.6` is the next target;
+- release evidence records an exact `sourceCommit` for Chromium capture separately from the later immutable `releaseCommit`.
+
+### Verified control result
+
+For three two-page A6 jobs of `100` at `4+1`, all four plans remain available. The operator-selected `uniform-r90-paper-minimum` remains selected at 20 sheets while cost-first recommends `uniform-r90-dedicated-pairs` at 21 sheets and `240.05 BYN` under the evidence pricing profile. Reranking reuses four plans and regenerates zero.
+
+### Boundary
+
+The user catalog is complete only within one shared product format × uniform grid × fitting `0°/90°` × `paperMinimum/dedicatedPairForms` × separate front/back forms × one shared duplex color specification × complete page pairs. M7.5 does not claim a global imposition solver, general user-driven work-and-turn search, mixed-format packing, mixed rotations, per-row geometry/colors, simplex/odd-page production, folding imposition, profitability, persistence, or machine compatibility.
+
 ## 0.7.0-alpha.4 — 2026-07-26
 
 ### Added
