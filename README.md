@@ -1,145 +1,152 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Текущая версия / Current version: 0.7.0-alpha.4</strong></p>
-<p align="center"><strong><a href="START_HERE.md">Продолжить разработку с нового устройства / Continue development from a new device</a></strong></p>
+<p align="center"><strong>Опубликованная версия / Published version: 0.7.0-alpha.4</strong></p>
+<p align="center"><strong>main содержит невыпущенный M7.5 / main contains unreleased M7.5</strong></p>
+<p align="center"><strong><a href="START_HERE.md">Начать здесь / Start here</a> · <a href="docs/CODEX_HANDOFF.md">Передача в Codex / Codex handoff</a></strong></p>
 
-<table>
-<tr>
-<td width="50%" valign="top">
+## Назначение
 
-## Русский
+uImposition — статический браузерный калькулятор и планировщик монтажей для листовой офсетной печати.
 
-uImposition — статический браузерный инструмент для расчёта сложных сборных офсетных монтажей.
+Программа должна:
 
-### Работает в M1–M6
+- принимать реальные параметры листа, изделия и заказов;
+- показывать, что технологически возможно в заданных условиях;
+- сохранять все допустимые варианты внутри явно описанного search scope;
+- не скрывать дорогие, доминируемые или убыточные решения;
+- считать бумагу, формы, цветовые пластины, прогоны, перетираж и себестоимость;
+- позволять оператору менять цели и выбирать решение самостоятельно;
+- выдавать реальные схемы, production report и PDF выбранного плана;
+- никогда не принимать недопечатку.
 
-- реальные и произвольные форматы листов;
+## Текущая точка разработки
+
+- GitHub: `https://github.com/sunpole/uImposition`;
+- GitHub Pages: `https://sunpole.github.io/uImposition/`;
+- текущий `main` после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
+- опубликованный checkpoint: `0.7.0-alpha.4` / M7.4;
+- функциональный M7.5 уже объединён в `main` через PR `#44`, `#45`, `#46`;
+- следующий обязательный checkpoint: `0.7.0-alpha.5`;
+- полный handoff: [`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md).
+
+## Что работает
+
+### M1–M6
+
+- произвольные форматы листов;
 - зачистка и непечатные поля как отдельные этапы;
-- A4, A5, A6 и произвольный формат изделия;
-- выпуск, общий рез и дополнительный зазор;
-- сетки 0°/90° и выбор максимальной вместимости;
-- точные пары страниц;
-- проверенные лица и автоматически зеркальные обороты;
-- напечатанное количество, недопечатка и перетираж;
-- физическая бумага, layout-формы, цветовые пластины и листопрогоны;
-- production report и отдельные PDF схем/отчёта;
-- полный набор `8960` ограниченных контрольных кандидатов;
-- доказанный минимум физической бумаги `3305` листов;
-- производственные regression-кейсы.
+- A4/A5/A6 и произвольный единый формат изделия;
+- выпуск, общий/раздельный рез и gap;
+- fitting grids `0°/90°`;
+- точные последовательные page pairs;
+- validated front и derived mirrored back;
+- physical sheets, layout forms, color plates и press passes;
+- underproduction/overrun;
+- production report;
+- отдельные PDF schemes/report;
+- bounded candidate generation;
+- доказанный paper minimum `3305` листов для контрольного набора;
+- production regression fixtures.
 
-### Добавлено в M7.1–M7.2
+### M7.1–M7.3
 
-- 11 изменяемых целей и отдельные жёсткие ограничения;
-- мгновенное лексикографическое ранжирование;
-- прозрачная BYN-модель бумаги, пластин и подготовки layout-форм;
-- единая guarded-модель `SolutionMetrics`;
-- ввод рабочего прайса на основной странице;
-- состояния `pricing incomplete / inputs ready / ready`;
-- защита от недопечатки, `null → 0` и несовместимой денежной базы.
+- 11 optimization objectives;
+- immutable hard constraints;
+- lexicographic ranking;
+- operator pricing и guarded cost;
+- `SolutionMetrics`;
+- strict Pareto frontier;
+- materially different alternatives;
+- RU/EN explanations и component deltas;
+- sanitized alternatives runtime/UI.
 
-### Добавлено в M7.3
+### M7.4 — опубликовано
 
-- строгий Pareto-frontier;
-- compact display set существенно разных вариантов;
-- реальные `compact manual` и доказанный `paper minimum`;
-- paper-first / cost-first без повторной генерации;
-- выбор базы сравнения;
-- RU/EN-объяснения преимуществ и цены компромисса;
-- component cost deltas;
-- sanitized runtime и compact read-only панель.
-
-### Добавлено в M7.4
-
-- отдельные стратегии `чужой оборот` и `свой оборот / work-and-turn`;
-- режимы `только чужой / сравнить оба / только свой`;
-- одна симметричная общая форма для двух прогонов;
-- обязательная проверка зеркальных пар страниц и направления переворота;
-- независимый production report готовых изделий;
-- mode-aware учёт одной или двух layout-форм;
-- нулевая недопечатка как обязательное условие;
-- sanitized runtime без raw reports/layouts/pagePairs;
-- компактное RU/EN-сравнение и preview общей формы `4 × 4`;
+- separate front/back forms;
+- work-and-turn control model;
+- horizontal axis;
+- symmetric shared form;
+- mirrored front/back validation;
+- independent production report;
+- strategy modes;
+- forms/plates comparison;
 - focused Chromium evidence.
 
-### Дальше в M7
+### M7.5 — объединено в main, release ещё не создан
 
-- M7.5: компактный редактор порядка приоритетов и рабочих цен;
-- M7.6: итоговая таблица вариантов, детали выбранного решения и экспорт.
+#### Пользовательские production plans
 
-</td>
-<td width="50%" valign="top">
+- пользовательские orders/page pairs подключены к production pipeline;
+- fitting orientations `0°/90°`;
+- plan-family `paperMinimum` и `dedicatedPairForms`;
+- front/back materialization и validation каждого плана;
+- independent production report;
+- dynamic BYN cost;
+- lossless catalog;
+- `All / Pareto / Recommended / Dominated` как view filters.
 
-## English
+#### Выбор и экспорт
 
-uImposition is a static browser tool for planning complex gang-run offset impositions.
+- явный выбор любого плана;
+- recommendation не заменяет selection;
+- реальные schemes выбранного плана;
+- dynamic file/pair production report;
+- PDF schemes;
+- PDF report;
+- compact desktop/mobile details view.
 
-### Working through M6
+#### Приоритеты оператора
 
-Sheet/product geometry, exact page pairs, validated front/back schemes, production totals, separate PDFs, complete bounded control candidates, a proven 3,305-sheet minimum, separate side-layout/color-plate metrics, and production regressions.
+- полный порядок 11 целей;
+- presets `По умолчанию / Бумага / Стоимость / Формы / Прогоны / Перетираж`;
+- стрелки для desktop/mobile;
+- drag-and-drop на desktop;
+- preference сохраняется при пересчёте;
+- reranking использует те же plan-объекты;
+- layouts/reports не генерируются заново;
+- PR `#46`: `173/173` tests, Chromium/PDF success, visual desktop/mobile review.
 
-### Added in M7.1–M7.2
+## Честная граница текущего пользовательского solver
 
-Eleven reorderable objectives, immutable hard constraints, instant lexicographic ranking, transparent production costing, guarded `SolutionMetrics`, main-page pricing inputs, explicit pricing states, and production-report-backed cost.
-
-### Added in M7.3
-
-A strict Pareto frontier, materially-different compact alternatives, real compact-manual and proven paper-minimum results, instant paper/cost re-ranking, selectable references, RU/EN tradeoff explanations, component cost deltas, a sanitized runtime, and a compact read-only panel.
-
-### Added in M7.4
-
-Separate front/back and work-and-turn strategies, three operator modes, one symmetric shared plate for two passes, mandatory mirrored-pair and turn-direction validation, an independent production report, mode-aware form metrics, zero-underproduction guards, a sanitized runtime, a compact RU/EN comparison, a factual 4×4 plate preview, and focused Chromium evidence.
-
-### Later M7 patches
-
-M7.5 adds the compact priority/pricing editor. M7.6 adds the final alternatives table, selected-solution details, and export.
-
-</td>
-</tr>
-</table>
-
-## Открыть / Open
-
-- GitHub Pages: `https://sunpole.github.io/uImposition/`
-- [Демонстрация M7.1 / M7.1 decision demo](decision-profile-demo.html?demo=decision-profile)
-- [Начать или продолжить разработку / Start or continue development](START_HERE.md)
-- [Текущее состояние / Current state](docs/CURRENT_STATE.md)
-- [Текущая версия / Current version](VERSION.md)
-- [Полное ТЗ RU](docs/TECHNICAL_SPECIFICATION_RU.md)
-- [Full specification EN](docs/TECHNICAL_SPECIFICATION_EN.md)
-
-## Документация / Documentation
-
-- [Что осталось до 1.0 / Remaining work](docs/REMAINING_WORK.md)
-- [План M7 / M7 implementation plan](docs/M7_IMPLEMENTATION_PLAN.md)
-- [M7.4 свой оборот / M7.4 work-and-turn](docs/M7_4_WORK_AND_TURN.md)
-- [M7.3 runtime и UI альтернатив](docs/M7_3_RUNTIME_ALTERNATIVES_UI.md)
-- [Денежная оценка производства / Production costing](docs/PRODUCTION_COSTING.md)
-- [Архитектура / Architecture](docs/ARCHITECTURE.md)
-- [Справочник конфигурации / Configuration](docs/CONFIG_REFERENCE.md)
-- [План тестирования / Test plan](docs/TEST_PLAN.md)
-- [Дорожная карта / Roadmap](docs/ROADMAP.md)
-- [Автоматизация скриншотов и PDF](docs/SCREENSHOT_AUTOMATION.md)
-
-## Разработка / Development model
-
-GitHub — единственный источник истины. Каждый завершённый опубликованный патч получает:
+Каталог полный только внутри:
 
 ```text
-feature branch
-→ PR и проверки
-→ focused Chromium evidence
-→ version checkpoint
-→ patchnote + uNews/Telegram
-→ permanent evidence archive
-→ recovery/v{version}
-→ immutable tag
-→ GitHub prerelease/release с assets
+один общий формат изделия
+× uniform grid
+× fitting rotation 0°/90°
+× paperMinimum/dedicatedPairForms
+× separate front/back forms
+× одна общая duplex-цветность
+× полные front/back page pairs
 ```
 
-Локальный терминал необязателен и не является источником истины.
+Это ещё не глобальный перебор всех технологически возможных монтажей.
 
-## Контрольные решения / Control solutions
+Пока не реализованы полностью:
+
+- общий user-driven automatic work-and-turn;
+- vertical turn axis;
+- automatic mixed-format packing;
+- mixed rotations `0° + 90°` на одном листе;
+- индивидуальные параметры каждой order row;
+- односторонние/нечётные работы;
+- тетрадный/фальцевальный спуск;
+- profit/loss и margin;
+- project persistence/import/export;
+- heavy search worker, progress/cancel/time limits;
+- финальная comparison table `Только различия`;
+- полный beta/RC audit.
+
+## Следующий порядок
+
+1. Выпустить объединённый M7.5 как `0.7.0-alpha.5`.
+2. Создать version sync, focused image, patchnote, uNews/Telegram, permanent evidence, recovery branch, immutable tag и GitHub prerelease.
+3. Затем реализовать M7.6 — компактную lossless comparison table.
+4. После M7.6 расширять search space отдельными plan-family патчами.
+5. Затем mixed-format, full order rows, persistence, profitability и heavy-search worker.
+
+## Контрольные решения
 
 ### M7.3 — бумага против стоимости
 
@@ -148,13 +155,13 @@ feature branch
 | Compact manual | 3395 | 8 | 32 | 972,55 BYN |
 | Paper minimum | 3305 | 112 | 448 | 7199,49 BYN |
 
-При evidence-профиле `620×450 мм`, `130 г/м²`, `4 BYN/кг` и `15 BYN` за цветовую пластину минимум бумаги экономит `90` листов, но дороже на `6226,94 BYN`. Это не рабочий прайс.
+При evidence-профиле `620×450 мм`, `130 г/м²`, `4 BYN/кг` и `15 BYN` за цветовую пластину minimum paper экономит `90` листов, но дороже на `6226,94 BYN`. Это не рабочий default.
 
-### M7.4 — чужой оборот против своего
+### M7.4 — separate против work-and-turn
 
 Четыре разных A6, 2 страницы, `1+1`, по `4000`:
 
-| Метрика | Чужой оборот | Свой оборот |
+| Метрика | Separate | Work-and-turn |
 |---|---:|---:|
 | Листы | 1000 | 1000 |
 | Прогоны | 2000 | 2000 |
@@ -163,17 +170,52 @@ feature branch
 | Недопечатка | 0 | 0 |
 | Перетираж | 0 | 0 |
 
-При evidence-прайсе `15 BYN` за пластину и нулевой подготовке свой оборот экономит ровно `15 BYN`. Бумага и прогоны не меняются.
+### M7.5 — paper-first против cost-first
 
-## Границы
+Три двухстраничных A6 по `100`, цветность `4+1`:
 
-- M7.4 подтверждает горизонтальный work-and-turn для фиксированного контрольного кейса, но ещё не общий автоматический solver;
-- совместимость с захватом, боковым упором и конкретной машиной проверяет оператор;
-- полный редактор приоритетов и цен относится к M7.5;
-- итоговая таблица и экспорт выбранного решения относятся к M7.6;
-- automatic mixed-format packing относится к M8;
-- 32-страничный regression проверяет последовательные пары, но не заявляет готовый фальцевальный спуск;
-- полный импорт/экспорт проекта и постоянное хранение относятся к M8.
+- paper-focused: `20` листов;
+- dedicated pairs: `21` лист, меньше forms/plates и `240,05 BYN` при evidence-прайсе;
+- оба остаются доступными;
+- recommendation меняется вместе с objective order;
+- выбранный оператором plan не подменяется.
+
+## Документация
+
+- [Начать здесь](START_HERE.md)
+- [Codex handoff](docs/CODEX_HANDOFF.md)
+- [Текущее состояние](docs/CURRENT_STATE.md)
+- [Остаток до 1.0](docs/REMAINING_WORK.md)
+- [Архитектура](docs/ARCHITECTURE.md)
+- [Полное ТЗ RU](docs/TECHNICAL_SPECIFICATION_RU.md)
+- [Full specification EN](docs/TECHNICAL_SPECIFICATION_EN.md)
+- [M7.4 work-and-turn](docs/M7_4_WORK_AND_TURN.md)
+- [M7.5 user production plans](docs/M7_5_USER_UNIFORM_PRODUCTION_PLANS.md)
+- [M7.5 selection/export](docs/M7_5_USER_PLAN_SELECTION_EXPORT.md)
+- [M7.5 objective editor](docs/M7_5_OBJECTIVE_PRIORITY_EDITOR.md)
+- [Production costing](docs/PRODUCTION_COSTING.md)
+- [Configuration](docs/CONFIG_REFERENCE.md)
+- [Test plan](docs/TEST_PLAN.md)
+- [Screenshot/PDF automation](docs/SCREENSHOT_AUTOMATION.md)
+
+## Development model
+
+```text
+feature branch
+→ draft PR
+→ exact-head tests
+→ Chromium/PDF evidence
+→ visual review
+→ merge
+→ version checkpoint
+→ patchnote + uNews/Telegram
+→ permanent evidence archive
+→ recovery/v{version}
+→ immutable tag
+→ GitHub prerelease/release with verified assets
+```
+
+GitHub is the source of truth. A local terminal is optional and cannot be the only evidence.
 
 ## Лицензия / License
 
