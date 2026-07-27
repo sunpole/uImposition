@@ -264,3 +264,16 @@ At the end provide:
 ## Stop condition
 
 This task is complete only when `0.7.0-alpha.5` is a verified GitHub prerelease with immutable recovery references, permanent evidence, release news and uNews state. After that, provide the proposed first M7.6 patch, but do not silently begin a large new solver in the alpha.5 release branches.
+
+## Completion record — 2026-07-27
+
+- version PR: `#49`, merge/release commit `195d6496a291095a69cc9089a64154561ffbb1fa`;
+- publication PR: `#50`, merge commit `546f637a25b51f72706ebbe7346acb2df9819af8`;
+- focused source commit: `a8db529c29e7b71a7809bb5f857d48cfde115597`;
+- recovery branch: `release/v0.7.0-alpha.5`;
+- immutable tag: `v0.7.0-alpha.5`;
+- GitHub prerelease: `uImposition v0.7.0-alpha.5`;
+- exact publication-head checks: `173/173` tests and `16/16` Chromium scenarios;
+- release PNG and evidence ZIP independently downloaded and SHA-256 verified;
+- uNews state checked: patchnote has `queued_at`; the latest external scan predates the merge, so Telegram publication remains pending the next FIFO run;
+- M7.6 code and new solver work were not mixed into alpha.5.
