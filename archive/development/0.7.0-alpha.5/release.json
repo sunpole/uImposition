@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "project": "uImposition",
+  "version": "0.7.0-alpha.5",
+  "tag": "v0.7.0-alpha.5",
+  "title": "uImposition v0.7.0-alpha.5",
+  "prerelease": true,
+  "sourceCommit": "e28eef2f454cc83f76175b39ec3231eafae1fd04",
+  "releaseCommit": "195d6496a291095a69cc9089a64154561ffbb1fa",
+  "createdAt": "2026-07-27T04:13:33Z",
+  "patchnote": "news/2026-07-27-uimposition-v0-7-0-alpha-5-user-production-plans.md",
+  "image": "news/2026-07-27-uimposition-v0-7-0-alpha-5-user-production-plans.png",
+  "archive": "archive/development/0.7.0-alpha.5/uimposition-v0-7-0-alpha-5-evidence.zip",
+  "screenshotScenario": "m7-objective-priority-editor",
+  "archiveScenarios": [
+    "m7-objective-priority-editor",
+    "m7-objective-priority-editor-mobile",
+    "m7-user-order-plan-catalog",
+    "m7-user-order-plan-catalog-mobile",
+    "m7-user-selected-plan-details",
+    "m7-user-selected-plan-details-mobile"
+  ],
+  "historicalArtifacts": [
+    {
+      "artifactId": 8641678651,
+      "fileName": "uimposition-quality-49-1.zip"
+    },
+    {
+      "artifactId": 8641691735,
+      "fileName": "uimposition-screenshots-49-1.zip"
+    }
+  ],
+  "telegramText": "uImposition 0.7.0-alpha.5: M7.5 выпускает проверенные производственные планы для пользовательского заказа. Внутри текущей ограниченной области каталог сохраняет все допустимые варианты; фильтры меняют только представление. Оператор выбирает план явно и выгружает схемы/отчёт PDF. Приоритеты переоценивают 4 готовых плана без перестроения геометрии; рекомендация не заменяет выбор."
+}
