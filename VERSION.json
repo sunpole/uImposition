@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "project": "uImposition",
-  "version": "0.7.0-alpha.4",
+  "version": "0.7.0-alpha.5",
   "semverCore": "0.7.0",
   "channel": "alpha",
-  "channelIteration": 4,
-  "versionSequence": 12,
-  "releaseDate": "2026-07-26",
-  "status": "m7-4-work-and-turn-alpha",
-  "milestone": "M7.4",
-  "nextMilestone": "M7.5",
+  "channelIteration": 5,
+  "versionSequence": 13,
+  "releaseDate": "2026-07-27",
+  "status": "m7-5-user-production-plans-alpha",
+  "milestone": "M7.5",
+  "nextMilestone": "M7.6",
   "productionReady": false,
   "publicDemoReady": true,
   "capacityImplemented": true,
@@ -54,14 +54,14 @@
   "workAndTurnReadOnlyUiImplemented": true,
   "automaticWorkAndTurnSearchImplemented": false,
   "summary": {
-    "ru": "M7.4 добавляет отдельно проверяемый свой оборот / work-and-turn: одну симметричную форму для двух прогонов, три режима допуска стратегии, независимый production report и компактное RU/EN-сравнение. Контрольный кейс четырёх A6 1+1 по 4000 подтверждает одинаковые 1000 листов и 2000 прогонов, но уменьшение layout-форм и цветовых пластин с 2 до 1 без недопечатки.",
-    "en": "M7.4 adds separately validated work-and-turn production: one symmetric plate for two passes, three operator strategy modes, an independent production report, and a compact RU/EN comparison. The four-A6 1+1 control case confirms equal 1,000 sheets and 2,000 passes while reducing side-layout forms and color plates from 2 to 1 with zero underproduction."
+    "ru": "M7.5 подключает реальные пользовательские размеры и строки заказов к проверенному production pipeline. Все допустимые планы внутри явно ограниченной области 0°/90° × paperMinimum/dedicatedPairForms сохраняются в lossless-каталоге; оператор выбирает любой план, получает его схемы, production report и PDF, а порядок 11 целей меняет только рекомендацию без повторной генерации геометрии.",
+    "en": "M7.5 connects real user geometry and order rows to the validated production pipeline. Every feasible plan inside the explicit 0°/90° × paperMinimum/dedicatedPairForms scope remains in the lossless catalog; the operator may select any plan, inspect and export its schemes and report, and reorder 11 objectives without regenerating geometry."
   },
   "nextTarget": {
-    "version": "0.7.0-alpha.5",
-    "milestone": "M7.5",
-    "ru": "Добавить компактный редактор порядка приоритетов и рабочих цен с доступным desktop/mobile управлением без повторной генерации готовых вариантов.",
-    "en": "Add a compact priority-order and production-pricing editor with accessible desktop/mobile controls and no regeneration of prepared alternatives."
+    "version": "0.7.0-alpha.6",
+    "milestone": "M7.6",
+    "ru": "Добавить компактную lossless-таблицу всех вариантов: одна строка на вариант, режим «Только различия», точные component deltas, сортировка и фильтры как преобразования представления.",
+    "en": "Add a compact lossless comparison table with one row per plan, differences-only mode, exact component deltas, and sorting/filtering as view-only transformations."
   },
   "versionSources": {
     "machine": "VERSION.json",
@@ -73,11 +73,24 @@
     "rollbackBranch": "release/v{version}",
     "tag": "v{version}",
     "githubReleaseRequiredForEveryPublishedPatch": true,
-    "preReleaseChannels": ["alpha", "beta", "rc"],
+    "preReleaseChannels": [
+      "alpha",
+      "beta",
+      "rc"
+    ],
     "releaseNewsRequired": true,
     "telegramQueueRequired": true,
     "permanentEvidenceArchiveRequired": true,
     "publishedTagsAreImmutable": true
   },
-  "synchronizationRule": "When the project version changes, VERSION.json, VERSION.md, CHANGELOG.md, README, package.json, visible site version, release news, screenshot scenarios, and release archive manifest must be updated in the same release cycle."
+  "synchronizationRule": "When the project version changes, VERSION.json, VERSION.md, CHANGELOG.md, README, package.json, visible site version, release news, screenshot scenarios, and release archive manifest must be updated in the same release cycle.",
+  "userUniformProductionPlansImplemented": true,
+  "userPlanCatalogLossless": true,
+  "userPlanSelectionImplemented": true,
+  "userPlanSchemePdfImplemented": true,
+  "userPlanProductionReportPdfImplemented": true,
+  "userObjectivePriorityEditorImplemented": true,
+  "userObjectivePresetsImplemented": true,
+  "userObjectiveRerankingWithoutRegeneration": true,
+  "explicitOperatorSelectionIndependentOfRecommendation": true
 }
