@@ -5,11 +5,14 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "../..");
 const markerPath = path.join(root, "news/.prepare-release.json");
-const manifestPath = path.join(root, "artifacts/screenshots/manifest.json");
+const manifestPath = path.join(root, "artifacts/screenshots/manifest.ndjson");
 
 const marker = JSON.parse(await readFile(markerPath, "utf8"));
-const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-const entry = manifest.entries.find((item) => item.scenario === marker.scenario);
+const manifestEntries = (await readFile(manifestPath, "utf8"))
+  .split(/\r?\n/)
+  .filter(Boolean)
+  .map((line) => JSON.parse(line));
+const entry = manifestEntries.find((item) => item.scenario === marker.scenario);
 const expectedCommit = process.env.SCREENSHOT_COMMIT || process.env.GITHUB_SHA;
 const releaseCommit = String(marker.releaseCommit ?? "");
 
