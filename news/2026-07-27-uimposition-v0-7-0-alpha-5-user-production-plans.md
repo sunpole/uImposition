@@ -4,15 +4,15 @@ project: uImposition
 series: uimposition
 title: uImposition 0.7.0-alpha.5: проверенные производственные планы
 version: 0.7.0-alpha.5
-queued_at: 2026-07-27T04:13:33Z
+queued_at: 2026-07-27T04:18:53Z
 repo_url: https://github.com/sunpole/uImposition
 web_url: https://sunpole.github.io/uImposition/
 image: 2026-07-27-uimposition-v0-7-0-alpha-5-user-production-plans.png
 image_text: Редактор приоритетов M7.5: расчётная стоимость поставлена первой; 4 готовых плана переоценены без перестроения геометрии; рекомендация показана отдельно от выбора оператора.
 image_source: playwright
 image_target: scenario/m7-objective-priority-editor
-image_commit: e28eef2f454cc83f76175b39ec3231eafae1fd04
-image_captured_at: 2026-07-27T04:13:26.208Z
+image_commit: a8db529c29e7b71a7809bb5f857d48cfde115597
+image_captured_at: 2026-07-27T04:18:46.632Z
 ---
 
 # uImposition 0.7.0-alpha.5: проверенные производственные планы

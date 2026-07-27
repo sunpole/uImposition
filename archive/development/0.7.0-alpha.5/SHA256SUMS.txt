@@ -1,0 +1,2 @@
+bb5686efa1d0f75990885b6f5e8736c1c4c93233eae181c3ae68f81397cf5a6e  news/2026-07-27-uimposition-v0-7-0-alpha-5-user-production-plans.png
+9ac0cfb4c01c34e530b4f734e499e6184cf2d6ab78f2157ea1216e6ee5742ec9  archive/development/0.7.0-alpha.5/uimposition-v0-7-0-alpha-5-evidence.zip
