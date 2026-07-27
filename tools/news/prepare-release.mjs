@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -35,6 +36,8 @@ const targetPatchnote = path.join(root, "news", patchnoteName);
 const releaseDirectory = path.join(root, "archive", "development", marker.version);
 const archiveName = `uimposition-v${safeVersion}-evidence.zip`;
 const releaseManifestPath = path.join(releaseDirectory, "release.json");
+const evidenceReadmePath = path.join(releaseDirectory, "README.md");
+const internalSumsPath = path.join(releaseDirectory, "SHA256SUMS.internal.txt");
 
 function bulletList(items) {
   return items.map((item) => `- ${item};`).join("\n").replace(/;$/, ".");
@@ -107,6 +110,24 @@ const releaseManifest = {
 };
 
 await writeFile(releaseManifestPath, `${JSON.stringify(releaseManifest, null, 2)}\n`, "utf8");
+
+const evidenceReadmeTemplate = String(marker.evidenceReadme ?? "");
+if (!evidenceReadmeTemplate.trim()) throw new Error("evidenceReadme is required");
+const evidenceReadme = evidenceReadmeTemplate
+  .replaceAll("{{SOURCE_COMMIT}}", entry.commit)
+  .replaceAll("{{RELEASE_COMMIT}}", releaseCommit)
+  .replaceAll("{{QUEUED_AT}}", queuedAt);
+await writeFile(evidenceReadmePath, evidenceReadme.endsWith("\n") ? evidenceReadme : `${evidenceReadme}\n`, "utf8");
+
+async function sha256(filePath) {
+  return createHash("sha256").update(await readFile(filePath)).digest("hex");
+}
+const internalInputs = [targetImage, targetPatchnote, releaseManifestPath, evidenceReadmePath];
+const internalSums = [];
+for (const filePath of internalInputs) {
+  internalSums.push(`${await sha256(filePath)}  ${path.relative(root, filePath).replaceAll("\\\\", "/")}`);
+}
+await writeFile(internalSumsPath, `${internalSums.join("\n")}\n`, "utf8");
 await rm(markerPath);
 console.log(JSON.stringify({
   imageName,
@@ -114,5 +135,7 @@ console.log(JSON.stringify({
   queuedAt,
   imageCommit: entry.commit,
   releaseManifest: path.relative(root, releaseManifestPath),
+  evidenceReadme: path.relative(root, evidenceReadmePath),
+  internalSums: path.relative(root, internalSumsPath),
   archive: releaseManifest.archive,
 }, null, 2));
