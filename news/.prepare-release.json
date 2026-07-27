@@ -1,0 +1,43 @@
+{
+  "version": "0.7.0-alpha.5",
+  "releaseCommit": "195d6496a291095a69cc9089a64154561ffbb1fa",
+  "scenario": "m7-objective-priority-editor",
+  "archiveScenarios": [
+    "m7-objective-priority-editor",
+    "m7-objective-priority-editor-mobile",
+    "m7-user-order-plan-catalog",
+    "m7-user-order-plan-catalog-mobile",
+    "m7-user-selected-plan-details",
+    "m7-user-selected-plan-details-mobile"
+  ],
+  "historicalArtifacts": [
+    {
+      "artifactId": 8641678651,
+      "fileName": "uimposition-quality-49-1.zip"
+    },
+    {
+      "artifactId": 8641691735,
+      "fileName": "uimposition-screenshots-49-1.zip"
+    }
+  ],
+  "slug": "user-production-plans",
+  "type": "release",
+  "title": "uImposition 0.7.0-alpha.5: проверенные производственные планы",
+  "imageText": "Редактор приоритетов M7.5: расчётная стоимость поставлена первой; 4 готовых плана переоценены без перестроения геометрии; рекомендация показана отдельно от выбора оператора.",
+  "summary": "M7.5 выводит проверенные варианты производства для пользовательского заказа, сохраняет полный допустимый каталог внутри явно ограниченной области, позволяет оператору выбрать план и выгрузить схемы и отчёт PDF. Приоритеты меняют рекомендацию без перестроения геометрии.",
+  "features": [
+    "полный каталог допустимых планов внутри текущей ограниченной области, без удаления вариантов фильтрами",
+    "отдельные рекомендация и явный выбор оператора",
+    "детали выбранного плана, схемы и производственный отчёт PDF",
+    "редактор приоритетов целей с переоценкой уже проверенного каталога без регенерации геометрии"
+  ],
+  "controlFacts": [
+    "в focused-сценарии доступно 4 проверенных плана",
+    "при приоритете стоимости повторно использовано 4 плана и построено заново 0",
+    "рекомендован uniform-r90-dedicated-pairs; операторский выбор остаётся независимым",
+    "недопечатка запрещена; отсутствие стоимости не превращается в ноль"
+  ],
+  "nextStep": "Следующий самостоятельный этап — M7.6 / 0.7.0-alpha.6. Он не входит в этот релиз; текущий поиск нельзя считать глобально полным вне задокументированной области.",
+  "telegramText": "uImposition 0.7.0-alpha.5: M7.5 выпускает проверенные производственные планы для пользовательского заказа. Внутри текущей ограниченной области каталог сохраняет все допустимые варианты; фильтры меняют только представление. Оператор выбирает план явно и выгружает схемы/отчёт PDF. Приоритеты переоценивают 4 готовых плана без перестроения геометрии; рекомендация не заменяет выбор.",
+  "evidenceReadme": "# uImposition 0.7.0-alpha.5 evidence\n\nGenerated: {{QUEUED_AT}}\n\nThis permanent archive records the M7.5 release checkpoint and its focused browser evidence.\n\n## Exact release boundary\n\n- Functional M7.5 baseline: `009451cce94d5cde05ee72305f30447aa65a646c`\n- Version checkpoint release commit: `{{RELEASE_COMMIT}}`\n- Focused screenshot source head: `{{SOURCE_COMMIT}}`\n- Version PR: `#49`\n- Version: `0.7.0-alpha.5`\n- Recovery branch: `release/v0.7.0-alpha.5`\n- Immutable tag: `v0.7.0-alpha.5`\n\nThe recovery branch and immutable tag must point to the version checkpoint commit. The later publication merge contains only release tooling, patchnote, image, manifest, hashes, and evidence.\n\n## Confirmed M7.5 scope\n\n- verified user production-plan catalog inside one shared product format, uniform grids, fitting 0°/90°, paper-minimum and dedicated-pair strategies, separate front/back forms, one shared duplex color specification, and complete page pairs;\n- all feasible variants inside that documented scope stay in the catalog;\n- filters change only the view;\n- recommendation and explicit operator selection remain separate;\n- selected-plan details and scheme/report PDF export;\n- objective priority reranking reuses validated plans without rebuilding geometry.\n\nThe checkpoint does not claim a globally complete solver, a lower-bound proof outside explicitly proven cases, or compatibility with a particular press.\n\n## Production invariants\n\n- underproduction is forbidden;\n- back layouts derive only from a validated front;\n- missing cost never becomes zero;\n- layout forms and color plates remain separate;\n- recommendations never replace the operator's choice;\n- fixtures and bounded searches are not described as automatic global solvers;\n- geometric symmetry does not prove machine compatibility.\n\n## Exact checks\n\n- Quality run: `30236119913` — 173/173 tests, 0 failures;\n- Quality artifact: `8641678651`, `uimposition-quality-49-1`;\n- Quality digest: `sha256:7570c0a0c529d9994ea416d28cfefdbcfd688c8701fed09213b9c12642315f27`;\n- Full Chromium/PDF run: `30236119914` — 16/16 scenarios;\n- Full Chromium/PDF artifact: `8641691735`, `uimposition-screenshots-49-1`;\n- Full Chromium/PDF digest: `sha256:1cf047532caf18e7d49a6464a8f4b339dcc2ea15c37eb6f6ca0581491b0d33df`;\n- scheme PDF: 8 A4 pages, verified by pdfinfo and rendered with Poppler;\n- production report PDF: 6 A4 pages, verified by pdfinfo and rendered with Poppler;\n- focused evidence workflow run: `{{PREPARE_RUN_ID}}`;\n- focused image captured at: `{{CAPTURED_AT}}`.\n\nThe two exact-head Action archives are preserved under `historical/`.\n\n## Focused screenshot\n\n- Scenario: `m7-objective-priority-editor`\n- Original: `uimposition-m7-5-objective-priority-editor.png`\n- Release image: `news/2026-07-27-uimposition-v0-7-0-alpha-5-user-production-plans.png`\n- Viewport: 1440 × 1180\n- Selector: `#userObjectivePriorityEditor`\n\nDesktop and mobile focused PNGs were visually reviewed. Text is readable without clipping or overflow; estimated cost is first; the panel reports four reused plans and zero regenerated plans; `uniform-r90-dedicated-pairs` remains a recommendation rather than an operator selection. No secrets or private data are visible.\n\n## Integrity\n\n- `SHA256SUMS.internal.txt` records the PNG, patchnote, release manifest, and this README inside the ZIP;\n- `SHA256SUMS.txt` records the release PNG and the final evidence ZIP;\n- the ZIP includes the six focused M7.5 Chromium scenarios, capture log and NDJSON manifest, patchnote, release manifest, README, internal hashes, and both historical exact-head Action archives.\n"
+}
