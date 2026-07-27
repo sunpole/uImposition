@@ -30,6 +30,15 @@ For three two-page A6 jobs of `100` at `4+1`, all four plans remain available. T
 
 The user catalog is complete only within one shared product format × uniform grid × fitting `0°/90°` × `paperMinimum/dedicatedPairForms` × separate front/back forms × one shared duplex color specification × complete page pairs. M7.5 does not claim a global imposition solver, general user-driven work-and-turn search, mixed-format packing, mixed rotations, per-row geometry/colors, simplex/odd-page production, folding imposition, profitability, persistence, or machine compatibility.
 
+### Published
+
+- version/release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
+- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
+- recovery branch and immutable tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
+- GitHub prerelease includes the focused PNG and permanent evidence ZIP;
+- release PNG SHA-256: `bb5686efa1d0f75990885b6f5e8736c1c4c93233eae181c3ae68f81397cf5a6e`;
+- evidence ZIP SHA-256: `9ac0cfb4c01c34e530b4f734e499e6184cf2d6ab78f2157ea1216e6ee5742ec9`.
+
 ## 0.7.0-alpha.4 — 2026-07-26
 
 ### Added
