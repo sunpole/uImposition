@@ -15,7 +15,11 @@ on:
       - src/**
       - data/**
       - tools/screenshots/**
+      - tools/news/**
+      - news/**
+      - archive/development/**
       - .github/workflows/capture-screenshots.yml
+      - .github/workflows/prepare-release-news.yml
 
 permissions:
   contents: read
