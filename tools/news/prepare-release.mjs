@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -5,15 +6,20 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "../..");
 const markerPath = path.join(root, "news/.prepare-release.json");
-const manifestPath = path.join(root, "artifacts/screenshots/manifest.json");
+const manifestPath = path.join(root, "artifacts/screenshots/manifest.ndjson");
 
 const marker = JSON.parse(await readFile(markerPath, "utf8"));
-const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-const entry = manifest.entries.find((item) => item.scenario === marker.scenario);
+const manifestEntries = (await readFile(manifestPath, "utf8"))
+  .split(/\r?\n/)
+  .filter(Boolean)
+  .map((line) => JSON.parse(line));
+const entry = manifestEntries.find((item) => item.scenario === marker.scenario);
 const expectedCommit = process.env.SCREENSHOT_COMMIT || process.env.GITHUB_SHA;
+const releaseCommit = String(marker.releaseCommit ?? "");
 
 if (!entry) throw new Error(`Screenshot scenario not found: ${marker.scenario}`);
 if (!expectedCommit) throw new Error("Expected screenshot commit is not available");
+if (!/^[0-9a-f]{40}$/i.test(releaseCommit)) throw new Error("releaseCommit must be a full 40-character commit SHA");
 if (!entry.commit || entry.commit !== expectedCommit) {
   throw new Error(`Screenshot commit ${entry.commit} does not match expected commit ${expectedCommit}`);
 }
@@ -30,6 +36,8 @@ const targetPatchnote = path.join(root, "news", patchnoteName);
 const releaseDirectory = path.join(root, "archive", "development", marker.version);
 const archiveName = `uimposition-v${safeVersion}-evidence.zip`;
 const releaseManifestPath = path.join(releaseDirectory, "release.json");
+const evidenceReadmePath = path.join(releaseDirectory, "README.md");
+const internalSumsPath = path.join(releaseDirectory, "SHA256SUMS.internal.txt");
 
 function bulletList(items) {
   return items.map((item) => `- ${item};`).join("\n").replace(/;$/, ".");
@@ -88,6 +96,7 @@ const releaseManifest = {
   title: `uImposition v${marker.version}`,
   prerelease,
   sourceCommit: entry.commit,
+  releaseCommit,
   createdAt: queuedAt,
   patchnote: path.relative(root, targetPatchnote).replaceAll("\\", "/"),
   image: path.relative(root, targetImage).replaceAll("\\", "/"),
@@ -101,6 +110,26 @@ const releaseManifest = {
 };
 
 await writeFile(releaseManifestPath, `${JSON.stringify(releaseManifest, null, 2)}\n`, "utf8");
+
+const evidenceReadmeTemplate = String(marker.evidenceReadme ?? "");
+if (!evidenceReadmeTemplate.trim()) throw new Error("evidenceReadme is required");
+const evidenceReadme = evidenceReadmeTemplate
+  .replaceAll("{{SOURCE_COMMIT}}", entry.commit)
+  .replaceAll("{{RELEASE_COMMIT}}", releaseCommit)
+  .replaceAll("{{QUEUED_AT}}", queuedAt)
+  .replaceAll("{{CAPTURED_AT}}", entry.capturedAt)
+  .replaceAll("{{PREPARE_RUN_ID}}", String(process.env.GITHUB_RUN_ID ?? "local"));
+await writeFile(evidenceReadmePath, evidenceReadme.endsWith("\n") ? evidenceReadme : `${evidenceReadme}\n`, "utf8");
+
+async function sha256(filePath) {
+  return createHash("sha256").update(await readFile(filePath)).digest("hex");
+}
+const internalInputs = [targetImage, targetPatchnote, releaseManifestPath, evidenceReadmePath];
+const internalSums = [];
+for (const filePath of internalInputs) {
+  internalSums.push(`${await sha256(filePath)}  ${path.relative(root, filePath).replaceAll("\\\\", "/")}`);
+}
+await writeFile(internalSumsPath, `${internalSums.join("\n")}\n`, "utf8");
 await rm(markerPath);
 console.log(JSON.stringify({
   imageName,
@@ -108,5 +137,7 @@ console.log(JSON.stringify({
   queuedAt,
   imageCommit: entry.commit,
   releaseManifest: path.relative(root, releaseManifestPath),
+  evidenceReadme: path.relative(root, evidenceReadmePath),
+  internalSums: path.relative(root, internalSumsPath),
   archive: releaseManifest.archive,
 }, null, 2));

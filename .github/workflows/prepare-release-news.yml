@@ -130,6 +130,8 @@ jobs:
               root / manifest['patchnote'],
               root / manifest['image'],
               manifest_path,
+              release_dir / 'README.md',
+              release_dir / 'SHA256SUMS.internal.txt',
               release_dir / 'historical',
           ]
 
@@ -149,6 +151,26 @@ jobs:
                       archive.write(path, relative)
 
           print(f'Created {archive_path.relative_to(root)} with {len(seen)} files')
+          PY
+
+      - name: Create SHA-256 release asset record
+        if: steps.marker.outputs.exists == 'true'
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import pathlib
+
+          root = pathlib.Path('.').resolve()
+          release_dir = root / 'archive' / 'development' / '${{ env.RELEASE_VERSION }}'
+          manifest = json.loads((release_dir / 'release.json').read_text(encoding='utf-8'))
+          assets = [root / manifest['image'], root / manifest['archive']]
+          lines = []
+          for asset in assets:
+              digest = hashlib.sha256(asset.read_bytes()).hexdigest()
+              lines.append(f"{digest}  {asset.relative_to(root).as_posix()}")
+          (release_dir / 'SHA256SUMS.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
           PY
 
       - name: Commit news and permanent development archive
