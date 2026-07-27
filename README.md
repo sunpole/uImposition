@@ -3,7 +3,7 @@
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
 <p align="center"><strong>Version checkpoint / Версия проекта: 0.7.0-alpha.5</strong></p>
 <p align="center"><strong>M7.5 · пользовательские production plans, выбор, экспорт и приоритеты</strong></p>
-<p align="center"><strong><a href="START_HERE.md">Начать здесь / Start here</a> · <a href="docs/CODEX_HANDOFF.md">Передача в Codex / Codex handoff</a></strong></p>
+<p align="center"><strong><a href="START_HERE.md">Начать здесь / Start here</a> · <a href="docs/README.md">Документация / Documentation</a> · <a href="docs/PROJECT_CATALOG.md">Каталог проекта / Project catalog</a></strong></p>
 
 ## Назначение
 
@@ -184,6 +184,8 @@ uImposition — статический браузерный калькулято
 
 ## Документация
 
+- [Полный каталог документации](docs/README.md)
+- [Карта каталогов и модулей проекта](docs/PROJECT_CATALOG.md)
 - [Начать здесь](START_HERE.md)
 - [Codex handoff](docs/CODEX_HANDOFF.md)
 - [Текущее состояние](docs/CURRENT_STATE.md)

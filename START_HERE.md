@@ -14,6 +14,8 @@
 - publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
 - следующий функциональный milestone: **M7.6 / `0.7.0-alpha.6`**;
 - основной документ передачи в Codex: `docs/CODEX_HANDOFF.md`;
+- полный каталог документации: `docs/README.md`;
+- карта каталогов и модулей: `docs/PROJECT_CATALOG.md`;
 - полный актуальный остаток: `docs/REMAINING_WORK.md`.
 
 Последние объединённые функциональные PR:
@@ -31,20 +33,21 @@ PR `#46` прошёл `173/173` теста, полный Chromium/PDF workflow �
 1. `AGENTS.md`;
 2. `START_HERE.md`;
 3. `docs/CODEX_HANDOFF.md`;
-4. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
-5. `docs/CURRENT_STATE.md`;
-6. `docs/REMAINING_WORK.md`;
-7. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-8. `docs/ARCHITECTURE.md`;
-9. `docs/M7_4_WORK_AND_TURN.md`;
-10. `docs/M7_5_USER_UNIFORM_PRODUCTION_PLANS.md`;
-11. `docs/M7_5_USER_PLAN_SELECTION_EXPORT.md`;
-12. `docs/M7_5_OBJECTIVE_PRIORITY_EDITOR.md`;
-13. `docs/PRODUCTION_COSTING.md`;
-14. `docs/TEST_PLAN.md`;
-15. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
-16. `docs/VERSIONING.md`;
-17. последние PR, Actions, branches, tags, Releases и issues.
+4. `docs/README.md` и `docs/PROJECT_CATALOG.md`;
+5. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
+6. `docs/CURRENT_STATE.md`;
+7. `docs/REMAINING_WORK.md`;
+8. `docs/TECHNICAL_SPECIFICATION_RU.md`;
+9. `docs/ARCHITECTURE.md`;
+10. `docs/M7_4_WORK_AND_TURN.md`;
+11. `docs/M7_5_USER_UNIFORM_PRODUCTION_PLANS.md`;
+12. `docs/M7_5_USER_PLAN_SELECTION_EXPORT.md`;
+13. `docs/M7_5_OBJECTIVE_PRIORITY_EDITOR.md`;
+14. `docs/PRODUCTION_COSTING.md`;
+15. `docs/TEST_PLAN.md`;
+16. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
+17. `docs/VERSIONING.md`;
+18. последние PR, Actions, branches, tags, Releases и issues.
 
 ## Что уже работает
 

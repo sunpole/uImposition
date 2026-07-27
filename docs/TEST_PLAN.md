@@ -16,7 +16,8 @@
 6. проверка браузерного скачивания;
 7. структурная PDF-проверка;
 8. полный Poppler-render;
-9. ручная проверка доказательных изображений и PDF-страниц.
+9. ручная проверка доказательных изображений и PDF-страниц;
+10. проверка локальных Markdown-ссылок и полноты каталога документации.
 
 ### Базовые сценарии
 
@@ -121,6 +122,13 @@
 - смешанный regression проверяет заданную раскладку, но не автоматический mixed-format packing;
 - поле `forms` исторически означает layout-формы сторон; цветовые пластины 4+4 считаются отдельно.
 
+### Документация
+
+- `npm run check:docs` проверяет локальные Markdown-ссылки;
+- каждый Markdown-файл внутри `docs/` должен быть перечислен в `docs/README.md`;
+- исторические документы сохраняют факты своего milestone и не обязаны повторять текущую версию;
+- актуальные status/handoff-документы не должны противоречить опубликованному checkpoint.
+
 </td>
 <td width="50%" valign="top">
 
@@ -128,7 +136,7 @@
 
 ### Test levels
 
-Unit tests, calculation integration, front/back rematerialisation, independent production reporting, browser visual checks, PDF download verification, structural checks, complete Poppler rendering, and manual evidence review.
+Unit tests, calculation integration, front/back rematerialisation, independent production reporting, browser visual checks, PDF download verification, structural checks, complete Poppler rendering, manual evidence review, and documentation link/catalog validation.
 
 ### M6 verification
 
@@ -149,6 +157,8 @@ Unit tests, calculation integration, front/back rematerialisation, independent p
 - explicit separation between side-layout forms and 4+4 color plates.
 
 The 32-page tests do not claim folded-signature pagination, and the mixed-format test validates a supplied packing rather than automatic rectangle packing.
+
+`npm run check:docs` verifies local Markdown links and requires every Markdown file under `docs/` to be listed in `docs/README.md`. Historical milestone documents may retain their original version facts.
 
 </td>
 </tr>
