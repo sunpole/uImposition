@@ -7,9 +7,13 @@
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - рабочая ветка: `main`;
 - функциональный baseline после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- текущий version checkpoint: **`0.7.0-alpha.5` / M7.5**;
+- опубликованный prerelease: **`0.7.0-alpha.5` / M7.5**;
 - VERSION-файлы синхронизированы с M7.5;
-- publication package должен отдельно добавить evidence/news, recovery branch, immutable tag и настоящий GitHub prerelease;
+- release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
+- recovery branch: `release/v0.7.0-alpha.5`;
+- immutable tag: `v0.7.0-alpha.5`;
+- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
+- GitHub prerelease, focused PNG и evidence ZIP опубликованы и независимо проверены;
 - следующий функциональный milestone: **M7.6 / `0.7.0-alpha.6`**;
 - `productionReady` остаётся `false`;
 - GitHub — единственный источник истины.
@@ -206,23 +210,15 @@ sheet/product inputs
 - полный accessibility/performance/browser audit;
 - production beta matrix.
 
-## 8. Следующий обязательный release
+## 8. Опубликованный release `0.7.0-alpha.5`
 
-До начала M7.6 нужно выпустить `0.7.0-alpha.5`:
-
-1. audit main и VERSION sources;
-2. version sync;
-3. CHANGELOG/README/site sync;
-4. screenshot scenario version sync;
-5. focused M7.5 release image;
-6. patchnote и uNews/Telegram payload;
-7. permanent evidence ZIP и manifest;
-8. exact-head Quality и Chromium/PDF;
-9. version/publication PR merge;
-10. recovery branch `release/v0.7.0-alpha.5`;
-11. immutable tag `v0.7.0-alpha.5`;
-12. настоящий GitHub prerelease с assets;
-13. независимая проверка Release card и assets.
+- version PR `#49`, merge commit `195d6496a291095a69cc9089a64154561ffbb1fa`;
+- publication PR `#50`, merge commit `546f637a25b51f72706ebbe7346acb2df9819af8`;
+- exact publication-head Quality: `173/173`;
+- exact publication-head Chromium/PDF: `16/16`, PDF `8 + 6` A4 страниц;
+- recovery branch и tag указывают на release commit;
+- prerelease содержит focused PNG и permanent evidence ZIP;
+- patchnote валиден и ожидает следующего внешнего FIFO scan uNews, если ещё не опубликован.
 
 ## 9. Следующий функциональный milestone
 
