@@ -61,6 +61,20 @@ async function runBeforeScreenshotActions(page, actions = []) {
       });
       continue;
     }
+    if (action.action === "style") {
+      const locator = page.locator(action.selector);
+      await expect(locator).toBeVisible();
+      const styles = action.styles;
+      if (!styles || typeof styles !== "object" || Array.isArray(styles)) {
+        throw new Error("Style action requires a styles object");
+      }
+      await locator.evaluate((element, styleEntries) => {
+        Object.entries(styleEntries).forEach(([property, value]) => {
+          element.style.setProperty(property, String(value), "important");
+        });
+      }, styles);
+      continue;
+    }
     if (action.action === "waitForHidden") {
       await page.locator(action.selector).waitFor({ state: "hidden", timeout: action.timeoutMs ?? 10000 });
       continue;

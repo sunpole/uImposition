@@ -1,0 +1,38 @@
+.user-objective-priority { display: grid; gap: 11px; }
+.user-objective-priority__subtitle { margin: 0; font-weight: 800; }
+.user-objective-priority__hint { margin: 0; }
+.objective-priority-label { margin: 4px 0 -3px; font-size: .78rem; font-weight: 850; text-transform: uppercase; letter-spacing: .06em; color: #555; }
+
+.objective-preset-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.objective-preset-button { min-height: 36px; border: 1px solid #909090; border-radius: 8px; background: #fff; color: #171717; padding: 7px 8px; font-size: .78rem; font-weight: 750; }
+.objective-preset-button:hover:not(:disabled),
+.objective-preset-button:focus-visible:not(:disabled) { border-color: #171717; background: #f0f0f0; }
+.objective-preset-button:disabled { background: #ededed; color: #777; cursor: not-allowed; }
+
+.objective-priority-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.objective-priority-row { min-width: 0; display: grid; grid-template-columns: 18px 25px minmax(0, 1fr) auto; align-items: center; gap: 6px; border: 1px solid #c4c4c4; border-radius: 9px; background: #fafafa; padding: 6px; }
+.objective-priority-row[draggable="true"] { cursor: grab; }
+.objective-priority-row.is-dragging { opacity: .55; cursor: grabbing; }
+.objective-priority-handle { color: #777; font-weight: 900; letter-spacing: -3px; overflow: hidden; }
+.objective-priority-position { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 999px; background: #171717; color: #fff; font-size: .72rem; font-weight: 850; }
+.objective-priority-copy { min-width: 0; display: grid; gap: 1px; }
+.objective-priority-copy strong { overflow-wrap: anywhere; font-size: .8rem; }
+.objective-priority-copy small { color: #666; font-size: .68rem; }
+.objective-priority-actions { display: flex; gap: 4px; }
+.objective-move-button { width: 31px; min-width: 31px; height: 31px; border: 1px solid #8f8f8f; border-radius: 7px; background: #fff; color: #171717; padding: 0; font-weight: 900; line-height: 1; }
+.objective-move-button:disabled { opacity: .35; cursor: not-allowed; }
+
+.objective-drag-hint { margin: 0; }
+.objective-priority-status { margin: 0; border-left: 4px solid #171717; background: #f1f1f1; padding: 9px 10px; font-size: .76rem; }
+.objective-priority-status.is-error { border-left-color: #a90000; background: #fff0f0; color: #7a0000; }
+.objective-hard-constraints { margin-top: 1px; }
+.objective-hard-constraints summary { font-size: .78rem; }
+.hard-constraint-list { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; color: #555; font-size: .74rem; }
+
+@media (max-width: 620px) {
+  .objective-preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .objective-priority-row { grid-template-columns: 24px minmax(0, 1fr) auto; padding: 7px; }
+  .objective-priority-handle { display: none; }
+  .objective-priority-copy strong { font-size: .82rem; }
+  .objective-move-button { width: 36px; min-width: 36px; height: 36px; }
+}
