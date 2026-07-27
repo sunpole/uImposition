@@ -25,6 +25,7 @@
 <li>новые параметры добавляются в конфигурацию;</li>
 <li>производственные формулы не меняются без объяснения;</li>
 <li>недопечатка и неправильный оборот недопустимы;</li>
+<li>новые документы добавляются в <code>docs/README.md</code>, а локальные ссылки проверяются командой <code>npm run check:docs</code>;</li>
 <li>изменения должны сопровождаться тестами.</li>
 </ul>
 
@@ -52,6 +53,7 @@
 <li>new settings belong in the central configuration;</li>
 <li>production formulas must not change without explanation;</li>
 <li>underproduction and invalid back forms are prohibited;</li>
+<li>new documents must be listed in <code>docs/README.md</code>, and local links must pass <code>npm run check:docs</code>;</li>
 <li>changes should include appropriate tests.</li>
 </ul>
 

@@ -2,7 +2,7 @@
 
 ## Начало любой новой сессии
 
-Первым прочитать `START_HERE.md`, затем `docs/CODEX_HANDOFF.md`.
+Первым прочитать `START_HERE.md`, затем `docs/CODEX_HANDOFF.md`. Для навигации по остальным материалам использовать `docs/README.md`, а для карты каталогов и модулей — `docs/PROJECT_CATALOG.md`.
 
 Новый чат, Codex Work или другой агент не должен опираться на память предыдущей сессии или предполагать состояние проекта. Перед изменениями нужно прочитать фактические файлы, ветки, Pull Request, issues, tags, Releases и GitHub Actions.
 
@@ -154,4 +154,4 @@
 
 ## English summary
 
-Read `START_HERE.md` and `docs/CODEX_HANDOFF.md` first, then verify the actual GitHub state. Keep calculation logic pure, derive backs from validated fronts, reject underproduction, preserve every feasible alternative inside the stated search scope, and never claim global completeness for a bounded solver. Use feature branches, exact-head PR checks, factual Chromium evidence, immutable release checkpoints, and immediate uNews publication assets.
+Read `START_HERE.md` and `docs/CODEX_HANDOFF.md` first, use `docs/README.md` as the documentation index and `docs/PROJECT_CATALOG.md` as the repository map, then verify the actual GitHub state. Keep calculation logic pure, derive backs from validated fronts, reject underproduction, preserve every feasible alternative inside the stated search scope, and never claim global completeness for a bounded solver. Use feature branches, exact-head PR checks, factual Chromium evidence, immutable release checkpoints, and immediate uNews publication assets.
