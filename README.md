@@ -1,8 +1,8 @@
 # uImposition
 
 <p align="center"><strong>Расчёт офсетных монтажей · Offset Imposition Planner</strong></p>
-<p align="center"><strong>Опубликованная версия / Published version: 0.7.0-alpha.4</strong></p>
-<p align="center"><strong>main содержит невыпущенный M7.5 / main contains unreleased M7.5</strong></p>
+<p align="center"><strong>Version checkpoint / Версия проекта: 0.7.0-alpha.5</strong></p>
+<p align="center"><strong>M7.5 · пользовательские production plans, выбор, экспорт и приоритеты</strong></p>
 <p align="center"><strong><a href="START_HERE.md">Начать здесь / Start here</a> · <a href="docs/CODEX_HANDOFF.md">Передача в Codex / Codex handoff</a></strong></p>
 
 ## Назначение
@@ -24,10 +24,10 @@ uImposition — статический браузерный калькулято
 
 - GitHub: `https://github.com/sunpole/uImposition`;
 - GitHub Pages: `https://sunpole.github.io/uImposition/`;
-- текущий `main` после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- опубликованный checkpoint: `0.7.0-alpha.4` / M7.4;
-- функциональный M7.5 уже объединён в `main` через PR `#44`, `#45`, `#46`;
-- следующий обязательный checkpoint: `0.7.0-alpha.5`;
+- функциональный baseline M7.5: merge commit PR `#46` `009451cce94d5cde05ee72305f30447aa65a646c`;
+- текущий version checkpoint: `0.7.0-alpha.5` / M7.5;
+- функциональность объединена через PR `#44`, `#45`, `#46`;
+- следующий milestone: M7.6 / `0.7.0-alpha.6`;
 - полный handoff: [`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md).
 
 ## Что работает
@@ -73,7 +73,7 @@ uImposition — статический браузерный калькулято
 - forms/plates comparison;
 - focused Chromium evidence.
 
-### M7.5 — объединено в main, release ещё не создан
+### M7.5 / `0.7.0-alpha.5` — текущий version checkpoint
 
 #### Пользовательские production plans
 
@@ -140,11 +140,10 @@ uImposition — статический браузерный калькулято
 
 ## Следующий порядок
 
-1. Выпустить объединённый M7.5 как `0.7.0-alpha.5`.
-2. Создать version sync, focused image, patchnote, uNews/Telegram, permanent evidence, recovery branch, immutable tag и GitHub prerelease.
-3. Затем реализовать M7.6 — компактную lossless comparison table.
-4. После M7.6 расширять search space отдельными plan-family патчами.
-5. Затем mixed-format, full order rows, persistence, profitability и heavy-search worker.
+1. Завершить publication package `0.7.0-alpha.5`: focused image, patchnote, uNews/Telegram, permanent evidence, recovery branch, immutable tag и GitHub prerelease.
+2. После независимо проверенного prerelease реализовать M7.6 — компактную lossless comparison table.
+3. После M7.6 расширять search space отдельными plan-family патчами.
+4. Затем mixed-format, full order rows, persistence, profitability и heavy-search worker.
 
 ## Контрольные решения
 
