@@ -1,212 +1,398 @@
-# Архитектура / Architecture
+# uImposition — актуальная архитектура
 
-## Принцип / Principle
+Последнее обновление: **27 июля 2026**.
 
-uImposition остаётся статическим браузерным приложением без обязательного сервера и build step. GitHub Pages получает обычные HTML, CSS и JavaScript ES modules. Расчёт, оптимизация и PDF выполняются локально в браузере; GitHub Actions используются для воспроизводимой проверки.
+## 1. Основной принцип
 
-uImposition remains a static browser application with no mandatory server or build step. GitHub Pages serves plain HTML, CSS, and JavaScript ES modules. Calculation, optimisation, and PDF generation run locally in the browser; GitHub Actions provide reproducible verification.
+uImposition — статическое браузерное приложение без обязательного сервера и build step.
 
-## Слои / Layers
+- GitHub Pages обслуживает обычные HTML/CSS/JavaScript ES modules;
+- геометрия, поиск, validation, production report, ranking и PDF выполняются локально;
+- GitHub Actions дают воспроизводимые tests, Chromium evidence и PDF verification;
+- серверная база данных пока не нужна;
+- browser storage и Web Worker относятся к будущим milestone.
 
-1. **Конфигурация** — пресеты, ограничения, PDF и границы поиска.
-2. **Домен** — заказы, пары страниц, кандидаты, спрос, схемы и отчёты.
-3. **Геометрия** — лист, изделие, uniform-grid и заданные mixed-format placements.
-4. **Оптимизация** — кандидаты, событийные тиражи, упаковка остатков и доказательство бумажной нижней границы.
-5. **Валидация** — схемы, mixed-format duplex, производство и экспорт.
-6. **Представление** — DOM-renderers без производственных формул.
-7. **PDF-экспорт** — чистая модель, Canvas-renderers и бинарный контейнер.
-8. **Проверка артефактов** — Node, Chromium, `pdfinfo`, Poppler и ручной review.
-9. **Хранение** — browser storage без серверной базы.
+## 2. Архитектурные слои
 
-## Фактическая структура M6 / Actual M6 structure
+1. **Configuration** — presets, limits, PDF/search boundaries.
+2. **Input/domain** — sheet, product, orders, page pairs, print specification.
+3. **Geometry** — printable area, fitting grids, explicit mixed placements.
+4. **Imposition construction** — front layout, derived back, candidates.
+5. **Validation** — geometry, front/back mapping, directions, production.
+6. **Production** — sheets, forms, plates, passes, overrun and reports.
+7. **Cost** — explicit operator pricing and guarded cost components.
+8. **Search** — bounded candidate families and paper minimizer.
+9. **Decision** — normalized metrics, Pareto, ranking and recommendation.
+10. **User runtime** — current plan set, objective preference and explicit selection.
+11. **Presentation** — DOM renderers without production formulas.
+12. **PDF** — document models, dependency-free binary writer and renderers.
+13. **Evidence** — Node tests, Chromium, downloads, `pdfinfo`, Poppler and manual review.
+
+## 3. Dependency rules
+
+- `config.js` does not import business modules.
+- Domain/search/validation/PDF models do not use DOM.
+- Back layout is always derived from an existing front layout.
+- Renderer receives a complete validated model and does not recalculate production logic.
+- Runtime may coordinate immutable models but must not hide raw calculation rules in event handlers.
+- UI filters/sorting/reranking do not regenerate plans unless input geometry/orders actually changed.
+- Missing cost stays unavailable and never becomes `0` implicitly.
+- Hard validation failure blocks recommendation and export.
+- Runtime dependencies and mandatory CDN dependencies are absent.
+
+## 4. Current source map
+
+### Configuration and base input
 
 ```text
-src/
-├─ config.js
-├─ geometry.js
-├─ orders.js
-├─ orientation.js
-├─ front-layout.js
-├─ back-layout.js
-├─ imposition-validation.js
-├─ imposition-candidate.js
-├─ candidate-generator.js
-├─ paper-minimizer.js
-├─ paper-solution-view.js
-├─ paper-solution-renderer.js
-├─ mixed-format-layout.js
-├─ print-specification.js
-├─ production-metrics.js
-├─ production-validation.js
-├─ production-report.js
-├─ scheme-renderer.js
-├─ production-report-renderer.js
-├─ pdf-document-model.js
-├─ pdf-binary.js
-├─ pdf-scheme-renderer.js
-├─ pdf-report-renderer.js
-├─ pdf-export-ui.js
-├─ app.js
-└─ m3-demo.js
+src/config.js
+src/geometry.js
+src/orders.js
+src/orientation.js
 ```
 
-## Геометрия, лицо и оборот
+- `config.js` — sheet presets, limits, PDF/search settings;
+- `geometry.js` — source sheet, trim, press margins, printable area and fitting uniform grids;
+- `orders.js` — line parsing, validation and sequential page-pair expansion;
+- `orientation.js` — rotation/direction helpers.
 
-- `geometry.js` — лист, изделие и uniform-grid 0°/90°;
-- `orders.js` — заказы и последовательные пары страниц;
-- `front-layout.js` — детерминированное row-major лицо;
-- `back-layout.js` — оборот только из готового лица;
-- `imposition-validation.js` — страницы, зеркальность, координаты и направления;
-- `mixed-format-layout.js` — проверка заданных прямоугольников разных форматов и зеркальный mixed-format оборот.
+### Front/back and validation
 
-`mixed-format-layout.js` не является автоматическим rectangle-packing solver. Он валидирует явную раскладку: границы, пересечения, страницы и зеркальность.
+```text
+src/front-layout.js
+src/back-layout.js
+src/imposition-validation.js
+src/imposition-candidate.js
+src/candidate-generator.js
+src/imposition-distribution.js
+```
 
-## M6: модель кандидата
+- front is deterministic and row-major inside the selected model;
+- back is created only from front;
+- validation independently checks pages, file/pair identity, coordinates, mirroring and directions;
+- candidate generation is bounded and must expose truncation or limits.
 
-### `imposition-candidate.js`
+### Paper search
 
-Чистый слой без DOM:
+```text
+src/paper-minimizer.js
+src/paper-solution-view.js
+src/paper-solution-renderer.js
+src/paper-solution-metrics.js
+```
 
-- полный кандидат `rows × columns`;
-- один непрерывный блок на пару;
-- неизменяемое состояние спроса;
-- `T_first` и `T_complete`;
-- применение явного тиража;
-- объяснимые вклады и остатки;
-- преобразование в вход `createFrontLayout`.
+The paper minimizer:
 
-### `candidate-generator.js`
+1. prints complete capacity groups;
+2. packs remaining demand into bounded full-sheet constructions;
+3. reapplies the plan to immutable demand;
+4. rematerializes layouts and production report;
+5. accepts only zero remaining demand.
 
-- генерирует точное ограниченное пространство;
-- текущая конфигурация: 1–2 различные пары на полном лице;
-- для 35 пар и 16 позиций даёт все `8960` кандидатов;
-- production signature удаляет только эквивалентность порядка блоков;
-- любое усечение сообщается явно и запрещает заявление о полноте.
-
-## M6: минимум бумаги
-
-### `paper-minimizer.js`
-
-Конструкция состоит из двух частей:
-
-1. для каждой пары печатаются полные группы по `capacity`;
-2. остатки упаковываются в полные листы с не более чем двумя парами.
-
-После построения:
-
-- эквивалентные тиражи объединяются;
-- весь план применяется к неизменяемому спросу;
-- лица, обороты и production report материализуются повторно;
-- решение допустимо только при остатке `0`.
-
-Доказательство контрольного результата:
+For the historical control case:
 
 ```text
 required pair impressions = 52870
-capacity                   = 16
-universal lower bound      = ceil(52870 / 16) = 3305
-constructed paper          = 3305
+capacity                  = 16
+lower bound               = ceil(52870 / 16) = 3305
+constructed paper         = 3305
 ```
 
-Поскольку допустимая конструкция достигает универсальной нижней границы, `3305` — глобальный минимум бумаги для этого входа и этой вместимости. Это не доказывает минимум форм.
+This proves paper minimum only for that input and capacity. It does not prove minimum forms or cost.
 
-### `paper-solution-view.js`
+### Mixed-format validation
 
-Создаёт неизменяемую модель сравнения:
+```text
+src/mixed-format-layout.js
+```
 
-- ручной вариант `3395 / 4 / 8 / 6790 / 1450 / 930`;
-- бумажный минимум `3305 / 56 / 112 / 6610 / 10 / 0`;
-- экономия 90 листов;
-- строки сравнения и 56 объяснимых тиражей.
+This module validates a supplied mixed-format placement:
 
-### `paper-solution-renderer.js`
+- printable boundaries;
+- overlaps;
+- pages;
+- derived mirrored back.
 
-Показывает:
+It is not an automatic rectangle-packing solver.
 
-- доказанный статус;
-- нижнюю границу;
-- бумагу, формы, листопрогоны и перетираж;
-- предупреждение, что формы выросли `8 → 112`;
-- свёрнутую таблицу автоматических монтажей.
+### Duplex and work-and-turn
 
-Renderer не пересчитывает решение.
+```text
+src/print-specification.js
+src/duplex-strategies.js
+src/work-and-turn-layout.js
+src/work-and-turn-control-case.js
+src/work-and-turn-runtime.js
+src/work-and-turn-ui.js
+```
 
-## 4+4 и терминология форм
+Current work-and-turn scope:
 
-### `print-specification.js`
+- symmetric shared form;
+- even column count;
+- horizontal axis;
+- mirrored front/back pair validation;
+- independent production report;
+- separate/work-and-turn comparison for a control case.
 
-Явно разделяет:
+It is not yet part of general user-driven automatic search.
 
-- **layout-формы сторон** — лицо и оборот;
-- **цветовые пластины** — число цветоделённых пластин.
+### Production and cost
 
-Для одного монтажа 4+4:
+```text
+src/production-metrics.js
+src/production-validation.js
+src/production-report.js
+src/production-report-renderer.js
+src/production-cost.js
+src/print-specification.js
+src/solution-metrics.js
+src/production-solution-metrics.js
+```
+
+Important terminology:
+
+- **layout forms** — front/back side layouts;
+- **color plates** — color-separated plates.
+
+For one `4+4` imposition:
 
 ```text
 layout forms = 2
-color plates = 4 + 4 = 8
+color plates = 8
 ```
 
-Для трёх монтажей 4+4: `6` layout-форм и `24` цветовые пластины. Поле `productionReport.totals.forms` пока сохраняет исторический смысл layout-форм сторон.
+Production validation independently recalculates demand, output, overrun, physical sheets, forms and passes. Underproduction is always invalid.
 
-## Производственные regression fixtures
+Cost is built only from explicit pricing inputs. A plan may exist without a ready price.
 
-`data/production-regression-cases.json` содержит:
+### Alternatives and decision system
 
-- 32-страничный A6 landscape `148×105`, сетка `4×4`;
-- 32-страничный A6 portrait `105×148`, лучший поворот `90°`, сетка `4×4`;
-- заданный mixed-format duplex `1×A4 + 2×A5 + 8×A6`;
-- три A5 заказа `400 / 700 / 4200`, доказанный минимум `663` листа.
+```text
+src/optimization-objectives.js
+src/decision-profile.js
+src/pareto-alternatives.js
+src/pareto-display-set.js
+src/feasible-solution-catalog.js
+src/production-alternative-set.js
+src/alternative-explanations.js
+src/alternatives-runtime.js
+src/alternatives-controller.js
+src/alternatives-ui.js
+```
 
-Эти данные отделены от основного control-case и служат постоянными regression fixtures.
+Rules:
 
-## Производство и проверка
+- catalog data remains lossless;
+- Pareto/recommended/dominated are annotations;
+- filter does not remove source plans;
+- lexicographic order uses the first differing objective;
+- operator selection is independent of recommendation.
 
-- `production-metrics.js` — напечатано, перетираж, бумага, layout-формы и листопрогоны;
-- `production-validation.js` — независимый пересчёт и запрет недопечатки;
-- `production-report.js` — production-ready модель;
-- бумажный оптимизатор обязан проходить этот существующий слой заново.
+### User-driven M7.5 production pipeline
 
-## PDF-слой / PDF layer
+```text
+src/user-uniform-production-plans.js
+src/user-production-plans-ui.js
+src/user-production-plans-runtime.js
+src/user-production-plan-details-ui.js
+src/user-objective-priority.js
+src/user-objective-priority-ui.js
+```
 
-- `pdf-document-model.js` — две независимые модели документов;
-- `pdf-binary.js` — dependency-free PDF 1.4 writer;
-- `pdf-scheme-renderer.js` — одна схема на страницу;
-- `pdf-report-renderer.js` — отдельный пагинированный отчёт;
-- `pdf-export-ui.js` — только DOM-контролы и скачивание.
+#### `user-uniform-production-plans.js`
 
-Основной PDF содержит только четыре ручные контрольные схемы M3/M4. Экспорт 56 автоматических M6-схем намеренно не включён в этот milestone, чтобы не создавать неуправляемый документ до появления многокритериального выбора M7.
+Input:
 
-## Правила зависимостей / Dependency rules
+- user page pairs;
+- fitting placement options;
+- source sheet;
+- duplex color specification;
+- optional pricing.
 
-- `config.js` не импортирует бизнес-модули;
-- расчёт, оптимизация, валидация и PDF-модель не используют DOM;
-- оборот никогда не строится независимо от лица;
-- renderer получает готовую проверенную модель;
-- mixed-format manual validation не выдаётся за automatic packing;
-- paper minimum не выдаётся за minimum forms;
-- layout-формы не смешиваются с цветовыми пластинами;
-- ошибка жёсткой проверки блокирует рекомендацию и экспорт;
-- runtime-зависимости и CDN отсутствуют.
+For each fitting `0°/90°` orientation it currently builds:
 
-## Проверка / Verification
+- `paperMinimum`;
+- `dedicatedPairForms`.
 
-`.github/workflows/quality.yml`:
+Each plan is fully materialized, validated and reported before catalog insertion.
 
-- source checks;
-- все Node tests;
-- короткий хвост лога в консоли;
-- полный diagnostic log как artifact.
+#### `user-production-plans-runtime.js`
+
+Owns:
+
+- current immutable plan set;
+- selected plan ID;
+- objective preference;
+- sanitized public snapshot.
+
+Selection persists when the same plan ID survives recalculation. Objective preference persists when pricing is temporarily unavailable.
+
+#### `user-objective-priority.js`
+
+Pure reranking:
+
+- reuses the same plan array and plan objects;
+- does not regenerate geometry/layouts/reports;
+- recalculates catalog ranks, recommendation and Pareto annotations;
+- reports `regeneratedPlanCount = 0`.
+
+#### `user-production-plan-details-ui.js`
+
+Renders only the explicitly selected plan:
+
+- summary;
+- preview schemes;
+- dynamic production report;
+- PDF actions.
+
+The historical control renderer with fixed M3/M4 text is not reused for user plans.
+
+## 5. Current user pipeline
+
+```text
+sheet/product fields
+→ calculateSheetGeometry
+→ calculatePlacementOptions
+→ parseOrders / page pairs
+→ createUserUniformProductionPlanSet
+→ front/back materialization
+→ validateImposition
+→ production report
+→ guarded metrics/cost
+→ feasible lossless catalog
+→ Pareto/rank/recommendation
+→ explicit operator selection
+→ schemes/report/PDF
+```
+
+## 6. Current search completeness contract
+
+The current user catalog is complete only inside:
+
+```text
+one shared product format
+× uniform grid
+× fitting rotation 0° or 90°
+× paperMinimum and dedicatedPairForms
+× separate front/back forms
+× one shared duplex color specification
+× complete front/back page pairs
+```
+
+Anything outside this scope must be described as not searched, not as impossible.
+
+Required status vocabulary:
+
+- `complete within scope`;
+- `feasible`;
+- `lower bound reached`;
+- `truncated/incomplete`;
+- `not supported`.
+
+These statuses must not be conflated.
+
+## 7. PDF architecture
+
+```text
+src/pdf-document-model.js
+src/pdf-binary.js
+src/pdf-scheme-renderer.js
+src/pdf-report-renderer.js
+src/pdf-export-ui.js
+```
+
+- scheme and report documents are independent;
+- one front/back layout page is modeled explicitly;
+- PDF writer is dependency-free;
+- user-selected PDF uses selected plan layouts/report;
+- preview limits do not truncate the underlying plan;
+- interactive scheme export has an explicit safety limit.
+
+## 8. UI architecture
+
+- `index.html` defines static sections and module entrypoints;
+- UI modules may create their own panels near stable anchors;
+- calculation state lives in model/runtime modules, not DOM text;
+- settings panel and result panels share sanitized runtime events;
+- mobile layout must not require drag-and-drop;
+- dense tables may have local horizontal scrolling, but the page itself should not overflow.
+
+## 9. Test architecture
+
+### Unit/source
+
+```text
+npm run check:source
+npm test
+npm run check
+```
+
+- Node built-in test runner;
+- pure modules tested without browser;
+- source syntax check lists all production modules explicitly.
+
+### Chromium/PDF
 
 `.github/workflows/capture-screenshots.yml`:
 
-- открывает точный commit в Chromium;
-- проверяет desktop/mobile M6-panel;
-- сохраняет фактические screenshots;
-- повторно скачивает и проверяет оба M5 PDF;
-- запускает `pdfinfo` и Poppler;
-- сохраняет manifest, logs, PDF и PNG в artifact.
+- checks out exact source;
+- runs real Chromium;
+- executes scenario JSON actions/assertions;
+- captures desktop/mobile focused screenshots;
+- downloads generated PDFs;
+- checks PDF structure/page counts;
+- runs `pdfinfo` and Poppler;
+- uploads manifest, logs, PNG and PDF artifacts.
 
-## Граница / Boundary
+A green DOM assertion is not enough. Focused screenshot must be opened and visually checked.
 
-M6 доказывает минимум физической бумаги для контрольного uniform-grid случая и проверяет заданный mixed-format монтаж. Автоматический mixed-format packing, минимум форм, Pareto-набор и сигнатурная пагинация остаются следующими отдельными задачами.
+### Release validation
+
+- patchnote/image metadata is validated before publication;
+- release evidence is stored permanently;
+- recovery branch and immutable tag point to exact release commit;
+- GitHub Release card and assets are verified independently.
+
+## 10. Planned architecture extensions
+
+### M7.6
+
+- pure comparison-table model;
+- filter/sort/differences as view transformations;
+- no regeneration;
+- component cost columns and deltas.
+
+### Additional plan families
+
+Each family must provide:
+
+- exact eligibility;
+- finite candidate bounds;
+- deterministic signatures;
+- independent materialization/validation/report;
+- explicit completeness/truncation status.
+
+### Mixed packing
+
+Future automatic packing must be separate from `mixed-format-layout.js` validation and must preserve multiple valid materially different packings.
+
+### Persistence
+
+Future versioned project schema should store inputs and operator preferences, not trust serialized derived reports without recalculation and migration validation.
+
+### Heavy search
+
+Future worker boundary should isolate search only; domain validation and final report remain reusable deterministic modules.
+
+## 11. Non-negotiable invariants
+
+- no underproduction;
+- no independent back generation;
+- no hidden pricing defaults;
+- no loss of feasible alternatives;
+- no silent search truncation;
+- no global optimum claim without proof;
+- no renderer-owned production formulas;
+- no machine compatibility claim from geometry alone;
+- no release claim without actual verified Release assets.
