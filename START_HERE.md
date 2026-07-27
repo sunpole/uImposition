@@ -1,108 +1,141 @@
 # uImposition — START HERE / НАЧАТЬ ЗДЕСЬ
 
-> Первая точка входа для нового чата, устройства или разработчика.  
-> First entry point for a new conversation, device, or developer.
+> Первая точка входа для нового чата, устройства, Codex-сессии или разработчика.  
+> GitHub — единственный источник истины.
 
-## Текущее состояние
+## Текущая точка
 
-- репозиторий: `sunpole/uImposition`;
-- GitHub — единственный источник истины;
-- функциональность M7.4 объединена через PR `#39`;
-- functional merge commit: `20b17a8dd578be6777d50934f69c561b10363aca`;
-- текущий version checkpoint: **`0.7.0-alpha.4` / M7.4**;
-- release-prep ветка: `release-prep/v0.7.0-alpha.4`;
-- следующий шаг: publication package с patchnote, uNews/Telegram, focused image, permanent evidence и release manifest;
-- recovery-ветка `release/v0.7.0-alpha.4`, tag `v0.7.0-alpha.4` и GitHub prerelease считаются завершёнными только после их фактического создания и независимой проверки;
-- следующая функциональная цель после полного checkpoint: **M7.5 / `0.7.0-alpha.5`**;
-- полный остаток до `1.0.0`: `docs/REMAINING_WORK.md`.
+- репозиторий: `https://github.com/sunpole/uImposition`;
+- актуальная ветка: `main`;
+- точный commit передачи после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
+- опубликованный checkpoint: **`0.7.0-alpha.4` / M7.4**;
+- `main` уже содержит объединённую, но ещё не опубликованную функциональность **M7.5**;
+- следующий обязательный checkpoint: **`0.7.0-alpha.5` / M7.5**;
+- основной документ передачи в Codex: `docs/CODEX_HANDOFF.md`;
+- полный актуальный остаток: `docs/REMAINING_WORK.md`.
+
+Последние объединённые функциональные PR:
+
+- `#44` — пользовательские production plans из реальных полей;
+- `#45` — явный выбор, схемы, production report и PDF выбранного плана;
+- `#46` — полный desktop/mobile редактор порядка целей без повторной генерации.
+
+PR `#46` прошёл `173/173` теста, полный Chromium/PDF workflow и визуальную проверку desktop/mobile evidence.
 
 ## Что обязательно прочитать
 
-1. `START_HERE.md`;
-2. `AGENTS.md`;
-3. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
-4. `docs/CURRENT_STATE.md`;
-5. `docs/REMAINING_WORK.md`;
-6. `docs/M7_IMPLEMENTATION_PLAN.md`;
-7. `docs/M7_4_WORK_AND_TURN.md`;
-8. документы M7.3;
-9. `docs/PRODUCTION_COSTING.md`;
-10. `docs/ARCHITECTURE.md`;
-11. `docs/TEST_PLAN.md`;
-12. `docs/DEVELOPMENT_HISTORY_POLICY.md`;
-13. control/regression fixtures;
-14. последние PR, Actions, branches, tags и Releases.
+1. `AGENTS.md`;
+2. `START_HERE.md`;
+3. `docs/CODEX_HANDOFF.md`;
+4. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
+5. `docs/CURRENT_STATE.md`;
+6. `docs/REMAINING_WORK.md`;
+7. `docs/TECHNICAL_SPECIFICATION_RU.md`;
+8. `docs/ARCHITECTURE.md`;
+9. `docs/M7_4_WORK_AND_TURN.md`;
+10. `docs/M7_5_USER_UNIFORM_PRODUCTION_PLANS.md`;
+11. `docs/M7_5_USER_PLAN_SELECTION_EXPORT.md`;
+12. `docs/M7_5_OBJECTIVE_PRIORITY_EDITOR.md`;
+13. `docs/PRODUCTION_COSTING.md`;
+14. `docs/TEST_PLAN.md`;
+15. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
+16. `docs/VERSIONING.md`;
+17. последние PR, Actions, branches, tags, Releases и issues.
 
-## Что завершено до M7.4
+## Что уже работает
 
-- M1–M6: геометрия, пары страниц, лицо/оборот, production report, PDF, полный bounded search и доказанный минимум `3305` листов;
-- M7.1: цели, порядок, ranking и прозрачная модель стоимости;
-- M7.2: guarded `SolutionMetrics` и рабочий pricing pipeline;
-- M7.3: реальные Pareto-варианты, RU/EN explanations, component deltas и compact runtime/UI.
+### Базовый расчёт
 
-## Что завершено в M7.4
+- произвольный лист;
+- зачистка и непечатные поля;
+- произвольный единый формат изделия;
+- выпуск, общий/раздельный рез и зазор;
+- fitting uniform grids `0°/90°`;
+- пользовательские строки заказов и page pairs;
+- front/back materialization и validation;
+- production report;
+- PDF схем и отчёта;
+- operator pricing и BYN-себестоимость.
 
-- стратегии `separateFrontBackForms` и `workAndTurn`;
-- режимы `separateOnly / compareBoth / workAndTurnOnly`;
-- чистая симметричная модель одной общей формы;
-- горизонтальный переворот как единственный поддержанный axis;
-- обязательная проверка зеркальных front/back пар;
-- materialization через существующий duplex validator;
-- mode-aware production metrics и validation;
-- sanitized runtime без raw reports/layouts/pagePairs;
-- компактный RU/EN UI и preview общей формы;
-- focused Chromium scenario;
-- подробная документация `docs/M7_4_WORK_AND_TURN.md`;
-- exact-head Quality: `146/146` тестов;
-- полный Chromium/PDF regression: success;
-- визуально проверенный focused screenshot.
+### Пользовательский M7.5 pipeline
 
-## Проверенный A6-кейс
+- две проверенные plan-family на каждую fitting orientation;
+- lossless-каталог всех найденных допустимых планов;
+- Pareto/recommended/dominated как метки, а не удаление;
+- явный выбор любого плана;
+- реальные схемы, production report и PDF выбранного плана;
+- полный порядок из 11 целей;
+- presets, стрелки и desktop drag-and-drop;
+- reranking без повторной генерации layouts/reports;
+- явный выбор оператора не заменяется новой рекомендацией.
 
-Четыре разных файла, 2 страницы, `1+1`, по `4000`:
+## Честная текущая граница
 
-| Метрика | Чужой оборот | Свой оборот |
-|---|---:|---:|
-| Физические листы | 1000 | 1000 |
-| Прогоны | 2000 | 2000 |
-| Layout-формы | 2 | 1 |
-| Цветовые пластины | 2 | 1 |
-| Недопечатка | 0 | 0 |
-| Перетираж | 0 | 0 |
+Пользовательский каталог полный только внутри:
 
-При evidence-прайсе `15 BYN` за пластину и нулевой подготовке свой оборот экономит ровно `15 BYN`. Бумага и прогоны одинаковы.
+```text
+один общий формат изделия
+× uniform grids
+× 0°/90°
+× paperMinimum/dedicatedPairForms
+× separate front/back forms
+× одна общая duplex-цветность
+× полные front/back page pairs
+```
 
-## Граница M7.4
+Это ещё не общий solver всех технологически возможных монтажей.
 
-M7.4 не заявляет общий automatic work-and-turn solver, вертикальный переворот или автоматическую совместимость с конкретной машиной. Оператор проверяет захват, боковой упор, приводку и допустимость переворота.
+Не реализованы полностью:
 
-## Текущая безопасная последовательность
+- общий user-driven work-and-turn search;
+- mixed-format automatic packing;
+- mixed rotations;
+- индивидуальные параметры каждой строки заказа;
+- односторонние и нечётные работы;
+- тетрадный/фальцевальный спуск;
+- прибыль/убыток и маржа;
+- сохранение проекта;
+- heavy-search worker, progress и cancel;
+- полная production matrix до 1.0.
 
-1. Завершить version checkpoint PR `0.7.0-alpha.4` и получить зелёные exact-head проверки.
-2. Зафиксировать точный version merge commit как `releaseCommit`.
-3. Подготовить patchnote и короткий Telegram/uNews-текст.
-4. Сохранить focused PNG, manifest, capture log и quality log в permanent evidence ZIP.
-5. Создать publication PR и проверить его workflows.
-6. Создать recovery-ветку, immutable tag и настоящий GitHub prerelease с assets.
-7. Независимо открыть Release card и проверить каждый asset.
-8. Только затем переходить к M7.5.
+## Первый обязательный шаг новой Codex-сессии
+
+1. Подтвердить `main` commit `009451cce94d5cde05ee72305f30447aa65a646c`.
+2. Прочитать `docs/CODEX_HANDOFF.md`.
+3. Проверить PR `#44`, `#45`, `#46` и связанные Actions.
+4. Провести audit версии и документации.
+5. Подготовить полный release checkpoint **`0.7.0-alpha.5`** для уже объединённого M7.5.
+6. Не начинать M7.6 до recovery branch, immutable tag, GitHub prerelease, patchnote, uNews/Telegram и permanent evidence alpha.5.
+
+## После alpha.5
+
+Следующий функциональный патч — M7.6:
+
+- компактная таблица всех вариантов;
+- одна строка на вариант;
+- `Только различия`;
+- точные component deltas;
+- сортировка и фильтры без удаления планов;
+- duplex strategy/plan-family;
+- раскрытие и экспорт выбранного варианта;
+- desktop/mobile Chromium evidence.
 
 ## Главные правила
 
 - недопечатка всегда запрещена;
+- оборот не строится независимо от лица;
 - рабочие цены вводит оператор;
-- минимум бумаги не равен минимуму денег или форм;
 - layout-формы и цветовые пластины не смешиваются;
-- пользователь видит компромиссы и выбирает решение;
+- paper minimum не равен minimum cost/forms;
+- допустимые варианты не скрываются;
 - fixture не выдаётся за общий solver;
-- каждый опубликованный патч получает PR, проверки, Chromium evidence, patchnote, uNews/Telegram, archive, recovery branch, immutable tag и GitHub prerelease/release.
+- ограниченный search не выдаётся за глобально полный;
+- каждый опубликованный патч получает PR, exact-head checks, Chromium evidence, patchnote, uNews/Telegram, permanent archive, recovery branch, immutable tag и настоящий GitHub prerelease/release.
 
-## Prompt для нового чата
+## Prompt для Codex Work
+
+Актуальный готовый запрос находится в `docs/CODEX_HANDOFF.md`, разделы 10–12. Пользовательский вариант запроса также можно начинать так:
 
 ```text
-Открой sunpole/uImposition через GitHub. Прочитай START_HERE.md, AGENTS.md, VERSION.json, VERSION.md, CHANGELOG.md, docs/CURRENT_STATE.md, docs/REMAINING_WORK.md и docs/M7_4_WORK_AND_TURN.md. Проверь последние PR, Actions, branches, tags и Releases.
-
-GitHub — единственный источник истины. Не требуй локальный клон.
-
-Подтверди functional merge M7.4 через PR #39 и commit 20b17a8dd578be6777d50934f69c561b10363aca. Затем заверши release checkpoint 0.7.0-alpha.4: version PR, patchnote, uNews/Telegram, focused evidence, permanent archive, release manifest, recovery branch, immutable tag, GitHub prerelease и независимая проверка assets. Не начинай M7.5 раньше полного checkpoint.
+Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub-состоянию. Сначала прочитай AGENTS.md, START_HERE.md и docs/CODEX_HANDOFF.md. Подтверди main commit 009451cce94d5cde05ee72305f30447aa65a646c, опубликованную 0.7.0-alpha.4 и объединённый, но ещё не выпущенный M7.5 через PR #44–#46. Сначала заверши полный release checkpoint 0.7.0-alpha.5, затем переходи к M7.6 небольшими проверяемыми PR.
 ```
