@@ -4,12 +4,11 @@
 
 ## 1. Текущая точка
 
-- опубликованный checkpoint: `0.7.0-alpha.4` / M7.4;
-- текущий `main`: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- функциональный M7.5 уже объединён через PR `#44`, `#45`, `#46`;
-- M7.5 ещё не получил version/release checkpoint;
-- следующий обязательный релиз: `0.7.0-alpha.5`;
-- следующий функциональный milestone после release: M7.6;
+- функциональный baseline M7.5: `009451cce94d5cde05ee72305f30447aa65a646c`;
+- текущий version checkpoint: `0.7.0-alpha.5` / M7.5;
+- функциональный M7.5 объединён через PR `#44`, `#45`, `#46`;
+- до полного release остаётся publication package, recovery branch, immutable tag, GitHub prerelease и независимая asset/uNews-проверка;
+- следующий функциональный milestone после release: M7.6 / `0.7.0-alpha.6`;
 - полный handoff: `docs/CODEX_HANDOFF.md`.
 
 ## 2. Что уже завершено
@@ -53,7 +52,7 @@
 - forms/plates comparison;
 - release checkpoint опубликован.
 
-### M7.5 functional scope — объединён, но не выпущен
+### M7.5 / `0.7.0-alpha.5` — version checkpoint
 
 PR `#44`:
 
@@ -81,19 +80,19 @@ PR `#46`:
 - selected plan independent from recommendation;
 - `173/173` tests и full Chromium/PDF evidence.
 
-## 3. Срочно: release checkpoint `0.7.0-alpha.5`
+## 3. Срочно: publication checkpoint `0.7.0-alpha.5`
 
 Это первый обязательный этап перед новым функциональным кодом.
 
 ### Version audit
 
-- [ ] проверить фактический `main` и последние PR;
-- [ ] обновить `VERSION.json`;
-- [ ] обновить `VERSION.md`;
-- [ ] обновить `CHANGELOG.md`;
-- [ ] обновить README;
-- [ ] обновить видимую версию сайта;
-- [ ] обновить screenshot assertions;
+- [x] проверить фактический `main` и последние PR;
+- [x] обновить `VERSION.json`;
+- [x] обновить `VERSION.md`;
+- [x] обновить `CHANGELOG.md`;
+- [x] обновить README;
+- [x] обновить видимую версию сайта;
+- [x] обновить screenshot assertions;
 - [ ] обновить status/milestone/nextTarget.
 
 ### Release evidence
