@@ -1,6 +1,6 @@
 {
   "id": "m7-real-alternatives-cost-first",
-  "path": "/",
+  "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1100 },
   "assertions": [
     { "selector": "#productionAlternatives", "text": "Реальные варианты производства" },
