@@ -59,8 +59,9 @@ GitHub остаётся единственным источником истин
 | [`M7_5_USER_UNIFORM_PRODUCTION_PLANS.md`](M7_5_USER_UNIFORM_PRODUCTION_PLANS.md) | Завершённый milestone | Пользовательские uniform production plans |
 | [`M7_5_USER_PLAN_SELECTION_EXPORT.md`](M7_5_USER_PLAN_SELECTION_EXPORT.md) | Завершённый milestone | Явный выбор, схемы, report и PDF |
 | [`M7_5_OBJECTIVE_PRIORITY_EDITOR.md`](M7_5_OBJECTIVE_PRIORITY_EDITOR.md) | Завершённый milestone | Приоритеты оператора и reranking без regeneration |
+| [`M7_6_COMPARISON_TABLE_MODEL.md`](M7_6_COMPARISON_TABLE_MODEL.md) | Активный milestone | Чистая lossless-модель строк, колонок, filters, sorting, deltas и режима `Только различия` |
 
-Следующий функциональный milestone описан в актуальных [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md) и [`REMAINING_WORK.md`](REMAINING_WORK.md). Отдельного M7.6 implementation-документа пока нет.
+Следующий M7.6 UI-патч должен опираться на чистую comparison-table model и существующие selection/details/PDF модули, не расширяя search space.
 
 ## 5. Завершённые milestone и release evidence
 
@@ -102,4 +103,4 @@ npm run check:docs
 
 ## English summary
 
-This is the canonical documentation index. It separates current operational truth from stable policies, completed milestones, and historical evidence. Start with `AGENTS.md`, `START_HERE.md`, and `CODEX_HANDOFF.md`; verify live GitHub state before making changes; use `PROJECT_CATALOG.md` for the repository map; and run `npm run check:docs` to validate local links and catalog coverage.
+This is the canonical documentation index. It separates current operational truth from stable policies, completed milestones, and historical evidence. Start with `AGENTS.md`, `START_HERE.md`, and `CODEX_HANDOFF.md`; verify live GitHub state before making changes; use `PROJECT_CATALOG.md` for the repository map; and run `npm run check:docs` to validate local links and catalog coverage. The active M7.6 work begins with a pure lossless comparison-table model before any UI or search-space expansion.
