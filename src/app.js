@@ -377,7 +377,7 @@ async function loadControlCase() {
 }
 
 function initializeResponsiveSettingsPanel() {
-  const compactViewport = window.matchMedia("(max-width: 900px)").matches;
+  const compactViewport = window.matchMedia("(max-width: 620px)").matches;
   ui.settingsPanel.classList.toggle("is-collapsed", compactViewport);
   ui.settingsToggle.ariaExpanded = String(!compactViewport);
 }
