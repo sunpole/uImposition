@@ -1,6 +1,6 @@
 {
   "id": "m7-pricing-inputs-ready",
-  "path": "/",
+  "path": "/?demo=control",
   "viewport": { "width": 1280, "height": 960 },
   "assertions": [
     { "selector": ".brand", "text": "v0.7.0-alpha.5" },
