@@ -1,3 +1,24 @@
+.app-shell .comparison-table {
+  min-width: 820px;
+}
+
+.app-shell .comparison-table__cell--label {
+  min-width: 190px;
+}
+
+.app-shell .comparison-table__cell--status {
+  min-width: 108px;
+}
+
+.app-shell .comparison-table__cell--action {
+  width: 84px;
+}
+
+.app-shell .comparison-table__heading,
+.app-shell .comparison-table__cell {
+  padding-inline: 7px;
+}
+
 @media (max-width: 390px) {
   .app-header-button:not(.app-header-button--icon) {
     display: inline-flex !important;
