@@ -49,7 +49,9 @@ const TEXT = Object.freeze({
     allFamilies: "Все семейства",
     duplex: "Оборот",
     allDuplex: "Все способы",
-    shown: "Показано",
+    shown: "показано",
+    variants: "варианта(ов)",
+    exactScope: "Полный набор внутри текущей области: fitting 0°/90° × две uniform plan-family. Это не глобальный перебор mixed-layout и всех последовательностей форм.",
     from: "из",
     reference: "Дельты относительно",
     selectedReference: "выбранного плана",
@@ -86,7 +88,9 @@ const TEXT = Object.freeze({
     allFamilies: "All families",
     duplex: "Duplex",
     allDuplex: "All modes",
-    shown: "Shown",
+    shown: "shown",
+    variants: "variant(s)",
+    exactScope: "Complete inside the current scope: fitting 0°/90° × two uniform plan families. This is not a global enumeration of mixed layouts or every form sequence.",
     from: "of",
     reference: "Deltas relative to",
     selectedReference: "the selected plan",
@@ -435,7 +439,7 @@ export function renderUserProductionComparisonPanel(panel, planSet, {
     element("h2", "comparison-heading__title", t("title")),
     element("p", "comparison-heading__subtitle", t("subtitle")),
   );
-  heading.append(headingCopy, badge(`${tableModel.allRows.length}`, "count"));
+  heading.append(headingCopy, badge(`${tableModel.allRows.length} ${t("variants")}`, "count"));
 
   const statusFilters = element("div", "comparison-status-filters");
   const summary = planSet.catalog.summary;
@@ -463,6 +467,7 @@ export function renderUserProductionComparisonPanel(panel, planSet, {
   status.append(
     element("strong", "", `${t("shown")}: ${tableModel.summary.viewRowCount} ${t("from")} ${tableModel.summary.catalogFeasibleSolutionCount}`),
     element("span", "", renderMobileReference(tableModel)),
+    element("span", "", t("exactScope")),
     element("span", "", t("retained")),
     element("span", "comparison-runtime-proof", `${tableModel.summary.reusedPlanCount} ${t("rowsReused")} · ${tableModel.summary.regeneratedPlanCount} ${t("rowsRegenerated")}`),
   );
