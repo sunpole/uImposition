@@ -18,16 +18,19 @@
     { "action": "click", "selector": "[data-app-screen-target='alternatives']" },
     { "action": "click", "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]" },
     { "action": "click", "selector": "[data-app-screen-target='selected']" },
-    { "action": "wait", "timeoutMs": 300 }
+    { "action": "wait", "timeoutMs": 300 },
+    { "action": "waitForHidden", "selector": "[data-selected-plan-tab-panel='report']" }
   ],
   "beforeScreenshotAssertions": [
     { "selector": "[data-app-screen='selected']", "text": "Выбранный план" },
-    { "selector": "#selectedUserPlanDetails", "text": "Dedicated pair forms" },
-    { "selector": "#selectedUserPlanDetails", "text": "21" },
-    { "selector": "#selectedUserPlanDetails", "text": "240,05 BYN" },
-    { "selector": "#selectedUserPlanDetails", "text": "Недопечатки нет · отчёт проверен" },
-    { "selector": "#selectedUserPlanDetails", "text": "A,1" },
-    { "selector": "#selectedUserPlanDetails", "text": "A,2" },
+    { "selector": ".selected-plan-tab-list", "text": "Обзор" },
+    { "selector": ".selected-plan-tab-list", "text": "Схемы" },
+    { "selector": ".selected-plan-tab-list", "text": "Отчёт" },
+    { "selector": ".selected-plan-tab-list", "text": "Файлы" },
+    { "selector": "[data-selected-plan-tab='overview'][aria-selected='true']", "text": "Обзор" },
+    { "selector": "[data-selected-plan-tab-panel='overview']", "text": "Dedicated pair forms" },
+    { "selector": "[data-selected-plan-tab-panel='overview']", "text": "21" },
+    { "selector": "[data-selected-plan-tab-panel='overview']", "text": "240,05 BYN" },
     { "selector": "#appPrimaryButton", "text": "К экспорту" }
   ],
   "screenshotSelector": "[data-app-screen='selected']",
