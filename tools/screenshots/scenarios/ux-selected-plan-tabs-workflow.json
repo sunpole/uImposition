@@ -1,0 +1,38 @@
+{
+  "id": "ux-selected-plan-tabs-workflow",
+  "path": "/",
+  "viewport": { "width": 1280, "height": 960 },
+  "assertions": [
+    { "selector": "#applicationShell", "text": "Параметры заказа" }
+  ],
+  "beforeScreenshot": [
+    { "action": "fill", "selector": "#ordersInput", "value": "A | 100 | 2\nB | 100 | 2\nC | 100 | 2" },
+    { "action": "fill", "selector": "#userFrontColors", "value": "4" },
+    { "action": "fill", "selector": "#userBackColors", "value": "1" },
+    { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },
+    { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
+    { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
+    { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "2" },
+    { "action": "wait", "timeoutMs": 500 },
+    { "action": "click", "selector": "[data-app-screen-target='alternatives']" },
+    { "action": "click", "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]" },
+    { "action": "click", "selector": "[data-app-screen-target='selected']" },
+    { "action": "wait", "timeoutMs": 300 },
+    { "action": "click", "selector": "[data-selected-plan-tab='schemes']" },
+    { "action": "assertText", "selector": "[data-selected-plan-tab-panel='schemes']", "text": "Реальные схемы выбранного плана" },
+    { "action": "click", "selector": "[data-selected-plan-tab='report']" },
+    { "action": "assertText", "selector": "[data-selected-plan-tab-panel='report']", "text": "Недопечатки нет · отчёт проверен" },
+    { "action": "click", "selector": "[data-selected-plan-tab='files']" },
+    { "action": "assertText", "selector": "[data-selected-plan-tab-panel='files']", "text": "Итоги по файлам" },
+    { "action": "assertText", "selector": "[data-selected-plan-tab-panel='files']", "text": "Итоги по печатным парам" },
+    { "action": "wait", "timeoutMs": 150 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "[data-selected-plan-tab='files'][aria-selected='true']", "text": "Файлы" },
+    { "selector": "[data-selected-plan-tab-panel='files']", "text": "Подробные итоги по файлам" },
+    { "selector": "[data-selected-plan-tab-panel='files'] .selected-plan-details-block", "text": "Итоги по файлам" },
+    { "selector": "#appPrimaryButton", "text": "К экспорту" }
+  ],
+  "screenshotSelector": "[data-app-screen='selected']",
+  "screenshot": "uimposition-ux-4-selected-plan-tabs-files.png"
+}
