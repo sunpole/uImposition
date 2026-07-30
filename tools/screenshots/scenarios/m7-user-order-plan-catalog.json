@@ -3,7 +3,8 @@
   "path": "/",
   "viewport": { "width": 1440, "height": 1180 },
   "assertions": [
-    { "selector": "#userProductionPlans", "text": "Введите корректные строки заказа" }
+    { "selector": "#applicationShell", "text": "Параметры заказа" },
+    { "selector": "[data-app-screen='order']", "text": "Лист, изделие, файлы" }
   ],
   "beforeScreenshot": [
     { "action": "fill", "selector": "#ordersInput", "value": "A | 100 | 2\nB | 100 | 2\nC | 100 | 2" },
@@ -13,10 +14,12 @@
     { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
     { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
     { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "2" },
-    { "action": "hide", "selector": "#settingsPanel" },
-    { "action": "wait", "timeoutMs": 500 }
+    { "action": "wait", "timeoutMs": 500 },
+    { "action": "click", "selector": "[data-app-screen-target='alternatives']" },
+    { "action": "wait", "timeoutMs": 250 }
   ],
   "beforeScreenshotAssertions": [
+    { "selector": "[data-app-screen='alternatives']", "text": "Варианты производства" },
     { "selector": "#userProductionPlans", "text": "4 варианта" },
     { "selector": "#userProductionPlans", "text": "Полный набор внутри текущей области" },
     { "selector": "#userProductionPlans", "text": "Pareto" },
@@ -25,6 +28,6 @@
     { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "BYN" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "Pareto" }
   ],
-  "screenshotSelector": "#userProductionPlans",
+  "screenshotSelector": "[data-app-screen='alternatives']",
   "screenshot": "uimposition-m7-5-user-order-plan-catalog.png"
 }
