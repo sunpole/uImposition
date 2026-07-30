@@ -11,12 +11,43 @@
 }
 
 .app-shell .comparison-table__cell--action {
+  position: sticky;
+  z-index: 2;
+  right: 0;
   width: 84px;
+  background: #fff;
+  box-shadow: -7px 0 10px rgba(27,36,48,.06);
+}
+
+.app-shell .comparison-table__heading:last-child {
+  position: sticky;
+  z-index: 4;
+  right: 0;
+  min-width: 84px;
+  background: #eef2f7;
+  box-shadow: -7px 0 10px rgba(27,36,48,.06);
+}
+
+.app-shell .comparison-table__row:nth-child(even) .comparison-table__cell--action {
+  background: #fafbfc;
+}
+
+.app-shell .comparison-table__row.is-operator-selected .comparison-table__cell--action {
+  background: #edf8f1;
 }
 
 .app-shell .comparison-table__heading,
 .app-shell .comparison-table__cell {
   padding-inline: 7px;
+}
+
+@media (max-width: 820px) {
+  .app-shell .comparison-table__cell--action {
+    position: static;
+    width: auto;
+    background: transparent !important;
+    box-shadow: none;
+  }
 }
 
 @media (max-width: 390px) {
