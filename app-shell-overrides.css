@@ -1,0 +1,22 @@
+@media (max-width: 390px) {
+  .app-header-button:not(.app-header-button--icon) {
+    display: inline-flex !important;
+    align-items: center;
+  }
+
+  .app-header .brand__version {
+    display: none;
+  }
+
+  .app-header__actions {
+    gap: 4px;
+    padding-inline: 5px;
+  }
+
+  .app-header-button,
+  .app-header .language-button {
+    min-height: 36px;
+    padding-inline: 7px;
+    font-size: .69rem;
+  }
+}
