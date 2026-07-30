@@ -7,3 +7,4 @@ for (const href of ["app-shell.css", "app-shell-overrides.css"]) {
 }
 
 await import("./app-shell.js");
+await import("./user-production-comparison-status-layout.js");
