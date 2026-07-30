@@ -30,6 +30,7 @@
     { "selector": "#userProductionPlans", "text": "4 готовых планов использовано повторно" },
     { "selector": "#userProductionPlans", "text": "0 планов построено заново" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "Выбран" },
+    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]", "text": "Выбран" },
     { "selector": ".comparison-table tbody tr:first-child[data-plan-id='uniform-r90-dedicated-pairs']", "text": "240,05 BYN" },
     { "selector": "[data-comparison-differences]", "text": "" }
   ],
