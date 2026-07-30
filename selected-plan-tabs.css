@@ -117,14 +117,10 @@
   .selected-plan-tabs { gap: 8px; }
 
   .selected-plan-tab-list {
-    position: sticky;
-    z-index: 20;
-    top: calc(var(--app-header-height) + 61px);
     grid-template-columns: repeat(4, minmax(78px, 1fr));
     overflow-x: auto;
     border-radius: 8px;
     padding: 4px;
-    box-shadow: 0 4px 12px rgba(22,32,46,.08);
   }
 
   .selected-plan-tab {
