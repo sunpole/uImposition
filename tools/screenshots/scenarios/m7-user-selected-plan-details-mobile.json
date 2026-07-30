@@ -70,6 +70,22 @@
     {
       "action": "wait",
       "timeoutMs": 300
+    },
+    {
+      "action": "waitForHidden",
+      "selector": "[data-selected-plan-tab-panel='report']"
+    },
+    {
+      "action": "hide",
+      "selector": ".app-header"
+    },
+    {
+      "action": "hide",
+      "selector": ".app-navigation"
+    },
+    {
+      "action": "hide",
+      "selector": ".app-action-bar"
     }
   ],
   "beforeScreenshotAssertions": [
@@ -78,24 +94,36 @@
       "text": "Выбранный план"
     },
     {
-      "selector": ".selected-plan-summary",
+      "selector": ".selected-plan-tab-list",
+      "text": "Обзор"
+    },
+    {
+      "selector": ".selected-plan-tab-list",
+      "text": "Схемы"
+    },
+    {
+      "selector": ".selected-plan-tab-list",
+      "text": "Отчёт"
+    },
+    {
+      "selector": ".selected-plan-tab-list",
+      "text": "Файлы"
+    },
+    {
+      "selector": "[data-selected-plan-tab='overview'][aria-selected='true']",
+      "text": "Обзор"
+    },
+    {
+      "selector": "[data-selected-plan-tab-panel='overview']",
       "text": "Dedicated pair forms"
     },
     {
-      "selector": ".selected-plan-summary",
+      "selector": "[data-selected-plan-tab-panel='overview']",
       "text": "21"
     },
     {
-      "selector": ".selected-plan-summary",
+      "selector": "[data-selected-plan-tab-panel='overview']",
       "text": "240,05 BYN"
-    },
-    {
-      "selector": "#selectedUserPlanDetails",
-      "text": "Недопечатки нет · отчёт проверен"
-    },
-    {
-      "selector": "#appPrimaryButton",
-      "text": "К экспорту"
     }
   ],
   "screenshotSelector": "[data-app-screen='selected']",
