@@ -3,7 +3,8 @@
   "path": "/",
   "viewport": { "width": 1440, "height": 1180 },
   "assertions": [
-    { "selector": "#selectedUserPlanDetails", "text": "Сначала введите корректный заказ" }
+    { "selector": "#applicationShell", "text": "Параметры заказа" },
+    { "selector": "[data-app-screen-target='selected']", "text": "План" }
   ],
   "beforeScreenshot": [
     { "action": "fill", "selector": "#ordersInput", "value": "A | 100 | 2\nB | 100 | 2\nC | 100 | 2" },
@@ -14,21 +15,21 @@
     { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
     { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "2" },
     { "action": "wait", "timeoutMs": 500 },
+    { "action": "click", "selector": "[data-app-screen-target='alternatives']" },
     { "action": "click", "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]" },
-    { "action": "hide", "selector": "#settingsPanel" },
+    { "action": "click", "selector": "[data-app-screen-target='selected']" },
     { "action": "wait", "timeoutMs": 300 }
   ],
   "beforeScreenshotAssertions": [
-    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "Выбран" },
+    { "selector": "[data-app-screen='selected']", "text": "Выбранный план" },
     { "selector": "#selectedUserPlanDetails", "text": "Dedicated pair forms" },
     { "selector": "#selectedUserPlanDetails", "text": "21" },
     { "selector": "#selectedUserPlanDetails", "text": "240,05 BYN" },
     { "selector": "#selectedUserPlanDetails", "text": "Недопечатки нет · отчёт проверен" },
-    { "selector": "#selectedUserPlanDetails", "text": "Скачать PDF схем" },
-    { "selector": "#selectedUserPlanDetails", "text": "Скачать PDF отчёта" },
     { "selector": "#selectedUserPlanDetails", "text": "A,1" },
-    { "selector": "#selectedUserPlanDetails", "text": "A,2" }
+    { "selector": "#selectedUserPlanDetails", "text": "A,2" },
+    { "selector": "#appPrimaryButton", "text": "К экспорту" }
   ],
-  "screenshotSelector": "#selectedUserPlanDetails",
+  "screenshotSelector": "[data-app-screen='selected']",
   "screenshot": "uimposition-m7-5-user-selected-plan-details.png"
 }
