@@ -202,3 +202,28 @@ footer { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 0 0 48p
   .field-grid { grid-template-columns: 1fr; }
 }
 
+/* M7.6 compact mobile hero refinement */
+.hero-compact { display: none; }
+
+@media (max-width: 700px) {
+  .hero { padding: 8px 8px 20px; }
+  .nav { margin-bottom: 10px; }
+  .eyebrow { margin: 0; font-size: .56rem; }
+  h1 { margin: 3px 0 6px; font-size: 1.38rem; line-height: 1.03; letter-spacing: -.025em; }
+  .hero__content > p:last-child { font-size: .72rem; line-height: 1.28; }
+  .hero-wide { display: none; }
+  .hero-compact { display: inline; }
+
+  .settings-panel.is-collapsed {
+    width: calc(100% - 12px);
+    max-height: none;
+    overflow: hidden;
+  }
+  .settings-panel.is-collapsed .settings-toggle__text { display: inline; }
+  .settings-panel.is-collapsed .settings-toggle {
+    width: 100%;
+    justify-content: flex-start;
+    border-bottom: 0;
+  }
+}
+
