@@ -54,6 +54,12 @@ async function runBeforeScreenshotActions(page, actions = []) {
       await locator.fill(String(action.value ?? ""));
       continue;
     }
+    if (action.action === "assertText") {
+      const locator = page.locator(action.selector);
+      await expect(locator).toBeVisible();
+      await expect(locator).toContainText(String(action.text ?? ""));
+      continue;
+    }
     if (action.action === "hide") {
       const locator = page.locator(action.selector);
       await locator.evaluate((element) => {
