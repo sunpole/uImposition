@@ -1,0 +1,31 @@
+{
+  "id": "ux-user-plan-export-screen",
+  "path": "/",
+  "viewport": { "width": 1280, "height": 960 },
+  "assertions": [
+    { "selector": "#applicationShell", "text": "Параметры заказа" }
+  ],
+  "beforeScreenshot": [
+    { "action": "fill", "selector": "#ordersInput", "value": "A | 100 | 2\nB | 100 | 2\nC | 100 | 2" },
+    { "action": "fill", "selector": "#userFrontColors", "value": "4" },
+    { "action": "fill", "selector": "#userBackColors", "value": "1" },
+    { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },
+    { "action": "fill", "selector": "#pricingPaperPricePerKg", "value": "4" },
+    { "action": "fill", "selector": "#pricingColorPlatePrice", "value": "15" },
+    { "action": "fill", "selector": "#pricingLayoutFormPreparationPrice", "value": "2" },
+    { "action": "wait", "timeoutMs": 500 },
+    { "action": "click", "selector": "[data-app-screen-target='alternatives']" },
+    { "action": "click", "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]" },
+    { "action": "click", "selector": "[data-app-screen-target='export']" },
+    { "action": "wait", "timeoutMs": 300 }
+  ],
+  "beforeScreenshotAssertions": [
+    { "selector": "[data-app-screen='export']", "text": "Экспорт" },
+    { "selector": "#appExportHost", "text": "Скачать PDF схем" },
+    { "selector": "#appExportHost", "text": "Скачать PDF отчёта" },
+    { "selector": "#appExportHost", "text": "PDF готов к созданию" },
+    { "selector": "[data-app-screen-target='export'][aria-current='step']", "text": "Экспорт" }
+  ],
+  "screenshotSelector": "[data-app-screen='export']",
+  "screenshot": "uimposition-ux-1-user-plan-export-screen.png"
+}
