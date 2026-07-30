@@ -7,15 +7,15 @@
   },
   "assertions": [
     {
-      "selector": "#selectedUserPlanDetails",
-      "text": "Сначала введите корректный заказ"
+      "selector": "#applicationShell",
+      "text": "Параметры заказа"
+    },
+    {
+      "selector": "[data-app-screen-target='selected']",
+      "text": "План"
     }
   ],
   "beforeScreenshot": [
-    {
-      "action": "click",
-      "selector": "#settingsToggle"
-    },
     {
       "action": "fill",
       "selector": "#ordersInput",
@@ -57,11 +57,15 @@
     },
     {
       "action": "click",
+      "selector": "[data-app-screen-target='alternatives']"
+    },
+    {
+      "action": "click",
       "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]"
     },
     {
-      "action": "hide",
-      "selector": "#settingsPanel"
+      "action": "click",
+      "selector": "[data-app-screen-target='selected']"
     },
     {
       "action": "wait",
@@ -70,8 +74,8 @@
   ],
   "beforeScreenshotAssertions": [
     {
-      "selector": "[data-plan-id='uniform-r90-dedicated-pairs']",
-      "text": "Выбран"
+      "selector": "[data-app-screen='selected']",
+      "text": "Выбранный план"
     },
     {
       "selector": ".selected-plan-summary",
@@ -90,14 +94,10 @@
       "text": "Недопечатки нет · отчёт проверен"
     },
     {
-      "selector": "#selectedUserPlanDetails",
-      "text": "Скачать PDF схем"
-    },
-    {
-      "selector": "#selectedUserPlanDetails",
-      "text": "Скачать PDF отчёта"
+      "selector": "#appPrimaryButton",
+      "text": "К экспорту"
     }
   ],
-  "screenshotSelector": ".selected-plan-summary",
+  "screenshotSelector": "[data-app-screen='selected']",
   "screenshot": "uimposition-m7-5-user-selected-plan-details-mobile.png"
 }
