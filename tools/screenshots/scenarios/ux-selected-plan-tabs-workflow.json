@@ -30,7 +30,7 @@
   "beforeScreenshotAssertions": [
     { "selector": "[data-selected-plan-tab='files'][aria-selected='true']", "text": "Файлы" },
     { "selector": "[data-selected-plan-tab-panel='files']", "text": "Подробные итоги по файлам" },
-    { "selector": "[data-selected-plan-tab-panel='files'] .selected-plan-details-block", "text": "Итоги по файлам" },
+    { "selector": "[data-selected-plan-tab-panel='files'] details.selected-plan-details-block:first-of-type", "text": "Итоги по файлам" },
     { "selector": "#appPrimaryButton", "text": "К экспорту" }
   ],
   "screenshotSelector": "[data-app-screen='selected']",
