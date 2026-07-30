@@ -1,6 +1,6 @@
 {
   "id": "m7-work-and-turn-control",
-  "path": "/",
+  "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1180 },
   "assertions": [
     { "selector": "#workAndTurnComparison", "text": "Свой оборот: одна форма, два прогона" },
