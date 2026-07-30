@@ -7,15 +7,15 @@
   },
   "assertions": [
     {
-      "selector": "#userProductionPlans",
-      "text": "Введите корректные строки заказа"
+      "selector": "#applicationShell",
+      "text": "Параметры заказа"
+    },
+    {
+      "selector": "[data-app-screen-target='order']",
+      "text": "Заказ"
     }
   ],
   "beforeScreenshot": [
-    {
-      "action": "click",
-      "selector": "#settingsToggle"
-    },
     {
       "action": "fill",
       "selector": "#ordersInput",
@@ -52,15 +52,23 @@
       "value": "2"
     },
     {
-      "action": "hide",
-      "selector": "#settingsPanel"
+      "action": "wait",
+      "timeoutMs": 500
+    },
+    {
+      "action": "click",
+      "selector": "[data-app-screen-target='alternatives']"
     },
     {
       "action": "wait",
-      "timeoutMs": 500
+      "timeoutMs": 250
     }
   ],
   "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-app-screen='alternatives']",
+      "text": "Варианты производства"
+    },
     {
       "selector": "#userProductionPlans",
       "text": "4 варианта"
@@ -86,6 +94,6 @@
       "text": "Pareto"
     }
   ],
-  "screenshotSelector": "#userProductionPlans",
+  "screenshotSelector": "[data-app-screen='alternatives']",
   "screenshot": "uimposition-m7-5-user-order-plan-catalog-mobile.png"
 }
