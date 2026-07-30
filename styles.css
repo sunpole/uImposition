@@ -128,3 +128,77 @@ footer { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 0 0 48p
   .metric { min-height: 104px; }
   .placement-preview { grid-template-columns: repeat(var(--grid-columns), minmax(28px, 1fr)); }
 }
+
+/* M7.6 mobile compact foundation */
+@media (max-width: 700px) {
+  :root { font-size: 14px; line-height: 1.35; }
+  .hero { padding: 10px 10px 30px; }
+  .nav { margin-bottom: 18px; }
+  .brand { gap: 6px; padding: 4px 6px; margin-left: -6px; }
+  .brand__name { font-size: 1rem; }
+  .brand__version { font-size: .62rem; }
+  .language-button { padding: 6px 10px; font-size: .75rem; }
+  h1 { margin: 4px 0 8px; font-size: clamp(1.72rem, 8.7vw, 2.25rem); line-height: 1; letter-spacing: -.04em; }
+  .hero__content > p:last-child { margin: 0; font-size: .84rem; line-height: 1.35; }
+
+  .settings-panel {
+    width: calc(100% - 12px);
+    max-height: min(68vh, 500px);
+    margin: -18px auto 10px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(0,0,0,.14);
+    backdrop-filter: none;
+  }
+  .settings-toggle { min-height: 38px; padding: 7px 10px; font-size: .82rem; }
+  .settings-panel__content { padding: 9px; gap: 9px; }
+  .settings-section-title { font-size: .86rem; }
+  .settings-divider { margin: 1px 0; }
+  .field { gap: 3px; font-size: .76rem; }
+  .field-grid, .four-sides { grid-template-columns: 1fr 1fr; gap: 6px; }
+  input, select, textarea { border-radius: 7px; padding: 7px 8px; font-size: .82rem; }
+  textarea { min-height: 112px; line-height: 1.35; }
+  .check-row { gap: 6px; font-size: .78rem; }
+  .check-row input { width: 16px; height: 16px; }
+  .hint { margin-top: -4px; font-size: .7rem; }
+  details { padding-top: 7px; }
+  summary { font-size: .78rem; }
+
+  .workspace { width: calc(100% - 12px); margin: 0 auto 24px; gap: 9px; }
+  .panel { border-radius: 11px; padding: 11px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+  .section-heading { gap: 7px; margin-bottom: 11px; }
+  .section-heading h2 { margin-top: 0; font-size: 1.13rem; line-height: 1.12; }
+  .eyebrow, .section-kicker { font-size: .64rem; letter-spacing: .1em; }
+  .status-chip { min-height: 24px; padding: 3px 8px; font-size: .7rem; }
+
+  .result-grid, .result-grid--capacity, .result-grid--m7-status { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .metric { min-height: 66px; border-radius: 8px; padding: 7px; }
+  .metric span { font-size: .66rem; line-height: 1.2; }
+  .metric strong, .milestone-panel .metric strong { font-size: .98rem; line-height: 1.12; }
+  .formula-card { margin-top: 8px; padding: 8px 10px; font-size: .75rem; }
+  .button-row { gap: 5px; }
+  .button { border-radius: 7px; padding: 7px 9px; font-size: .78rem; }
+  .error-box { margin-top: 8px; padding: 8px 9px; font-size: .74rem; }
+
+  .candidate-grid { gap: 7px; margin-top: 9px; }
+  .candidate-card { border-radius: 9px; padding: 9px; }
+  .candidate-card.is-best { border-width: 2px; padding: 8px; }
+  .candidate-card strong { font-size: 1.08rem; }
+  .candidate-card p { margin: 7px 0 2px; }
+  .placement-preview-wrap { margin-top: 12px; }
+  .preview-heading h3, .preview-heading p { margin-bottom: 6px; }
+  .placement-preview { gap: 3px; padding: 5px; }
+  .placement-cell { min-height: 30px; font-size: .66rem; }
+
+  .table-wrap { border-radius: 8px; }
+  table { min-width: 520px; }
+  th, td { padding: 6px 7px; font-size: .72rem; }
+  .empty-state { margin-top: 8px; font-size: .76rem; }
+  footer { width: calc(100% - 12px); padding-bottom: 20px; font-size: .72rem; }
+}
+
+@media (max-width: 355px) {
+  .result-grid, .result-grid--capacity, .result-grid--m7-status { grid-template-columns: 1fr; }
+  .field-grid { grid-template-columns: 1fr; }
+}
+

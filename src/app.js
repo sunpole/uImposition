@@ -376,6 +376,12 @@ async function loadControlCase() {
   }
 }
 
+function initializeResponsiveSettingsPanel() {
+  const compactViewport = window.matchMedia("(max-width: 900px)").matches;
+  ui.settingsPanel.classList.toggle("is-collapsed", compactViewport);
+  ui.settingsToggle.ariaExpanded = String(!compactViewport);
+}
+
 function attachListeners() {
   ui.languageButton.addEventListener("click", () => {
     language = language === "ru" ? "en" : "ru";
@@ -403,6 +409,7 @@ function attachListeners() {
 
 populatePresets();
 applyDefaults();
+initializeResponsiveSettingsPanel();
 attachListeners();
 renderLanguage();
 renderVersion();

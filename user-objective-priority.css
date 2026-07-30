@@ -36,3 +36,28 @@
   .objective-priority-copy strong { font-size: .82rem; }
   .objective-move-button { width: 36px; min-width: 36px; height: 36px; }
 }
+
+/* M7.6 mobile compact foundation */
+@media (max-width: 620px) {
+  .user-objective-priority { gap: 6px; }
+  .user-objective-priority__subtitle { font-size: .84rem; }
+  .user-objective-priority__hint, .objective-drag-hint { font-size: .68rem; line-height: 1.3; }
+  .objective-priority-label { margin: 2px 0 -1px; font-size: .66rem; }
+  .objective-preset-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .objective-preset-button { min-height: 30px; padding: 4px 5px; font-size: .68rem; }
+  .objective-priority-list { gap: 3px; }
+  .objective-priority-row { grid-template-columns: 20px minmax(0, 1fr) auto; gap: 4px; border-radius: 7px; padding: 4px; }
+  .objective-priority-position { width: 20px; height: 20px; font-size: .62rem; }
+  .objective-priority-copy strong { font-size: .72rem; line-height: 1.12; }
+  .objective-priority-copy small { font-size: .58rem; }
+  .objective-priority-actions { gap: 3px; }
+  .objective-move-button { width: 30px; min-width: 30px; height: 30px; border-radius: 6px; }
+  .objective-priority-status { padding: 6px 7px; font-size: .66rem; line-height: 1.3; }
+  .objective-hard-constraints summary { font-size: .7rem; }
+  .hard-constraint-list { margin-top: 5px; gap: 2px; font-size: .64rem; }
+}
+
+@media (max-width: 355px) {
+  .objective-preset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
