@@ -219,7 +219,7 @@ footer { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 0 0 48p
     max-height: none;
     overflow: hidden;
   }
-  .settings-panel.is-collapsed .settings-toggle__text { display: inline; }
+  .settings-panel.is-collapsed .settings-toggle__text:not([hidden]) { display: inline; }
   .settings-panel.is-collapsed .settings-toggle {
     width: 100%;
     justify-content: flex-start;
