@@ -8,18 +8,18 @@
   "assertions": [
     {
       "selector": ".brand",
-      "text": "v0.7.0-alpha.5"
+      "text": "uImposition"
     },
     {
-      "selector": "#settingsToggle",
-      "text": "Настройки"
+      "selector": "#appObjectivesButton",
+      "text": "Цели"
+    },
+    {
+      "selector": "[data-app-screen-target='order']",
+      "text": "Заказ"
     }
   ],
   "beforeScreenshot": [
-    {
-      "action": "click",
-      "selector": "#settingsToggle"
-    },
     {
       "action": "fill",
       "selector": "#ordersInput",
@@ -61,7 +61,15 @@
     },
     {
       "action": "click",
+      "selector": "[data-app-screen-target='alternatives']"
+    },
+    {
+      "action": "click",
       "selector": "[data-plan-id='uniform-r90-paper-minimum'] [data-select-user-plan]"
+    },
+    {
+      "action": "click",
+      "selector": "#appObjectivesButton"
     },
     {
       "action": "click",
@@ -73,6 +81,10 @@
     }
   ],
   "beforeScreenshotAssertions": [
+    {
+      "selector": "#appObjectivesDrawer",
+      "text": "Цели оптимизации"
+    },
     {
       "selector": "#userObjectivePriorityEditor",
       "text": "Стоимость"
@@ -86,18 +98,14 @@
       "text": "0 планов построено заново"
     },
     {
-      "selector": "[data-plan-id='uniform-r90-paper-minimum']",
-      "text": "Выбран"
-    },
-    {
-      "selector": "[data-plan-id='uniform-r90-dedicated-pairs']",
-      "text": "рекомендован"
+      "selector": "#userObjectivePriorityEditor",
+      "text": "uniform-r90-dedicated-pairs"
     },
     {
       "selector": "#userObjectivePriorityEditor [data-move-objective='estimatedTotalCost'][data-offset='1']",
       "text": "↓"
     }
   ],
-  "screenshotSelector": "#userObjectivePriorityEditor",
+  "screenshotSelector": "#appObjectivesDrawer",
   "screenshot": "uimposition-m7-5-objective-priority-editor-mobile.png"
 }
