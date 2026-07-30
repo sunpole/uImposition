@@ -62,6 +62,18 @@
     {
       "action": "wait",
       "timeoutMs": 250
+    },
+    {
+      "action": "hide",
+      "selector": ".app-header"
+    },
+    {
+      "action": "hide",
+      "selector": ".app-navigation"
+    },
+    {
+      "action": "hide",
+      "selector": ".app-action-bar"
     }
   ],
   "beforeScreenshotAssertions": [
@@ -92,6 +104,10 @@
     {
       "selector": "[data-plan-id='uniform-r90-dedicated-pairs']",
       "text": "Pareto"
+    },
+    {
+      "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]",
+      "text": "Выбрать"
     }
   ],
   "screenshotSelector": "[data-app-screen='alternatives']",

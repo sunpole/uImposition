@@ -8,6 +8,7 @@ import {
   setUserProductionPlanSet,
   subscribeUserProductionPlanRuntime,
 } from "./user-production-plans-runtime.js";
+import { renderUserProductionComparisonPanel } from "./user-production-comparison-ui.js";
 
 const sides = ["left", "right", "top", "bottom"];
 const ids = { left: "Left", right: "Right", top: "Top", bottom: "Bottom" };
@@ -101,6 +102,7 @@ const state = {
   error: null,
   timer: null,
   pricing: window.__uimpositionPricingState?.pricing ?? null,
+  selectedPlanId: null,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -127,6 +129,13 @@ function ensureStylesheet() {
   link.href = "user-production-plans.css";
   link.setAttribute("data-user-production-plans-styles", "");
   document.head.append(link);
+  if (!$('link[data-user-production-comparison-styles]')) {
+    const comparisonLink = document.createElement("link");
+    comparisonLink.rel = "stylesheet";
+    comparisonLink.href = "user-production-comparison.css";
+    comparisonLink.setAttribute("data-user-production-comparison-styles", "");
+    document.head.append(comparisonLink);
+  }
 }
 
 function localizedSpan(key, lang) {
@@ -406,6 +415,11 @@ function render() {
     return;
   }
 
+  renderUserProductionComparisonPanel(panel, state.planSet, {
+    selectedPlanId: state.selectedPlanId,
+  });
+  return;
+
   const entries = filteredEntries();
   const summary = state.planSet.catalog.summary;
   panel.innerHTML = "";
@@ -478,8 +492,11 @@ ensurePanel();
 attachListeners();
 calculate();
 subscribeUserProductionPlanRuntime((runtimeSnapshot) => {
-  if (runtimeSnapshot.planSet === state.planSet) return;
+  const planSetChanged = runtimeSnapshot.planSet !== state.planSet;
+  const selectionChanged = runtimeSnapshot.selectedPlanId !== state.selectedPlanId;
+  if (!planSetChanged && !selectionChanged) return;
   state.planSet = runtimeSnapshot.planSet;
+  state.selectedPlanId = runtimeSnapshot.selectedPlanId;
   state.error = null;
   if (!state.planSet) state.filter = FILTERS.ALL;
   render();
