@@ -11,8 +11,8 @@
       "text": "v0.7.0-alpha.5"
     },
     {
-      "selector": "#userObjectivePriorityEditor",
-      "text": "Введите корректный заказ"
+      "selector": "#settingsToggle",
+      "text": "Настройки"
     }
   ],
   "beforeScreenshot": [
