@@ -1,10 +1,10 @@
 {
   "id": "m7-real-alternatives-cost-first",
-  "path": "/",
+  "path": "/?demo=control",
   "viewport": { "width": 1440, "height": 1100 },
   "assertions": [
     { "selector": "#productionAlternatives", "text": "Реальные варианты производства" },
-    { "selector": "#alternativesStatus", "text": "Загрузите контрольный заказ" }
+    { "selector": "#alternativesStatus", "text": "2 Pareto · без денежного сравнения" }
   ],
   "beforeScreenshot": [
     { "action": "fill", "selector": "#pricingGrammageGsm", "value": "130" },

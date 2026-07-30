@@ -1,0 +1,14 @@
+{
+  "id": "ux-application-shell-mobile",
+  "path": "/",
+  "viewport": { "width": 390, "height": 844 },
+  "assertions": [
+    { "selector": "#applicationShell", "text": "Параметры заказа" },
+    { "selector": ".app-header", "text": "uImposition" },
+    { "selector": "#appObjectivesButton", "text": "Цели" },
+    { "selector": "[data-app-screen-target='order'][aria-current='step']", "text": "Заказ" },
+    { "selector": "[data-app-screen-target='alternatives']", "text": "Варианты" },
+    { "selector": "#appPrimaryButton", "text": "Проверить данные" }
+  ],
+  "screenshot": "uimposition-ux-1-application-shell-mobile.png"
+}
