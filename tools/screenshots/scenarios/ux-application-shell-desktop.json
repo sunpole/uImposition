@@ -1,0 +1,16 @@
+{
+  "id": "ux-application-shell-desktop",
+  "path": "/",
+  "viewport": { "width": 1440, "height": 1000 },
+  "assertions": [
+    { "selector": "#applicationShell", "text": "Параметры заказа" },
+    { "selector": ".app-header", "text": "uImposition" },
+    { "selector": "[data-app-screen-target='order'][aria-current='step']", "text": "Заказ" },
+    { "selector": "[data-app-screen-target='check']", "text": "Проверка" },
+    { "selector": "[data-app-screen-target='alternatives']", "text": "Варианты" },
+    { "selector": "#appObjectivesButton", "text": "Цели" },
+    { "selector": "#appPrimaryButton", "text": "Проверить данные" },
+    { "selector": ".app-summary", "text": "Сводка расчёта" }
+  ],
+  "screenshot": "uimposition-ux-1-application-shell-desktop.png"
+}
