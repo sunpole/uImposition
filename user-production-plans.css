@@ -47,3 +47,32 @@
   .plan-metric { padding: 8px; }
   .plan-filter { flex: 1 1 calc(50% - 4px); text-align: center; }
 }
+
+/* M7.6 mobile compact foundation */
+@media (max-width: 620px) {
+  .user-production-plans { gap: 8px; }
+  .user-production-plans__subtitle { margin-top: 3px; font-size: .76rem; }
+  .user-production-plans__status { padding: 7px 8px; font-size: .7rem; line-height: 1.3; }
+  .plan-filters { gap: 4px; }
+  .plan-filter { flex: 1 1 calc(50% - 2px); padding: 5px 6px; font-size: .7rem; }
+  .production-plan-list { gap: 6px; }
+  .production-plan-card { border-radius: 9px; padding: 9px; gap: 7px; }
+  .production-plan-card.is-recommended { border-width: 2px; padding: 8px; }
+  .production-plan-card__heading { gap: 5px; }
+  .production-plan-card__heading h3 { font-size: .84rem; line-height: 1.18; }
+  .production-plan-card__proof { margin-top: 2px; font-size: .66rem; }
+  .production-plan-card__badges { gap: 3px; }
+  .plan-badge { min-height: 21px; padding: 2px 6px; font-size: .62rem; }
+  .plan-badge--count { min-height: 24px; font-size: .68rem; }
+  .production-plan-card__metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .plan-metric { border-radius: 6px; padding: 5px; gap: 2px; }
+  .plan-metric span { font-size: .58rem; line-height: 1.15; }
+  .plan-metric strong { font-size: .78rem; line-height: 1.15; }
+  .production-plan-card__footer { gap: 4px 8px; font-size: .64rem; }
+  .select-user-plan-button { min-height: 30px; padding: 4px 8px; font-size: .72rem; }
+}
+
+@media (max-width: 355px) {
+  .production-plan-card__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
