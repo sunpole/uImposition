@@ -22,6 +22,7 @@ GitHub остаётся единственным источником истин
 | [`REMAINING_WORK.md`](REMAINING_WORK.md) | Актуальный | Остаток до 1.0 и порядок следующих milestone |
 | [`ROADMAP.md`](ROADMAP.md) | Актуальный ориентир | Укрупнённая последовательность развития |
 | [`PROJECT_CATALOG.md`](PROJECT_CATALOG.md) | Актуальный | Карта каталогов, исходных модулей, тестов, automation и правил размещения файлов |
+| [`UI_UX_APPLICATION_REDESIGN.md`](UI_UX_APPLICATION_REDESIGN.md) | Актуальный блокирующий UX-контракт | Полная перестройка длинной demo-страницы в рабочее desktop/mobile приложение |
 
 ## 2. Требования, архитектура и расчёты
 
@@ -61,7 +62,7 @@ GitHub остаётся единственным источником истин
 | [`M7_5_OBJECTIVE_PRIORITY_EDITOR.md`](M7_5_OBJECTIVE_PRIORITY_EDITOR.md) | Завершённый milestone | Приоритеты оператора и reranking без regeneration |
 | [`M7_6_COMPARISON_TABLE_MODEL.md`](M7_6_COMPARISON_TABLE_MODEL.md) | Активный milestone | Чистая lossless-модель строк, колонок, filters, sorting, deltas и режима `Только различия` |
 
-Следующий M7.6 UI-патч должен опираться на чистую comparison-table model и существующие selection/details/PDF модули, не расширяя search space.
+Pure M7.6 comparison-table model уже существует. Но следующий пользовательский UI-патч обязан сначала реализовать application shell из [`UI_UX_APPLICATION_REDESIGN.md`](UI_UX_APPLICATION_REDESIGN.md). Нельзя добавлять новую большую таблицу поверх прежней бесконечной demo-страницы.
 
 ## 5. Завершённые milestone и release evidence
 
@@ -103,4 +104,4 @@ npm run check:docs
 
 ## English summary
 
-This is the canonical documentation index. It separates current operational truth from stable policies, completed milestones, and historical evidence. Start with `AGENTS.md`, `START_HERE.md`, and `CODEX_HANDOFF.md`; verify live GitHub state before making changes; use `PROJECT_CATALOG.md` for the repository map; and run `npm run check:docs` to validate local links and catalog coverage. The active M7.6 work begins with a pure lossless comparison-table model before any UI or search-space expansion.
+This is the canonical documentation index. It separates current operational truth from stable policies, completed milestones, and historical evidence. Start with `AGENTS.md`, `START_HERE.md`, and `CODEX_HANDOFF.md`; verify live GitHub state before making changes; use `PROJECT_CATALOG.md` for the repository map; and run `npm run check:docs` to validate local links and catalog coverage. The pure M7.6 comparison-table model already exists, but the next user-facing UI patch must first implement the application shell defined in `UI_UX_APPLICATION_REDESIGN.md`; do not add another large table to the previous endless demo page.
