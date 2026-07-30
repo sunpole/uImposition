@@ -1,6 +1,6 @@
 # Каталог проекта uImposition / Project catalog
 
-Последняя структурная сверка: **27 июля 2026**, checkpoint `0.7.0-alpha.5`.
+Последняя структурная сверка: **30 июля 2026**, checkpoint `0.7.0-alpha.5`, active milestone M7.6.
 
 Этот документ объясняет назначение каталогов и активных групп файлов. Он не заменяет [`ARCHITECTURE.md`](ARCHITECTURE.md): архитектура описывает зависимости и поток расчёта, а каталог отвечает на вопрос «где что лежит и куда добавлять новое».
 
@@ -94,18 +94,19 @@ alternatives-controller.js
 
 Исходный каталог остаётся lossless; filtering, Pareto и recommendation являются представлением и аннотациями.
 
-### Пользовательский M7.5 pipeline
+### Пользовательский M7.5/M7.6 pipeline
 
 ```text
 user-uniform-production-plans.js
 user-production-plans-runtime.js
 user-objective-priority.js
+user-production-comparison-table.js
 user-production-plans-ui.js
 user-objective-priority-ui.js
 user-production-plan-details-ui.js
 ```
 
-Модель, runtime и UI разделены. Selection оператора не подменяется recommendation, а reranking не регенерирует планы.
+M7.5 разделяет generation, runtime, selection/details и UI. M7.6 начинается с `user-production-comparison-table.js`: чистой view-model, которая сохраняет ссылку на каждый исходный plan, даёт lossless `allRows`, view-only filters/sorting, exact deltas и режим `Только различия` без regeneration.
 
 ### Duplex и work-and-turn
 
@@ -157,6 +158,7 @@ m7-decision-demo.js
 - M6 candidates и paper minimizer;
 - M7 objectives, pricing, Pareto и alternatives;
 - user plan generation, runtime, selection/export и objective persistence;
+- M7.6 comparison rows, view-only filters/sorting, deltas и missing-pricing guards;
 - work-and-turn;
 - production regression fixtures.
 
@@ -221,4 +223,4 @@ npm run check
 
 ## English summary
 
-This catalog maps repository locations to their responsibilities and file-placement rules. Production logic belongs in pure `src/` modules with matching tests; UI stays separate; fixtures remain explicit; documentation is indexed by status; news and release evidence are version-specific and immutable; and historical files are retained until the owner approves a separate archive migration.
+This catalog maps repository locations to their responsibilities and file-placement rules. Production logic belongs in pure `src/` modules with matching tests; UI stays separate; fixtures remain explicit; documentation is indexed by status; news and release evidence are version-specific and immutable; and historical files are retained until the owner approves a separate archive migration. Active M7.6 work starts with a pure lossless comparison-table model before renderer/UI work or any search-space expansion.
