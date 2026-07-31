@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>uImposition — R3 workspace concepts</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172036;
+      --muted: #687086;
+      --line: #dfe3ec;
+      --soft: #f4f6fa;
+      --paper: #ffffff;
+      --primary: #335cff;
+      --primary-soft: #edf1ff;
+      --good: #16845b;
+      --good-soft: #eaf8f2;
+      --warn: #b56a00;
+      --warn-soft: #fff5e6;
+      --bad: #c53a4a;
+      --bad-soft: #fff0f2;
+      --radius: 12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: #edf0f5; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .review-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .review-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      align-items: center;
+      padding: 12px 16px;
+      color: #fff;
+      background: #111827;
+      box-shadow: 0 4px 20px rgba(10, 18, 34, .18);
+    }
+
+    .review-brand { min-width: 215px; }
+    .review-brand strong { display: block; font-size: 14px; }
+    .review-brand span { color: #aeb8cc; font-size: 12px; }
+
+    .review-group { display: flex; align-items: center; gap: 6px; }
+    .review-group-label { color: #aeb8cc; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-right: 3px; }
+    .review-toolbar button {
+      min-height: 34px;
+      border: 1px solid #354057;
+      border-radius: 8px;
+      padding: 6px 10px;
+      color: #e9edf7;
+      background: #1b2435;
+    }
+    .review-toolbar button:hover { border-color: #6f82aa; }
+    .review-toolbar button[aria-pressed="true"] { color: #111827; border-color: #fff; background: #fff; }
+
+    .review-note {
+      margin-left: auto;
+      max-width: 360px;
+      color: #bfc8da;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .review-stage-wrap { padding: 22px; overflow: auto; }
+    .review-stage {
+      --preview-width: 1440px;
+      width: min(var(--preview-width), calc(100vw - 44px));
+      min-width: min(var(--preview-width), calc(100vw - 44px));
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 16px 46px rgba(33, 44, 66, .18);
+      overflow: hidden;
+      transition: width .2s ease, min-width .2s ease;
+    }
+    .review-stage[data-viewport="1440"] { --preview-width: 1440px; }
+    .review-stage[data-viewport="1024"] { --preview-width: 1024px; }
+    .review-stage[data-viewport="390"] { --preview-width: 390px; }
+    .review-stage[data-viewport="360"] { --preview-width: 360px; }
+
+    .concept { display: none; min-height: 840px; background: var(--paper); }
+    .concept.is-active { display: block; }
+
+    .app-topbar {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 0 22px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+    .app-logo { font-weight: 800; letter-spacing: -.02em; }
+    .app-logo small { margin-left: 8px; color: var(--muted); font-weight: 500; }
+    .app-project { flex: 1; min-width: 0; color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .app-status { display: inline-flex; align-items: center; gap: 7px; color: var(--good); font-size: 12px; font-weight: 700; }
+    .app-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .state-calculating .app-status { color: var(--primary); }
+    .state-calculating .app-status::before { animation: pulse 1s infinite; }
+    .state-error .app-status { color: var(--bad); }
+    @keyframes pulse { 50% { opacity: .28; } }
+
+    .btn {
+      min-height: 36px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 650;
+    }
+    .btn:hover { background: var(--soft); }
+    .btn.primary { color: #fff; border-color: var(--primary); background: var(--primary); }
+    .btn.primary:hover { background: #2449df; }
+    .btn.quiet { border-color: transparent; background: transparent; color: var(--muted); }
+    .btn.danger { color: var(--bad); }
+    .icon-btn { width: 34px; min-height: 34px; padding: 0; display: inline-grid; place-items: center; }
+
+    .eyebrow { color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 5px; font-size: 24px; letter-spacing: -.025em; }
+    h2 { margin-bottom: 5px; font-size: 18px; letter-spacing: -.015em; }
+    h3 { margin-bottom: 4px; font-size: 14px; }
+    .subtle { color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .preset-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .preset {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .preset.active { color: var(--primary); border-color: #9db0ff; background: var(--primary-soft); }
+    .preset.add { color: var(--muted); border-style: dashed; }
+
+    .field { display: grid; gap: 5px; min-width: 0; }
+    .field label { color: var(--muted); font-size: 11px; font-weight: 700; }
+    .field input, .field select {
+      width: 100%;
+      min-height: 36px;
+      padding: 7px 9px;
+      border: 1px solid #cfd5e2;
+      border-radius: 7px;
+      color: var(--ink);
+      background: #fff;
+    }
+    .field input:focus, .field select:focus { outline: 3px solid #dce4ff; border-color: var(--primary); }
+    .field.has-error input { border-color: var(--bad); background: var(--bad-soft); }
+    .field-error { display: none; color: var(--bad); font-size: 11px; line-height: 1.25; }
+    .state-error .field.has-error .field-error { display: block; }
+
+    .row-actions { display: flex; gap: 4px; align-items: center; }
+    .row-actions button { border: 0; color: var(--muted); background: transparent; padding: 5px; border-radius: 6px; }
+    .row-actions button:hover { color: var(--ink); background: var(--soft); }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .metric { min-width: 0; padding: 11px 12px; background: #fff; }
+    .metric span { display: block; color: var(--muted); font-size: 11px; }
+    .metric strong { display: block; margin-top: 3px; font-size: 17px; white-space: nowrap; }
+    .metric em { display: block; margin-top: 2px; color: var(--good); font-size: 10px; font-style: normal; }
+
+    .result-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .result-table th { padding: 9px 10px; color: var(--muted); border-bottom: 1px solid var(--line); text-align: right; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+    .result-table th:first-child, .result-table td:first-child { text-align: left; }
+    .result-table td { padding: 10px; border-bottom: 1px solid #edf0f5; text-align: right; }
+    .result-table tr.selected { background: var(--primary-soft); }
+    .tag { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 7px; border-radius: 999px; color: var(--good); background: var(--good-soft); font-size: 10px; font-weight: 800; }
+    .tag.recommended { color: var(--primary); background: var(--primary-soft); }
+
+    .sheet-preview {
+      position: relative;
+      aspect-ratio: 650 / 313;
+      min-height: 180px;
+      border: 14px solid #e6e9ef;
+      border-bottom-width: 26px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px #c9d0dc;
+      overflow: hidden;
+    }
+    .sheet-preview::after { content: "клапан / захват 13 мм"; position: absolute; left: 0; right: 0; bottom: -22px; color: #778094; font-size: 9px; text-align: center; }
+    .tiles { position: absolute; inset: 8px; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(2, 1fr); gap: 3px; }
+    .tile { display: grid; place-items: center; min-width: 0; color: #455170; border: 1px solid #8fa3d6; background: #edf2ff; font-size: 9px; font-weight: 750; overflow: hidden; }
+    .tile.alt { border-color: #70a98f; background: #eaf8f2; }
+
+    .notice { display: none; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; font-size: 12px; }
+    .state-calculating .notice.calculating { display: flex; color: var(--primary); background: var(--primary-soft); }
+    .state-error .notice.error { display: flex; color: var(--bad); background: var(--bad-soft); }
+
+    /* Concept A: compact production desk */
+    .compact-app { min-height: 840px; background: #f7f8fb; }
+    .compact-body { display: grid; gap: 14px; padding: 18px; }
+    .compact-presets { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 13px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .compact-work { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr); gap: 14px; min-height: 470px; }
+    .compact-products, .compact-summary, .compact-results { border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .section-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; padding: 15px 16px 11px; }
+    .products-list { padding: 0 14px 14px; }
+    .product-row {
+      display: grid;
+      grid-template-columns: minmax(145px, 1.45fr) minmax(115px, .8fr) minmax(90px, .65fr) minmax(75px, .5fr) minmax(85px, .55fr) minmax(80px, .55fr) auto;
+      gap: 8px;
+      align-items: start;
+      padding: 11px 0;
+      border-top: 1px solid #edf0f5;
+    }
+    .product-row:first-child { border-top: 0; }
+    .product-row.is-extra { display: none; }
+    .rows-five .product-row.is-extra { display: grid; }
+    .compact-summary { display: grid; align-content: start; }
+    .summary-content { padding: 0 16px 16px; }
+    .summary-highlight { padding: 15px; border-radius: 9px; background: var(--primary-soft); }
+    .summary-highlight strong { display: block; margin-top: 4px; font-size: 26px; }
+    .summary-list { margin: 12px 0 0; padding: 0; list-style: none; }
+    .summary-list li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid #edf0f5; font-size: 12px; }
+    .compact-results { overflow: hidden; }
+
+    /* Concept B: split workspace */
+    .split-app { min-height: 840px; background: #fff; }
+    .split-tabs { display: flex; gap: 2px; padding: 0 20px; border-bottom: 1px solid var(--line); }
+    .split-tab { padding: 12px 13px 10px; border: 0; border-bottom: 3px solid transparent; color: var(--muted); background: transparent; font-weight: 750; }
+    .split-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .split-layout { display: grid; grid-template-columns: minmax(470px, .92fr) minmax(440px, 1.08fr); min-height: 742px; }
+    .split-input { padding: 18px; border-right: 1px solid var(--line); overflow: hidden; }
+    .split-preview { display: grid; grid-template-rows: auto auto 1fr; gap: 14px; padding: 18px; background: #f6f8fb; }
+    .split-preset-bar { margin-bottom: 16px; }
+    .split-products .product-row { grid-template-columns: minmax(132px, 1.3fr) minmax(104px, .8fr) minmax(78px, .55fr) minmax(70px, .5fr) auto; }
+    .split-products .product-row .field.color, .split-products .product-row .field.pages { display: none; }
+    .preview-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .preview-panel { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr); gap: 14px; align-items: start; }
+    .preview-copy { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .split-options { border: 1px solid var(--line); border-radius: 10px; background: #fff; overflow: hidden; }
+
+    /* Concept C: table-first console */
+    .console-app { min-height: 840px; color: #152132; background: #eef2f6; }
+    .console-app .app-topbar { color: #f2f6ff; border-color: #2c3e55; background: #1d2b3d; }
+    .console-app .app-logo small, .console-app .app-project { color: #a9b6c7; }
+    .console-app .btn.quiet { color: #c4cfdd; }
+    .console-preset-bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #cfd6df; background: #f9fafc; }
+    .console-work { display: grid; grid-template-columns: minmax(0, 1fr) 305px; min-height: 730px; }
+    .console-main { min-width: 0; background: #fff; }
+    .console-side { padding: 14px; border-left: 1px solid #cfd6df; background: #f3f5f8; }
+    .console-tools { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+    .console-tools .spacer { flex: 1; }
+    .console-table-wrap { overflow: auto; }
+    .console-table { width: 100%; min-width: 920px; border-collapse: collapse; font-size: 12px; }
+    .console-table th { position: sticky; top: 0; z-index: 2; padding: 8px; color: #526075; border-right: 1px solid #dce1e9; border-bottom: 1px solid #cbd2dd; background: #eef1f5; text-align: left; font-size: 10px; text-transform: uppercase; }
+    .console-table td { padding: 5px 7px; border-right: 1px solid #edf0f4; border-bottom: 1px solid #e6e9ef; }
+    .console-table input, .console-table select { width: 100%; min-height: 29px; padding: 4px 6px; border: 1px solid transparent; border-radius: 4px; background: transparent; }
+    .console-table input:focus, .console-table select:focus { outline: 2px solid #afc0ff; border-color: var(--primary); background: #fff; }
+    .console-table tr.is-extra { display: none; }
+    .rows-five .console-table tr.is-extra { display: table-row; }
+    .state-error .console-table .bad-cell input { border-color: var(--bad); background: var(--bad-soft); }
+    .console-side-section { margin-bottom: 12px; padding: 12px; border: 1px solid #d4dae4; border-radius: 8px; background: #fff; }
+    .console-side .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .console-side .metric:last-child { grid-column: 1 / -1; }
+    .console-variants { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .console-variants td { padding: 7px 3px; border-bottom: 1px solid #edf0f4; }
+    .console-variants td:last-child { text-align: right; }
+
+    .mobile-nav { display: none; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); background: #fff; }
+    .mobile-nav button { min-height: 52px; border: 0; color: var(--muted); background: transparent; font-weight: 750; }
+    .mobile-nav button.active { color: var(--primary); }
+
+    .mock-modal[hidden] { display: none; }
+    .mock-modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(12, 18, 30, .54); }
+    .mock-modal-card { width: min(480px, 100%); padding: 20px; border-radius: 14px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.25); }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+
+    @media (max-width: 620px) {
+      .review-toolbar { position: static; padding: 10px; }
+      .review-brand { min-width: 100%; }
+      .review-note { display: none; }
+      .review-group-label { display: none; }
+      .review-stage-wrap { padding: 10px; }
+      .review-stage { width: min(var(--preview-width), calc(100vw - 20px)); min-width: min(var(--preview-width), calc(100vw - 20px)); }
+    }
+
+    .review-stage[data-viewport="390"] .concept,
+    .review-stage[data-viewport="360"] .concept { min-height: 780px; }
+    .review-stage[data-viewport="390"] .app-topbar,
+    .review-stage[data-viewport="360"] .app-topbar {
+      height: 52px;
+      padding: 0 12px;
+      gap: 10px;
+    }
+    .review-stage[data-viewport="390"] .app-logo small,
+    .review-stage[data-viewport="360"] .app-logo small,
+    .review-stage[data-viewport="390"] .app-project,
+    .review-stage[data-viewport="360"] .app-project,
+    .review-stage[data-viewport="390"] .app-status,
+    .review-stage[data-viewport="360"] .app-status,
+    .review-stage[data-viewport="390"] .app-topbar .btn.quiet,
+    .review-stage[data-viewport="360"] .app-topbar .btn.quiet { display: none; }
+    .review-stage[data-viewport="390"] .app-topbar .btn.primary,
+    .review-stage[data-viewport="360"] .app-topbar .btn.primary { margin-left: auto; min-height: 32px; padding: 5px 9px; }
+
+    .review-stage[data-viewport="390"] .compact-body,
+    .review-stage[data-viewport="360"] .compact-body { gap: 10px; padding: 10px; padding-bottom: 65px; }
+    .review-stage[data-viewport="390"] .compact-presets,
+    .review-stage[data-viewport="360"] .compact-presets { grid-template-columns: 1fr auto; padding: 10px; }
+    .review-stage[data-viewport="390"] .compact-presets .eyebrow,
+    .review-stage[data-viewport="360"] .compact-presets .eyebrow { grid-column: 1 / -1; }
+    .review-stage[data-viewport="390"] .compact-work,
+    .review-stage[data-viewport="360"] .compact-work { display: block; }
+    .review-stage[data-viewport="390"] .compact-summary,
+    .review-stage[data-viewport="360"] .compact-summary { margin-top: 10px; }
+    .review-stage[data-viewport="390"] .section-head,
+    .review-stage[data-viewport="360"] .section-head { padding: 12px; }
+    .review-stage[data-viewport="390"] .products-list,
+    .review-stage[data-viewport="360"] .products-list { padding: 0 10px 10px; }
+    .review-stage[data-viewport="390"] .product-row,
+    .review-stage[data-viewport="360"] .product-row {
+      grid-template-columns: 1.25fr .75fr;
+      gap: 8px;
+      padding: 12px 0;
+    }
+    .review-stage[data-viewport="390"] .product-row .field.name,
+    .review-stage[data-viewport="360"] .product-row .field.name { grid-column: 1 / -1; }
+    .review-stage[data-viewport="390"] .product-row .row-actions,
+    .review-stage[data-viewport="360"] .product-row .row-actions { grid-column: 1 / -1; justify-content: flex-end; }
+    .review-stage[data-viewport="390"] .compact-results,
+    .review-stage[data-viewport="360"] .compact-results { display: none; }
+    .review-stage[data-viewport="390"] .metric-grid,
+    .review-stage[data-viewport="360"] .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .review-stage[data-viewport="390"] .metric:last-child,
+    .review-stage[data-viewport="360"] .metric:last-child { grid-column: 1 / -1; }
+    .review-stage[data-viewport="390"] .mobile-nav,
+    .review-stage[data-viewport="360"] .mobile-nav { position: absolute; bottom: 0; left: 0; right: 0; display: grid; }
+    .review-stage[data-viewport="390"], .review-stage[data-viewport="360"] { position: relative; }
+
+    .review-stage[data-viewport="390"] .split-tabs,
+    .review-stage[data-viewport="360"] .split-tabs { padding: 0 8px; overflow-x: auto; }
+    .review-stage[data-viewport="390"] .split-tab,
+    .review-stage[data-viewport="360"] .split-tab { padding-inline: 10px; white-space: nowrap; }
+    .review-stage[data-viewport="390"] .split-layout,
+    .review-stage[data-viewport="360"] .split-layout { display: block; min-height: 720px; }
+    .review-stage[data-viewport="390"] .split-input,
+    .review-stage[data-viewport="360"] .split-input { padding: 12px; border-right: 0; }
+    .review-stage[data-viewport="390"] .split-preview,
+    .review-stage[data-viewport="360"] .split-preview { display: none; }
+    .review-stage[data-viewport="390"] .split-products .product-row,
+    .review-stage[data-viewport="360"] .split-products .product-row { grid-template-columns: 1fr 1fr; }
+
+    .review-stage[data-viewport="390"] .console-preset-bar,
+    .review-stage[data-viewport="360"] .console-preset-bar { padding: 9px; }
+    .review-stage[data-viewport="390"] .console-preset-bar .eyebrow,
+    .review-stage[data-viewport="360"] .console-preset-bar .eyebrow { display: none; }
+    .review-stage[data-viewport="390"] .console-work,
+    .review-stage[data-viewport="360"] .console-work { display: block; min-height: 720px; }
+    .review-stage[data-viewport="390"] .console-side,
+    .review-stage[data-viewport="360"] .console-side { display: none; }
+    .review-stage[data-viewport="390"] .console-tools,
+    .review-stage[data-viewport="360"] .console-tools { padding: 7px 9px; }
+    .review-stage[data-viewport="390"] .console-tools .hide-mobile,
+    .review-stage[data-viewport="360"] .console-tools .hide-mobile { display: none; }
+    .review-stage[data-viewport="390"] .console-table,
+    .review-stage[data-viewport="360"] .console-table { min-width: 0; display: block; padding: 8px; }
+    .review-stage[data-viewport="390"] .console-table thead,
+    .review-stage[data-viewport="360"] .console-table thead { display: none; }
+    .review-stage[data-viewport="390"] .console-table tbody,
+    .review-stage[data-viewport="360"] .console-table tbody { display: grid; gap: 9px; }
+    .review-stage[data-viewport="390"] .console-table tr,
+    .review-stage[data-viewport="360"] .console-table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .review-stage[data-viewport="390"] .console-table tr.is-extra,
+    .review-stage[data-viewport="360"] .console-table tr.is-extra { display: none; }
+    .review-stage[data-viewport="390"].rows-five .console-table tr.is-extra,
+    .review-stage[data-viewport="360"].rows-five .console-table tr.is-extra { display: grid; }
+    .review-stage[data-viewport="390"] .console-table td,
+    .review-stage[data-viewport="360"] .console-table td { padding: 0; border: 0; }
+    .review-stage[data-viewport="390"] .console-table td:first-child,
+    .review-stage[data-viewport="360"] .console-table td:first-child { grid-column: 1 / -1; }
+
+    @media print {
+      .review-toolbar { display: none; }
+      .review-stage-wrap { padding: 0; }
+      .review-stage { width: 100%; min-width: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="review-shell">
+  <header class="review-toolbar" aria-label="Панель просмотра концепций">
+    <div class="review-brand">
+      <strong>uImposition · R3 design gate</strong>
+      <span>Интерактивный макет, не рабочий расчёт</span>
+    </div>
+    <div class="review-group" aria-label="Концепция">
+      <span class="review-group-label">Концепция</span>
+      <button type="button" data-concept="compact" aria-pressed="true">A · Быстрый стол</button>
+      <button type="button" data-concept="split" aria-pressed="false">B · Разделённый экран</button>
+      <button type="button" data-concept="console" aria-pressed="false">C · Таблица оператора</button>
+    </div>
+    <div class="review-group" aria-label="Ширина просмотра">
+      <span class="review-group-label">Экран</span>
+      <button type="button" data-viewport="1440" aria-pressed="true">1440</button>
+      <button type="button" data-viewport="1024" aria-pressed="false">1024</button>
+      <button type="button" data-viewport="390" aria-pressed="false">390</button>
+      <button type="button" data-viewport="360" aria-pressed="false">360</button>
+    </div>
+    <div class="review-group" aria-label="Состояние макета">
+      <span class="review-group-label">Данные</span>
+      <button type="button" data-rows="1" aria-pressed="true">1 вид</button>
+      <button type="button" data-rows="5" aria-pressed="false">5 видов</button>
+      <button type="button" data-state="ready" aria-pressed="true">Готово</button>
+      <button type="button" data-state="calculating" aria-pressed="false">Расчёт</button>
+      <button type="button" data-state="error" aria-pressed="false">Ошибка</button>
+    </div>
+    <div class="review-note">Переключайте концепции, размеры, количество видов и состояния. Кнопка «Новый пресет» открывает макет локального пресета.</div>
+  </header>
+
+  <main class="review-stage-wrap">
+    <div class="review-stage state-ready" id="reviewStage" data-viewport="1440">
+      <section class="concept compact-app is-active" data-concept-panel="compact" aria-label="Концепция A: быстрый производственный стол">
+        <header class="app-topbar">
+          <div class="app-logo">uImposition <small>Заказ</small></div>
+          <div class="app-project">Листовки июль · сохранено локально</div>
+          <span class="app-status">Результат актуален</span>
+          <button class="btn quiet" type="button">Проекты</button>
+          <button class="btn primary" type="button">Открыть схему</button>
+        </header>
+        <div class="compact-body">
+          <div class="compact-presets">
+            <span class="eyebrow">Лист и машина</span>
+            <div class="preset-strip">
+              <button class="preset" type="button">616×446</button>
+              <button class="preset" type="button">616×466</button>
+              <button class="preset active" type="button">650×313</button>
+              <button class="preset" type="button">716×336</button>
+              <button class="preset" type="button">716×516</button>
+            </div>
+            <button class="preset add" type="button" data-open-preset>＋ Новый пресет</button>
+          </div>
+
+          <div class="notice calculating">Пересчитываем варианты после изменения тиража. Последний корректный результат остаётся видимым.</div>
+          <div class="notice error">В строке «Листовка А6» нужно исправить тираж. Расчёт ниже показывает последний корректный результат.</div>
+
+          <div class="compact-work">
+            <section class="compact-products">
+              <div class="section-head">
+                <div><span class="eyebrow">Что печатаем</span><h2>Виды продукции</h2><p class="subtle">Основные параметры в строке, технологические — внутри «Ещё».</p></div>
+                <button class="btn" type="button">＋ Добавить вид</button>
+              </div>
+              <div class="products-list">
+                <div class="product-row">
+                  <div class="field name"><label>Название / файл</label><input value="Листовка А6"></div>
+                  <div class="field"><label>Формат, мм</label><input value="105 × 148"></div>
+                  <div class="field has-error"><label>Тираж вида</label><input value="5 000"><span class="field-error">Введите целое число больше нуля</span></div>
+                  <div class="field"><label>Видов</label><input value="3"></div>
+                  <div class="field pages"><label>Страниц</label><input value="2"></div>
+                  <div class="field color"><label>Цветность</label><select><option>4+4</option></select></div>
+                  <div class="row-actions"><button title="Дублировать">⧉</button><button title="Дополнительно">•••</button></div>
+                </div>
+                <div class="product-row is-extra"><div class="field name"><label>Название / файл</label><input value="Флаер DL"></div><div class="field"><label>Формат, мм</label><input value="99 × 210"></div><div class="field"><label>Тираж вида</label><input value="2 000"></div><div class="field"><label>Видов</label><input value="2"></div><div class="field pages"><label>Страниц</label><input value="2"></div><div class="field color"><label>Цветность</label><select><option>4+4</option></select></div><div class="row-actions"><button>⧉</button><button>•••</button></div></div>
+                <div class="product-row is-extra"><div class="field name"><label>Название / файл</label><input value="Вкладыш А5"></div><div class="field"><label>Формат, мм</label><input value="148 × 210"></div><div class="field"><label>Тираж вида</label><input value="1 500"></div><div class="field"><label>Видов</label><input value="1"></div><div class="field pages"><label>Страниц</label><input value="2"></div><div class="field color"><label>Цветность</label><select><option>4+0</option></select></div><div class="row-actions"><button>⧉</button><button>•••</button></div></div>
+                <div class="product-row is-extra"><div class="field name"><label>Название / файл</label><input value="Бирка 70×100"></div><div class="field"><label>Формат, мм</label><input value="70 × 100"></div><div class="field"><label>Тираж вида</label><input value="8 000"></div><div class="field"><label>Видов</label><input value="4"></div><div class="field pages"><label>Страниц</label><input value="2"></div><div class="field color"><label>Цветность</label><select><option>4+4</option></select></div><div class="row-actions"><button>⧉</button><button>•••</button></div></div>
+                <div class="product-row is-extra"><div class="field name"><label>Название / файл</label><input value="Купон 90×50"></div><div class="field"><label>Формат, мм</label><input value="90 × 50"></div><div class="field"><label>Тираж вида</label><input value="10 000"></div><div class="field"><label>Видов</label><input value="2"></div><div class="field pages"><label>Страниц</label><input value="2"></div><div class="field color"><label>Цветность</label><select><option>1+1</option></select></div><div class="row-actions"><button>⧉</button><button>•••</button></div></div>
+              </div>
+            </section>
+
+            <aside class="compact-summary">
+              <div class="section-head"><div><span class="eyebrow">Живой итог</span><h2>Лучший текущий вариант</h2></div></div>
+              <div class="summary-content">
+                <div class="summary-highlight"><span class="tag recommended">Рекомендуется</span><strong>938 листов</strong><span class="subtle">Вариант B · минимум стоимости</span></div>
+                <ul class="summary-list">
+                  <li><span>Монтажей</span><strong>2</strong></li>
+                  <li><span>Форм</span><strong>4</strong></li>
+                  <li><span>Пластин</span><strong>16</strong></li>
+                  <li><span>Прогонов</span><strong>1 876</strong></li>
+                  <li><span>Стоимость</span><strong>412,50 BYN</strong></li>
+                </ul>
+                <button class="btn primary" style="width:100%;margin-top:14px" type="button">Сравнить все варианты</button>
+              </div>
+            </aside>
+          </div>
+
+          <section class="compact-results">
+            <div class="section-head"><div><span class="eyebrow">Быстрое сравнение</span><h2>Варианты монтажа</h2></div><button class="btn quiet" type="button">Все показатели →</button></div>
+            <div class="metric-grid" style="margin:0 14px 13px"><div class="metric"><span>Бумага</span><strong>938</strong><em>−62 листа</em></div><div class="metric"><span>Формы</span><strong>4</strong><em>−2 формы</em></div><div class="metric"><span>Пластины</span><strong>16</strong><em>−8 пластин</em></div><div class="metric"><span>Прогоны</span><strong>1 876</strong><em>без изменений</em></div><div class="metric"><span>Стоимость</span><strong>412,50</strong><em>−48,20 BYN</em></div></div>
+          </section>
+        </div>
+        <nav class="mobile-nav"><button class="active">Заказ</button><button>Варианты</button><button>Схема</button></nav>
+      </section>
+
+      <section class="concept split-app" data-concept-panel="split" aria-label="Концепция B: разделённый рабочий экран">
+        <header class="app-topbar"><div class="app-logo">uImposition <small>Рабочее пространство</small></div><div class="app-project">Заказ #U-174 · автосохранение</div><span class="app-status">Результат актуален</span><button class="btn quiet">Настройки</button><button class="btn primary">Выбрать вариант</button></header>
+        <nav class="split-tabs"><button class="split-tab active">Заказ</button><button class="split-tab">Варианты · 4</button><button class="split-tab">Схема</button><button class="split-tab">Экспорт</button></nav>
+        <div class="split-layout">
+          <section class="split-input">
+            <div class="split-preset-bar"><span class="eyebrow">Пресет листа</span><div class="preset-strip" style="margin-top:8px"><button class="preset">616×466</button><button class="preset active">650×313</button><button class="preset">716×336</button><button class="preset add" data-open-preset>＋</button></div></div>
+            <div class="notice calculating">Идёт быстрый перерасчёт. Схема справа показывает последний корректный результат.</div>
+            <div class="notice error">Исправьте тираж первой строки. Последний корректный результат сохранён справа.</div>
+            <div class="section-head" style="padding-inline:0"><div><span class="eyebrow">Состав заказа</span><h2>Продукция</h2></div><button class="btn">＋ Вид</button></div>
+            <div class="split-products">
+              <div class="product-row"><div class="field name"><label>Название</label><input value="Листовка А6"></div><div class="field"><label>Формат</label><input value="105×148"></div><div class="field has-error"><label>Тираж</label><input value="5 000"><span class="field-error">Неверный тираж</span></div><div class="field"><label>Видов</label><input value="3"></div><div class="field pages"><label>Стр.</label><input value="2"></div><div class="field color"><label>Цвет</label><select><option>4+4</option></select></div><div class="row-actions"><button>•••</button></div></div>
+              <div class="product-row is-extra"><div class="field name"><label>Название</label><input value="Флаер DL"></div><div class="field"><label>Формат</label><input value="99×210"></div><div class="field"><label>Тираж</label><input value="2 000"></div><div class="field"><label>Видов</label><input value="2"></div><div class="field pages"><label>Стр.</label><input value="2"></div><div class="field color"><label>Цвет</label><select><option>4+4</option></select></div><div class="row-actions"><button>•••</button></div></div>
+              <div class="product-row is-extra"><div class="field name"><label>Название</label><input value="Вкладыш А5"></div><div class="field"><label>Формат</label><input value="148×210"></div><div class="field"><label>Тираж</label><input value="1 500"></div><div class="field"><label>Видов</label><input value="1"></div><div class="field pages"><label>Стр.</label><input value="2"></div><div class="field color"><label>Цвет</label><select><option>4+0</option></select></div><div class="row-actions"><button>•••</button></div></div>
+              <div class="product-row is-extra"><div class="field name"><label>Название</label><input value="Бирка"></div><div class="field"><label>Формат</label><input value="70×100"></div><div class="field"><label>Тираж</label><input value="8 000"></div><div class="field"><label>Видов</label><input value="4"></div><div class="field pages"><label>Стр.</label><input value="2"></div><div class="field color"><label>Цвет</label><select><option>4+4</option></select></div><div class="row-actions"><button>•••</button></div></div>
+              <div class="product-row is-extra"><div class="field name"><label>Название</label><input value="Купон"></div><div class="field"><label>Формат</label><input value="90×50"></div><div class="field"><label>Тираж</label><input value="10 000"></div><div class="field"><label>Видов</label><input value="2"></div><div class="field pages"><label>Стр.</label><input value="2"></div><div class="field color"><label>Цвет</label><select><option>1+1</option></select></div><div class="row-actions"><button>•••</button></div></div>
+            </div>
+            <button class="btn quiet" type="button">Показать параметры выпуска, реза и оборота</button>
+          </section>
+          <section class="split-preview">
+            <div class="preview-head"><div><span class="eyebrow">Синхронный результат</span><h1>Монтаж на 650 × 313</h1><p class="subtle">16 позиций · 8×2 · оборот получен из лица</p></div><span class="tag recommended">Минимум стоимости</span></div>
+            <div class="preview-panel"><div class="sheet-preview"><div class="tiles"><div class="tile">A1</div><div class="tile">A2</div><div class="tile">A3</div><div class="tile">A1</div><div class="tile alt">B1</div><div class="tile alt">B2</div><div class="tile">A2</div><div class="tile">A3</div><div class="tile">A1</div><div class="tile">A2</div><div class="tile">A3</div><div class="tile">A1</div><div class="tile alt">B1</div><div class="tile alt">B2</div><div class="tile">A2</div><div class="tile">A3</div></div></div><div class="preview-copy"><h3>Текущий выбор</h3><ul class="summary-list"><li><span>Бумага</span><strong>938</strong></li><li><span>Формы</span><strong>4</strong></li><li><span>Пластины</span><strong>16</strong></li><li><span>Стоимость</span><strong>412,50</strong></li></ul></div></div>
+            <div class="split-options"><table class="result-table"><thead><tr><th>Вариант</th><th>Листы</th><th>Формы</th><th>Пластины</th><th>Стоимость</th></tr></thead><tbody><tr><td><span class="tag">Минимум бумаги</span></td><td>912</td><td>6</td><td>24</td><td>438,10</td></tr><tr class="selected"><td><span class="tag recommended">Рекомендация</span> Вариант B</td><td>938</td><td>4</td><td>16</td><td>412,50</td></tr><tr><td>Минимум форм</td><td>1 060</td><td>2</td><td>8</td><td>426,00</td></tr></tbody></table></div>
+          </section>
+        </div>
+        <nav class="mobile-nav"><button class="active">Заказ</button><button>Варианты</button><button>Схема</button></nav>
+      </section>
+
+      <section class="concept console-app" data-concept-panel="console" aria-label="Концепция C: табличная консоль оператора">
+        <header class="app-topbar"><div class="app-logo">uImposition <small>Operator Console</small></div><div class="app-project">U-174 · 5 строк · Ctrl+Enter — добавить строку</div><span class="app-status">Готово</span><button class="btn quiet">Импорт</button><button class="btn primary">Схема</button></header>
+        <div class="console-preset-bar"><span class="eyebrow">Лист</span><div class="preset-strip"><button class="preset">616×446</button><button class="preset active">650×313</button><button class="preset">716×336</button><button class="preset add" data-open-preset>＋ Пресет</button></div></div>
+        <div class="console-work">
+          <section class="console-main">
+            <div class="notice calculating" style="margin:10px">Перерасчёт revision 18. Таблица доступна; справа сохранён revision 17.</div>
+            <div class="notice error" style="margin:10px">Строка 1: неверный тираж. Расчёт revision 17 сохранён.</div>
+            <div class="console-tools"><button class="btn">＋ Строка</button><button class="btn hide-mobile">Дублировать</button><button class="btn hide-mobile">Отключить</button><span class="spacer"></span><span class="subtle hide-mobile">5 включено · 12 видов · 43 500 экз.</span><button class="btn quiet">Колонки</button></div>
+            <div class="console-table-wrap">
+              <table class="console-table"><thead><tr><th>Название / файл</th><th>Ширина</th><th>Высота</th><th>Тираж</th><th>Видов</th><th>Стр.</th><th>Лицо</th><th>Оборот</th><th>Выпуск</th><th>Рез</th><th></th></tr></thead><tbody>
+                <tr><td><input value="Листовка А6"></td><td><input value="105"></td><td><input value="148"></td><td class="bad-cell"><input value="5000"></td><td><input value="3"></td><td><input value="2"></td><td><select><option>4</option></select></td><td><select><option>4</option></select></td><td><input value="2"></td><td><select><option>Раздельный</option></select></td><td>•••</td></tr>
+                <tr class="is-extra"><td><input value="Флаер DL"></td><td><input value="99"></td><td><input value="210"></td><td><input value="2000"></td><td><input value="2"></td><td><input value="2"></td><td><select><option>4</option></select></td><td><select><option>4</option></select></td><td><input value="2"></td><td><select><option>Раздельный</option></select></td><td>•••</td></tr>
+                <tr class="is-extra"><td><input value="Вкладыш А5"></td><td><input value="148"></td><td><input value="210"></td><td><input value="1500"></td><td><input value="1"></td><td><input value="2"></td><td><select><option>4</option></select></td><td><select><option>0</option></select></td><td><input value="0"></td><td><select><option>Общий</option></select></td><td>•••</td></tr>
+                <tr class="is-extra"><td><input value="Бирка"></td><td><input value="70"></td><td><input value="100"></td><td><input value="8000"></td><td><input value="4"></td><td><input value="2"></td><td><select><option>4</option></select></td><td><select><option>4</option></select></td><td><input value="0"></td><td><select><option>Общий</option></select></td><td>•••</td></tr>
+                <tr class="is-extra"><td><input value="Купон"></td><td><input value="90"></td><td><input value="50"></td><td><input value="10000"></td><td><input value="2"></td><td><input value="2"></td><td><select><option>1</option></select></td><td><select><option>1</option></select></td><td><input value="0"></td><td><select><option>Общий</option></select></td><td>•••</td></tr>
+              </tbody></table>
+            </div>
+          </section>
+          <aside class="console-side">
+            <div class="console-side-section"><span class="eyebrow">Revision 17</span><h2 style="margin-top:5px">Текущий результат</h2><div class="metric-grid"><div class="metric"><span>Листы</span><strong>938</strong></div><div class="metric"><span>Формы</span><strong>4</strong></div><div class="metric"><span>Пластины</span><strong>16</strong></div><div class="metric"><span>Прогоны</span><strong>1 876</strong></div><div class="metric"><span>Стоимость</span><strong>412,50 BYN</strong></div></div></div>
+            <div class="console-side-section"><div style="display:flex;justify-content:space-between;gap:8px"><h3>Варианты</h3><span class="tag recommended">4 найдено</span></div><table class="console-variants"><tr><td>Мин. бумага</td><td>912 / 438,10</td></tr><tr style="color:var(--primary);font-weight:800"><td>Рекомендация</td><td>938 / 412,50</td></tr><tr><td>Мин. формы</td><td>1060 / 426,00</td></tr><tr><td>Другой</td><td>980 / 419,40</td></tr></table><button class="btn primary" style="width:100%;margin-top:10px">Открыть сравнение</button></div>
+            <div class="console-side-section"><h3>Схема выбранного</h3><div class="sheet-preview" style="min-height:105px;border-width:8px;border-bottom-width:16px"><div class="tiles" style="inset:4px;gap:2px"><div class="tile">1</div><div class="tile">2</div><div class="tile">3</div><div class="tile">1</div><div class="tile alt">B</div><div class="tile alt">B</div><div class="tile">2</div><div class="tile">3</div><div class="tile">1</div><div class="tile">2</div><div class="tile">3</div><div class="tile">1</div><div class="tile alt">B</div><div class="tile alt">B</div><div class="tile">2</div><div class="tile">3</div></div></div></div>
+          </aside>
+        </div>
+        <nav class="mobile-nav"><button class="active">Заказ</button><button>Варианты</button><button>Схема</button></nav>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="mock-modal" id="presetModal" hidden>
+  <div class="mock-modal-card" role="dialog" aria-modal="true" aria-labelledby="presetTitle">
+    <span class="eyebrow">Локальный пресет</span><h2 id="presetTitle" style="margin-top:5px">Новый лист и машина</h2><p class="subtle">Сохраняется только в этом браузере. Позже его можно экспортировать вместе с проектом.</p>
+    <div class="field"><label>Название</label><input value="Heidelberg 650×313"></div>
+    <div class="modal-grid" style="margin-top:12px"><div class="field"><label>Ширина листа</label><input value="654"></div><div class="field"><label>Высота листа</label><input value="317"></div><div class="field"><label>Зачистка со всех сторон</label><input value="2"></div><div class="field"><label>Рабочий размер</label><input value="650 × 313" disabled></div><div class="field"><label>Поле слева / справа</label><input value="4 / 4"></div><div class="field"><label>Поле сверху / снизу</label><input value="2 / 13"></div></div>
+    <div class="modal-actions"><button class="btn" type="button" data-close-preset>Отмена</button><button class="btn primary" type="button" data-close-preset>Сохранить пресет</button></div>
+  </div>
+</div>
+
+<script>
+  const stage = document.getElementById('reviewStage');
+  const conceptButtons = [...document.querySelectorAll('[data-concept]')];
+  const conceptPanels = [...document.querySelectorAll('[data-concept-panel]')];
+  const viewportButtons = [...document.querySelectorAll('[data-viewport]')];
+  const rowButtons = [...document.querySelectorAll('[data-rows]')];
+  const stateButtons = [...document.querySelectorAll('[data-state]')];
+  const modal = document.getElementById('presetModal');
+
+  function activate(buttons, active) {
+    buttons.forEach(button => button.setAttribute('aria-pressed', button === active ? 'true' : 'false'));
+  }
+
+  conceptButtons.forEach(button => button.addEventListener('click', () => {
+    activate(conceptButtons, button);
+    conceptPanels.forEach(panel => panel.classList.toggle('is-active', panel.dataset.conceptPanel === button.dataset.concept));
+  }));
+
+  viewportButtons.forEach(button => button.addEventListener('click', () => {
+    activate(viewportButtons, button);
+    stage.dataset.viewport = button.dataset.viewport;
+  }));
+
+  rowButtons.forEach(button => button.addEventListener('click', () => {
+    activate(rowButtons, button);
+    stage.classList.toggle('rows-five', button.dataset.rows === '5');
+  }));
+
+  stateButtons.forEach(button => button.addEventListener('click', () => {
+    activate(stateButtons, button);
+    stage.classList.remove('state-ready', 'state-calculating', 'state-error');
+    stage.classList.add(`state-${button.dataset.state}`);
+    document.querySelectorAll('.app-status').forEach(status => {
+      status.textContent = button.dataset.state === 'ready' ? 'Результат актуален' : button.dataset.state === 'calculating' ? 'Пересчёт…' : 'Нужно исправить';
+    });
+  }));
+
+  document.querySelectorAll('[data-open-preset]').forEach(button => button.addEventListener('click', () => {
+    modal.hidden = false;
+    modal.querySelector('input').focus();
+  }));
+  document.querySelectorAll('[data-close-preset]').forEach(button => button.addEventListener('click', () => { modal.hidden = true; }));
+  modal.addEventListener('click', event => { if (event.target === modal) modal.hidden = true; });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') modal.hidden = true; });
+</script>
+</body>
+</html>
