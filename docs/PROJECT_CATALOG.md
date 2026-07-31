@@ -1,6 +1,6 @@
 # Каталог проекта uImposition / Project catalog
 
-Последняя структурная сверка: **30 июля 2026**, checkpoint `0.7.0-alpha.5`, active milestone M7.6.
+Последняя структурная сверка: **31 июля 2026**, опубликованный checkpoint `0.7.0-alpha.5`, operator-first rebuild R2.
 
 Этот документ объясняет назначение каталогов и активных групп файлов. Он не заменяет [`ARCHITECTURE.md`](ARCHITECTURE.md): архитектура описывает зависимости и поток расчёта, а каталог отвечает на вопрос «где что лежит и куда добавлять новое».
 
@@ -8,9 +8,9 @@
 
 | Путь | Назначение |
 |---|---|
-| `index.html` | Основная страница GitHub Pages и стабильные DOM anchors |
-| `styles.css` | Базовые стили страницы |
-| `m3.css` … `m7-*.css`, `user-*.css` | Стили milestone- и feature-панелей, подключаемые соответствующими UI-модулями |
+| `index.html` | Текущая историческая GitHub Pages оболочка и legacy DOM anchors; не является основой нового R3 UI |
+| `styles.css` | Базовые стили текущей страницы |
+| `m3.css` … `m7-*.css`, `user-*.css` | Стили milestone- и feature-панелей текущего технического UI |
 | `decision-profile-demo.html` | Изолированная демонстрация decision profile |
 | `site.js` | Вспомогательный ранний browser script; текущий `index.html` его не загружает |
 | `VERSION.json`, `VERSION.md`, `CHANGELOG.md` | Версия, человекочитаемый checkpoint и история изменений |
@@ -18,13 +18,13 @@
 | `CONTRIBUTING.md`, `LICENSE.md` | Участие в проекте и лицензирование |
 | `package.json` | Node-команды проверок; runtime сайта не требует build step |
 
-Root CSS пока не переносится массово: пути динамически подключаются из UI-модулей и покрыты Chromium-сценариями. Возможная будущая консолидация стилей должна быть отдельным UI/architecture patch.
+Root CSS не переносится массово в R2: этот этап не меняет визуальную оболочку. Новый R3 workspace должен получить отдельную чистую HTML/CSS-структуру после выбора визуального направления, а не продолжать цепочку legacy overrides.
 
 ## 2. Основные каталоги
 
 | Каталог | Что хранится | Правило |
 |---|---|---|
-| `src/` | Production ES modules и UI coordinators | Расчётная логика остаётся чистой и не прячется в DOM |
+| `src/` | Production ES modules, pure state/storage models и UI coordinators | Расчётная логика и application state остаются чистыми и не прячутся в DOM |
 | `tests/` | Node unit/integration/regression tests | Имя теста соответствует модулю или milestone |
 | `data/` | Контрольные и regression fixtures | Fixture не выдаётся за automatic solver |
 | `tools/` | Release, documentation, screenshot и PDF tooling | Инструменты не меняют production-формулы |
@@ -36,18 +36,30 @@ Root CSS пока не переносится массово: пути дина�
 
 ## 3. Карта `src/`
 
-### Configuration и ввод
+### Configuration, application state и ввод
 
 ```text
 config.js
-config.example.js
+sheet-press-presets.js
+application-state.js
+application-state-persistence.js
+local-state-repository.js
 geometry.js
 orders.js
 orientation.js
 print-specification.js
 ```
 
-Здесь находятся presets/limits, лист и печатная область, строки заказов, направления и спецификация печати.
+Назначение:
+
+- `config.js` — production presets, defaults, limits и versioned storage keys;
+- `sheet-press-presets.js` — полная immutable schema встроенных и локальных пресетов листа/машины, validation и migration;
+- `application-state.js` — versioned plain-data state нового operator-first product layer, input revisions и защита от stale calculation results;
+- `application-state-persistence.js` — удаляет transient active request перед сохранением и восстанавливает прерванный расчёт как `dirty`/restartable;
+- `local-state-repository.js` — dependency-injected repositories для project state и локальных sheet/press presets;
+- `geometry.js`, `orders.js`, `orientation.js`, `print-specification.js` — существующая чистая геометрия, строки заказов, направления и спецификация печати.
+
+R2-модули не импортируют DOM и не подключаются к legacy `app.js`. Новый R3 UI обязан потреблять application state, а не читать production input напрямую из разрозненных полей.
 
 ### Лицо, оборот, кандидаты и validation
 
@@ -101,12 +113,26 @@ user-uniform-production-plans.js
 user-production-plans-runtime.js
 user-objective-priority.js
 user-production-comparison-table.js
+user-production-comparison-ui.js
+user-production-comparison-status-layout.js
 user-production-plans-ui.js
 user-objective-priority-ui.js
 user-production-plan-details-ui.js
 ```
 
-M7.5 разделяет generation, runtime, selection/details и UI. M7.6 начинается с `user-production-comparison-table.js`: чистой view-model, которая сохраняет ссылку на каждый исходный plan, даёт lossless `allRows`, view-only filters/sorting, exact deltas и режим `Только различия` без regeneration.
+M7.5 разделяет generation, runtime, selection/details и UI. M7.6 `user-production-comparison-table.js` является чистой reusable view-model: сохраняет ссылку на каждый исходный plan, даёт lossless `allRows`, view-only filters/sorting, exact deltas и режим `Только различия` без regeneration.
+
+UI-модули этого раздела сохраняются как работающий технический эксперимент и regression reference, но не являются обязательной основой R3.
+
+### Application shell experiment
+
+```text
+app-shell-model.js
+app-shell.js
+app-shell-bootstrap.js
+```
+
+Эти файлы принадлежат superseded UX-0–UX-5 направлению. Они остаются в `main` для истории и regression, но новая оболочка не должна строиться их дальнейшим расширением или перестановкой legacy DOM.
 
 ### Duplex и work-and-turn
 
@@ -137,7 +163,7 @@ alternatives-ui.js
 app.js
 ```
 
-Renderer получает готовую проверенную модель и не пересчитывает производственные формулы. `app.js` остаётся DOM-координатором.
+Renderer получает готовую проверенную модель и не пересчитывает производственные формулы. `app.js` остаётся координатором legacy DOM до появления отдельного R3 entrypoint.
 
 ### Исторические demo entrypoints
 
@@ -159,8 +185,19 @@ m7-decision-demo.js
 - M7 objectives, pricing, Pareto и alternatives;
 - user plan generation, runtime, selection/export и objective persistence;
 - M7.6 comparison rows, view-only filters/sorting, deltas и missing-pricing guards;
+- R2 sheet/press preset validation, namespaces и migrations;
+- R2 immutable application state, deterministic serialization и stale-result guards;
+- R2 project/preset repositories, import/export, favorites/recent ordering, interrupted-calculation recovery и corrupted-storage handling;
 - work-and-turn;
 - production regression fixtures.
+
+R2 tests:
+
+```text
+tests/sheet-press-presets.test.js
+tests/application-state.test.js
+tests/local-state-repository.test.js
+```
 
 `data/` содержит:
 
@@ -187,6 +224,8 @@ npm run check
 | `prepare-release-news.yml` | Сбор focused release evidence и manifest |
 | `publish-version-release.yml` | Recovery branch, immutable tag и GitHub Release/prerelease |
 
+R2 меняет только pure modules, tests, config keys и документацию. Chromium/PDF не является обязательным gate по содержанию, но workflow может запускаться консервативной path matrix и тогда должен оставаться зелёным.
+
 ### Локальные инструменты
 
 | Путь | Назначение |
@@ -202,12 +241,15 @@ npm run check
 - `archive/development/{version}/release.json` хранит manifest.
 - Evidence ZIP и SHA-256 принадлежат конкретному immutable checkpoint.
 - Старые milestone/evidence документы индексируются в [`docs/README.md`](README.md), но не становятся текущими инструкциями.
+- Внутренний pure R2 foundation не меняет version и не создаёт release assets.
 
 ## 7. Куда добавлять новый файл
 
 | Новый материал | Правильное место |
 |---|---|
 | Чистая расчётная модель | `src/{responsibility}.js` + соответствующий `tests/*.test.js` |
+| Versioned application state или migration | отдельный pure `src/*state*.js` / `src/*migration*.js` + tests |
+| Storage adapter/repository | отдельный dependency-injected `src/*repository*.js` + memory-storage tests |
 | DOM/UI renderer | отдельный `src/*-ui.js` или `src/*-renderer.js`; стили — связанный CSS |
 | Fixture | `data/` с явным описанием границы |
 | Chromium scenario | `tools/screenshots/scenarios/` |
@@ -223,4 +265,4 @@ npm run check
 
 ## English summary
 
-This catalog maps repository locations to their responsibilities and file-placement rules. Production logic belongs in pure `src/` modules with matching tests; UI stays separate; fixtures remain explicit; documentation is indexed by status; news and release evidence are version-specific and immutable; and historical files are retained until the owner approves a separate archive migration. Active M7.6 work starts with a pure lossless comparison-table model before renderer/UI work or any search-space expansion.
+This catalog maps repository locations to their responsibilities. R2 introduces complete sheet/press presets, a versioned immutable application state with stale-calculation guards, transient persistence normalization, and dependency-injected local repositories with explicit migrations. They do not touch the DOM or production formulas. The existing app-shell/UI modules remain as superseded regression references; R3 must create a clean operator-first entrypoint on top of R2 rather than rearranging the legacy page.

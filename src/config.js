@@ -72,6 +72,8 @@ export const CONFIG = Object.freeze({
 
   storage: {
     projectKey: "uImposition.m2.project",
+    applicationStateKey: "uImposition.project.v1",
+    sheetPressPresetsKey: "uImposition.sheetPressPresets.v1",
     languageKey: "uImposition.language",
     persistPanelCollapsedState: false,
   },
