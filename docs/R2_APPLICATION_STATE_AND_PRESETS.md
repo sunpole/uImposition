@@ -14,7 +14,8 @@ R2 создаёт данные и storage-контракт для нового o
 - хранить избранные и недавно использованные presets;
 - применять preset одним согласованным изменением application state;
 - сохранять и восстанавливать versioned project state;
-- не принимать запоздавший расчёт для уже изменившегося ввода.
+- не принимать запоздавший расчёт для уже изменившегося ввода;
+- безопасно восстанавливаться после закрытия страницы во время расчёта.
 
 ## 2. Новые модули
 
@@ -114,6 +115,19 @@ applicationState
 
 `products[]` в R2 хранится как JSON-safe массив без окончательной product-row schema. Полная модель строки продукции является отдельным следующим pure patch или частью подготовленного R3 model этапа; R2 не фиксирует преждевременно поля сложного mixed-format заказа.
 
+### `src/application-state-persistence.js`
+
+Отделяет transient runtime от сохраняемого project state.
+
+Browser calculation request не может пережить перезагрузку страницы. Поэтому перед записью:
+
+- `calculating` преобразуется в `dirty`;
+- `activeRevision` очищается;
+- input revision и последний valid revision сохраняются;
+- следующий controller может запустить свежий расчёт для тех же входов.
+
+Это запрещает восстановление проекта в ложном вечном состоянии «рассчитывается».
+
 ### `src/local-state-repository.js`
 
 Storage adapters с dependency injection.
@@ -124,7 +138,8 @@ Storage adapters с dependency injection.
 - `save`;
 - `clear`;
 - deterministic JSON export/import;
-- version migration через application-state model.
+- version migration через application-state model;
+- normalization interrupted calculation snapshots before save/load/import/export.
 
 `createSheetPressPresetRepository`:
 
@@ -193,6 +208,7 @@ sheetPressPresetsKey: uImposition.sheetPressPresets.v1
 ### Repositories
 
 - project save/load/import/export/clear;
+- interrupted calculation → restartable `dirty` state;
 - preset timestamps and stable IDs;
 - favorites/recent ordering;
 - built-ins cannot be persisted/deleted as local;
@@ -218,4 +234,4 @@ R3 должен использовать новые modules как единст�
 
 ## English summary
 
-R2 adds a pure, versioned foundation for the operator-first rebuild: complete sheet/press preset objects, deterministic local preset IDs, immutable application state, input-revision calculation guards, and dependency-injected local storage repositories with explicit migrations and recovery-safe errors. It does not modify the current UI or production formulas. The next UI must consume this state rather than rearranging the legacy DOM.
+R2 adds a pure, versioned foundation for the operator-first rebuild: complete sheet/press preset objects, deterministic local preset IDs, immutable application state, input-revision calculation guards, transient-state persistence normalization, and dependency-injected local storage repositories with explicit migrations and recovery-safe errors. An interrupted browser calculation is restored as dirty and restartable rather than falsely remaining active. R2 does not modify the current UI or production formulas. The next UI must consume this state rather than rearranging the legacy DOM.
