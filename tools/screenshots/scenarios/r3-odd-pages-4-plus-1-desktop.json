@@ -1,0 +1,76 @@
+{
+  "id": "r3-odd-pages-4-plus-1-desktop",
+  "path": "/app/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 900
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='pages']",
+      "value": "3"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.frontColors']",
+      "value": "4"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.backColors']",
+      "value": "1"
+    },
+    {
+      "action": "waitForHidden",
+      "selector": "#calculationError",
+      "timeoutMs": 10000
+    },
+    {
+      "action": "click",
+      "selector": ".topbar__nav [data-open-screen='layout']"
+    },
+    {
+      "action": "click",
+      "selector": "[data-acceptance-layout='both']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 700
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#calculationError",
+      "hidden": true
+    },
+    {
+      "selector": "#layoutDetails",
+      "text": "Выбранный план"
+    },
+    {
+      "selector": ".layout-pair",
+      "text": "обр. —"
+    },
+    {
+      "selector": "[data-workspace-pdf='schemes']",
+      "text": "Скачать схемы PDF"
+    },
+    {
+      "selector": "[data-workspace-pdf='report']",
+      "text": "Скачать отчёт PDF"
+    }
+  ],
+  "screenshotSelector": ".screen--layout",
+  "screenshot": "uimposition-r3-odd-pages-4-plus-1-desktop.png"
+}
