@@ -51,13 +51,12 @@ function deepFreeze(value) {
   return Object.freeze(value);
 }
 
-function normalizeText(value, maxLength) {
-  const text = String(value ?? "").trim();
-  return text.slice(0, maxLength);
+function normalizeText(value) {
+  return String(value ?? "").trim();
 }
 
-function normalizeOptionalText(value, maxLength) {
-  const text = normalizeText(value, maxLength);
+function normalizeOptionalText(value) {
+  const text = normalizeText(value);
   return text || null;
 }
 
@@ -204,11 +203,8 @@ export function normalizeProductRowDraft(input, {
     schemaVersion: PRODUCT_ROW_SCHEMA_VERSION,
     id: resolvedId,
     enabled: source.enabled !== false,
-    name: normalizeText(source.name, config.limits.maxProductNameLength),
-    sourceFileName: normalizeOptionalText(
-      source.sourceFileName,
-      config.limits.maxProductSourceFileNameLength,
-    ),
+    name: normalizeText(source.name),
+    sourceFileName: normalizeOptionalText(source.sourceFileName),
     finished: {
       widthMm: normalizeDraftNumber(finished.widthMm ?? source.widthMm ?? defaults.finished.widthMm),
       heightMm: normalizeDraftNumber(finished.heightMm ?? source.heightMm ?? defaults.finished.heightMm),
@@ -228,7 +224,7 @@ export function normalizeProductRowDraft(input, {
       PRODUCT_ROTATION_POLICIES,
       defaults.rotationPolicy,
     ),
-    notes: normalizeText(source.notes ?? source.note, config.limits.maxProductNotesLength),
+    notes: normalizeText(source.notes ?? source.note),
   };
 
   return deepFreeze(row);
@@ -290,6 +286,32 @@ export function validateProductRow(input, config = CONFIG) {
 
   if (!row.name) {
     issues.push(issue(PRODUCT_ISSUE_SEVERITIES.ERROR, "nameRequired", "name"));
+  } else if (row.name.length > limits.maxProductNameLength) {
+    issues.push(issue(
+      PRODUCT_ISSUE_SEVERITIES.ERROR,
+      "nameTooLong",
+      "name",
+      { length: row.name.length, max: limits.maxProductNameLength },
+    ));
+  }
+  if (
+    row.sourceFileName !== null
+    && row.sourceFileName.length > limits.maxProductSourceFileNameLength
+  ) {
+    issues.push(issue(
+      PRODUCT_ISSUE_SEVERITIES.ERROR,
+      "sourceFileNameTooLong",
+      "sourceFileName",
+      { length: row.sourceFileName.length, max: limits.maxProductSourceFileNameLength },
+    ));
+  }
+  if (row.notes.length > limits.maxProductNotesLength) {
+    issues.push(issue(
+      PRODUCT_ISSUE_SEVERITIES.ERROR,
+      "notesTooLong",
+      "notes",
+      { length: row.notes.length, max: limits.maxProductNotesLength },
+    ));
   }
 
   const width = validateNumber(row.finished.widthMm, "finished.widthMm", {
@@ -427,6 +449,14 @@ export function validateProductRowForUniformPipeline(input, config = CONFIG) {
       PRODUCT_ISSUE_SEVERITIES.ERROR,
       "uniformPipelineWorkAndTurnNotGeneralized",
       "print.duplexPreference",
+    ));
+  }
+  if (row.rotationPolicy !== PRODUCT_ROTATION_POLICIES.AUTO) {
+    issues.push(issue(
+      PRODUCT_ISSUE_SEVERITIES.ERROR,
+      "uniformPipelineForcedRotationNotSupported",
+      "rotationPolicy",
+      { rotationPolicy: row.rotationPolicy },
     ));
   }
 
