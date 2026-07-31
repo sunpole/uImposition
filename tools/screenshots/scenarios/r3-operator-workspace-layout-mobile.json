@@ -30,7 +30,7 @@
     },
     {
       "action": "wait",
-      "timeoutMs": 200
+      "timeoutMs": 650
     }
   ],
   "beforeScreenshotAssertions": [
@@ -51,6 +51,5 @@
       "text": "Схема"
     }
   ],
-  "screenshotSelector": "[data-screen='layout']",
   "screenshot": "uimposition-r3-operator-workspace-layout-mobile.png"
 }
