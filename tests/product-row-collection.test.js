@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { CONFIG } from "../src/config.js";
 import {
   addProductRow,
   allocateProductRowId,
@@ -257,13 +258,17 @@ test("unsupported collection schemas and row-count overflow fail explicitly", ()
     () => normalizeProductRowCollection({ schemaVersion: 99, rows: [] }),
     /Unsupported product row collection schemaVersion/,
   );
-  const rows = Array.from({ length: 2 }, (_, index) => ({
-    ...row(`Row ${index + 1}`),
-    id: `product:${index + 1}`,
-  }));
+
   const restrictedConfig = {
-    ...((await import("../src/config.js")).CONFIG),
+    ...CONFIG,
+    limits: { ...CONFIG.limits, maxOrders: 1 },
   };
-  void rows;
-  void restrictedConfig;
+  const rows = [
+    { ...row("A"), id: "product:1" },
+    { ...row("B"), id: "product:2" },
+  ];
+  assert.throws(
+    () => normalizeProductRowCollection({ rows }, restrictedConfig),
+    /Product row count exceeds 1/,
+  );
 });
