@@ -2,7 +2,7 @@
 
 Этот файл — единый каталог документации проекта. Он помогает отличить текущие источники истины от нормативных справочников, завершённых milestone-документов и исторических evidence-материалов.
 
-GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md), [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md), [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
+GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md), [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md), [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md), [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
 
 ## Статусы документов
 
@@ -20,6 +20,7 @@ GitHub остаётся единственным источником истин
 |---|---|---|
 | [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md) | **Актуальный обязательный продуктовый контракт** | Новый operator-first workflow: пресеты листов, строки продукции, live calculation, сравнение бумага/forms/cost и чистый UI-слой |
 | [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md) | Завершённый pure-code milestone | Versioned application state, sheet/press presets, persistence normalization, migrations и local repositories из PR `#66` |
+| [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md) | Активный pure-code milestone | Реальный вид продукции, collection operations, field-level validation, legacy migration и application-state adapter до визуального R3 |
 | [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md) | Актуальный для расчётного ядра и release-процесса | Полная передача существующего production pipeline и границ search space; UI-next-step заменён rebuild-контрактом |
 | [`CURRENT_STATE.md`](CURRENT_STATE.md) | Актуальный | Проверенное фактическое состояние функций, R1/R2 и release checkpoint |
 | [`REMAINING_WORK.md`](REMAINING_WORK.md) | Актуальный расчётный backlog | Остаток solver/production функций до 1.0; порядок UI-разработки задаёт rebuild-контракт |
@@ -35,7 +36,7 @@ GitHub остаётся единственным источником истин
 | [`TECHNICAL_SPECIFICATION_EN.md`](TECHNICAL_SPECIFICATION_EN.md) | Нормативный | Профессиональная английская версия технического задания |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Актуальный для доменного ядра | Архитектурные слои и текущий M7.5/M7.6 pipeline; новый state/storage layer описан в R2 |
 | [`ALGORITHM_AND_OPTIMIZATION.md`](ALGORITHM_AND_OPTIMIZATION.md) | Нормативный | Алгоритмические принципы и честные границы оптимизации |
-| [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md) | Нормативный | Действующие настройки, presets и limits |
+| [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md) | Нормативный | Действующие настройки, presets, product-row defaults и limits |
 | [`PRODUCTION_COSTING.md`](PRODUCTION_COSTING.md) | Нормативный | Модель производственной себестоимости и защита отсутствующих цен |
 | [`BUSINESS_MODEL.md`](BUSINESS_MODEL.md) | Справочный | Возможная коммерческая модель; не является текущей production-логикой |
 | [`BILINGUAL_LAYOUT.md`](BILINGUAL_LAYOUT.md) | Нормативный | Правила русско-английского интерфейса и документации |
@@ -66,10 +67,11 @@ GitHub остаётся единственным источником истин
 | [`M7_6_COMPARISON_TABLE_MODEL.md`](M7_6_COMPARISON_TABLE_MODEL.md) | Завершённая pure model / reusable core | Lossless-модель строк, колонок, filters, sorting, deltas и режима `Только различия` |
 | [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md) | Активный цикл R0–R5 | Новый продуктовый и архитектурный порядок пользовательской разработки |
 | [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md) | Завершённый R2 | State/preset/storage foundation, `207/207` tests и `20/20` Chromium/PDF regression |
+| [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md) | Активный этап до R3 | Versioned product rows, list operations, compatibility boundaries and legacy order adapter |
 
 Pure comparison model и часть app-shell эксперимента существуют в `main`, но дальнейшая пользовательская разработка **не должна** продолжать перестановку старых DOM-панелей.
 
-Следующий этап до визуального R3 — отдельная pure product-row schema и collection model с legacy migration и field-level validation.
+После завершения product-row model следующий gate — визуально разные направления clean R3 workspace. Production UI не начинается до выбора направления.
 
 ## 5. Завершённые milestone и release evidence
 
@@ -97,7 +99,7 @@ Pure comparison model и часть app-shell эксперимента суще�
 |---|---|---|
 | [`codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md`](codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md) | Выполненная история | Полное задание и completion record релиза `0.7.0-alpha.5` |
 
-Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Operator-first rebuild закреплён в Issue #64, PR #65/#66 и milestone-документах.
+Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Operator-first rebuild закреплён в Issue #64, Issue #68, PR #65/#66 и milestone-документах.
 
 ## 7. Проверка каталога
 
@@ -111,4 +113,4 @@ npm run check:docs
 
 ## English summary
 
-This is the canonical documentation index. R1 stopped the legacy app-shell direction, and R2 completed the versioned application state, sheet/press presets, interrupted-calculation recovery, migrations and local repositories. The next mandatory patch is a pure product-row and collection model. R3 may begin only after that model and a visual-direction review; it must not rearrange the legacy DOM.
+This is the canonical documentation index. R1 stopped the legacy app-shell direction, R2 completed the versioned state and sheet/press presets, and the active pure product-row milestone now defines real production rows, collection operations, field-level validation, legacy migration and application-state integration. R3 may begin only after this model passes exact-head checks and a visual direction is selected; it must not rearrange the legacy DOM.
