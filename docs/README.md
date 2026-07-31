@@ -32,7 +32,7 @@ GitHub остаётся единственным источником истин
 |---|---|---|
 | [`TECHNICAL_SPECIFICATION_RU.md`](TECHNICAL_SPECIFICATION_RU.md) | Нормативный | Основное полное техническое задание на русском |
 | [`TECHNICAL_SPECIFICATION_EN.md`](TECHNICAL_SPECIFICATION_EN.md) | Нормативный | Профессиональная английская версия технического задания |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Актуальный для доменного ядра | Архитектурные слои, зависимости и карта текущего M7.5/M7.6 pipeline; application-state слой будет добавлен в R2 |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Актуальный для доменного ядра | Архитектурные слои, зависимости и карта текущего M7.5/M7.6 pipeline; новый state/storage layer описан в R2 |
 | [`ALGORITHM_AND_OPTIMIZATION.md`](ALGORITHM_AND_OPTIMIZATION.md) | Нормативный | Алгоритмические принципы и честные границы оптимизации |
 | [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md) | Нормативный | Действующие настройки, presets и limits |
 | [`PRODUCTION_COSTING.md`](PRODUCTION_COSTING.md) | Нормативный | Модель производственной себестоимости и защита отсутствующих цен |
@@ -64,8 +64,9 @@ GitHub остаётся единственным источником истин
 | [`M7_5_OBJECTIVE_PRIORITY_EDITOR.md`](M7_5_OBJECTIVE_PRIORITY_EDITOR.md) | Завершённый milestone | Приоритеты оператора и reranking без regeneration |
 | [`M7_6_COMPARISON_TABLE_MODEL.md`](M7_6_COMPARISON_TABLE_MODEL.md) | Завершённая pure model / reusable core | Lossless-модель строк, колонок, filters, sorting, deltas и режима `Только различия` |
 | [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md) | Активный цикл R0–R5 | Новый продуктовый и архитектурный порядок пользовательской разработки |
+| [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md) | Активный pure-code milestone | Versioned application state, sheet/press preset schema, migrations и local storage repositories |
 
-Pure comparison model и часть app-shell эксперимента уже существуют в `main`, но дальнейшая пользовательская разработка **не должна** продолжать перестановку старых DOM-панелей. Новый UI создаётся как чистый state/render слой после R2 foundation.
+Pure comparison model и часть app-shell эксперимента уже существуют в `main`, но дальнейшая пользовательская разработка **не должна** продолжать перестановку старых DOM-панелей. R2 создаёт чистый state/storage foundation; визуальный R3 начинается только после выбора направления.
 
 ## 5. Завершённые milestone и release evidence
 
@@ -93,7 +94,7 @@ Pure comparison model и часть app-shell эксперимента уже с
 |---|---|---|
 | [`codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md`](codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md) | Выполненная история | Полное задание и completion record релиза `0.7.0-alpha.5` |
 
-Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Текущий operator-first rebuild закреплён в Issue #64, активном PR и `OPERATOR_FIRST_PRODUCT_REBUILD.md`.
+Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Текущий operator-first rebuild закреплён в Issue #64, активных PR и milestone-документах R1/R2.
 
 ## 7. Проверка каталога
 
@@ -107,4 +108,4 @@ npm run check:docs
 
 ## English summary
 
-This is the canonical documentation index. The active product direction is now `OPERATOR_FIRST_PRODUCT_REBUILD.md`: choose or create a sheet/press preset, enter real product rows, receive coherent live recalculation, compare paper/forms/cost trade-offs, select a layout and export it. The previous app-shell redesign document is preserved as superseded history. Existing calculation modules, M7.6 comparison data and PDF pipelines remain reusable, but the next UI must be a clean versioned state/render layer rather than another rearrangement of the legacy DOM.
+This is the canonical documentation index. The active product direction is `OPERATOR_FIRST_PRODUCT_REBUILD.md`. R2 adds a versioned application state, complete sheet/press presets, deterministic migrations and dependency-injected local storage repositories without changing the current UI. The previous app-shell redesign is preserved as superseded history. R3 must be a clean operator-first workspace built on R2, not another rearrangement of the legacy DOM.
