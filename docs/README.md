@@ -2,7 +2,7 @@
 
 Этот файл — единый каталог документации проекта. Он помогает отличить текущие источники истины от нормативных справочников, завершённых milestone-документов и исторических evidence-материалов.
 
-GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
+GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md), [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
 
 ## Статусы документов
 
@@ -10,6 +10,7 @@ GitHub остаётся единственным источником истин
 - **Нормативный** — задаёт устойчивые правила, требования или процесс.
 - **Milestone** — фиксирует границы и решения конкретного этапа; может быть завершённым.
 - **История / evidence** — сохраняет факты прошлого релиза или задания и не заменяет текущий handoff.
+- **Superseded** — документ сохраняется как история решения, но не задаёт дальнейшую разработку.
 
 Исторические файлы могут намеренно содержать старые версии и прежние планы. Их нужно читать вместе с указанным статусом, а не «осовременивать» задним числом.
 
@@ -17,12 +18,13 @@ GitHub остаётся единственным источником истин
 
 | Документ | Статус | Назначение |
 |---|---|---|
-| [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md) | Актуальный | Полная передача проекта, текущие границы search space и следующий этап |
-| [`CURRENT_STATE.md`](CURRENT_STATE.md) | Актуальный | Проверенное фактическое состояние функций и release checkpoint |
-| [`REMAINING_WORK.md`](REMAINING_WORK.md) | Актуальный | Остаток до 1.0 и порядок следующих milestone |
-| [`ROADMAP.md`](ROADMAP.md) | Актуальный ориентир | Укрупнённая последовательность развития |
+| [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md) | **Актуальный обязательный продуктовый контракт** | Новый operator-first workflow: пресеты листов, строки продукции, live calculation, сравнение бумага/forms/cost и чистый UI-слой |
+| [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md) | Актуальный для расчётного ядра и release-процесса | Полная передача существующего production pipeline и границ search space; UI-next-step заменён новым rebuild-контрактом |
+| [`CURRENT_STATE.md`](CURRENT_STATE.md) | Актуальный | Проверенное фактическое состояние функций, UX-эксперимента и release checkpoint |
+| [`REMAINING_WORK.md`](REMAINING_WORK.md) | Актуальный расчётный backlog | Остаток solver/production функций до 1.0; порядок UI-разработки задаёт rebuild-контракт |
+| [`ROADMAP.md`](ROADMAP.md) | Актуальный ориентир | Укрупнённая последовательность развития; требует дальнейшей синхронизации с R0–R5 |
 | [`PROJECT_CATALOG.md`](PROJECT_CATALOG.md) | Актуальный | Карта каталогов, исходных модулей, тестов, automation и правил размещения файлов |
-| [`UI_UX_APPLICATION_REDESIGN.md`](UI_UX_APPLICATION_REDESIGN.md) | Актуальный блокирующий UX-контракт | Полная перестройка длинной demo-страницы в рабочее desktop/mobile приложение |
+| [`UI_UX_APPLICATION_REDESIGN.md`](UI_UX_APPLICATION_REDESIGN.md) | Superseded / история UX-0–UX-5 | Предыдущая попытка перестроить demo-page через app shell; не является основой нового UI |
 
 ## 2. Требования, архитектура и расчёты
 
@@ -30,7 +32,7 @@ GitHub остаётся единственным источником истин
 |---|---|---|
 | [`TECHNICAL_SPECIFICATION_RU.md`](TECHNICAL_SPECIFICATION_RU.md) | Нормативный | Основное полное техническое задание на русском |
 | [`TECHNICAL_SPECIFICATION_EN.md`](TECHNICAL_SPECIFICATION_EN.md) | Нормативный | Профессиональная английская версия технического задания |
-| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Актуальный | Архитектурные слои, зависимости и карта текущего M7.5 pipeline |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Актуальный для доменного ядра | Архитектурные слои, зависимости и карта текущего M7.5/M7.6 pipeline; application-state слой будет добавлен в R2 |
 | [`ALGORITHM_AND_OPTIMIZATION.md`](ALGORITHM_AND_OPTIMIZATION.md) | Нормативный | Алгоритмические принципы и честные границы оптимизации |
 | [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md) | Нормативный | Действующие настройки, presets и limits |
 | [`PRODUCTION_COSTING.md`](PRODUCTION_COSTING.md) | Нормативный | Модель производственной себестоимости и защита отсутствующих цен |
@@ -50,7 +52,7 @@ GitHub остаётся единственным источником истин
 | [`GITHUB_PAGES.md`](GITHUB_PAGES.md) | Справочный | Публикация статического сайта |
 | [`REPOSITORY_SETUP.md`](REPOSITORY_SETUP.md) | Справочный | Метаданные и первоначальное оформление репозитория |
 
-## 4. Текущий цикл M7
+## 4. Текущий цикл M7 и UI rebuild
 
 | Документ | Статус | Назначение |
 |---|---|---|
@@ -60,9 +62,10 @@ GitHub остаётся единственным источником истин
 | [`M7_5_USER_UNIFORM_PRODUCTION_PLANS.md`](M7_5_USER_UNIFORM_PRODUCTION_PLANS.md) | Завершённый milestone | Пользовательские uniform production plans |
 | [`M7_5_USER_PLAN_SELECTION_EXPORT.md`](M7_5_USER_PLAN_SELECTION_EXPORT.md) | Завершённый milestone | Явный выбор, схемы, report и PDF |
 | [`M7_5_OBJECTIVE_PRIORITY_EDITOR.md`](M7_5_OBJECTIVE_PRIORITY_EDITOR.md) | Завершённый milestone | Приоритеты оператора и reranking без regeneration |
-| [`M7_6_COMPARISON_TABLE_MODEL.md`](M7_6_COMPARISON_TABLE_MODEL.md) | Активный milestone | Чистая lossless-модель строк, колонок, filters, sorting, deltas и режима `Только различия` |
+| [`M7_6_COMPARISON_TABLE_MODEL.md`](M7_6_COMPARISON_TABLE_MODEL.md) | Завершённая pure model / reusable core | Lossless-модель строк, колонок, filters, sorting, deltas и режима `Только различия` |
+| [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md) | Активный цикл R0–R5 | Новый продуктовый и архитектурный порядок пользовательской разработки |
 
-Pure M7.6 comparison-table model уже существует. Но следующий пользовательский UI-патч обязан сначала реализовать application shell из [`UI_UX_APPLICATION_REDESIGN.md`](UI_UX_APPLICATION_REDESIGN.md). Нельзя добавлять новую большую таблицу поверх прежней бесконечной demo-страницы.
+Pure comparison model и часть app-shell эксперимента уже существуют в `main`, но дальнейшая пользовательская разработка **не должна** продолжать перестановку старых DOM-панелей. Новый UI создаётся как чистый state/render слой после R2 foundation.
 
 ## 5. Завершённые milestone и release evidence
 
@@ -90,7 +93,7 @@ Pure M7.6 comparison-table model уже существует. Но следую�
 |---|---|---|
 | [`codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md`](codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md) | Выполненная история | Полное задание и completion record релиза `0.7.0-alpha.5` |
 
-Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Короткие текущие действия должны отражаться в PR и актуальных status-документах, а не создавать лишние дубли.
+Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Текущий operator-first rebuild закреплён в Issue #64, активном PR и `OPERATOR_FIRST_PRODUCT_REBUILD.md`.
 
 ## 7. Проверка каталога
 
@@ -104,4 +107,4 @@ npm run check:docs
 
 ## English summary
 
-This is the canonical documentation index. It separates current operational truth from stable policies, completed milestones, and historical evidence. Start with `AGENTS.md`, `START_HERE.md`, and `CODEX_HANDOFF.md`; verify live GitHub state before making changes; use `PROJECT_CATALOG.md` for the repository map; and run `npm run check:docs` to validate local links and catalog coverage. The pure M7.6 comparison-table model already exists, but the next user-facing UI patch must first implement the application shell defined in `UI_UX_APPLICATION_REDESIGN.md`; do not add another large table to the previous endless demo page.
+This is the canonical documentation index. The active product direction is now `OPERATOR_FIRST_PRODUCT_REBUILD.md`: choose or create a sheet/press preset, enter real product rows, receive coherent live recalculation, compare paper/forms/cost trade-offs, select a layout and export it. The previous app-shell redesign document is preserved as superseded history. Existing calculation modules, M7.6 comparison data and PDF pipelines remain reusable, but the next UI must be a clean versioned state/render layer rather than another rearrangement of the legacy DOM.
