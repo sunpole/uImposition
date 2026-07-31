@@ -18,7 +18,7 @@
     },
     {
       "action": "click",
-      "selector": "[data-open-screen='alternatives']"
+      "selector": ".quick-comparison [data-open-screen='alternatives']"
     },
     {
       "action": "wait",
