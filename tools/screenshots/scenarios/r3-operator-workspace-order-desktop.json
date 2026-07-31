@@ -23,8 +23,8 @@
   ],
   "beforeScreenshotAssertions": [
     {
-      "selector": "#productList",
-      "text": "Листовка А6"
+      "selector": "[data-product-row]",
+      "text": "Название / файл"
     },
     {
       "selector": "#summaryContent",
