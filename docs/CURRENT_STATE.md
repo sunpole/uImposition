@@ -1,171 +1,141 @@
 # uImposition — текущее фактическое состояние
 
-Последнее обновление: **27 июля 2026**.
+Последнее обновление: **31 июля 2026**.
 
 ## 1. Repository checkpoint
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - рабочая ветка: `main`;
-- функциональный baseline после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
+- текущий `main`: `0eaf7f075ed28e74e629a206017a8073ae1f8498`;
+- последний объединённый PR: `#61` — UX-3 comparison workspace;
 - опубликованный prerelease: **`0.7.0-alpha.5` / M7.5**;
-- VERSION-файлы синхронизированы с M7.5;
 - release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
 - recovery branch: `release/v0.7.0-alpha.5`;
 - immutable tag: `v0.7.0-alpha.5`;
 - publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
-- GitHub prerelease, focused PNG и evidence ZIP опубликованы и независимо проверены;
-- следующий функциональный milestone: **M7.6 / `0.7.0-alpha.6`**;
+- `VERSION.json` намеренно остаётся на последнем опубликованном checkpoint;
 - `productionReady` остаётся `false`;
 - GitHub — единственный источник истины.
 
-## 2. Последние функциональные PR
+## 2. Что добавлено после опубликованного alpha.5
 
-### PR #44 — user-driven uniform production plans
+### PR #52 — documentation catalog
 
-Merge commit: `584c634bc53fa2e00801705b68e2b86eea48f1a9`.
+- единый `docs/README.md`;
+- `docs/PROJECT_CATALOG.md`;
+- автоматическая проверка Markdown-ссылок и catalog coverage.
 
-Реализовано:
+### PR #53 — pure M7.6 comparison model
 
-- пользовательские orders/page pairs подключены к production pipeline;
-- для fitting `0°/90°` создаются plan-family `paperMinimum` и `dedicatedPairForms`;
-- каждый план materialize-ится в front/back layouts;
-- каждый план повторно проходит validation и production report;
-- недопечатка запрещена;
-- считаются sheets/forms/plates/passes/overrun/cost;
-- все допустимые планы сохраняются в lossless-каталоге;
-- Pareto/recommended/dominated являются аннотациями;
-- неполная последняя duplex-пара отклоняется до расчёта.
+- одна строка на каждый catalog plan;
+- lossless `allRows`;
+- view-only filters/sorting;
+- `Только различия`;
+- exact deltas;
+- pricing `null`, а не ноль;
+- source plan references сохраняются;
+- планы не генерируются заново.
 
-Проверка PR #44:
+### PR #54 — compact mobile experiment
 
-- `156/156` тестов;
-- Chromium/PDF: success;
-- desktop/mobile focused screenshots визуально проверены.
+Уменьшил высоту и размеры исторической страницы, но реальная проверка владельцем подтвердила, что информационная архитектура осталась неверной.
 
-### PR #45 — selection, details and export
+### PR #59 — UX-0 specification
 
-Merge commit: `bf005f038869bb66bb4faee37a02ffab2bff4fa0`.
+Зафиксировал app-shell подход `Заказ / Проверка / Варианты / План / Экспорт`.
 
-Реализовано:
+### PR #60 — UX-1 application shell
 
-- оператор явно выбирает любой plan ID;
-- recommendation не выбирается автоматически;
-- выбранный вариант сохраняется при допустимом пересчёте;
-- реальные materialized front/back schemes;
-- dynamic production report выбранного плана;
-- file/pair totals и contributions;
-- PDF схем и PDF отчёта именно выбранного плана;
-- mobile summary и локальная прокрутка таблиц;
-- preview первых восьми монтажей;
-- явный лимит 120 монтажей для интерактивного scheme PDF.
+- desktop sidebar/workspace/summary;
+- mobile step navigation;
+- технические блоки убраны из основного flow;
+- существующие панели перераспределены между экранами.
 
-Проверка PR #45:
+### PR #61 — UX-3 comparison workspace
 
-- `163/163` теста;
-- Chromium/PDF: success;
-- desktop/mobile focused screenshots визуально проверены.
+- M7.6 comparison model подключён к UI;
+- desktop table и mobile rows;
+- filters/sort/differences-only;
+- recommendation и selection разделены;
+- operator selection из строки;
+- точные данные существующих планов переиспользуются.
 
-### PR #46 — operator objective priority editor
+PR #61 прошёл:
 
-Merge commit: `009451cce94d5cde05ee72305f30447aa65a646c`.
+- Quality: `183/183`;
+- Chromium/PDF: `20/20`;
+- visual review desktop/mobile;
+- merge commit: `0eaf7f075ed28e74e629a206017a8073ae1f8498`.
 
-Реализовано:
+## 3. Открытый PR #62
 
-- 11 целей при готовом прайсе;
-- presets `По умолчанию / Бумага / Стоимость / Формы / Прогоны / Перетираж`;
-- кнопки вверх/вниз;
-- desktop drag-and-drop;
-- hard constraints read-only;
-- reranking использует те же plan-объекты;
-- geometry/layouts/reports не генерируются заново;
-- выбранный оператором вариант не подменяется новой recommendation;
-- preference сохраняется при изменении заказов, размеров, цветности и прайса;
-- денежная цель временно исключается без прайса и возвращается на сохранённую позицию;
-- desktop/mobile compact UI.
+PR `#62` добавляет вкладки выбранного плана поверх существующей shell/DOM архитектуры.
 
-Exact-head PR #46: `ca89cd0f6a7243fb78c3c5ec04a44635c8d75007`.
+Факты его последнего проверенного head:
 
-Проверки:
+- head: `b50fb4c2271db954eae326fedd066c1c5f1cc6bb`;
+- Quality: `187/187`;
+- Chromium/PDF: `21/21`;
+- release-news validation: success;
+- review threads отсутствуют.
 
-- Quality: `173/173` теста;
-- quality artifact ID: `8638127223`;
-- Chromium/PDF: success;
-- screenshot artifact ID: `8638136408`;
-- uNews validation: success;
-- desktop/mobile focused screenshots визуально проверены.
+Несмотря на зелёные проверки, PR **не объединяется**, потому что владелец отклонил само продуктовое направление: интерфейс остаётся запутанным, нелогичным и визуально нестабильным. Зелёные тесты подтверждают отсутствие известных регрессий внутри старой архитектуры, но не доказывают пригодность интерфейса.
 
-## 3. Опубликованный M7.4
+## 4. Решение о product reset
 
-M7.4 добавляет проверяемый work-and-turn контрольный контур:
+Issue `#64` и `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md` заменяют дальнейшее развитие UX-0–UX-5.
 
-- `separateFrontBackForms`;
-- `workAndTurn`;
-- режимы `separateOnly / compareBoth / workAndTurnOnly`;
-- одна симметричная форма;
-- горизонтальный turn axis;
-- зеркальная front/back validation;
-- independent production report;
-- mode-aware forms/plates;
-- runtime без raw reports/layouts/pagePairs.
+Текущий UI считается **временным техническим прототипом**.
 
-Контрольный случай: четыре разных A6, две страницы, `1+1`, по `4000`.
+Сохраняются:
 
-| Метрика | Separate | Work-and-turn |
-|---|---:|---:|
-| Физические листы | 1000 | 1000 |
-| Прогоны | 2000 | 2000 |
-| Layout-формы | 2 | 1 |
-| Цветовые пластины | 2 | 1 |
-| Недопечатка | 0 | 0 |
-| Перетираж | 0 | 0 |
+- geometry;
+- page pairs;
+- front/back validation;
+- production reports;
+- pricing/cost;
+- lossless catalog;
+- comparison data model;
+- operator selection semantics;
+- PDF;
+- tests, fixtures и GitHub Actions.
 
-M7.4 не является общим automatic work-and-turn solver для пользовательских заказов, не поддерживает vertical axis и не заменяет технологическую проверку конкретной машины.
+Не используется как основа нового UI:
 
-## 4. Что сейчас реально принимает пользователь
+- историческая длинная HTML-страница;
+- app shell, построенный перестановкой старых DOM-панелей;
+- накопленная цепочка CSS overrides;
+- milestone/status/evidence панели;
+- PR #62 tabs implementation.
 
-### Лист
-
-- произвольная ширина/высота;
-- размер до или после зачистки;
-- зачистка одинаковая или раздельная;
-- поля машины по четырём сторонам;
-- рабочие листовые presets.
-
-### Изделие
-
-- произвольная ширина/высота;
-- bleed;
-- общий/раздельный рез;
-- gap;
-- fitting uniform grids `0°/90°`.
-
-### Заказы
-
-Формат:
+## 5. Новый целевой пользовательский сценарий
 
 ```text
-файл | тираж | страниц | примечание
+выбрать или создать sheet/press preset
+→ добавить реальные виды продукции
+→ получить согласованный live calculation
+→ сравнить варианты по бумаге, формам, пластинам, прогонам и стоимости
+→ выбрать монтаж
+→ открыть понятную схему
+→ экспортировать PDF
 ```
 
-Поддерживаются validation, exact sequential page pairs и потребность пары.
+Основные классы результата:
 
-### Цветность и прайс
+- минимум бумаги;
+- минимум форм;
+- минимум стоимости;
+- производственно удобный — только после формализации критериев;
+- остальные допустимые варианты без удаления из lossless catalog.
 
-- общая цветность лица/оборота для пользовательского набора;
-- grammage;
-- paper BYN/kg;
-- color plate BYN/шт.;
-- optional layout preparation BYN/форму;
-- отсутствие прайса не превращается в нулевую стоимость.
-
-## 5. Фактический end-to-end пользовательский pipeline
+## 6. Текущий production pipeline
 
 ```text
 sheet/product inputs
 → printable geometry
 → fitting 0°/90° grids
 → user order page pairs
-→ two plan-family per orientation
+→ two uniform plan-family per orientation
 → front/back materialization
 → imposition validation
 → production report
@@ -176,9 +146,9 @@ sheet/product inputs
 → real schemes/report/PDF
 ```
 
-## 6. Текущая finite scope
+## 7. Честная finite scope
 
-Полнота каталога относится только к:
+Полнота текущего каталога относится только к:
 
 ```text
 один общий формат изделия
@@ -190,56 +160,65 @@ sheet/product inputs
 × полные front/back page pairs
 ```
 
-Нельзя утверждать глобальную полноту за пределами этой области.
+Текущий движок ещё не является общим solver сложных многовидовых монтажей.
 
-## 7. Что ещё отсутствует
+## 8. Что ещё отсутствует
 
-- дополнительные plan-family и bounded search последовательностей форм;
-- automatic user-driven work-and-turn;
-- vertical work-and-turn;
+### Product layer
+
+- versioned application state;
+- built-in и local sheet/press presets;
+- migrations и deterministic serialization;
+- полноценные product rows с индивидуальными параметрами;
+- coherent live calculation snapshot;
+- чистый новый desktop workspace;
+- самостоятельный mobile workflow;
+- project save/import/export.
+
+### Solver
+
 - automatic mixed-format packing;
+- разные форматы и тиражи в одном search;
 - mixed rotations на одном листе;
-- индивидуальные параметры каждой строки;
+- bounded sequences частично заполненных форм;
+- automatic user-driven work-and-turn;
 - односторонние/нечётные работы;
-- тетрадный/фальцевальный спуск;
-- machine profiles;
-- прибыль/убыток, маржа и стоимость дополнительных операций;
-- project persistence/import/export;
-- heavy-search worker, progress/cancel/time limits;
-- единая таблица `Только различия`;
-- полный accessibility/performance/browser audit;
+- progress/cancel/time limits;
 - production beta matrix.
 
-## 8. Опубликованный release `0.7.0-alpha.5`
+### Economics
 
-- version PR `#49`, merge commit `195d6496a291095a69cc9089a64154561ffbb1fa`;
-- publication PR `#50`, merge commit `546f637a25b51f72706ebbe7346acb2df9819af8`;
-- exact publication-head Quality: `173/173`;
-- exact publication-head Chromium/PDF: `16/16`, PDF `8 + 6` A4 страниц;
-- recovery branch и tag указывают на release commit;
-- prerelease содержит focused PNG и permanent evidence ZIP;
-- patchnote валиден и ожидает следующего внешнего FIFO scan uNews, если ещё не опубликован.
+- выручка;
+- прибыль/убыток;
+- маржа;
+- стоимость резки, фальцовки и дополнительных операций.
 
-## 9. Следующий функциональный milestone
+## 9. Следующий обязательный кодовый PR — R2
 
-M7.6 должен завершить операторскую систему сравнения:
+R2 не является визуальным redesign.
 
-- одна компактная строка на вариант;
-- полный каталог без удаления;
-- режим `Только различия`;
-- component deltas;
-- sorting/filtering без regeneration;
-- weight/paper/forms/plates/passes/overrun/cost/unit cost;
-- plan-family и duplex strategy;
-- выбранный вариант раскрывает schemes/report/PDF;
-- desktop/mobile evidence.
+Измеримая цель:
 
-После M7.6 расширять search space отдельными небольшими патчами.
+- pure versioned application-state model;
+- sheet/press preset schema;
+- встроенные presets;
+- local preset repository;
+- localStorage persistence;
+- migrations;
+- deterministic import/export representation;
+- unit tests;
+- никаких production formula changes;
+- никакого нового UI в том же PR.
 
-## 10. Известный неблокирующий долг
+После R2 визуальное направление должно быть отдельно выбрано и только затем реализовано в R3.
 
-Issue `#40`: заменить некорректное изображение существующего Telegram-поста `0.7.0-alpha.2`, сообщение `@uNewsLog/76`, через uNews `edit:media`. Пост не удалять и не публиковать заново.
+## 10. Release status
 
-## 11. Основной handoff
+- version не меняется;
+- новый tag/release не создаётся;
+- release news не создаются для документационного R1;
+- alpha.6 нельзя выпускать как удобный рабочий инструмент до проверки владельцем нового R3–R4 flow на реальном заказе.
 
-Полный операционный контекст для Codex: `docs/CODEX_HANDOFF.md`.
+## 11. Известный неблокирующий долг
+
+Issue `#40`: заменить некорректное изображение существующего Telegram-поста `0.7.0-alpha.2` через uNews `edit:media`.
