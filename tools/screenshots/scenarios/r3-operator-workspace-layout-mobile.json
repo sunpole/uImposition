@@ -2,8 +2,8 @@
   "id": "r3-operator-workspace-layout-mobile",
   "path": "/app/",
   "viewport": {
-    "width": 360,
-    "height": 800
+    "width": 390,
+    "height": 844
   },
   "assertions": [
     {
@@ -14,42 +14,70 @@
   "beforeScreenshot": [
     {
       "action": "wait",
-      "timeoutMs": 800
+      "timeoutMs": 900
     },
     {
       "action": "click",
-      "selector": "[data-mobile-screen='alternatives']"
+      "selector": "#addProductButton"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(2) [data-product-field='print.backColors']",
+      "value": "1"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 350
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.backColors']",
+      "value": "1"
+    },
+    {
+      "action": "waitForHidden",
+      "selector": "#calculationError",
+      "timeoutMs": 10000
     },
     {
       "action": "click",
-      "selector": "#alternativesList .alternative-card:nth-child(2) [data-select-plan]"
+      "selector": "[data-priority='paper']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 900
     },
     {
       "action": "click",
       "selector": "[data-mobile-screen='layout']"
     },
     {
+      "action": "click",
+      "selector": "[data-acceptance-layout='both']"
+    },
+    {
       "action": "wait",
-      "timeoutMs": 650
+      "timeoutMs": 500
     }
   ],
   "beforeScreenshotAssertions": [
     {
-      "selector": "#layoutTitle",
-      "text": "Лицо и производственные показатели"
+      "selector": "#calculationError",
+      "hidden": true
     },
     {
       "selector": "#layoutDetails",
       "text": "Выбранный план"
     },
     {
-      "selector": "#layoutSheet",
-      "text": "Листовка А6"
+      "selector": ".layout-pair",
+      "text": "Оборот · зеркально"
     },
     {
       "selector": "[data-mobile-screen='layout']",
       "text": "Схема"
     }
   ],
+  "screenshotSelector": ".screen--layout",
   "screenshot": "uimposition-r3-operator-workspace-layout-mobile.png"
 }
