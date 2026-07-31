@@ -43,7 +43,7 @@ async function runAssertions(page, assertions = []) {
 async function runBeforeScreenshotActions(page, actions = []) {
   for (const action of actions) {
     if (action.action === "click") {
-      const locator = page.locator(action.selector);
+      const locator = page.locator(action.selector).first();
       await expect(locator).toBeVisible();
       await locator.click();
       continue;
