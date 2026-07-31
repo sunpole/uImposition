@@ -7,6 +7,7 @@ import {
 const details = document.querySelector("#layoutDetails");
 let rendering = false;
 let busy = false;
+let lastSignature = null;
 
 function workspaceSnapshot() {
   return window.__uimpositionR3?.getSnapshot?.() ?? null;
@@ -21,7 +22,17 @@ function readySnapshot() {
     && result.status === "ready"
     && result.revision === currentRevision,
   );
-  return { snapshot, result, ready };
+  return { snapshot, result, currentRevision, ready };
+}
+
+function controlSignature({ result, currentRevision, ready }) {
+  return JSON.stringify({
+    planId: result?.selectedPlanId ?? null,
+    resultRevision: result?.revision ?? null,
+    currentRevision,
+    ready,
+    busy,
+  });
 }
 
 function removePlaceholder() {
@@ -43,14 +54,24 @@ function exportButton(type, label, enabled) {
   return button;
 }
 
-function renderControls() {
+function renderControls({ force = false } = {}) {
   if (!details || rendering) return;
+  const snapshot = readySnapshot();
+  const signature = controlSignature(snapshot);
+  if (
+    !force
+    && signature === lastSignature
+    && details.querySelector("[data-workspace-export]")
+  ) {
+    return;
+  }
+
   rendering = true;
+  lastSignature = signature;
   try {
     removePlaceholder();
     details.querySelector("[data-workspace-export]")?.remove();
-    const { result, ready } = readySnapshot();
-    if (!result) return;
+    if (!snapshot.result) return;
 
     const section = document.createElement("section");
     section.dataset.workspaceExport = "true";
@@ -59,7 +80,7 @@ function renderControls() {
     section.style.borderTop = "1px solid var(--line)";
     section.innerHTML = `
       <p class="kicker">PDF выбранного плана</p>
-      <p class="muted" data-workspace-export-status>${ready
+      <p class="muted" data-workspace-export-status>${snapshot.ready
         ? "Схемы и отчёт будут сформированы из текущего выбора оператора."
         : "Исправьте текущий ввод: экспорт предыдущей ревизии отключён."}</p>
       <div data-workspace-export-actions style="display:grid;gap:7px;margin-top:10px"></div>
@@ -69,12 +90,12 @@ function renderControls() {
       exportButton(
         OPERATOR_WORKSPACE_EXPORT_TYPES.SCHEMES,
         "Скачать схемы PDF",
-        ready && !busy,
+        snapshot.ready && !busy,
       ),
       exportButton(
         OPERATOR_WORKSPACE_EXPORT_TYPES.REPORT,
         "Скачать отчёт PDF",
-        ready && !busy,
+        snapshot.ready && !busy,
       ),
     );
     details.append(section);
@@ -87,15 +108,13 @@ async function handleExport(type) {
   if (busy) return;
   const { result, ready } = readySnapshot();
   if (!ready) {
-    renderControls();
+    renderControls({ force: true });
     return;
   }
 
   const models = createOperatorWorkspaceExportModels(result);
-  const section = details.querySelector("[data-workspace-export]");
-  const status = section?.querySelector("[data-workspace-export-status]");
   busy = true;
-  renderControls();
+  renderControls({ force: true });
   const activeStatus = details.querySelector("[data-workspace-export-status]");
   if (activeStatus) activeStatus.textContent = type === OPERATOR_WORKSPACE_EXPORT_TYPES.SCHEMES
     ? "Формируем страницы схем…"
@@ -114,7 +133,7 @@ async function handleExport(type) {
     }));
   } finally {
     busy = false;
-    setTimeout(renderControls, 0);
+    setTimeout(() => renderControls({ force: true }), 0);
   }
 }
 
@@ -124,18 +143,18 @@ details?.addEventListener("click", (event) => {
 });
 
 if (details) {
-  const observer = new MutationObserver(() => queueMicrotask(renderControls));
+  const observer = new MutationObserver(() => queueMicrotask(() => renderControls()));
   observer.observe(details, { childList: true, subtree: true });
   const waitForWorkspace = setInterval(() => {
     if (!window.__uimpositionR3) return;
     clearInterval(waitForWorkspace);
-    renderControls();
+    renderControls({ force: true });
   }, 25);
   setTimeout(() => clearInterval(waitForWorkspace), 10000);
 }
 
 window.__uimpositionR3Export = Object.freeze({
-  render: renderControls,
+  render: () => renderControls({ force: true }),
   download: handleExport,
   getModels: () => {
     const { result, ready } = readySnapshot();
