@@ -30,6 +30,25 @@ export const CONFIG = Object.freeze({
 
   bleedPresetsMm: [0, 2, 5],
 
+  productRows: {
+    defaults: {
+      finishedWidthMm: 105,
+      finishedHeightMm: 148,
+      quantityPerVariant: null,
+      variantCount: 1,
+      pages: 2,
+      printMode: "duplex",
+      frontColors: 4,
+      backColors: 4,
+      duplexPreference: "auto",
+      bleedMode: "uniform",
+      bleedUniformMm: 0,
+      cutMode: "commonCut",
+      gapMm: 0,
+      rotationPolicy: "auto",
+    },
+  },
+
   defaults: {
     sheetPresetId: "custom",
     sheetWidth: 620,
@@ -65,6 +84,12 @@ export const CONFIG = Object.freeze({
     maxOrders: 500,
     maxPagesPerFile: 10000,
     maxQuantity: 100000000,
+    maxProductVariants: 1000,
+    maxTotalProductQuantity: 100000000,
+    maxColorUnits: 12,
+    maxProductNameLength: 160,
+    maxProductSourceFileNameLength: 240,
+    maxProductNotesLength: 2000,
     maxPreviewCells: 200,
     maxPagePairRows: 500,
     decimalStepMm: 0.1,

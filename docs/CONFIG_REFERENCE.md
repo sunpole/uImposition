@@ -13,11 +13,13 @@ All editable production, export, and search parameters live in `src/config.js` o
 | `app` | название, язык, единицы / name, language, units |
 | `sheetPresets` | размеры после зачистки / post-trim sizes |
 | `productPresets` | A4, A5, A6 / finished sizes |
-| `defaults` | первый запуск / initial state |
+| `productRows` | defaults реального вида продукции / real product-row defaults |
+| `defaults` | первый запуск legacy UI / legacy initial state |
 | `limits` | допустимые диапазоны / allowed ranges |
-| `storage` | browser storage keys |
+| `storage` | versioned browser storage keys |
 | `demo` | контрольный заказ и монтажи / control input |
 | `pdf` | страницы, рендер, качество и имена PDF / PDF pages, rendering, quality, names |
+| `pricing` | валюта, required/optional price inputs и defaults |
 | `optimizer` | границы пространства поиска / search-space boundaries |
 | `i18n` | подписи интерфейса / interface labels |
 
@@ -37,6 +39,86 @@ press passes = 2 × physical sheets
 ```
 
 `afterTrim` не уменьшается повторно. Недопечатка блокирует производственную готовность.
+
+## Operator-first sheet/press storage
+
+```text
+CONFIG.storage.applicationStateKey    = "uImposition.project.v1"
+CONFIG.storage.sheetPressPresetsKey   = "uImposition.sheetPressPresets.v1"
+CONFIG.storage.projectKey             = "uImposition.m2.project"  // legacy recovery
+```
+
+Новые ключи принадлежат versioned R2 state. Старый `projectKey` не переиспользуется молча и сохраняется для явной migration/recovery.
+
+## Product row defaults
+
+```text
+CONFIG.productRows.defaults.finishedWidthMm      = 105
+CONFIG.productRows.defaults.finishedHeightMm     = 148
+CONFIG.productRows.defaults.quantityPerVariant   = null
+CONFIG.productRows.defaults.variantCount         = 1
+CONFIG.productRows.defaults.pages                = 2
+CONFIG.productRows.defaults.printMode            = "duplex"
+CONFIG.productRows.defaults.frontColors          = 4
+CONFIG.productRows.defaults.backColors           = 4
+CONFIG.productRows.defaults.duplexPreference     = "auto"
+CONFIG.productRows.defaults.bleedMode            = "uniform"
+CONFIG.productRows.defaults.bleedUniformMm       = 0
+CONFIG.productRows.defaults.cutMode              = "commonCut"
+CONFIG.productRows.defaults.gapMm                = 0
+CONFIG.productRows.defaults.rotationPolicy       = "auto"
+```
+
+Эти значения создают новый черновик будущего UI. `quantityPerVariant = null` намеренно требует явного тиража оператора.
+
+`productRows.defaults` не является набором скрытых производственных решений. Он только задаёт начальные значения поля формы; validation и solver получают явный normalized product row.
+
+## Product row limits
+
+```text
+CONFIG.limits.maxProductVariants              = 1000
+CONFIG.limits.maxTotalProductQuantity          = 100000000
+CONFIG.limits.maxColorUnits                    = 12
+CONFIG.limits.maxProductNameLength             = 160
+CONFIG.limits.maxProductSourceFileNameLength   = 240
+CONFIG.limits.maxProductNotesLength            = 2000
+```
+
+Дополнительно переиспользуются:
+
+```text
+min/maxProductDimensionMm
+min/maxBleedMm
+min/maxGapMm
+maxPagesPerFile
+maxQuantity
+maxOrders
+```
+
+Длинные operator draft strings не обрезаются. Модель возвращает field-level issue с фактической длиной и limit.
+
+## Product row compatibility boundary
+
+Общая product-row schema может хранить:
+
+- simplex и duplex;
+- odd/even pages;
+- auto/forced rotation;
+- auto/separate/work-and-turn preference;
+- разные finished sizes и print specification между строками.
+
+Текущий user uniform pipeline принимает только явно совместимое подмножество:
+
+```text
+duplex
+× complete even page pairs
+× auto rotation
+× no generalized work-and-turn request
+× one shared finished geometry
+× one shared color/bleed/cut specification
+```
+
+Это разделение является validation contract, а не скрытым изменением solver.
 
 ## Контрольные источники / Control sources
 
@@ -163,6 +245,8 @@ color plates = 24
 
 ## Значения первого запуска / Initial defaults
 
+### Legacy UI
+
 - язык: `ru`;
 - исходный лист: `620 × 450`;
 - зачистка: `2` мм с каждой стороны;
@@ -173,3 +257,21 @@ color plates = 24
 - дополнительный зазор: `0`;
 - PDF схем: A4;
 - пространство M6: полные кандидаты с 1–2 различными парами, максимум `10000` кандидатов.
+
+### New operator-first product draft
+
+- finished format: A6 `105 × 148`;
+- тираж: незаполнен;
+- variants: `1`;
+- pages: `2`;
+- цветность: `4+4`;
+- duplex preference: `auto`;
+- bleed: `0`;
+- cut: `commonCut`;
+- rotation: `auto`.
+
+---
+
+## English summary
+
+Configuration now separates legacy first-run defaults from the new operator-first product-row defaults. A draft product starts as A6 duplex 4+4 with one variant and an explicit missing run length. Product limits cover dimensions, variants, total run, color units and text sizes. The general product schema can preserve simplex, forced rotations and mixed specifications, while a separate compatibility validator restricts the existing uniform solver to its documented supported subset.
