@@ -12,14 +12,17 @@ function addMismatch(errors, label, actual, expected) {
   if (actual !== expected) errors.push(`${label}: expected ${expected}, received ${actual}`);
 }
 
-function expectedFormsForMode(duplexMode) {
-  if (duplexMode === DUPLEX_STRATEGIES.SEPARATE_FRONT_BACK_FORMS) {
-    return { frontForms: 1, backForms: 1, forms: 2 };
-  }
+function expectedRunShape(metric, duplexMode) {
   if (duplexMode === DUPLEX_STRATEGIES.WORK_AND_TURN) {
-    return { frontForms: 1, backForms: 0, forms: 1 };
+    return { frontForms: 1, backForms: 0, forms: 1, printedSideCount: 2 };
   }
-  return null;
+  const backPrinted = Boolean(metric?.backPrinted);
+  return {
+    frontForms: 1,
+    backForms: backPrinted ? 1 : 0,
+    forms: backPrinted ? 2 : 1,
+    printedSideCount: backPrinted ? 2 : 1,
+  };
 }
 
 export function validateProductionReport(report) {
@@ -52,11 +55,18 @@ export function validateProductionReport(report) {
       ? metric.contributions.reduce((sum, contribution) => sum + Number(contribution?.producedQuantity ?? 0), 0)
       : 0;
     addMismatch(errors, `${prefix} contribution total`, contributionTotal, metric?.producedQuantity);
-
-    const expectedUnderproduction = Math.max(0, Number(metric?.requiredQuantity ?? 0) - Number(metric?.producedQuantity ?? 0));
-    const expectedOverrun = Math.max(0, Number(metric?.producedQuantity ?? 0) - Number(metric?.requiredQuantity ?? 0));
-    addMismatch(errors, `${prefix} underproduction`, metric?.underproduction, expectedUnderproduction);
-    addMismatch(errors, `${prefix} overrun`, metric?.overrun, expectedOverrun);
+    addMismatch(
+      errors,
+      `${prefix} underproduction`,
+      metric?.underproduction,
+      Math.max(0, Number(metric?.requiredQuantity ?? 0) - Number(metric?.producedQuantity ?? 0)),
+    );
+    addMismatch(
+      errors,
+      `${prefix} overrun`,
+      metric?.overrun,
+      Math.max(0, Number(metric?.producedQuantity ?? 0) - Number(metric?.requiredQuantity ?? 0)),
+    );
 
     requiredPairQuantity += Number(metric?.requiredQuantity ?? 0);
     producedPairQuantity += Number(metric?.producedQuantity ?? 0);
@@ -72,28 +82,14 @@ export function validateProductionReport(report) {
   fileMetrics.forEach((metric, index) => {
     const prefix = `File metric ${index + 1}`;
     const matchingPairs = pairMetrics.filter((pair) => pair.file === metric?.file);
-    if (matchingPairs.length !== metric?.pairCount) {
-      errors.push(`${prefix} pair count does not match pair metrics`);
-    }
-
+    if (matchingPairs.length !== metric?.pairCount) errors.push(`${prefix} pair count does not match pair metrics`);
     if (matchingPairs.length > 0) {
       const expectedProduced = Math.min(...matchingPairs.map((pair) => pair.producedQuantity));
       const expectedMaximum = Math.max(...matchingPairs.map((pair) => pair.producedQuantity));
       addMismatch(errors, `${prefix} producedQuantity`, metric?.producedQuantity, expectedProduced);
       addMismatch(errors, `${prefix} maximumPairQuantity`, metric?.maximumPairQuantity, expectedMaximum);
-      addMismatch(
-        errors,
-        `${prefix} unevenPairProduction`,
-        metric?.unevenPairProduction,
-        expectedMaximum - expectedProduced,
-      );
+      addMismatch(errors, `${prefix} unevenPairProduction`, metric?.unevenPairProduction, expectedMaximum - expectedProduced);
     }
-
-    const expectedUnderproduction = Math.max(0, Number(metric?.requiredQuantity ?? 0) - Number(metric?.producedQuantity ?? 0));
-    const expectedOverrun = Math.max(0, Number(metric?.producedQuantity ?? 0) - Number(metric?.requiredQuantity ?? 0));
-    addMismatch(errors, `${prefix} underproduction`, metric?.underproduction, expectedUnderproduction);
-    addMismatch(errors, `${prefix} overrun`, metric?.overrun, expectedOverrun);
-
     requiredFileQuantity += Number(metric?.requiredQuantity ?? 0);
     producedCompleteFileQuantity += Number(metric?.producedQuantity ?? 0);
     fileUnderproduction += Number(metric?.underproduction ?? 0);
@@ -101,49 +97,28 @@ export function validateProductionReport(report) {
   });
 
   if (runMetrics && Array.isArray(runMetrics.impositions)) {
-    const expectedForms = expectedFormsForMode(runMetrics.duplexMode);
-    if (!expectedForms) errors.push(`Unsupported duplex mode: ${runMetrics.duplexMode}`);
-    if (report?.duplexMode !== runMetrics.duplexMode) {
-      errors.push("Production report duplexMode does not match run metrics");
-    }
-
+    if (report?.duplexMode !== runMetrics.duplexMode) errors.push("Production report duplexMode does not match run metrics");
     runMetrics.impositions.forEach((metric, index) => {
       const prefix = `Run metric ${index + 1}`;
       if (!isPositiveInteger(metric?.runLength)) errors.push(`${prefix} has invalid runLength`);
+      const expected = expectedRunShape(metric, runMetrics.duplexMode);
       addMismatch(errors, `${prefix} physicalSheets`, metric?.physicalSheets, metric?.runLength);
-      addMismatch(errors, `${prefix} pressPasses`, metric?.pressPasses, Number(metric?.runLength ?? 0) * 2);
-      if (expectedForms) {
-        addMismatch(errors, `${prefix} frontForms`, metric?.frontForms, expectedForms.frontForms);
-        addMismatch(errors, `${prefix} backForms`, metric?.backForms, expectedForms.backForms);
-        addMismatch(errors, `${prefix} forms`, metric?.forms, expectedForms.forms);
-      }
+      addMismatch(errors, `${prefix} frontForms`, metric?.frontForms, expected.frontForms);
+      addMismatch(errors, `${prefix} backForms`, metric?.backForms, expected.backForms);
+      addMismatch(errors, `${prefix} forms`, metric?.forms, expected.forms);
+      addMismatch(errors, `${prefix} printedSideCount`, metric?.printedSideCount, expected.printedSideCount);
+      addMismatch(
+        errors,
+        `${prefix} pressPasses`,
+        metric?.pressPasses,
+        Number(metric?.runLength ?? 0) * expected.printedSideCount,
+      );
     });
 
-    const physicalSheets = runMetrics.impositions.reduce(
-      (sum, metric) => sum + Number(metric?.physicalSheets ?? 0),
-      0,
-    );
-    const frontForms = runMetrics.impositions.reduce(
-      (sum, metric) => sum + Number(metric?.frontForms ?? 0),
-      0,
-    );
-    const backForms = runMetrics.impositions.reduce(
-      (sum, metric) => sum + Number(metric?.backForms ?? 0),
-      0,
-    );
-    const forms = runMetrics.impositions.reduce(
-      (sum, metric) => sum + Number(metric?.forms ?? 0),
-      0,
-    );
-    const pressPasses = runMetrics.impositions.reduce(
-      (sum, metric) => sum + Number(metric?.pressPasses ?? 0),
-      0,
-    );
-    addMismatch(errors, "Run metrics physicalSheets", runMetrics.physicalSheets, physicalSheets);
-    addMismatch(errors, "Run metrics frontForms", runMetrics.frontForms, frontForms);
-    addMismatch(errors, "Run metrics backForms", runMetrics.backForms, backForms);
-    addMismatch(errors, "Run metrics forms", runMetrics.forms, forms);
-    addMismatch(errors, "Run metrics pressPasses", runMetrics.pressPasses, pressPasses);
+    for (const field of ["physicalSheets", "frontForms", "backForms", "forms", "pressPasses"]) {
+      const expected = runMetrics.impositions.reduce((sum, metric) => sum + Number(metric?.[field] ?? 0), 0);
+      addMismatch(errors, `Run metrics ${field}`, runMetrics[field], expected);
+    }
   }
 
   if (totals) {
@@ -154,33 +129,19 @@ export function validateProductionReport(report) {
     addMismatch(errors, "Totals underproduction", totals.underproduction, pairUnderproduction);
     addMismatch(errors, "Totals overrun", totals.overrun, pairOverrun);
     addMismatch(errors, "Totals requiredFileQuantity", totals.requiredFileQuantity, requiredFileQuantity);
-    addMismatch(
-      errors,
-      "Totals producedCompleteFileQuantity",
-      totals.producedCompleteFileQuantity,
-      producedCompleteFileQuantity,
-    );
+    addMismatch(errors, "Totals producedCompleteFileQuantity", totals.producedCompleteFileQuantity, producedCompleteFileQuantity);
     addMismatch(errors, "Totals fileUnderproduction", totals.fileUnderproduction, fileUnderproduction);
     addMismatch(errors, "Totals fileOverrun", totals.fileOverrun, fileOverrun);
-
     if (runMetrics) {
       addMismatch(errors, "Totals impositionCount", totals.impositionCount, runMetrics.impositionCount);
-      addMismatch(errors, "Totals physicalSheets", totals.physicalSheets, runMetrics.physicalSheets);
-      addMismatch(errors, "Totals frontForms", totals.frontForms, runMetrics.frontForms);
-      addMismatch(errors, "Totals backForms", totals.backForms, runMetrics.backForms);
-      addMismatch(errors, "Totals forms", totals.forms, runMetrics.forms);
-      addMismatch(errors, "Totals pressPasses", totals.pressPasses, runMetrics.pressPasses);
+      for (const field of ["physicalSheets", "frontForms", "backForms", "forms", "pressPasses"]) {
+        addMismatch(errors, `Totals ${field}`, totals[field], runMetrics[field]);
+      }
     }
   }
 
-  if (pairUnderproduction > 0) {
-    errors.push(`Underproduction is forbidden: ${pairUnderproduction}`);
-  }
-
-  return Object.freeze({
-    valid: errors.length === 0,
-    errors: Object.freeze(errors),
-  });
+  if (pairUnderproduction > 0) errors.push(`Underproduction is forbidden: ${pairUnderproduction}`);
+  return Object.freeze({ valid: errors.length === 0, errors: Object.freeze(errors) });
 }
 
 export function assertProductionReady(report) {

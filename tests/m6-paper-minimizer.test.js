@@ -81,14 +81,20 @@ test("the constructed candidates materialize into independently validated produc
     impositions,
     duplexMode: controlCase.duplexMode,
   });
+  const expectedPressPasses = report.runMetrics.impositions.reduce(
+    (sum, metric) => sum + metric.runLength * (metric.backPrinted ? 2 : 1),
+    0,
+  );
 
   assert.equal(impositions.length, 56);
   assert.ok(impositions.every((record) => record.validation.valid));
   assert.equal(report.valid, true);
   assert.equal(report.status, "ready");
   assert.equal(report.totals.physicalSheets, 3305);
-  assert.equal(report.totals.forms, 112);
-  assert.equal(report.totals.pressPasses, 6610);
+  assert.equal(report.totals.frontForms, 56);
+  assert.equal(report.totals.backForms, 40);
+  assert.equal(report.totals.forms, 96);
+  assert.equal(report.totals.pressPasses, expectedPressPasses);
   assert.equal(report.totals.requiredPairQuantity, 52870);
   assert.equal(report.totals.producedPairQuantity, 52880);
   assert.equal(report.totals.underproduction, 0);

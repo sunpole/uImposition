@@ -83,7 +83,7 @@ test("invalid current draft keeps the previous valid workspace result", () => {
   assert.equal(first.result.status, "ready");
   assert.equal(first.state.runtime.calculation.status, "ready");
 
-  const invalid = updateApplicationProductRow(first.state, "product:1", { pages: 3 });
+  const invalid = updateApplicationProductRow(first.state, "product:1", { pages: 0 });
   const invalidRequest = createOperatorWorkspaceCalculationRequest(invalid);
   const second = resolveOperatorWorkspaceCalculation({
     currentState: invalidRequest.inputState,
@@ -96,8 +96,8 @@ test("invalid current draft keeps the previous valid workspace result", () => {
   assert.equal(second.result, first.lastValidResult);
   assert.equal(second.lastValidResult, first.lastValidResult);
   assert.equal(second.attemptedResult.status, "invalid");
-  assert.ok(second.attemptedResult.issues.some(({ code }) => (
-    code === "uniformPipelineRequiresCompletePagePairs"
+  assert.ok(second.attemptedResult.issues.some(({ code, field }) => (
+    code === "outOfRange" && field === "pages"
   )));
 });
 

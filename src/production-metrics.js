@@ -197,12 +197,17 @@ export function calculateFileMetrics(pairMetrics) {
   }));
 }
 
-function formMetricsForDuplexMode(duplexMode) {
+function formMetricsForDuplexMode(duplexMode, backPrinted) {
   if (duplexMode === DUPLEX_MODES.SEPARATE_FRONT_BACK_FORMS) {
-    return Object.freeze({ frontForms: 1, backForms: 1, forms: 2 });
+    return Object.freeze({
+      frontForms: 1,
+      backForms: backPrinted ? 1 : 0,
+      forms: backPrinted ? 2 : 1,
+      printedSideCount: backPrinted ? 2 : 1,
+    });
   }
   if (duplexMode === DUPLEX_MODES.WORK_AND_TURN) {
-    return Object.freeze({ frontForms: 1, backForms: 0, forms: 1 });
+    return Object.freeze({ frontForms: 1, backForms: 0, forms: 1, printedSideCount: 2 });
   }
   throw new RangeError(`Unsupported duplex mode: ${duplexMode}`);
 }
@@ -214,7 +219,6 @@ export function calculateRunMetrics({
   if (!Array.isArray(impositions) || impositions.length === 0) {
     throw new TypeError("impositions must be a non-empty array");
   }
-  const perImpositionForms = formMetricsForDuplexMode(duplexMode);
 
   const ids = new Set();
   const impositionMetrics = impositions.map((record, index) => {
@@ -232,14 +236,18 @@ export function calculateRunMetrics({
     if (ids.has(front.id)) throw new RangeError(`Duplicate imposition id: ${front.id}`);
     ids.add(front.id);
 
+    const backPrinted = back.cells.some((cell) => cell.page !== null && cell.backPage !== null);
+    const perImpositionForms = formMetricsForDuplexMode(duplexMode, backPrinted);
     return Object.freeze({
       impositionId: front.id,
       runLength: front.runLength,
       physicalSheets: front.runLength,
+      backPrinted,
+      printedSideCount: perImpositionForms.printedSideCount,
       frontForms: perImpositionForms.frontForms,
       backForms: perImpositionForms.backForms,
       forms: perImpositionForms.forms,
-      pressPasses: front.runLength * 2,
+      pressPasses: front.runLength * perImpositionForms.printedSideCount,
     });
   });
 
