@@ -1,3 +1,5 @@
+import { DUPLEX_STRATEGIES } from "./duplex-strategies.js";
+
 function isNonNegativeInteger(value) {
   return Number.isInteger(value) && value >= 0;
 }
@@ -8,6 +10,19 @@ function isPositiveInteger(value) {
 
 function addMismatch(errors, label, actual, expected) {
   if (actual !== expected) errors.push(`${label}: expected ${expected}, received ${actual}`);
+}
+
+function expectedRunShape(metric, duplexMode) {
+  if (duplexMode === DUPLEX_STRATEGIES.WORK_AND_TURN) {
+    return { frontForms: 1, backForms: 0, forms: 1, printedSideCount: 2 };
+  }
+  const backPrinted = Boolean(metric?.backPrinted);
+  return {
+    frontForms: 1,
+    backForms: backPrinted ? 1 : 0,
+    forms: backPrinted ? 2 : 1,
+    printedSideCount: backPrinted ? 2 : 1,
+  };
 }
 
 export function validateProductionReport(report) {
@@ -86,18 +101,17 @@ export function validateProductionReport(report) {
     runMetrics.impositions.forEach((metric, index) => {
       const prefix = `Run metric ${index + 1}`;
       if (!isPositiveInteger(metric?.runLength)) errors.push(`${prefix} has invalid runLength`);
-      const expectedBackForms = metric?.backPrinted ? 1 : 0;
-      const expectedPrintedSideCount = metric?.backPrinted ? 2 : 1;
+      const expected = expectedRunShape(metric, runMetrics.duplexMode);
       addMismatch(errors, `${prefix} physicalSheets`, metric?.physicalSheets, metric?.runLength);
-      addMismatch(errors, `${prefix} frontForms`, metric?.frontForms, 1);
-      addMismatch(errors, `${prefix} backForms`, metric?.backForms, expectedBackForms);
-      addMismatch(errors, `${prefix} forms`, metric?.forms, 1 + expectedBackForms);
-      addMismatch(errors, `${prefix} printedSideCount`, metric?.printedSideCount, expectedPrintedSideCount);
+      addMismatch(errors, `${prefix} frontForms`, metric?.frontForms, expected.frontForms);
+      addMismatch(errors, `${prefix} backForms`, metric?.backForms, expected.backForms);
+      addMismatch(errors, `${prefix} forms`, metric?.forms, expected.forms);
+      addMismatch(errors, `${prefix} printedSideCount`, metric?.printedSideCount, expected.printedSideCount);
       addMismatch(
         errors,
         `${prefix} pressPasses`,
         metric?.pressPasses,
-        Number(metric?.runLength ?? 0) * expectedPrintedSideCount,
+        Number(metric?.runLength ?? 0) * expected.printedSideCount,
       );
     });
 
