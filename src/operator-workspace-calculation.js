@@ -5,16 +5,16 @@ import {
   failApplicationCalculation,
   normalizeApplicationState,
 } from "./application-state.js";
+import { normalizeProductRowCollection } from "./product-row-collection.js";
 import {
-  expandProductRowsToLegacyOrders,
-  normalizeProductRowCollection,
-  validateProductRowsForUniformPipeline,
-} from "./product-row-collection.js";
+  createOddPageUniformProductionPlanSet,
+  expandOddPageProductRowsToLegacyOrders,
+  validateProductRowsForOddPageUniformPipeline,
+} from "./odd-page-uniform-support.js";
 import { calculatePlacementOptions, calculateSheetGeometry } from "./geometry.js";
 import { expandPagePairs } from "./orders.js";
 import { createDuplexPrintSpecification } from "./print-specification.js";
 import { createPricingProfile } from "./production-cost.js";
-import { createUserUniformProductionPlanSet } from "./user-uniform-production-plans.js";
 
 export const OPERATOR_WORKSPACE_CALCULATION_KIND = "operatorWorkspaceCalculation";
 export const OPERATOR_WORKSPACE_REQUEST_KIND = "operatorWorkspaceCalculationRequest";
@@ -83,25 +83,22 @@ function formatPlan(plan, entry) {
 }
 
 function layoutPreview(plan) {
-  const descriptor = plan.runDescriptors[0] ?? null;
-  if (!descriptor) return null;
-  const cells = descriptor.candidate.pairPositions.flatMap((position) => Array.from(
-    { length: position.positionCount },
-    () => deepFreeze({
-      file: position.file,
-      pairIndex: position.pairIndex,
-      frontPage: position.frontPage,
-      backPage: position.backPage,
-    }),
-  ));
+  const record = plan.impositions[0] ?? null;
+  if (!record?.front) return null;
   return deepFreeze({
     planId: plan.id,
-    rotation: descriptor.candidate.rotation,
-    rows: descriptor.candidate.rows,
-    columns: descriptor.candidate.columns,
-    capacity: descriptor.candidate.capacity,
-    runLength: descriptor.runLength,
-    cells,
+    rotation: record.front.rotation,
+    rows: record.front.rows,
+    columns: record.front.columns,
+    capacity: record.front.rows * record.front.columns,
+    runLength: record.front.runLength,
+    cells: record.front.cells.map((cell) => deepFreeze({
+      file: cell.file,
+      pairIndex: cell.pairIndex,
+      frontPage: cell.frontPage,
+      backPage: cell.backPage,
+      technicalBlankBack: cell.backPage === null,
+    })),
   });
 }
 
@@ -128,7 +125,7 @@ function invalidResult({ state, validation, extraIssues = [] }) {
 export function calculateOperatorWorkspace(state, config = CONFIG) {
   const normalizedState = normalizeApplicationState(state, config);
   const collection = normalizeProductRowCollection(normalizedState.input.products, config);
-  const validation = validateProductRowsForUniformPipeline(collection, config);
+  const validation = validateProductRowsForOddPageUniformPipeline(collection, config);
   if (!validation.valid) return invalidResult({ state: normalizedState, validation });
 
   const enabledRows = collection.rows.filter(({ enabled }) => enabled);
@@ -146,7 +143,7 @@ export function calculateOperatorWorkspace(state, config = CONFIG) {
     });
   }
 
-  const orders = expandProductRowsToLegacyOrders(collection, config);
+  const orders = expandOddPageProductRowsToLegacyOrders(collection, config);
   const pagePairs = expandPagePairs(orders);
   const geometry = calculateSheetGeometry({
     width: normalizedState.input.sheet.width,
@@ -182,7 +179,7 @@ export function calculateOperatorWorkspace(state, config = CONFIG) {
   }
 
   const pricing = pricingProfile(normalizedState.input.pricing);
-  const planSet = createUserUniformProductionPlanSet({
+  const planSet = createOddPageUniformProductionPlanSet({
     pagePairs,
     placementOptions,
     sourceSheet: geometry.source,
