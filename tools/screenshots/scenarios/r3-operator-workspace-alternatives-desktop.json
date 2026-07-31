@@ -1,0 +1,48 @@
+{
+  "id": "r3-operator-workspace-alternatives-desktop",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 800
+    },
+    {
+      "action": "click",
+      "selector": ".quick-comparison [data-open-screen='alternatives']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 150
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#alternativesTitle",
+      "text": "Сравнение вариантов"
+    },
+    {
+      "selector": "#alternativesList",
+      "text": "Рекомендация"
+    },
+    {
+      "selector": "#alternativesList",
+      "text": "Пластины"
+    },
+    {
+      "selector": "#scopeNote",
+      "text": "lossless"
+    }
+  ],
+  "screenshotSelector": "[data-screen='alternatives']",
+  "screenshot": "uimposition-r3-operator-workspace-alternatives-desktop.png"
+}

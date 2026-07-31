@@ -1,0 +1,39 @@
+{
+  "id": "r3-operator-workspace-order-mobile",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    },
+    {
+      "selector": "[data-mobile-screen='order']",
+      "text": "Заказ"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 800
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-product-row]",
+      "text": "Название / файл"
+    },
+    {
+      "selector": "#summaryContent",
+      "text": "листов"
+    },
+    {
+      "selector": "[data-mobile-screen='order']",
+      "text": "Заказ"
+    }
+  ],
+  "screenshot": "uimposition-r3-operator-workspace-order-mobile.png"
+}

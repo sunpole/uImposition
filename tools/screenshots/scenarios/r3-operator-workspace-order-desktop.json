@@ -1,0 +1,44 @@
+{
+  "id": "r3-operator-workspace-order-desktop",
+  "path": "/app/",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    },
+    {
+      "selector": "#productsTitle",
+      "text": "Виды продукции"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 800
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-product-row]",
+      "text": "Название / файл"
+    },
+    {
+      "selector": "#summaryContent",
+      "text": "листов"
+    },
+    {
+      "selector": "#saveStatus",
+      "text": "результат актуален"
+    },
+    {
+      "selector": "#quickComparisonContent",
+      "text": "Пластины"
+    }
+  ],
+  "screenshotSelector": "[data-screen='order']",
+  "screenshot": "uimposition-r3-operator-workspace-order-desktop.png"
+}
