@@ -93,6 +93,7 @@ for (const scenario of scenarios) {
     await page.goto(scenario.path, { waitUntil: "networkidle" });
 
     await runAssertions(page, scenario.assertions);
+    await runBeforeScreenshotActions(page, scenario.beforeDownload);
 
     let downloadEntry = null;
     if (scenario.download) {
@@ -104,7 +105,13 @@ for (const scenario of scenarios) {
       if (failure) throw new Error(`Download failed: ${failure}`);
 
       const suggestedFileName = download.suggestedFilename();
-      expect(suggestedFileName).toBe(scenario.download.fileName);
+      if (scenario.download.fileName) {
+        expect(suggestedFileName).toBe(scenario.download.fileName);
+      } else if (scenario.download.fileNamePattern) {
+        expect(suggestedFileName).toMatch(new RegExp(scenario.download.fileNamePattern));
+      } else {
+        throw new Error("Download scenario requires fileName or fileNamePattern");
+      }
       const artifactFileName = scenario.download.artifact || suggestedFileName;
       const artifactPath = path.join(outputDir, artifactFileName);
       await download.saveAs(artifactPath);
@@ -143,6 +150,7 @@ for (const scenario of scenarios) {
       viewport: scenario.viewport,
       screenshot: scenario.screenshot,
       screenshotSelector: scenario.screenshotSelector || null,
+      beforeDownload: scenario.beforeDownload ?? [],
       beforeScreenshot: scenario.beforeScreenshot ?? [],
       beforeScreenshotAssertions: scenario.beforeScreenshotAssertions ?? [],
       assertions: scenario.assertions,
