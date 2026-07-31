@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  APPLICATION_CALCULATION_STATUSES,
+  beginApplicationCalculation,
   createDefaultApplicationState,
   replaceApplicationInput,
 } from "../src/application-state.js";
@@ -66,6 +68,28 @@ test("application repository saves, loads, exports and clears a normalized snaps
 
   repository.clear();
   assert.equal(repository.load(), null);
+  assert.equal(repository.exportJson(), null);
+});
+
+test("interrupted calculations are persisted as dirty and restartable", () => {
+  const storage = createMemoryStorage();
+  const repository = createApplicationStateRepository({ storage, key: "project" });
+  const calculating = beginApplicationCalculation(createDefaultApplicationState());
+
+  assert.equal(
+    calculating.runtime.calculation.status,
+    APPLICATION_CALCULATION_STATUSES.CALCULATING,
+  );
+  assert.equal(calculating.runtime.calculation.activeRevision, 0);
+
+  const saved = repository.save(calculating);
+  const loaded = repository.load();
+
+  assert.equal(saved.runtime.calculation.status, APPLICATION_CALCULATION_STATUSES.DIRTY);
+  assert.equal(saved.runtime.calculation.activeRevision, null);
+  assert.equal(loaded.runtime.calculation.status, APPLICATION_CALCULATION_STATUSES.DIRTY);
+  assert.equal(loaded.runtime.calculation.activeRevision, null);
+  assert.equal(loaded.runtime.inputRevision, calculating.runtime.inputRevision);
 });
 
 test("application repository import migrates legacy versionless input", () => {
