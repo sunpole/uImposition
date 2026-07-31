@@ -2,7 +2,6 @@ import { CONFIG } from "./config.js";
 import { parseOrders } from "./orders.js";
 import {
   PRODUCT_ISSUE_SEVERITIES,
-  PRODUCT_ROW_SCHEMA_VERSION,
   expandProductRowToLegacyOrders,
   normalizeProductRow,
   normalizeProductRowDraft,
@@ -22,14 +21,32 @@ function deepFreeze(value) {
   return Object.freeze(value);
 }
 
-function collectionIssue(severity, code, field, details = {}) {
+function collectionIssue(severity, code, field, details = {}, blocking = true) {
   return Object.freeze({
     severity,
     code,
     field,
     messageKey: `products.${code}`,
     details: deepFreeze({ ...details }),
+    blocking,
   });
+}
+
+function decorateRowIssue(entry, row, index, blocking = row.enabled) {
+  return deepFreeze({
+    ...entry,
+    rowId: row.id,
+    index,
+    blocking,
+  });
+}
+
+function isBlockingError(entry) {
+  return entry.severity === PRODUCT_ISSUE_SEVERITIES.ERROR && entry.blocking !== false;
+}
+
+function issueSignature(entry) {
+  return [entry.rowId ?? "collection", entry.code, entry.field].join("|");
 }
 
 function canonicalize(value) {
@@ -176,11 +193,15 @@ export function validateProductRowCollection(collection, config = CONFIG) {
   const current = normalizeProductRowCollection(collection, config);
   const rowResults = current.rows.map((row, index) => {
     const result = validateProductRow(row, config);
+    const issues = result.issues.map((entry) => decorateRowIssue(entry, row, index));
     return deepFreeze({
       rowId: row.id,
       index,
-      ...result,
-      issues: result.issues.map((entry) => deepFreeze({ ...entry, rowId: row.id, index })),
+      row: result.row,
+      issues,
+      valid: !issues.some(isBlockingError),
+      draftValid: result.valid,
+      summary: result.summary,
     });
   });
   const issues = rowResults.flatMap(({ issues: rowIssues }) => rowIssues);
@@ -190,6 +211,8 @@ export function validateProductRowCollection(collection, config = CONFIG) {
       PRODUCT_ISSUE_SEVERITIES.WARNING,
       "noEnabledRows",
       "rows",
+      {},
+      false,
     ));
   }
 
@@ -208,7 +231,7 @@ export function validateProductRowCollection(collection, config = CONFIG) {
     collection: current,
     rows: rowResults,
     issues,
-    valid: !issues.some(({ severity }) => severity === PRODUCT_ISSUE_SEVERITIES.ERROR),
+    valid: !issues.some(isBlockingError),
     summary,
   });
 }
@@ -220,6 +243,7 @@ function uniformGeometrySignature(row) {
       mode: row.print.mode,
       frontColors: row.print.frontColors,
       backColors: row.print.backColors,
+      duplexPreference: row.print.duplexPreference,
     },
     bleed: row.bleed,
     cut: row.cut,
@@ -230,12 +254,28 @@ function uniformGeometrySignature(row) {
 export function validateProductRowsForUniformPipeline(collection, config = CONFIG) {
   const base = validateProductRowCollection(collection, config);
   const issues = [...base.issues];
+  const signatures = new Set(issues.map(issueSignature));
   const enabledRows = base.collection.rows.filter(({ enabled }) => enabled);
+
+  if (enabledRows.length === 0) {
+    const emptyIssue = collectionIssue(
+      PRODUCT_ISSUE_SEVERITIES.ERROR,
+      "uniformPipelineRequiresEnabledRows",
+      "rows",
+    );
+    issues.push(emptyIssue);
+    signatures.add(issueSignature(emptyIssue));
+  }
+
   const rowResults = enabledRows.map((row) => validateProductRowForUniformPipeline(row, config));
   rowResults.forEach((result) => {
+    const index = base.collection.rows.findIndex(({ id }) => id === result.row.id);
     result.issues.forEach((entry) => {
-      if (!issues.some((candidate) => candidate.rowId === result.row.id && candidate.code === entry.code)) {
-        issues.push(deepFreeze({ ...entry, rowId: result.row.id }));
+      const decorated = decorateRowIssue(entry, result.row, index, true);
+      const signature = issueSignature(decorated);
+      if (!signatures.has(signature)) {
+        issues.push(decorated);
+        signatures.add(signature);
       }
     });
   });
@@ -257,7 +297,7 @@ export function validateProductRowsForUniformPipeline(collection, config = CONFI
   return deepFreeze({
     ...base,
     issues,
-    valid: !issues.some(({ severity }) => severity === PRODUCT_ISSUE_SEVERITIES.ERROR),
+    valid: !issues.some(isBlockingError),
   });
 }
 
@@ -344,6 +384,6 @@ export function migrateLegacyOrdersToProductRowCollection(input, {
   return deepFreeze({
     collection: normalizeProductRowCollection({ rows }, config),
     issues,
-    valid: issues.length === 0,
+    valid: !issues.some(isBlockingError),
   });
 }
