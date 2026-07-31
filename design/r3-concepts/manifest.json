@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "issue": 71,
+  "type": "design-only",
+  "productionConnected": false,
+  "concepts": [
+    { "id": "compact", "name": "Быстрый производственный стол" },
+    { "id": "split", "name": "Разделённый рабочий экран" },
+    { "id": "console", "name": "Таблица оператора" }
+  ],
+  "viewports": [1440, 1024, 390, 360],
+  "states": ["ready", "calculating", "error"],
+  "rowCounts": [1, 5]
+}
