@@ -82,11 +82,22 @@ function formatPlan(plan, entry) {
   });
 }
 
+function previewRecord(plan) {
+  return plan.impositions.find(({ front }) => (
+    front.cells.some(({ backPage }) => backPage === null)
+  )) ?? plan.impositions[0] ?? null;
+}
+
 function layoutPreview(plan) {
-  const record = plan.impositions[0] ?? null;
+  const record = previewRecord(plan);
   if (!record?.front) return null;
+  const impositionIndex = plan.impositions.indexOf(record);
   return deepFreeze({
     planId: plan.id,
+    impositionId: record.front.id,
+    impositionIndex: impositionIndex + 1,
+    impositionCount: plan.impositions.length,
+    containsTechnicalBlank: record.front.cells.some(({ backPage }) => backPage === null),
     rotation: record.front.rotation,
     rows: record.front.rows,
     columns: record.front.columns,
