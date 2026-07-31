@@ -1,0 +1,57 @@
+{
+  "id": "r3-operator-workspace-local-preset",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#createPresetButton",
+      "text": "Новый пресет"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 600
+    },
+    {
+      "action": "click",
+      "selector": "#createPresetButton"
+    },
+    {
+      "action": "fill",
+      "selector": "#presetForm [name='name']",
+      "value": "Heidelberg 650×313"
+    },
+    {
+      "action": "click",
+      "selector": "#presetForm button[type='submit']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 650
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#presetList",
+      "text": "Heidelberg 650×313"
+    },
+    {
+      "selector": "#presetList",
+      "text": "локальный"
+    },
+    {
+      "selector": "#sheetFacts",
+      "text": "654 × 317"
+    },
+    {
+      "selector": "#sheetFacts",
+      "text": "650 × 313"
+    }
+  ],
+  "screenshotSelector": ".preset-panel",
+  "screenshot": "uimposition-r3-operator-workspace-local-preset.png"
+}
