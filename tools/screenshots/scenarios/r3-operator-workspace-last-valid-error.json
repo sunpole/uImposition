@@ -1,0 +1,49 @@
+{
+  "id": "r3-operator-workspace-last-valid-error",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 800
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row] [data-product-field='quantityPerVariant']",
+      "value": "0"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 500
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#calculationError",
+      "text": "допустимый диапазон"
+    },
+    {
+      "selector": "#summaryContext",
+      "text": "последний корректный результат"
+    },
+    {
+      "selector": "#summaryContent",
+      "text": "Предыдущая ревизия"
+    },
+    {
+      "selector": "[data-field-wrap='quantityPerVariant']",
+      "text": "Тираж вида"
+    }
+  ],
+  "screenshotSelector": "[data-screen='order']",
+  "screenshot": "uimposition-r3-operator-workspace-last-valid-error.png"
+}
