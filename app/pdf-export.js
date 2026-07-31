@@ -1,3 +1,6 @@
+import "./acceptance-controls.js";
+import "./txt-import.js";
+
 import {
   OPERATOR_WORKSPACE_EXPORT_TYPES,
   createOperatorWorkspaceExportModels,

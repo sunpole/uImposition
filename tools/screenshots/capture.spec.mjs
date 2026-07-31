@@ -34,35 +34,44 @@ function countPdfPages(bytes) {
 
 async function runAssertions(page, assertions = []) {
   for (const assertion of assertions) {
-    const locator = page.locator(assertion.selector);
+    const locator = page.locator(assertion.selector).first();
+    if (assertion.hidden) {
+      await expect(locator).toBeHidden();
+      continue;
+    }
     await expect(locator).toBeVisible();
-    await expect(locator).toContainText(assertion.text);
+    if (Object.hasOwn(assertion, "value")) {
+      await expect(locator).toHaveValue(String(assertion.value));
+    }
+    if (Object.hasOwn(assertion, "text")) {
+      await expect(locator).toContainText(assertion.text);
+    }
   }
 }
 
 async function runBeforeScreenshotActions(page, actions = []) {
   for (const action of actions) {
     if (action.action === "click") {
-      const locator = page.locator(action.selector);
+      const locator = page.locator(action.selector).first();
       await expect(locator).toBeVisible();
       await locator.click();
       continue;
     }
     if (action.action === "fill") {
-      const locator = page.locator(action.selector);
+      const locator = page.locator(action.selector).first();
       await expect(locator).toBeVisible();
       await locator.fill(String(action.value ?? ""));
       continue;
     }
     if (action.action === "hide") {
-      const locator = page.locator(action.selector);
+      const locator = page.locator(action.selector).first();
       await locator.evaluate((element) => {
         element.style.setProperty("display", "none", "important");
       });
       continue;
     }
     if (action.action === "style") {
-      const locator = page.locator(action.selector);
+      const locator = page.locator(action.selector).first();
       await expect(locator).toBeVisible();
       const styles = action.styles;
       if (!styles || typeof styles !== "object" || Array.isArray(styles)) {
@@ -76,7 +85,7 @@ async function runBeforeScreenshotActions(page, actions = []) {
       continue;
     }
     if (action.action === "waitForHidden") {
-      await page.locator(action.selector).waitFor({ state: "hidden", timeout: action.timeoutMs ?? 10000 });
+      await page.locator(action.selector).first().waitFor({ state: "hidden", timeout: action.timeoutMs ?? 10000 });
       continue;
     }
     if (action.action === "wait") {
@@ -99,7 +108,7 @@ for (const scenario of scenarios) {
     if (scenario.download) {
       const [download] = await Promise.all([
         page.waitForEvent("download", { timeout: 120000 }),
-        page.locator(scenario.download.selector).click(),
+        page.locator(scenario.download.selector).first().click(),
       ]);
       const failure = await download.failure();
       if (failure) throw new Error(`Download failed: ${failure}`);
@@ -135,7 +144,7 @@ for (const scenario of scenarios) {
 
     const screenshotPath = path.join(outputDir, scenario.screenshot);
     if (scenario.screenshotSelector) {
-      const target = page.locator(scenario.screenshotSelector);
+      const target = page.locator(scenario.screenshotSelector).first();
       await expect(target).toBeVisible();
       await target.screenshot({ path: screenshotPath });
     } else {
