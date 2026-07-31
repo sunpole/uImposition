@@ -242,10 +242,12 @@ function boot() {
     updateNavigationState();
     if (layoutView !== "front") renderLayoutView();
   }, 0));
-  const observer = new MutationObserver(() => {
+  const layoutHost = document.querySelector("#layoutSheet");
+  const observer = new MutationObserver((mutations) => {
     updateNavigationState();
     clearObsoleteCompatibilityMessage();
-    if (layoutView !== "front") queueMicrotask(renderLayoutView);
+    const hasExternalLayoutMutation = mutations.some(({ target }) => !layoutHost?.contains(target));
+    if (layoutView !== "front" && hasExternalLayoutMutation) queueMicrotask(renderLayoutView);
   });
   observer.observe(document.querySelector("#appShell"), { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "hidden"] });
 }
