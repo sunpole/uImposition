@@ -35,6 +35,5 @@
       "text": "Заказ"
     }
   ],
-  "screenshotSelector": "[data-screen='order']",
   "screenshot": "uimposition-r3-operator-workspace-order-mobile.png"
 }
