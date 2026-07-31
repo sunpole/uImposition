@@ -1,6 +1,6 @@
 # Каталог проекта uImposition / Project catalog
 
-Последняя структурная сверка: **31 июля 2026**, опубликованный checkpoint `0.7.0-alpha.5`, operator-first rebuild R2.
+Последняя структурная сверка: **31 июля 2026**, опубликованный checkpoint `0.7.0-alpha.5`, operator-first product-row foundation.
 
 Этот документ объясняет назначение каталогов и активных групп файлов. Он не заменяет [`ARCHITECTURE.md`](ARCHITECTURE.md): архитектура описывает зависимости и поток расчёта, а каталог отвечает на вопрос «где что лежит и куда добавлять новое».
 
@@ -18,13 +18,13 @@
 | `CONTRIBUTING.md`, `LICENSE.md` | Участие в проекте и лицензирование |
 | `package.json` | Node-команды проверок; runtime сайта не требует build step |
 
-Root CSS не переносится массово в R2: этот этап не меняет визуальную оболочку. Новый R3 workspace должен получить отдельную чистую HTML/CSS-структуру после выбора визуального направления, а не продолжать цепочку legacy overrides.
+Root CSS не переносится в pure product-row patch. Новый R3 workspace должен получить отдельную чистую HTML/CSS-структуру после выбора визуального направления, а не продолжать цепочку legacy overrides.
 
 ## 2. Основные каталоги
 
 | Каталог | Что хранится | Правило |
 |---|---|---|
-| `src/` | Production ES modules, pure state/storage models и UI coordinators | Расчётная логика и application state остаются чистыми и не прячутся в DOM |
+| `src/` | Production ES modules, pure state/product models и UI coordinators | Расчётная логика и application state остаются чистыми и не прячутся в DOM |
 | `tests/` | Node unit/integration/regression tests | Имя теста соответствует модулю или milestone |
 | `data/` | Контрольные и regression fixtures | Fixture не выдаётся за automatic solver |
 | `tools/` | Release, documentation, screenshot и PDF tooling | Инструменты не меняют production-формулы |
@@ -36,7 +36,7 @@ Root CSS не переносится массово в R2: этот этап н�
 
 ## 3. Карта `src/`
 
-### Configuration, application state и ввод
+### Configuration, application state и product input
 
 ```text
 config.js
@@ -44,6 +44,9 @@ sheet-press-presets.js
 application-state.js
 application-state-persistence.js
 local-state-repository.js
+product-row.js
+product-row-collection.js
+application-product-rows.js
 geometry.js
 orders.js
 orientation.js
@@ -52,14 +55,17 @@ print-specification.js
 
 Назначение:
 
-- `config.js` — production presets, defaults, limits и versioned storage keys;
-- `sheet-press-presets.js` — полная immutable schema встроенных и локальных пресетов листа/машины, validation и migration;
+- `config.js` — production presets, product-row defaults, limits и versioned storage keys;
+- `sheet-press-presets.js` — immutable schema встроенных и локальных пресетов листа/машины, validation и migration;
 - `application-state.js` — versioned plain-data state нового operator-first product layer, input revisions и защита от stale calculation results;
 - `application-state-persistence.js` — удаляет transient active request перед сохранением и восстанавливает прерванный расчёт как `dirty`/restartable;
 - `local-state-repository.js` — dependency-injected repositories для project state и локальных sheet/press presets;
-- `geometry.js`, `orders.js`, `orientation.js`, `print-specification.js` — существующая чистая геометрия, строки заказов, направления и спецификация печати.
+- `product-row.js` — immutable schema одного реального вида продукции, general validation и явная current-uniform compatibility boundary;
+- `product-row-collection.js` — add/duplicate/update/enable/remove/reorder, summaries, deterministic JSON, legacy migration и expansion в текущие orders;
+- `application-product-rows.js` — применяет product collection operations через R2 application state и его revision/selection invalidation rules;
+- `geometry.js`, `orders.js`, `orientation.js`, `print-specification.js` — существующая чистая геометрия, legacy order parser, направления и спецификация печати.
 
-R2-модули не импортируют DOM и не подключаются к legacy `app.js`. Новый R3 UI обязан потреблять application state, а не читать production input напрямую из разрозненных полей.
+R2/product modules не импортируют DOM и не подключаются к legacy `app.js`. Новый R3 UI обязан потреблять application state и product collection, а не читать production input напрямую из разрозненных полей.
 
 ### Лицо, оборот, кандидаты и validation
 
@@ -188,15 +194,21 @@ m7-decision-demo.js
 - R2 sheet/press preset validation, namespaces и migrations;
 - R2 immutable application state, deterministic serialization и stale-result guards;
 - R2 project/preset repositories, import/export, favorites/recent ordering, interrupted-calculation recovery и corrupted-storage handling;
+- product row drafts, field-level validation, simplex/duplex and current-solver compatibility;
+- product collection operations, disabled non-blocking drafts, legacy migration and deterministic JSON;
+- application-state product adapter and coherent input revisions;
 - work-and-turn;
 - production regression fixtures.
 
-R2 tests:
+Operator-first foundation tests:
 
 ```text
 tests/sheet-press-presets.test.js
 tests/application-state.test.js
 tests/local-state-repository.test.js
+tests/product-row.test.js
+tests/product-row-collection.test.js
+tests/application-product-rows.test.js
 ```
 
 `data/` содержит:
@@ -224,7 +236,7 @@ npm run check
 | `prepare-release-news.yml` | Сбор focused release evidence и manifest |
 | `publish-version-release.yml` | Recovery branch, immutable tag и GitHub Release/prerelease |
 
-R2 меняет только pure modules, tests, config keys и документацию. Chromium/PDF не является обязательным gate по содержанию, но workflow может запускаться консервативной path matrix и тогда должен оставаться зелёным.
+Product-row patch меняет только pure modules, tests, config defaults/limits и документацию. Chromium/PDF не является обязательным gate по содержанию, но conservative path matrix может запустить его и тогда regression должен оставаться зелёным.
 
 ### Локальные инструменты
 
@@ -241,13 +253,13 @@ R2 меняет только pure modules, tests, config keys и докумен�
 - `archive/development/{version}/release.json` хранит manifest.
 - Evidence ZIP и SHA-256 принадлежат конкретному immutable checkpoint.
 - Старые milestone/evidence документы индексируются в [`docs/README.md`](README.md), но не становятся текущими инструкциями.
-- Внутренний pure R2 foundation не меняет version и не создаёт release assets.
+- Внутренние pure R2/product foundation patches не меняют version и не создают release assets.
 
 ## 7. Куда добавлять новый файл
 
 | Новый материал | Правильное место |
 |---|---|
-| Чистая расчётная модель | `src/{responsibility}.js` + соответствующий `tests/*.test.js` |
+| Чистая расчётная или product model | `src/{responsibility}.js` + соответствующий `tests/*.test.js` |
 | Versioned application state или migration | отдельный pure `src/*state*.js` / `src/*migration*.js` + tests |
 | Storage adapter/repository | отдельный dependency-injected `src/*repository*.js` + memory-storage tests |
 | DOM/UI renderer | отдельный `src/*-ui.js` или `src/*-renderer.js`; стили — связанный CSS |
@@ -265,4 +277,4 @@ R2 меняет только pure modules, tests, config keys и докумен�
 
 ## English summary
 
-This catalog maps repository locations to their responsibilities. R2 introduces complete sheet/press presets, a versioned immutable application state with stale-calculation guards, transient persistence normalization, and dependency-injected local repositories with explicit migrations. They do not touch the DOM or production formulas. The existing app-shell/UI modules remain as superseded regression references; R3 must create a clean operator-first entrypoint on top of R2 rather than rearranging the legacy page.
+This catalog maps repository locations to their responsibilities. The operator-first foundation now includes versioned sheet/press presets, application state, local persistence, real product rows, immutable collection operations, field-level validation, legacy migration and an application-state adapter. These modules do not touch the DOM or production formulas. The existing app-shell/UI modules remain superseded regression references; R3 must create a clean entrypoint on top of the state and product models rather than rearranging the legacy page.
