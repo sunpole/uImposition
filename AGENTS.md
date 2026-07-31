@@ -7,10 +7,11 @@
 1. `START_HERE.md`;
 2. `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md`;
 3. `docs/R2_APPLICATION_STATE_AND_PRESETS.md`;
-4. Issue `#64`;
-5. `docs/CODEX_HANDOFF.md`;
-6. `docs/README.md` и `docs/PROJECT_CATALOG.md`;
-7. фактические `main`, PR, Actions, tags, Releases и issues.
+4. `docs/PRODUCT_ROW_MODEL.md`;
+5. Issue `#64`;
+6. `docs/CODEX_HANDOFF.md`;
+7. `docs/README.md` и `docs/PROJECT_CATALOG.md`;
+8. фактические `main`, PR, Actions, tags, Releases и issues.
 
 Не опираться на память предыдущего чата. GitHub — единственный источник истины.
 
@@ -23,15 +24,17 @@
 3. `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md`;
 4. Issue `#64`;
 5. активный milestone-документ;
-6. `docs/CODEX_HANDOFF.md`;
-7. `docs/CURRENT_STATE.md`;
-8. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
-9. `docs/REMAINING_WORK.md`;
-10. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-11. `docs/ARCHITECTURE.md`;
-12. `src/config.js`;
-13. tests и fixtures;
-14. process/release/news документы.
+6. `docs/R2_APPLICATION_STATE_AND_PRESETS.md`;
+7. `docs/PRODUCT_ROW_MODEL.md`;
+8. `docs/CODEX_HANDOFF.md`;
+9. `docs/CURRENT_STATE.md`;
+10. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
+11. `docs/REMAINING_WORK.md`;
+12. `docs/TECHNICAL_SPECIFICATION_RU.md`;
+13. `docs/ARCHITECTURE.md`;
+14. `src/config.js`;
+15. tests и fixtures;
+16. process/release/news документы.
 
 `docs/UI_UX_APPLICATION_REDESIGN.md` и PR `#62` — superseded-история. Они не задают новый UI.
 
@@ -71,15 +74,17 @@
 - не лечить архитектуру очередным CSS override;
 - milestone, roadmap, diagnostics и evidence не входят в основной workflow;
 - новый UI использует versioned application state из R2;
+- product input использует product-row/collection model из PR `#69`;
 - domain modules получают plain data и не читают DOM;
 - UI dispatch-ит actions и render-ит state, но не содержит production formulas;
 - один расчёт создаёт один согласованный snapshot;
 - stale async result не перезаписывает новый input;
 - ошибка draft input не уничтожает последний valid result;
+- disabled invalid product row сохраняется, но не блокирует активный заказ;
 - interrupted calculation после reload становится `dirty`, а не остаётся active;
 - local presets и projects используют schemaVersion и migrations;
 - mobile — самостоятельный сценарий `Заказ → Варианты → Схема`;
-- визуальный R3 начинается только после pure product-row model и выбора направления.
+- production implementation R3 начинается только после выбора визуального направления.
 
 ## Завершённые этапы rebuild
 
@@ -101,79 +106,81 @@ PR `#66` добавил:
 - `local-state-repository.js`;
 - versioned storage keys;
 - migrations;
-- **207/207 Node tests**;
-- **20/20 Chromium/PDF regression scenarios**.
+- `207/207` Node tests;
+- `20/20` Chromium/PDF regression scenarios.
 
-R2 намеренно не подключён к legacy DOM.
+### Product-row foundation
 
-## Следующий обязательный этап — pure product-row model
+PR `#69` добавил:
 
-До R3 создать отдельный PR без UI и без solver changes.
+- `product-row.js`;
+- `product-row-collection.js`;
+- `application-product-rows.js`;
+- реальную schema вида продукции;
+- field-level validation;
+- immutable collection operations;
+- disabled non-blocking drafts;
+- legacy migration;
+- current uniform compatibility boundary;
+- application-state revisions;
+- `236/236` Node tests;
+- `20/20` Chromium/PDF regression scenarios.
 
-Модель должна формализовать реальный вид продукции:
+R2 и product-row foundation намеренно не подключены к legacy DOM.
 
-- stable ID;
-- name/file reference;
-- finished width/height;
-- quantity;
-- pages;
-- copies/variant count;
-- front/back colors;
-- simplex/duplex;
-- bleed;
-- common/separated cut;
-- gap;
-- duplex strategy allowance;
-- enabled state;
-- optional notes;
-- validation issues suitable for field-level UI.
+## Следующий обязательный этап — R3 visual direction gate
 
-Collection operations:
+До production HTML/CSS подготовить минимум три действительно разных направления:
 
-- add;
-- duplicate;
-- update;
-- enable/disable;
-- remove;
-- reorder;
-- stable serialization;
-- migration from legacy `file,quantity,pages` rows.
+1. `Compact production desk`;
+2. `Split workspace`;
+3. `Table-first operator console`.
 
-Правила этого PR:
+Каждое направление должно показать:
 
-- pure JavaScript;
-- immutable results;
-- no DOM;
-- no CSS/HTML;
-- no automatic mixed-format solver;
-- no production formula change;
-- unit tests for every transition and migration;
-- application state integration may store normalized rows, but visual rendering остаётся следующим этапом.
+- desktop 1440 и 1024;
+- mobile 390 и 360;
+- preset switcher;
+- один и пять product rows;
+- field-level error;
+- calculating/ready states;
+- comparison бумага/forms/plates/passes/cost;
+- selected layout preview;
+- primary/secondary action hierarchy;
+- отсутствие milestone/roadmap/debug панелей.
 
-## После product-row model
+Перед идеацией и redesign использовать Product Design context workflow. Решение должно быть зафиксировано в issue/document before production implementation.
 
-### Visual direction gate
+Запрещено:
 
-Подготовить несколько действительно разных направлений нового desktop/mobile workspace и выбрать одно до production implementation.
+- начинать R3 с копирования `index.html`;
+- переносить существующие панели как готовые компоненты;
+- выбирать направление только по красоте без рабочего сценария;
+- смешивать visual exploration, production implementation и новый solver в одном PR.
 
-### R3
+## R3 — после выбора направления
 
-- clean entrypoint и styles;
+Отдельный implementation PR:
+
+- новый clean entrypoint;
+- отдельная чистая CSS-система;
 - preset switcher;
 - product rows;
-- live validation;
-- current uniform calculation adapter;
-- последний valid result;
-- без старых технических панелей.
+- field-level validation;
+- live calculation controller;
+- last valid result;
+- current uniform-pipeline adapter;
+- самостоятельный mobile flow;
+- desktop/mobile Chromium evidence.
 
-### R4
+## R4
 
 - comparison бумага/forms/plates/passes/cost;
 - operator selection;
 - layout preview;
 - existing PDFs.
 
-### R5
+## R5
 
 Mixed-format/multi-product solver расширяется отдельными bounded plan-family с limits, progress/cancel и validation.
 
@@ -189,7 +196,7 @@ Mixed-format/multi-product solver расширяется отдельными bo
 
 ## Version и release
 
-- R1, R2 и следующий internal pure model могут не менять version;
+- internal pure foundation и visual exploration могут не менять version;
 - version меняется только для законченного публикуемого checkpoint;
 - при version change синхронизируются все version sources, visible version и screenshot assertions;
 - каждый опубликованный patch получает recovery branch, immutable tag и GitHub Release/prerelease;
@@ -209,7 +216,7 @@ Mixed-format/multi-product solver расширяется отдельными bo
 
 - HTML/CSS/JavaScript ES modules;
 - без обязательного build step;
-- pure domain/state modules;
+- pure domain/state/product modules;
 - versioned plain-data state;
 - deterministic actions/reducer-style updates;
 - Node built-in tests;
@@ -236,4 +243,4 @@ Mixed-format/multi-product solver расширяется отдельными bo
 
 ## English summary
 
-Preserve the validated production core and the R2 versioned state/preset foundation. Do not continue the legacy app-shell direction. The next mandatory patch is a pure immutable product-row schema and collection model with legacy migration and field-level validation, without UI or solver changes. Only after that and a visual-direction review may R3 build the clean operator-first workspace.
+R1, R2 and the product-row foundation are complete. Preserve the validated production core and do not return to the legacy app-shell direction. The next mandatory gate is visual exploration of at least three genuinely different operator-first desktop/mobile workspaces. Select and document one direction before implementing R3. The production UI must consume the versioned application state and product-row collection, not rearrange the legacy DOM.
