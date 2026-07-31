@@ -6,109 +6,133 @@
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - рабочая ветка: `main`;
-- текущий `main`: `0eaf7f075ed28e74e629a206017a8073ae1f8498`;
-- последний объединённый PR: `#61` — UX-3 comparison workspace;
+- текущий `main`: `1180ff5de008662db63b07d6b973af4f772326ed`;
+- последний объединённый PR: `#66` — R2 application state and sheet/press presets;
 - опубликованный prerelease: **`0.7.0-alpha.5` / M7.5**;
 - release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
 - recovery branch: `release/v0.7.0-alpha.5`;
 - immutable tag: `v0.7.0-alpha.5`;
-- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
-- `VERSION.json` намеренно остаётся на последнем опубликованном checkpoint;
+- `VERSION.json` остаётся на последнем опубликованном checkpoint;
 - `productionReady` остаётся `false`;
+- текущий сайт остаётся временным техническим прототипом;
 - GitHub — единственный источник истины.
 
-## 2. Что добавлено после опубликованного alpha.5
+## 2. Функциональность после опубликованного alpha.5
 
-### PR #52 — documentation catalog
+### M7.6 comparison foundation
 
-- единый `docs/README.md`;
-- `docs/PROJECT_CATALOG.md`;
-- автоматическая проверка Markdown-ссылок и catalog coverage.
+PR `#53`:
 
-### PR #53 — pure M7.6 comparison model
-
-- одна строка на каждый catalog plan;
-- lossless `allRows`;
+- pure lossless comparison rows;
 - view-only filters/sorting;
 - `Только различия`;
 - exact deltas;
-- pricing `null`, а не ноль;
-- source plan references сохраняются;
-- планы не генерируются заново.
+- missing pricing остаётся `null`;
+- plan objects не генерируются заново.
 
-### PR #54 — compact mobile experiment
+PR `#61`:
 
-Уменьшил высоту и размеры исторической страницы, но реальная проверка владельцем подтвердила, что информационная архитектура осталась неверной.
-
-### PR #59 — UX-0 specification
-
-Зафиксировал app-shell подход `Заказ / Проверка / Варианты / План / Экспорт`.
-
-### PR #60 — UX-1 application shell
-
-- desktop sidebar/workspace/summary;
-- mobile step navigation;
-- технические блоки убраны из основного flow;
-- существующие панели перераспределены между экранами.
-
-### PR #61 — UX-3 comparison workspace
-
-- M7.6 comparison model подключён к UI;
-- desktop table и mobile rows;
+- technical desktop/mobile comparison workspace;
 - filters/sort/differences-only;
 - recommendation и selection разделены;
 - operator selection из строки;
-- точные данные существующих планов переиспользуются.
+- `183/183` tests и `20/20` Chromium/PDF regression.
 
-PR #61 прошёл:
+Эти модули сохраняются как reusable calculation/view foundation, но текущий visual shell не является целевым продуктом.
 
-- Quality: `183/183`;
-- Chromium/PDF: `20/20`;
-- visual review desktop/mobile;
-- merge commit: `0eaf7f075ed28e74e629a206017a8073ae1f8498`.
+## 3. Product reset
 
-## 3. Открытый PR #62
+Реальная проверка владельцем показала:
 
-PR `#62` добавляет вкладки выбранного плана поверх существующей shell/DOM архитектуры.
+- интерфейс запутан и нелогичен;
+- верстка визуально нестабильна;
+- функции распределены по старым панелям;
+- app-shell не соответствует реальной работе оператора;
+- добавление вкладок не исправляет информационную архитектуру.
 
-Факты его последнего проверенного head:
+Поэтому:
 
-- head: `b50fb4c2271db954eae326fedd066c1c5f1cc6bb`;
-- Quality: `187/187`;
-- Chromium/PDF: `21/21`;
-- release-news validation: success;
-- review threads отсутствуют.
+- Issue `#64` задаёт operator-first rebuild;
+- `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md` — обязательный продуктовый контракт;
+- PR `#62` закрыт без merge;
+- UI UX-0–UX-5 сохраняется как superseded experiment;
+- расчётное ядро, tests, PDF и production invariants сохраняются.
 
-Несмотря на зелёные проверки, PR **не объединяется**, потому что владелец отклонил само продуктовое направление: интерфейс остаётся запутанным, нелогичным и визуально нестабильным. Зелёные тесты подтверждают отсутствие известных регрессий внутри старой архитектуры, но не доказывают пригодность интерфейса.
+R1 объединён через PR `#65`, merge commit `816f1d67844494864ae6a31bb0b493a7e30242ec`.
 
-## 4. Решение о product reset
+## 4. R2 — завершён
 
-Issue `#64` и `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md` заменяют дальнейшее развитие UX-0–UX-5.
+PR `#66` объединён в `main`, merge commit `1180ff5de008662db63b07d6b973af4f772326ed`.
 
-Текущий UI считается **временным техническим прототипом**.
+### Sheet/press presets
 
-Сохраняются:
+`src/sheet-press-presets.js`:
 
-- geometry;
-- page pairs;
-- front/back validation;
-- production reports;
-- pricing/cost;
-- lossless catalog;
-- comparison data model;
-- operator selection semantics;
-- PDF;
-- tests, fixtures и GitHub Actions.
+- complete built-in/local preset schema;
+- sheet size stage;
+- trim mode и стороны;
+- press margins;
+- favorite/recent metadata;
+- namespaces `builtin:` / `local:`;
+- deterministic local IDs;
+- legacy migration;
+- no duplicate trim for post-trim presets;
+- immutable normalized objects.
 
-Не используется как основа нового UI:
+### Application state
 
-- историческая длинная HTML-страница;
-- app shell, построенный перестановкой старых DOM-панелей;
-- накопленная цепочка CSS overrides;
-- milestone/status/evidence панели;
-- PR #62 tabs implementation.
+`src/application-state.js`:
 
-## 5. Новый целевой пользовательский сценарий
+- versioned project/input/runtime state;
+- sheet, press, products, pricing и objective preferences;
+- deterministic JSON;
+- input revisions;
+- begin/complete/fail calculation transitions;
+- stale calculation result protection;
+- selected plan и active screen вне production input.
+
+### Persistence normalization
+
+`src/application-state-persistence.js`:
+
+- browser request не восстанавливается как active после reload;
+- interrupted `calculating` state становится `dirty` и restartable;
+- последний valid revision сохраняется.
+
+### Local repositories
+
+`src/local-state-repository.js`:
+
+- project save/load/import/export/clear;
+- local preset CRUD;
+- favorite/recent ordering;
+- deterministic collection JSON;
+- legacy array migration;
+- corrupted data не стирается молча;
+- dependency injection позволяет тестировать без браузера.
+
+### R2 evidence
+
+Exact head: `374f410343417633c3ce55c168e1860b10c52288`.
+
+Quality:
+
+- run `30603877867` — success;
+- `207/207` Node tests;
+- artifact `8782884025`;
+- digest `sha256:da88043476c656419a22dbb59997dc5a7e53dfc8613980880eb85a948d152073`.
+
+Chromium/PDF regression:
+
+- run `30603877872` — success;
+- `20/20` Playwright scenarios;
+- PDF verification passed;
+- artifact `8782903792`;
+- digest `sha256:114e1b48a4a2135f1e1f44e939b67755716c63f7539dd9e0da667a8259de0c7e`.
+
+R2 не менял HTML, CSS, production formulas, solver, costing, PDF или version.
+
+## 5. Новый целевой сценарий
 
 ```text
 выбрать или создать sheet/press preset
@@ -128,27 +152,52 @@ Issue `#64` и `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md` заменяют дал�
 - производственно удобный — только после формализации критериев;
 - остальные допустимые варианты без удаления из lossless catalog.
 
-## 6. Текущий production pipeline
+## 6. Следующий обязательный pure model
+
+До визуального R3 требуется полноценная product-row schema.
+
+Она должна описывать:
+
+- stable ID;
+- name/file reference;
+- finished size;
+- quantity;
+- pages;
+- variant/file count;
+- front/back colors;
+- simplex/duplex;
+- bleed;
+- cut mode и gap;
+- allowed duplex technology;
+- enabled state;
+- notes;
+- field-level validation.
+
+Collection model должен поддерживать add, duplicate, update, enable/disable, remove, reorder, serialization и migration старого `file,quantity,pages` ввода.
+
+Этот patch не должен одновременно менять UI или solver.
+
+## 7. Текущий production pipeline
 
 ```text
 sheet/product inputs
 → printable geometry
 → fitting 0°/90° grids
-→ user order page pairs
-→ two uniform plan-family per orientation
+→ page pairs
+→ paperMinimum/dedicatedPairForms
 → front/back materialization
-→ imposition validation
+→ validation
 → production report
-→ normalized metrics and cost
+→ metrics and cost
 → lossless catalog
-→ Pareto/ranking/recommendation annotations
+→ annotations/ranking
 → explicit operator selection
-→ real schemes/report/PDF
+→ schemes/report/PDF
 ```
 
-## 7. Честная finite scope
+## 8. Честная finite scope
 
-Полнота текущего каталога относится только к:
+Полнота текущего пользовательского каталога относится только к:
 
 ```text
 один общий формат изделия
@@ -162,27 +211,26 @@ sheet/product inputs
 
 Текущий движок ещё не является общим solver сложных многовидовых монтажей.
 
-## 8. Что ещё отсутствует
+## 9. Что ещё отсутствует
 
 ### Product layer
 
-- versioned application state;
-- built-in и local sheet/press presets;
-- migrations и deterministic serialization;
-- полноценные product rows с индивидуальными параметрами;
-- coherent live calculation snapshot;
-- чистый новый desktop workspace;
+- окончательная product-row model;
+- clean R3 desktop workspace;
 - самостоятельный mobile workflow;
-- project save/import/export.
+- live calculation adapter;
+- field-level UI validation;
+- project file download/upload UX;
+- визуальный preset manager.
 
 ### Solver
 
 - automatic mixed-format packing;
-- разные форматы и тиражи в одном search;
-- mixed rotations на одном листе;
+- разные форматы/тиражи в одном search;
+- mixed rotations;
 - bounded sequences частично заполненных форм;
 - automatic user-driven work-and-turn;
-- односторонние/нечётные работы;
+- общий simplex/odd-page pipeline;
 - progress/cancel/time limits;
 - production beta matrix.
 
@@ -191,34 +239,14 @@ sheet/product inputs
 - выручка;
 - прибыль/убыток;
 - маржа;
-- стоимость резки, фальцовки и дополнительных операций.
-
-## 9. Следующий обязательный кодовый PR — R2
-
-R2 не является визуальным redesign.
-
-Измеримая цель:
-
-- pure versioned application-state model;
-- sheet/press preset schema;
-- встроенные presets;
-- local preset repository;
-- localStorage persistence;
-- migrations;
-- deterministic import/export representation;
-- unit tests;
-- никаких production formula changes;
-- никакого нового UI в том же PR.
-
-После R2 визуальное направление должно быть отдельно выбрано и только затем реализовано в R3.
+- резка, фальцовка и дополнительные операции.
 
 ## 10. Release status
 
-- version не меняется;
-- новый tag/release не создаётся;
-- release news не создаются для документационного R1;
-- alpha.6 нельзя выпускать как удобный рабочий инструмент до проверки владельцем нового R3–R4 flow на реальном заказе.
+- version не менялась;
+- tag/release/news для R1/R2 не создавались;
+- alpha.6 нельзя выпускать как удобный рабочий инструмент до реальной проверки владельцем нового R3–R4 flow.
 
-## 11. Известный неблокирующий долг
+## 11. Неблокирующий долг
 
-Issue `#40`: заменить некорректное изображение существующего Telegram-поста `0.7.0-alpha.2` через uNews `edit:media`.
+Issue `#40`: заменить некорректное изображение Telegram-поста `0.7.0-alpha.2` через uNews `edit:media`.

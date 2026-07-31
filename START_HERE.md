@@ -7,24 +7,24 @@
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - актуальная ветка: `main`;
-- текущий `main` после PR `#61`: `0eaf7f075ed28e74e629a206017a8073ae1f8498`;
+- текущий `main` после PR `#66`: `1180ff5de008662db63b07d6b973af4f772326ed`;
 - опубликованный prerelease: **`0.7.0-alpha.5` / M7.5**;
 - release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
 - recovery branch и immutable tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
-- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
-- `VERSION.json` пока намеренно остаётся на опубликованном M7.5 checkpoint;
-- расчётная M7.6 comparison model и UX-3 comparison workspace уже объединены, но ещё не выпущены отдельным release checkpoint;
-- PR `#62` с дальнейшей перестановкой старых панелей **не объединять**;
-- основная активная задача: **Issue #64 — operator-first product rebuild**;
+- `VERSION.json` намеренно остаётся на последнем опубликованном checkpoint;
+- основная программа перестройки: **Issue #64 — operator-first product rebuild**;
+- R1 product reset объединён через PR `#65`;
+- R2 versioned application state и sheet/press presets объединены через PR `#66`;
+- PR `#62` закрыт без merge и не является основой нового UI;
+- текущий сайт остаётся временным техническим прототипом;
 - новый обязательный продуктовый контракт: `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md`;
+- R2 foundation: `docs/R2_APPLICATION_STATE_AND_PRESETS.md`;
 - полный каталог документации: `docs/README.md`;
 - карта каталогов и модулей: `docs/PROJECT_CATALOG.md`.
 
 ## Важное решение от 31 июля 2026
 
-Текущий пользовательский интерфейс признаётся временным техническим прототипом.
-
-Работа UX-0–UX-5 показала, что перестановка исторических DOM-панелей и добавление CSS overrides не создают логичное производственное приложение. Расчётное ядро, tests, lossless catalog, production reports и PDF сохраняются. Пользовательская оболочка строится заново как чистый state/render layer.
+Расчётное ядро, tests, lossless catalog, production reports и PDF сохраняются. Пользовательская оболочка строится заново как чистый state/render layer, а не как перестановка исторических панелей.
 
 Главный целевой сценарий:
 
@@ -38,27 +38,70 @@
 → экспортировать PDF
 ```
 
-Следующий кодовый патч после документационного R1 — **R2: pure application-state and sheet/press preset foundation**, без нового визуального UI в том же PR.
+## Что завершено в R2
+
+В `main` уже находятся:
+
+- `src/sheet-press-presets.js` — complete built-in/local sheet and press presets;
+- `src/application-state.js` — immutable versioned project/input/runtime state;
+- `src/application-state-persistence.js` — recovery interrupted calculation as `dirty`;
+- `src/local-state-repository.js` — local project and preset repositories;
+- versioned storage keys;
+- legacy migrations;
+- deterministic JSON import/export;
+- favorite/recent local presets;
+- stale calculation result guards;
+- **207/207 Node tests**;
+- **20/20 Chromium/PDF regression scenarios**.
+
+R2 не подключён к старому DOM намеренно. Это фундамент нового интерфейса, а не ещё один patch старой страницы.
+
+## Следующий обязательный этап
+
+Перед визуальным R3 нужен отдельный pure model для реальной строки продукции.
+
+Следующий кодовый PR должен определить и проверить:
+
+- стабильный ID вида продукции;
+- название/файл;
+- готовую ширину и высоту;
+- тираж;
+- количество страниц;
+- количество одинаковых видов/файлов;
+- цветность лица и оборота;
+- simplex/duplex;
+- выпуск;
+- общий/раздельный рез и gap;
+- допустимую технологию оборота;
+- enabled/disabled состояние;
+- add/duplicate/update/remove/reorder operations;
+- миграцию старого `file,quantity,pages` ввода;
+- JSON-safe immutable rows;
+- validation, пригодную для field-level ошибок будущего UI.
+
+Этот этап не должен менять solver или создавать визуальную форму в том же PR.
+
+После product-row model нужно подготовить и выбрать визуальное направление R3, затем построить чистый workspace на R2 state.
 
 ## Что обязательно прочитать
 
 1. `AGENTS.md`;
 2. `START_HERE.md`;
 3. `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md`;
-4. Issue `#64` и активный rebuild PR;
-5. `docs/CODEX_HANDOFF.md` — существующее расчётное ядро и release process;
-6. `docs/README.md` и `docs/PROJECT_CATALOG.md`;
-7. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
-8. `docs/CURRENT_STATE.md`;
-9. `docs/REMAINING_WORK.md`;
-10. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-11. `docs/ARCHITECTURE.md`;
-12. `docs/M7_6_COMPARISON_TABLE_MODEL.md`;
-13. `docs/PRODUCTION_COSTING.md`;
-14. `docs/TEST_PLAN.md`;
-15. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
-16. `docs/VERSIONING.md`;
-17. последние PR, Actions, branches, tags, Releases и issues.
+4. `docs/R2_APPLICATION_STATE_AND_PRESETS.md`;
+5. Issue `#64` и последние PR;
+6. `docs/CODEX_HANDOFF.md` — существующее расчётное ядро и release process;
+7. `docs/README.md` и `docs/PROJECT_CATALOG.md`;
+8. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
+9. `docs/CURRENT_STATE.md`;
+10. `docs/REMAINING_WORK.md`;
+11. `docs/TECHNICAL_SPECIFICATION_RU.md`;
+12. `docs/ARCHITECTURE.md`;
+13. `docs/M7_6_COMPARISON_TABLE_MODEL.md`;
+14. `docs/PRODUCTION_COSTING.md`;
+15. `docs/TEST_PLAN.md`;
+16. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
+17. последние Actions, branches, tags, Releases и issues.
 
 ## Что уже работает и сохраняется
 
@@ -69,7 +112,7 @@
 - произвольный единый формат изделия;
 - выпуск, общий/раздельный рез и зазор;
 - fitting uniform grids `0°/90°`;
-- пользовательские строки заказов и page pairs;
+- page pairs;
 - front/back materialization и validation;
 - production report;
 - PDF схем и отчёта;
@@ -84,8 +127,15 @@
 - реальные схемы, production report и PDF выбранного плана;
 - полный порядок из 11 целей;
 - reranking без повторной генерации layouts/reports;
-- pure M7.6 comparison-table model;
-- desktop/mobile comparison workspace из PR `#61` как reusable эксперимент, но не как обязательная основа нового UI.
+- pure M7.6 comparison-table model.
+
+### Новый product foundation
+
+- versioned application state;
+- built-in/local sheet and press presets;
+- localStorage repositories через dependency injection;
+- migrations и deterministic serialization;
+- input revisions и stale-result protection.
 
 ## Честная текущая граница solver
 
@@ -105,58 +155,52 @@
 
 Не реализованы полностью:
 
-- разные форматы изделий в одном заказе и на одном листе;
+- разные форматы изделий в одном search;
 - mixed rotations;
 - bounded sequences частично заполненных форм;
 - общий user-driven work-and-turn search;
-- полноценная строка продукции с индивидуальными параметрами;
-- односторонние и нечётные работы;
-- project persistence/import/export;
+- окончательная product-row model и её UI;
+- односторонние и нечётные работы в общем pipeline;
+- визуальный новый R3 workspace;
 - heavy-search worker, progress и cancel;
 - production beta matrix.
 
-## Новый порядок R0–R5
+## Порядок R0–R5
 
-### R0 — завершено решением
+### R0 — завершён
 
-- старое UI-направление остановлено;
-- PR `#62` не объединяется;
-- опубликованный release и расчётное ядро не переписываются.
+Старое UI-направление остановлено, PR `#62` закрыт без merge.
 
-### R1 — текущий документационный PR
+### R1 — завершён
 
-- новый продуктовый контракт;
-- синхронизация точек входа;
-- Issue `#64`.
+Новый operator-first product contract объединён через PR `#65`.
 
-### R2 — следующий кодовый PR
+### R2 — завершён
 
-- versioned application state;
-- sheet/press preset model;
-- built-in и local presets;
-- localStorage repository и migrations;
-- deterministic serialization;
-- unit tests;
-- без смешивания с визуальным redesign.
+Versioned application state, sheet/press presets и local repositories объединены через PR `#66`.
 
-### R3 — новый чистый workspace
+### Product-row foundation — следующий
 
-- новое визуальное направление должно быть выбрано до реализации;
+Отдельная pure schema реального вида продукции и collection operations.
+
+### R3 — после выбора визуального направления
+
+- clean workspace;
 - preset switcher;
-- строки продукции;
-- live validation и calculation snapshot;
-- старые технические панели не переносятся в основной workflow.
+- product rows;
+- live validation/calculation snapshot;
+- старые технические панели не переносятся.
 
-### R4 — варианты и схема
+### R4
 
 - paper/forms/cost comparison;
 - operator selection;
 - preview;
 - существующие PDF.
 
-### R5 — сложные многовидовые раскладки
+### R5
 
-Отдельные bounded solver PR с честными limits, progress/cancel и validation.
+Сложные multi-product/mixed-format solver families отдельными bounded PR.
 
 ## Главные правила
 
@@ -175,5 +219,5 @@
 ## Prompt для следующей Codex-сессии
 
 ```text
-Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub-состоянию. Сначала прочитай AGENTS.md, START_HERE.md и docs/OPERATOR_FIRST_PRODUCT_REBUILD.md, затем Issue #64. Не продолжай старый UX-0–UX-5 и не объединяй PR #62. Следующий кодовый этап — R2: pure versioned application-state и sheet/press preset foundation с unit-тестами, без нового UI и без изменения production formulas.
+Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub-состоянию. Сначала прочитай AGENTS.md, START_HERE.md, docs/OPERATOR_FIRST_PRODUCT_REBUILD.md и docs/R2_APPLICATION_STATE_AND_PRESETS.md, затем Issue #64 и PR #65/#66. Не продолжай старый UX-0–UX-5 и не используй PR #62 как основу. Следующий этап — отдельная pure product-row schema и collection operations с unit-тестами, без визуального UI и без изменения production formulas. После неё подготовь визуальные направления R3.
 ```
