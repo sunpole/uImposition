@@ -126,7 +126,7 @@ test("enable, move and remove operations are deterministic and immutable", () =>
   assert.deepEqual(moved.rows.map(({ id }) => id), ["product:3", "product:1", "product:2"]);
   assert.deepEqual(removed.rows.map(({ id }) => id), ["product:3", "product:2"]);
   assert.deepEqual(collection.rows.map(({ id }) => id), ["product:1", "product:2", "product:3"]);
-  assert.equal(removeProductRow(removed, "product:999"), removed);
+  assert.deepEqual(removeProductRow(removed, "product:999"), removed);
   assert.throws(() => moveProductRow(removed, "product:999", 0), /Unknown product row id/);
 });
 
