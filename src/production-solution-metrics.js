@@ -1,5 +1,4 @@
 import { calculateProductionCost } from "./production-cost.js";
-import { calculatePrintPlateMetrics } from "./print-specification.js";
 import { createSolutionMetrics } from "./solution-metrics.js";
 
 export const DEFAULT_COLOR_PLATES_PER_LAYOUT_FORM = 4;
@@ -43,41 +42,29 @@ export function calculateColorPlatesForReport(report, {
   return layoutForms * colors;
 }
 
-function productionShape({ totals, impositionCount, physicalSheets, printSpecification, colorsPerLayoutForm }) {
-  const reportLayoutForms = nonNegativeInteger(totals.forms, "report.totals.forms");
-  const reportPressPasses = nonNegativeInteger(totals.pressPasses, "report.totals.pressPasses");
+function productionShape({ totals, printSpecification, colorsPerLayoutForm }) {
+  const layoutForms = nonNegativeInteger(totals.forms, "report.totals.forms");
+  const pressPasses = nonNegativeInteger(totals.pressPasses, "report.totals.pressPasses");
 
   if (!printSpecification) {
     return Object.freeze({
-      layoutForms: reportLayoutForms,
+      layoutForms,
       colorPlates: calculateColorPlatesForReport({ totals }, { colorsPerLayoutForm }),
-      pressPasses: reportPressPasses,
+      pressPasses,
       colorMode: null,
     });
   }
 
-  const plateMetrics = calculatePrintPlateMetrics({
-    impositionCount,
-    specification: printSpecification,
-  });
-  const expectedPressPasses = physicalSheets * printSpecification.printedSideCount;
-
-  if (plateMetrics.layoutForms !== reportLayoutForms) {
-    throw new RangeError(
-      `Print specification requires ${plateMetrics.layoutForms} layout forms, but report contains ${reportLayoutForms}`,
-    );
-  }
-  if (expectedPressPasses !== reportPressPasses) {
-    throw new RangeError(
-      `Print specification requires ${expectedPressPasses} press passes, but report contains ${reportPressPasses}`,
-    );
-  }
+  const frontForms = nonNegativeInteger(totals.frontForms, "report.totals.frontForms");
+  const backForms = nonNegativeInteger(totals.backForms, "report.totals.backForms");
+  const frontColors = nonNegativeInteger(printSpecification.frontColors, "printSpecification.frontColors");
+  const backColors = nonNegativeInteger(printSpecification.backColors, "printSpecification.backColors");
 
   return Object.freeze({
-    layoutForms: plateMetrics.layoutForms,
-    colorPlates: plateMetrics.colorPlates,
-    pressPasses: expectedPressPasses,
-    colorMode: plateMetrics.colorMode,
+    layoutForms,
+    colorPlates: frontForms * frontColors + backForms * backColors,
+    pressPasses,
+    colorMode: printSpecification.label,
   });
 }
 
@@ -97,14 +84,7 @@ export function createProductionReportSolutionMetrics({
 } = {}) {
   const totals = reportTotals(report);
   const physicalSheets = nonNegativeInteger(totals.physicalSheets, "report.totals.physicalSheets");
-  const impositionCount = nonNegativeInteger(totals.impositionCount, "report.totals.impositionCount");
-  const shape = productionShape({
-    totals,
-    impositionCount,
-    physicalSheets,
-    printSpecification,
-    colorsPerLayoutForm,
-  });
+  const shape = productionShape({ totals, printSpecification, colorsPerLayoutForm });
   const fileOverrun = nonNegativeInteger(totals.fileOverrun, "report.totals.fileOverrun");
   const pairOverrun = nonNegativeInteger(totals.overrun, "report.totals.overrun");
   const fileUnderproduction = nonNegativeInteger(totals.fileUnderproduction, "report.totals.fileUnderproduction");
@@ -134,7 +114,7 @@ export function createProductionReportSolutionMetrics({
     source,
     duplexMode: report.duplexMode,
     physicalSheets,
-    impositionCount,
+    impositionCount: nonNegativeInteger(totals.impositionCount, "report.totals.impositionCount"),
     layoutForms: shape.layoutForms,
     colorPlates: shape.colorPlates,
     pressPasses: shape.pressPasses,
