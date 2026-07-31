@@ -1,9 +1,9 @@
 import { CONFIG } from "./config.js";
 import {
   deserializeApplicationState,
-  normalizeApplicationState,
   serializeApplicationState,
 } from "./application-state.js";
+import { prepareApplicationStateForPersistence } from "./application-state-persistence.js";
 import {
   SHEET_PRESS_PRESET_KINDS,
   normalizeSheetPressPreset,
@@ -104,14 +104,19 @@ export function createApplicationStateRepository({
   const target = assertStorage(storage);
   const storageKey = String(key);
 
+  function normalizeForStorage(state) {
+    return prepareApplicationStateForPersistence(state, config);
+  }
+
   return Object.freeze({
     load() {
       const serialized = target.getItem(storageKey);
-      return serialized === null ? null : deserializeApplicationState(serialized, config);
+      if (serialized === null) return null;
+      return normalizeForStorage(deserializeApplicationState(serialized, config));
     },
 
     save(state) {
-      const normalized = normalizeApplicationState(state, config);
+      const normalized = normalizeForStorage(state);
       target.setItem(storageKey, serializeApplicationState(normalized, config));
       return normalized;
     },
@@ -121,11 +126,14 @@ export function createApplicationStateRepository({
     },
 
     exportJson() {
-      return target.getItem(storageKey);
+      const serialized = target.getItem(storageKey);
+      if (serialized === null) return null;
+      const normalized = normalizeForStorage(deserializeApplicationState(serialized, config));
+      return serializeApplicationState(normalized, config);
     },
 
     importJson(serialized) {
-      const normalized = deserializeApplicationState(serialized, config);
+      const normalized = normalizeForStorage(deserializeApplicationState(serialized, config));
       target.setItem(storageKey, serializeApplicationState(normalized, config));
       return normalized;
     },
