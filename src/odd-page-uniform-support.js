@@ -69,9 +69,7 @@ export function validateProductRowsForOddPageUniformPipeline(collection, config 
   const issues = [...base.issues];
   const enabledRows = base.collection.rows.filter(({ enabled }) => enabled);
 
-  if (enabledRows.length === 0) {
-    issues.push(issue("uniformPipelineRequiresEnabledRows", "rows"));
-  }
+  if (enabledRows.length === 0) issues.push(issue("uniformPipelineRequiresEnabledRows", "rows"));
 
   enabledRows.forEach((row) => {
     const result = validateProductRow(row, config);
@@ -253,7 +251,10 @@ export function createOddPageUniformProductionPlanSet({
     {
       objectiveIds,
       objectiveOrder: normalizedObjectiveOrder,
-      searchCoverage: base.catalog.searchCoverage,
+      searchCoverage: {
+        theoreticalCandidateCount: base.catalog.coverage.theoreticalCandidateCount,
+        evaluatedCandidateCount: base.catalog.coverage.evaluatedCandidateCount,
+      },
     },
   );
 
@@ -263,10 +264,7 @@ export function createOddPageUniformProductionPlanSet({
     technicalBlankPairCount: blankKeys.size,
     plans,
     catalog,
-    scope: deepFreeze({
-      ...base.scope,
-      oddPageTechnicalBlanks: true,
-    }),
+    scope: deepFreeze({ ...base.scope, oddPageTechnicalBlanks: true }),
   });
 }
 
