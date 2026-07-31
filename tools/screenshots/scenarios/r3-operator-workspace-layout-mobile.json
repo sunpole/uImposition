@@ -1,0 +1,56 @@
+{
+  "id": "r3-operator-workspace-layout-mobile",
+  "path": "/app/",
+  "viewport": {
+    "width": 360,
+    "height": 800
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 800
+    },
+    {
+      "action": "click",
+      "selector": "[data-mobile-screen='alternatives']"
+    },
+    {
+      "action": "click",
+      "selector": "#alternativesList .alternative-card:nth-child(2) [data-select-plan]"
+    },
+    {
+      "action": "click",
+      "selector": "[data-mobile-screen='layout']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 200
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#layoutTitle",
+      "text": "Лицо и производственные показатели"
+    },
+    {
+      "selector": "#layoutDetails",
+      "text": "Выбранный план"
+    },
+    {
+      "selector": "#layoutSheet",
+      "text": "Листовка А6"
+    },
+    {
+      "selector": "[data-mobile-screen='layout']",
+      "text": "Схема"
+    }
+  ],
+  "screenshotSelector": "[data-screen='layout']",
+  "screenshot": "uimposition-r3-operator-workspace-layout-mobile.png"
+}
