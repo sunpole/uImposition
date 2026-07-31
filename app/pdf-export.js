@@ -8,6 +8,7 @@ const details = document.querySelector("#layoutDetails");
 let rendering = false;
 let busy = false;
 let lastSignature = null;
+let releaseTimer = null;
 
 function workspaceSnapshot() {
   return window.__uimpositionR3?.getSnapshot?.() ?? null;
@@ -104,6 +105,14 @@ function renderControls({ force = false } = {}) {
   }
 }
 
+function releaseBusyState() {
+  clearTimeout(releaseTimer);
+  releaseTimer = setTimeout(() => {
+    busy = false;
+    renderControls({ force: true });
+  }, 2200);
+}
+
 async function handleExport(type) {
   if (busy) return;
   const { result, ready } = readySnapshot();
@@ -132,8 +141,7 @@ async function handleExport(type) {
       detail: { type, message: error.message },
     }));
   } finally {
-    busy = false;
-    setTimeout(() => renderControls({ force: true }), 0);
+    releaseBusyState();
   }
 }
 
