@@ -42,6 +42,7 @@ Root CSS не переносится массово в R2: этот этап н�
 config.js
 sheet-press-presets.js
 application-state.js
+application-state-persistence.js
 local-state-repository.js
 geometry.js
 orders.js
@@ -54,6 +55,7 @@ print-specification.js
 - `config.js` — production presets, defaults, limits и versioned storage keys;
 - `sheet-press-presets.js` — полная immutable schema встроенных и локальных пресетов листа/машины, validation и migration;
 - `application-state.js` — versioned plain-data state нового operator-first product layer, input revisions и защита от stale calculation results;
+- `application-state-persistence.js` — удаляет transient active request перед сохранением и восстанавливает прерванный расчёт как `dirty`/restartable;
 - `local-state-repository.js` — dependency-injected repositories для project state и локальных sheet/press presets;
 - `geometry.js`, `orders.js`, `orientation.js`, `print-specification.js` — существующая чистая геометрия, строки заказов, направления и спецификация печати.
 
@@ -185,7 +187,7 @@ m7-decision-demo.js
 - M7.6 comparison rows, view-only filters/sorting, deltas и missing-pricing guards;
 - R2 sheet/press preset validation, namespaces и migrations;
 - R2 immutable application state, deterministic serialization и stale-result guards;
-- R2 project/preset repositories, import/export, favorites/recent ordering и corrupted-storage recovery;
+- R2 project/preset repositories, import/export, favorites/recent ordering, interrupted-calculation recovery и corrupted-storage handling;
 - work-and-turn;
 - production regression fixtures.
 
@@ -222,7 +224,7 @@ npm run check
 | `prepare-release-news.yml` | Сбор focused release evidence и manifest |
 | `publish-version-release.yml` | Recovery branch, immutable tag и GitHub Release/prerelease |
 
-R2 меняет только pure modules, tests, config keys и документацию. Chromium/PDF не является обязательным gate, потому что HTML/CSS/runtime UI и PDF code не затрагиваются.
+R2 меняет только pure modules, tests, config keys и документацию. Chromium/PDF не является обязательным gate по содержанию, но workflow может запускаться консервативной path matrix и тогда должен оставаться зелёным.
 
 ### Локальные инструменты
 
@@ -263,4 +265,4 @@ R2 меняет только pure modules, tests, config keys и докумен�
 
 ## English summary
 
-This catalog maps repository locations to their responsibilities. R2 introduces three pure modules: complete sheet/press presets, a versioned immutable application state with stale-calculation guards, and dependency-injected local repositories with explicit migrations. They do not touch the DOM or production formulas. The existing app-shell/UI modules remain as superseded regression references; R3 must create a clean operator-first entrypoint on top of R2 rather than rearranging the legacy page.
+This catalog maps repository locations to their responsibilities. R2 introduces complete sheet/press presets, a versioned immutable application state with stale-calculation guards, transient persistence normalization, and dependency-injected local repositories with explicit migrations. They do not touch the DOM or production formulas. The existing app-shell/UI modules remain as superseded regression references; R3 must create a clean operator-first entrypoint on top of R2 rather than rearranging the legacy page.
