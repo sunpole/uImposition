@@ -1,0 +1,52 @@
+{
+  "id": "r3-operator-workspace-report-pdf",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    }
+  ],
+  "beforeDownload": [
+    {
+      "action": "wait",
+      "timeoutMs": 900
+    },
+    {
+      "action": "click",
+      "selector": ".topbar [data-open-screen='layout']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 450
+    }
+  ],
+  "download": {
+    "selector": "[data-workspace-pdf='report']",
+    "fileNamePattern": "^uImposition-uniform-r(0|90)-(paper-minimum|dedicated-pairs)-production-report\\.pdf$",
+    "artifact": "uimposition-r3-selected-plan-production-report.pdf",
+    "expectedPages": 3
+  },
+  "afterDownloadAssertions": [
+    {
+      "selector": "[data-workspace-export-status]",
+      "text": "Скачан"
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#layoutDetails",
+      "text": "PDF выбранного плана"
+    },
+    {
+      "selector": "[data-workspace-export-status]",
+      "text": "Скачан"
+    }
+  ],
+  "screenshotSelector": "#layoutDetails",
+  "screenshot": "uimposition-r3-selected-plan-report-download.png"
+}

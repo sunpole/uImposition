@@ -1,10 +1,12 @@
 # R3 — Operator-first workspace `/app/`
 
-Статус: **реализуется в PR #74**.
+Статус: **рабочий маршрут объединён через PR #74; selected-plan PDF подключается через PR #76**.
 
-Issue: `#73`.
+Основная реализация: Issue `#73`, PR `#74`.
 
-Design gate: `#71`, PR `#72`.
+PDF export: Issue `#75`, PR `#76`.
+
+Design gate: Issue `#71`, PR `#72`.
 
 ## 1. Цель
 
@@ -17,15 +19,16 @@ sheet/press preset
 → paper/forms/plates/passes/cost comparison
 → operator selection
 → layout preview
+→ selected-plan scheme/report PDF
 ```
 
-Маршрут после merge:
+Рабочий маршрут:
 
 ```text
 https://sunpole.github.io/uImposition/app/
 ```
 
-Корневой `index.html` в этом PR не заменяется. Это позволяет владельцу проверить новый рабочий маршрут до окончательного переключения публичной точки входа.
+Корневой `index.html` пока не заменяется. Это позволяет владельцу проверить новый рабочий маршрут до окончательного переключения публичной точки входа.
 
 ## 2. Архитектурная граница
 
@@ -35,6 +38,7 @@ https://sunpole.github.io/uImposition/app/
 /app/index.html
 /app/app.css
 /app/app.js
+/app/pdf-export.js
         ↓
 R2 application state and local repositories
         ↓
@@ -43,6 +47,10 @@ product-row collection and field-level validation
 operator-workspace-calculation adapter
         ↓
 existing geometry and user uniform plan pipeline
+        ↓
+operator-workspace-export adapter
+        ↓
+existing PDF document models and renderers
 ```
 
 `app.js` отвечает за browser events, persistence, navigation and rendering. Он не содержит production formulas.
@@ -106,15 +114,7 @@ Progressive disclosure содержит:
 - rotation policy;
 - notes.
 
-Поддерживаются:
-
-- add;
-- duplicate;
-- update;
-- enable/disable;
-- remove.
-
-Все операции используют immutable actions из `application-product-rows.js`.
+Поддерживаются add, duplicate, update, enable/disable и remove через immutable actions из `application-product-rows.js`.
 
 ## 5. Live calculation lifecycle
 
@@ -170,7 +170,32 @@ Preview строится из реального первого `runDescriptor` 
 
 Переключение `Лицо / Оборот` меняет только отображаемую страницу одной и той же проверенной пары. Оборот не редактируется независимо.
 
-## 8. Pricing
+## 8. PDF выбранного плана
+
+`src/operator-workspace-export.js` получает только готовый workspace result и находит фактически выбранный оператором plan внутри `planSet.plans`.
+
+Recommendation не может заменить selection при export.
+
+Доступны два отдельных документа:
+
+### Схемы PDF
+
+- источник: `selectedPlan.impositions`;
+- каждый монтаж содержит проверенные лицо и оборот;
+- одна схема на страницу;
+- page count: `impositionCount × 2`;
+- existing `createSchemePdfDocument()` и `renderSchemePdfBytes()` используются без изменения алгоритма.
+
+### Производственный отчёт PDF
+
+- источник: `selectedPlan.report`;
+- отдельный A4-документ;
+- summary, files и print-pair details;
+- existing `createProductionReportPdfDocument()` и `renderProductionReportPdfBytes()` используются без изменения алгоритма.
+
+Export разрешён только когда текущий result имеет ту же revision, что и application input. Предыдущая корректная ревизия остаётся видимой, но её PDF-кнопки отключены, пока draft не исправлен.
+
+## 9. Pricing
 
 Прайс считается готовым только если введены:
 
@@ -188,7 +213,7 @@ estimatedTotalCost = null
 
 UI показывает `Прайс не введён`, а не `0`.
 
-## 9. Mobile workflow
+## 10. Mobile workflow
 
 На ширинах до `860 px` основной workflow становится:
 
@@ -196,11 +221,9 @@ UI показывает `Прайс не введён`, а не `0`.
 Заказ → Варианты → Схема
 ```
 
-Mobile navigation является самостоятельной, а не уменьшенной desktop sidebar.
+Mobile navigation является самостоятельной, а не уменьшенной desktop sidebar. PDF формируется теми же browser APIs из layout screen.
 
-Поля продукции переходят в двухколоночную форму, summary находится ниже строк, comparison открывается отдельным экраном.
-
-## 10. Честная finite scope
+## 11. Честная finite scope
 
 R3 использует текущий полный catalog только внутри:
 
@@ -217,7 +240,7 @@ R3 использует текущий полный catalog только вну�
 
 Интерфейс может хранить более общие product-row данные, но adapter честно блокирует unsupported execution.
 
-В PR #74 не реализуются:
+Пока не реализуются:
 
 - automatic mixed-format packing;
 - mixed rotations on one sheet;
@@ -227,10 +250,9 @@ R3 использует текущий полный catalog только вну�
 - arbitrary sequences of partially filled forms;
 - heavy-search worker/progress/cancel;
 - root-site replacement;
-- новый release/version;
-- подключение selected-plan PDF к новому маршруту.
+- новый release/version.
 
-## 11. Проверки
+## 12. Проверки
 
 Node tests покрывают:
 
@@ -239,7 +261,11 @@ Node tests покрывают:
 - last-valid result;
 - stale request protection;
 - unequal side bleed boundary;
-- operator selection persistence.
+- operator selection persistence;
+- selected plan as the source of both PDF models;
+- recommendation/selection separation in export;
+- front/back page ordering;
+- rejection of invalid workspace results.
 
 Chromium scenarios покрывают:
 
@@ -248,6 +274,8 @@ Chromium scenarios покрывают:
 - mobile order;
 - mobile plan selection and layout;
 - field error with previous valid result;
-- local preset creation and application.
+- local preset creation and application;
+- selected-plan scheme PDF download;
+- selected-plan report PDF download.
 
-Merge разрешён только после exact-head Quality, Chromium/PDF regression и ручного просмотра новых screenshots.
+PDF downloads проходят внутреннюю page-count проверку и общий `pdfinfo`/Poppler verification workflow.
