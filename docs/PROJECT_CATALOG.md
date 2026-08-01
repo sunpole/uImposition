@@ -1,42 +1,67 @@
 # Каталог проекта uImposition / Project catalog
 
-Последняя структурная сверка: **31 июля 2026**, опубликованный checkpoint `0.7.0-alpha.5`, operator-first product-row foundation.
+Последняя структурная сверка: **1 августа 2026**.
 
-Этот документ объясняет назначение каталогов и активных групп файлов. Он не заменяет [`ARCHITECTURE.md`](ARCHITECTURE.md): архитектура описывает зависимости и поток расчёта, а каталог отвечает на вопрос «где что лежит и куда добавлять новое».
+Этот документ отвечает на вопрос «где что лежит и куда добавлять новое». Архитектурные зависимости описаны в [`ARCHITECTURE.md`](ARCHITECTURE.md), а последовательность universal solver — в [`../research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md`](../research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md).
 
 ## 1. Корень репозитория
 
 | Путь | Назначение |
 |---|---|
-| `index.html` | Текущая историческая GitHub Pages оболочка и legacy DOM anchors; не является основой нового R3 UI |
-| `styles.css` | Базовые стили текущей страницы |
-| `m3.css` … `m7-*.css`, `user-*.css` | Стили milestone- и feature-панелей текущего технического UI |
-| `decision-profile-demo.html` | Изолированная демонстрация decision profile |
-| `site.js` | Вспомогательный ранний browser script; текущий `index.html` его не загружает |
-| `VERSION.json`, `VERSION.md`, `CHANGELOG.md` | Версия, человекочитаемый checkpoint и история изменений |
-| `README.md`, `START_HERE.md`, `AGENTS.md` | Публичное описание, точка входа и обязательные правила агента |
-| `CONTRIBUTING.md`, `LICENSE.md` | Участие в проекте и лицензирование |
-| `package.json` | Node-команды проверок; runtime сайта не требует build step |
+| `index.html` | Стабильный GitHub Pages entrypoint; перенаправляет в актуальное приложение `app/` |
+| `app/` | Operator-first рабочее приложение: HTML, CSS, orchestration, responsive/acceptance helpers и PDF actions |
+| `README.md` | Публичное назначение, архитектурная точка и ссылки на research/docs |
+| `START_HERE.md` | Обязательная первая инструкция новой сессии |
+| `AGENTS.md` | Жёсткие правила разработки в репозитории |
+| `VERSION.json`, `VERSION.md`, `CHANGELOG.md` | Опубликованный version checkpoint и история; не обновляются каждым feature PR |
+| `package.json` | Source/docs/unit gates; runtime сайта не требует build step |
+| `decision-profile-demo.html` | Изолированная историческая демонстрация decision profile |
+| `m3.css` … `m7-*.css`, `user-*.css` | Historical/technical UI styles; не подключаются корневым entrypoint и удаляются только отдельным dependency-audit PR |
 
-Root CSS не переносится в pure product-row patch. Новый R3 workspace должен получить отдельную чистую HTML/CSS-структуру после выбора визуального направления, а не продолжать цепочку legacy overrides.
+Legacy root shell и удалённый `styles.css` сохранены в ветке:
+
+```text
+archive/pre-universal-solver-rebuild-2026-08-01
+```
 
 ## 2. Основные каталоги
 
 | Каталог | Что хранится | Правило |
 |---|---|---|
-| `src/` | Production ES modules, pure state/product models и UI coordinators | Расчётная логика и application state остаются чистыми и не прячутся в DOM |
-| `tests/` | Node unit/integration/regression tests | Имя теста соответствует модулю или milestone |
-| `data/` | Контрольные и regression fixtures | Fixture не выдаётся за automatic solver |
-| `tools/` | Release, documentation, screenshot и PDF tooling | Инструменты не меняют production-формулы |
-| `docs/` | Текущие, нормативные, milestone и исторические документы | Полный индекс находится в [`README.md`](README.md) |
-| `docs/codex-tasks/` | Полные задания и completion records для передачи сессий | Не использовать для коротких временных заметок |
-| `news/` | Patchnotes и реальные release images | Один release — свой текст и своё изображение |
-| `archive/development/` | Постоянные evidence-пакеты опубликованных версий | Не переписывать задним числом |
-| `.github/workflows/` | Quality, Chromium/PDF, uNews и release automation | PR объединяется только после exact-head checks |
+| `app/` | Текущий пользовательский runtime | DOM orchestration не содержит новых solver formulas |
+| `src/` | Production ES modules и pure models | Новая математика создаётся без DOM и имеет самостоятельные tests |
+| `tests/` | Unit, integration, regression и property tests | Каждый новый pure module получает отдельный test file |
+| `data/` | Fixtures, benchmarks и control cases | Fixture не читается solver как готовый answer |
+| `research/` | Аудиты, внешние опоры и implementation decisions | Не является production implementation; лицензии проверяются отдельно |
+| `docs/` | Канонические, нормативные, milestone и historical documents | Полный индекс — [`README.md`](README.md) |
+| `tools/` | Docs, screenshot/PDF, news и release tooling | Tooling не меняет production formulas |
+| `news/` | Patchnotes и release images | Только для настоящего version/release gate |
+| `archive/development/` | Permanent release evidence | Не переписывать задним числом |
+| `.github/workflows/` | Quality, Chromium/PDF, uNews и release automation | Merge только после exact-head gates |
 
-## 3. Карта `src/`
+## 3. Текущий runtime `app/`
 
-### Configuration, application state и product input
+```text
+app/index.html
+app/app.css
+app/app.js
+app/responsive-actions.js
+app/acceptance-controls.js
+app/txt-import.js
+app/operator-review-fixes.js
+app/pdf-export.js
+```
+
+Ответственность:
+
+- render operator workspace;
+- coordinate immutable application state;
+- collect form input;
+- call pure calculation modules;
+- display validated results;
+- never recreate geometry/production formulas in DOM code.
+
+## 4. `src/`: input и application state
 
 ```text
 config.js
@@ -45,236 +70,266 @@ application-state.js
 application-state-persistence.js
 local-state-repository.js
 product-row.js
+product-row-txt.js
+simple-product-row-txt.js
 product-row-collection.js
 application-product-rows.js
-geometry.js
-orders.js
-orientation.js
-print-specification.js
+operator-workspace-calculation.js
+operator-workspace-export.js
 ```
 
 Назначение:
 
-- `config.js` — production presets, product-row defaults, limits и versioned storage keys;
-- `sheet-press-presets.js` — immutable schema встроенных и локальных пресетов листа/машины, validation и migration;
-- `application-state.js` — versioned plain-data state нового operator-first product layer, input revisions и защита от stale calculation results;
-- `application-state-persistence.js` — удаляет transient active request перед сохранением и восстанавливает прерванный расчёт как `dirty`/restartable;
-- `local-state-repository.js` — dependency-injected repositories для project state и локальных sheet/press presets;
-- `product-row.js` — immutable schema одного реального вида продукции, general validation и явная current-uniform compatibility boundary;
-- `product-row-collection.js` — add/duplicate/update/enable/remove/reorder, summaries, deterministic JSON, legacy migration и expansion в текущие orders;
-- `application-product-rows.js` — применяет product collection operations через R2 application state и его revision/selection invalidation rules;
-- `geometry.js`, `orders.js`, `orientation.js`, `print-specification.js` — существующая чистая геометрия, legacy order parser, направления и спецификация печати.
+- versioned project/input/runtime state;
+- built-in/local sheet/press presets;
+- product rows и validation;
+- legacy/simple TXT migration;
+- calculation request/response adapter;
+- selected-plan export adapter.
 
-R2/product modules не импортируют DOM и не подключаются к legacy `app.js`. Новый R3 UI обязан потреблять application state и product collection, а не читать production input напрямую из разрозненных полей.
-
-### Лицо, оборот, кандидаты и validation
+## 5. `src/`: текущая geometry и page model
 
 ```text
+geometry.js
+orders.js
+orientation.js
 front-layout.js
 back-layout.js
 imposition-validation.js
+mixed-format-layout.js
+odd-page-uniform-support.js
+```
+
+Текущие обязанности:
+
+- sheet trim и press margins;
+- uniform fitting 0°/90°;
+- sequential page pairs;
+- front layout;
+- derived mirrored back;
+- geometry/page/mirror validation;
+- supplied mixed-layout validation;
+- odd technical blank adapter.
+
+`mixed-format-layout.js` не является automatic packing solver.
+
+## 6. `src/`: candidate/search foundation
+
+```text
 imposition-candidate.js
 candidate-generator.js
 imposition-distribution.js
-mixed-format-layout.js
 paper-minimizer.js
+bounded-mixed-form-search.js
+feasible-solution-catalog.js
 ```
 
-`mixed-format-layout.js` проверяет переданную раскладку и не является automatic packing solver. Оборот создаётся только из лица.
+Эти модули сохраняются как regression foundation и small-space building blocks.
 
-### Production, стоимость и метрики
+Новая universal-solver разработка не должна:
+
+- складывать все high-dimensional candidates в память;
+- развивать large-order search только увеличением limits;
+- смешивать geometry slots и run-length master state.
+
+Draft PR `#85` допустим только после переработки в exhaustive small-space oracle.
+
+## 7. Новые universal-solver модули
+
+Ближайшие файлы:
 
 ```text
+src/geometric-pattern.js
+src/uniform-grid-patterns.js
+tests/geometric-pattern.test.js
+tests/uniform-grid-patterns.test.js
+```
+
+Поздние группы:
+
+```text
+src/mixed-strip-patterns.js
+src/production-pattern.js
+src/pattern-allocation.js
+src/exhaustive-run-plan-oracle.js
+src/restricted-master.js
+src/pattern-pricing.js
+src/column-generation.js
+src/operator-case-memory.js
+src/machine-constraints.js
+```
+
+Названия поздних файлов являются целевыми группами и могут уточняться отдельным PR, но слои G/P/R/C/M/E менять нельзя без нового architecture decision.
+
+## 8. Production, metrics и cost
+
+```text
+print-specification.js
+duplex-strategies.js
+work-and-turn-layout.js
 production-metrics.js
 production-validation.js
 production-report.js
 production-cost.js
-production-solution-metrics.js
 solution-metrics.js
+production-solution-metrics.js
 paper-solution-metrics.js
 ```
 
-Layout-формы и цветовые пластины остаются разными метриками. Отсутствующая цена не становится нулём.
+Инварианты:
 
-### Решения и каталог вариантов
+- layout forms ≠ color plates;
+- physical sheets ≠ press passes;
+- underproduction invalid;
+- missing price remains unavailable;
+- work-and-turn uses explicit shared-form/transform validation.
+
+## 9. Alternatives и operator decision
 
 ```text
 optimization-objectives.js
 decision-profile.js
 pareto-alternatives.js
 pareto-display-set.js
-feasible-solution-catalog.js
 production-alternative-set.js
 alternative-explanations.js
 alternatives-runtime.js
 alternatives-controller.js
-```
-
-Исходный каталог остаётся lossless; filtering, Pareto и recommendation являются представлением и аннотациями.
-
-### Пользовательский M7.5/M7.6 pipeline
-
-```text
 user-uniform-production-plans.js
 user-production-plans-runtime.js
 user-objective-priority.js
 user-production-comparison-table.js
-user-production-comparison-ui.js
-user-production-comparison-status-layout.js
-user-production-plans-ui.js
-user-objective-priority-ui.js
-user-production-plan-details-ui.js
 ```
 
-M7.5 разделяет generation, runtime, selection/details и UI. M7.6 `user-production-comparison-table.js` является чистой reusable view-model: сохраняет ссылку на каждый исходный plan, даёт lossless `allRows`, view-only filters/sorting, exact deltas и режим `Только различия` без regeneration.
+Rules:
 
-UI-модули этого раздела сохраняются как работающий технический эксперимент и regression reference, но не являются обязательной основой R3.
+- source catalog remains lossless inside stated scope;
+- filtering/ranking does not regenerate plans;
+- recommendation is an annotation;
+- explicit operator selection persists independently.
 
-### Application shell experiment
-
-```text
-app-shell-model.js
-app-shell.js
-app-shell-bootstrap.js
-```
-
-Эти файлы принадлежат superseded UX-0–UX-5 направлению. Они остаются в `main` для истории и regression, но новая оболочка не должна строиться их дальнейшим расширением или перестановкой legacy DOM.
-
-### Duplex и work-and-turn
+## 10. PDF и renderers
 
 ```text
-duplex-strategies.js
-work-and-turn-layout.js
-work-and-turn-control-case.js
-work-and-turn-runtime.js
-work-and-turn-ui.js
-```
-
-Текущий контур ограничен задокументированным симметричным контрольным случаем и не доказывает совместимость с конкретной машиной.
-
-### Представление и PDF
-
-```text
-paper-solution-view.js
-paper-solution-renderer.js
-production-report-renderer.js
-scheme-renderer.js
 pdf-document-model.js
 pdf-binary.js
 pdf-scheme-renderer.js
 pdf-report-renderer.js
 pdf-export-ui.js
-pricing-ui.js
-alternatives-ui.js
-app.js
+scheme-renderer.js
+production-report-renderer.js
 ```
 
-Renderer получает готовую проверенную модель и не пересчитывает производственные формулы. `app.js` остаётся координатором legacy DOM до появления отдельного R3 entrypoint.
+Renderer consumes validated models. PDF structure and rendered output are independently checked by Chromium, `pdfinfo` and Poppler.
 
-### Исторические demo entrypoints
+## 11. Historical UI modules
 
 ```text
-m3-demo.js
-m7-decision-demo.js
+src/app.js
+src/app-shell-model.js
+src/app-shell.js
+src/app-shell-bootstrap.js
+src/m3-demo.js
+src/m7-decision-demo.js
+src/pricing-ui.js
+src/user-production-plans-ui.js
+src/user-objective-priority-ui.js
+src/user-production-plan-details-ui.js
+src/alternatives-ui.js
 ```
 
-Эти модули поддерживают демонстрационные и regression-контуры. Удаление или объединение требует отдельной проверки их HTML/scenario consumers.
+Эти файлы больше не являются public root entrypoint. Некоторые используются regression tests, demos или historical scenarios. Их удаление разрешено только после:
 
-## 4. Тесты и fixtures
+1. dependency map;
+2. replacement or removal of consumers;
+3. exact-head source/unit gate;
+4. Chromium/PDF regression;
+5. confirmation that archive branch contains the removed state.
 
-`tests/` сгруппирован по ответственности:
+## 12. Tests и fixtures
 
-- geometry/orders/front-back;
-- M4 production report;
-- M5 PDF model, writer и renderers;
-- M6 candidates и paper minimizer;
-- M7 objectives, pricing, Pareto и alternatives;
-- user plan generation, runtime, selection/export и objective persistence;
-- M7.6 comparison rows, view-only filters/sorting, deltas и missing-pricing guards;
-- R2 sheet/press preset validation, namespaces и migrations;
-- R2 immutable application state, deterministic serialization и stale-result guards;
-- R2 project/preset repositories, import/export, favorites/recent ordering, interrupted-calculation recovery и corrupted-storage handling;
-- product row drafts, field-level validation, simplex/duplex and current-solver compatibility;
-- product collection operations, disabled non-blocking drafts, legacy migration and deterministic JSON;
-- application-state product adapter and coherent input revisions;
+### Основные группы tests
+
+- application state/persistence/presets;
+- product rows/TXT;
+- geometry/orders/front/back;
+- candidates/paper minimizer;
+- production validation/report/cost;
 - work-and-turn;
-- production regression fixtures.
+- alternatives/ranking/selection;
+- PDF model/writer/renderers;
+- operator workspace;
+- bounded search contracts.
 
-Operator-first foundation tests:
+### Новая proof ladder
 
 ```text
-tests/sheet-press-presets.test.js
-tests/application-state.test.js
-tests/local-state-repository.test.js
-tests/product-row.test.js
-tests/product-row-collection.test.js
-tests/application-product-rows.test.js
+G0 — exact uniform geometry
+G1 — mixed strips
+P0/P1 — product assignment
+R0 — exhaustive small oracle
+R1/R2 — restricted master/pricing
+R3 — differential validation
+benchmark — control case and real operator cases
+M — machine constraints
 ```
 
-`data/` содержит:
+### Data
 
-- `control-case.json` — основной исторический контрольный набор;
-- `control-layout-m3.json` — контрольная раскладка M3;
-- `m7-decision-cases.json` — decision fixtures;
-- `production-regression-cases.json` — производственные regression cases.
+| Файл | Роль |
+|---|---|
+| `data/control-case.json` | Поздний benchmark входных данных |
+| `data/control-layout-m3.json` | Известный operator/oracle layout; production solver не читает его как answer |
+| `data/production-regression-cases.json` | Production regression fixtures |
+| `data/m7-decision-cases.json` | Decision/ranking fixtures |
 
-Команда полного source/unit контроля:
+## 13. Research records
 
 ```text
+research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md
+research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md
+research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md
+research/README.md
+```
+
+Research определяет:
+
+- какие внешние проекты изучены;
+- что реально можно использовать;
+- лицензии и риски;
+- geometry/master decomposition;
+- column-generation direction;
+- test and implementation order.
+
+## 14. Automation
+
+| Workflow/tool | Назначение |
+|---|---|
+| Quality | docs links/catalog, source syntax и Node tests |
+| Chromium/PDF | real browser, viewports, downloads, PDF structure и Poppler render |
+| uNews validation | patchnote/publication queue |
+| release tooling | evidence, hashes, recovery branch, tag и Release |
+
+Pure G0 PR требует Quality. Runtime/export changes требуют Chromium/PDF и visual artifact review.
+
+## 15. Куда добавлять новое
+
+| Материал | Путь |
+|---|---|
+| Pure geometry model | `src/` + matching `tests/` |
+| Production assignment/master/pricing | `src/` + exact/brute-force tests |
+| External oracle adapter | `tools/oracles/` или research-only script; не обязательный browser runtime |
+| Benchmark input | `data/` |
+| Operator-approved case | будущий versioned `data/operator-cases/` после schema PR |
+| Canonical architecture rule | `docs/` |
+| External investigation | `research/` |
+| UI change | `app/`, без solver formulas |
+| Release evidence | `archive/development/{version}/` |
+
+## 16. Проверка
+
+```bash
 npm run check
 ```
 
-## 5. Automation
-
-### GitHub Actions
-
-| Workflow | Назначение |
-|---|---|
-| `quality.yml` | Source, documentation и Node tests |
-| `capture-screenshots.yml` | Real Chromium, desktop/mobile screenshots, PDF download, `pdfinfo` и Poppler |
-| `validate-unews.yml` | Проверка patchnote и очереди публикации |
-| `prepare-release-news.yml` | Сбор focused release evidence и manifest |
-| `publish-version-release.yml` | Recovery branch, immutable tag и GitHub Release/prerelease |
-
-Product-row patch меняет только pure modules, tests, config defaults/limits и документацию. Chromium/PDF не является обязательным gate по содержанию, но conservative path matrix может запустить его и тогда regression должен оставаться зелёным.
-
-### Локальные инструменты
-
-| Путь | Назначение |
-|---|---|
-| `tools/docs/check-docs.mjs` | Локальные Markdown-ссылки и полнота каталога документации |
-| `tools/screenshots/` | Playwright scenarios, capture manifest и подготовка artifacts |
-| `tools/news/prepare-release.mjs` | Patchnote, evidence archive, hashes и release manifest |
-
-## 6. Releases, news и история
-
-- `news/README.md` задаёт формат patchnote.
-- `news/*.{md,png,jpg}` хранит опубликованный текст и focused image конкретной версии.
-- `archive/development/{version}/release.json` хранит manifest.
-- Evidence ZIP и SHA-256 принадлежат конкретному immutable checkpoint.
-- Старые milestone/evidence документы индексируются в [`docs/README.md`](README.md), но не становятся текущими инструкциями.
-- Внутренние pure R2/product foundation patches не меняют version и не создают release assets.
-
-## 7. Куда добавлять новый файл
-
-| Новый материал | Правильное место |
-|---|---|
-| Чистая расчётная или product model | `src/{responsibility}.js` + соответствующий `tests/*.test.js` |
-| Versioned application state или migration | отдельный pure `src/*state*.js` / `src/*migration*.js` + tests |
-| Storage adapter/repository | отдельный dependency-injected `src/*repository*.js` + memory-storage tests |
-| DOM/UI renderer | отдельный `src/*-ui.js` или `src/*-renderer.js`; стили — связанный CSS |
-| Fixture | `data/` с явным описанием границы |
-| Chromium scenario | `tools/screenshots/scenarios/` |
-| Текущее состояние | существующий `CURRENT_STATE.md`, `REMAINING_WORK.md` или handoff |
-| Устойчивое правило/справочник | отдельный нормативный файл в `docs/` и запись в `docs/README.md` |
-| Полное задание передачи | `docs/codex-tasks/` |
-| Release note | `news/` |
-| Immutable release evidence | `archive/development/{version}/` и GitHub Release assets |
-
-Не создавать новый документ, если достаточно обновить существующий источник истины. Не переносить и не удалять исторические файлы массово без отдельного решения владельца.
-
----
-
-## English summary
-
-This catalog maps repository locations to their responsibilities. The operator-first foundation now includes versioned sheet/press presets, application state, local persistence, real product rows, immutable collection operations, field-level validation, legacy migration and an application-state adapter. These modules do not touch the DOM or production formulas. The existing app-shell/UI modules remain superseded regression references; R3 must create a clean entrypoint on top of the state and product models rather than rearranging the legacy page.
+Перед удалением historical files дополнительно запускать полный Chromium/PDF workflow.

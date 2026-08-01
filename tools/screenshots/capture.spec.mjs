@@ -12,6 +12,7 @@ const scenarioFilter = new Set(
     .map((value) => value.trim())
     .filter(Boolean),
 );
+const includeHistoricalScenarios = process.env.INCLUDE_HISTORICAL_SCREENSHOTS === "1";
 
 const scenarioFiles = (await readdir(scenarioDir))
   .filter((name) => name.endsWith(".json"))
@@ -20,7 +21,11 @@ const scenarioFiles = (await readdir(scenarioDir))
 const scenarios = [];
 for (const fileName of scenarioFiles) {
   const scenario = JSON.parse(await readFile(path.join(scenarioDir, fileName), "utf8"));
-  if (scenarioFilter.size === 0 || scenarioFilter.has(scenario.id)) scenarios.push(scenario);
+  const explicitlySelected = scenarioFilter.has(scenario.id);
+  const belongsToCurrentApplication = String(scenario.path || "").startsWith("/app/");
+  const selectedByRequest = scenarioFilter.size === 0 || explicitlySelected;
+  const selectedByLifecycle = includeHistoricalScenarios || explicitlySelected || belongsToCurrentApplication;
+  if (selectedByRequest && selectedByLifecycle) scenarios.push(scenario);
 }
 
 if (scenarios.length === 0) throw new Error("No screenshot scenarios selected");

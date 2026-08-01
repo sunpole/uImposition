@@ -1,458 +1,252 @@
-# uImposition — передача разработки в Codex Work
+# uImposition — передача разработки
 
-Дата передачи: **27 июля 2026**  
-Репозиторий: **https://github.com/sunpole/uImposition**  
+Дата актуализации: **1 августа 2026**  
+Репозиторий: `https://github.com/sunpole/uImposition`  
 GitHub — единственный источник истины.
 
-## 1. Точная точка передачи
+## 1. Точка передачи
 
-- актуальная ветка разработки: `main`;
-- функциональный baseline M7.5 после PR `#46`: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- опубликованный prerelease: `0.7.0-alpha.5` / M7.5;
-- release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
-- focused screenshot source: `a8db529c29e7b71a7809bb5f857d48cfde115597`;
-- publication merge commit: `546f637a25b51f72706ebbe7346acb2df9819af8`;
-- recovery branch и immutable tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
-- следующий функциональный milestone: **`0.7.0-alpha.6` / M7.6**.
-
-Последние объединённые функциональные PR:
-
-- `#44` — пользовательские uniform-grid production plans;
-- `#45` — явный выбор любого плана, реальные схемы, production report и PDF выбранного плана;
-- `#46` — полный редактор порядка целей без повторной генерации планов.
-- `#49` — version checkpoint alpha.5;
-- `#50` — publication package, evidence и prerelease alpha.5.
-
-Проверенный head PR `#46`: `ca89cd0f6a7243fb78c3c5ec04a44635c8d75007`.
-
-Проверки PR `#46`:
-
-- Quality: `173/173` теста;
-- Chromium/PDF workflow: success;
-- uNews validation: success;
-- desktop/mobile focused screenshots визуально проверены;
-- merge commit в `main`: `009451cce94d5cde05ee72305f30447aa65a646c`.
+- рабочая ветка: `main`;
+- архитектурный baseline перед root cutover: `b9d83855ff685bb38831670fb0c3975bbd1bdbc4`;
+- опубликованный checkpoint: `0.7.0-alpha.5`;
+- release branch/tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
+- архив до universal-solver rebuild: `archive/pre-universal-solver-rebuild-2026-08-01`;
+- основной backlog: Issue `#83`;
+- draft PR `#85` не использовать как large-order solver;
+- research PR `#86` и canonical-docs PR `#87` объединены.
 
 ## 2. Обязательный порядок чтения
 
-Перед любыми изменениями прочитать:
-
 1. `AGENTS.md`;
 2. `START_HERE.md`;
-3. `docs/CODEX_HANDOFF.md`;
-4. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
-5. `docs/CURRENT_STATE.md`;
-6. `docs/REMAINING_WORK.md`;
-7. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-8. `docs/ARCHITECTURE.md`;
-9. `docs/M7_4_WORK_AND_TURN.md`;
-10. `docs/M7_5_USER_UNIFORM_PRODUCTION_PLANS.md`;
-11. `docs/M7_5_USER_PLAN_SELECTION_EXPORT.md`;
-12. `docs/M7_5_OBJECTIVE_PRIORITY_EDITOR.md`;
-13. `docs/PRODUCTION_COSTING.md`;
-14. `docs/TEST_PLAN.md`;
-15. `docs/GITHUB_ONLY_DEVELOPMENT.md`;
-16. `docs/VERSIONING.md`;
-17. `docs/NEWS_PUBLISHING.md`;
-18. последние PR, Actions, branches, tags, Releases и открытые issues.
+3. `README.md`;
+4. `docs/CURRENT_STATE.md`;
+5. `docs/CODEX_HANDOFF.md`;
+6. `docs/ARCHITECTURE.md`;
+7. `docs/ALGORITHM_AND_OPTIMIZATION.md`;
+8. `docs/TEST_PLAN.md`;
+9. `docs/REMAINING_WORK.md`;
+10. `research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md`;
+11. `research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`;
+12. `research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md`;
+13. `docs/PROJECT_CATALOG.md`;
+14. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
+15. Issue `#83`, open PR, latest Actions, branches, tags и Releases.
 
-Если документация противоречит коду или GitHub-состоянию, нельзя молча выбирать удобную сторону. Нужно зафиксировать расхождение и исправить источник истины в том же PR либо отдельным документационным PR.
+Документация, которая противоречит фактическому GitHub, исправляется до продолжения кода.
 
 ## 3. Назначение продукта
 
-uImposition — статический браузерный калькулятор и планировщик монтажей для листовой офсетной печати.
+uImposition должен:
 
-Цель продукта:
+- принимать реальные листы, изделия, страницы, цветность, тиражи и цены;
+- создавать геометрически корректные patterns;
+- назначать в slots виды, страницы и стороны;
+- подбирать один или несколько монтажей и целочисленные прогоны;
+- никогда не допускать недопечатку;
+- считать sheets, layout forms, color plates, passes, overrun и cost;
+- сохранять конструктивно разные допустимые решения;
+- показывать доказуемую границу поиска;
+- оставлять выбор оператору;
+- использовать подтверждённые cases как benchmark/warm start, но не как готовый ответ;
+- позднее учитывать machine zones, defects и operator preferences.
 
-- принять реальные параметры листа, изделия и заказов;
-- определить, что технологически возможно в заданных условиях;
-- построить **все допустимые варианты внутри явно описанной области поиска**;
-- не удалять дорогие, доминируемые или невыгодные варианты;
-- считать бумагу, формы, цветовые пластины, прогоны, перетираж и себестоимость;
-- показывать компромиссы;
-- позволять оператору менять цели и выбирать решение самостоятельно;
-- выдавать реальные схемы, production report и PDF выбранного решения;
-- никогда не принимать недопечатку.
+## 4. Фактический runtime
 
-Главный принцип продукта:
+Актуальный operator-first интерфейс находится в `app/`.
 
-> Рекомендация — это метка, а не способ скрыть остальные допустимые варианты.
+Корневой `index.html` должен только перенаправлять в `/app/`.
 
-## 4. Технологическая основа
+Работают:
 
-- статический GitHub Pages сайт;
-- обычные HTML/CSS/JavaScript ES modules;
-- без обязательного build step;
-- расчёты выполняются локально в браузере;
-- чистые доменные модули не используют DOM;
-- Node built-in test runner;
-- Playwright используется в GitHub Actions для реального Chromium evidence;
-- PDF создаётся собственным dependency-free PDF-слоем;
-- сервер и база данных пока не требуются.
+- versioned application state;
+- built-in/local sheet and press presets;
+- product rows и TXT import;
+- current uniform fitting `0°/90°`;
+- page pairs и odd technical blank;
+- validated front и mirrored back;
+- separate duplex и ограниченный work-and-turn;
+- production metrics/cost;
+- lossless alternatives, objectives и selection;
+- schemes/report/PDF;
+- mobile/desktop regression.
 
-## 5. Неприкосновенные производственные правила
+## 5. Архив
 
-Эти правила нельзя ослаблять ради прохождения теста или красивого UI:
-
-1. Недопечатка всегда запрещена.
-2. Оборот строится только из проверенного лица, а не независимо.
-3. Геометрия должна находиться внутри фактической печатной области.
-4. Зачистка листа и непечатные поля машины — разные этапы.
-5. Layout-формы сторон и цветовые пластины — разные метрики.
-6. Рабочие цены вводит оператор; placeholder/demo не становятся defaults.
-7. Отсутствующая стоимость не превращается в ноль.
-8. Paper minimum не означает minimum forms, minimum cost или global best.
-9. Ручной fixture не выдаётся за automatic solver.
-10. Ограниченный search не выдаётся за полный глобальный перебор.
-11. Явный выбор оператора не заменяется новой рекомендацией.
-12. Все допустимые варианты сохраняются; фильтры меняют только представление.
-13. Нельзя заявлять совместимость work-and-turn с машиной без технологической проверки оператора.
-14. Новая расчётная логика создаётся как чистый модуль с unit-тестами.
-15. `src/app.js` остаётся координатором интерфейса, а не местом производственных формул.
-
-## 6. Что уже работает из пользовательского ввода
-
-### Геометрия
-
-Пользователь может задавать:
-
-- произвольные ширину и высоту листа;
-- стадию размера — до или после зачистки;
-- зачистку одинаковую или раздельную по четырём сторонам;
-- непечатные поля машины;
-- ширину и высоту изделия;
-- выпуск;
-- общий или раздельный рез;
-- дополнительный зазор.
-
-Программа считает печатную область и fitting uniform-grid варианты `0°` и `90°`.
-
-### Заказы
-
-Пользователь вводит строки вида:
+До удаления или замены legacy UI создана ветка:
 
 ```text
-файл | тираж | страниц | примечание
+archive/pre-universal-solver-rebuild-2026-08-01
 ```
 
-Программа:
-
-- валидирует строки;
-- разворачивает страницы в последовательные front/back pairs;
-- считает потребность каждой пары;
-- запрещает пользовательский duplex production plan для неполной последней пары, чтобы не создать ложную оборотную пластину.
-
-### Пользовательские production plans
-
-Для каждой fitting ориентации `0°/90°` сейчас строятся две plan-family:
-
-1. `paperMinimum` — paper-focused результат minimizer;
-2. `dedicatedPairForms` — отдельная полностью заполненная форма для каждой печатной пары.
-
-Каждый план:
-
-- materialize-ится в реальные front/back layouts;
-- повторно проходит `validateImposition`;
-- получает независимый production report;
-- имеет нулевую недопечатку;
-- считает physical sheets, layout forms, color plates, press passes и overrun;
-- при готовом прайсе получает себестоимость BYN;
-- попадает в lossless-каталог независимо от выгодности.
-
-### Выбор и экспорт
-
-Оператор может выбрать любой план, а не только рекомендованный.
-
-Для выбранного плана работают:
-
-- summary метрик;
-- preview реальных front/back схем;
-- динамический production report;
-- file totals;
-- print-pair details и contributions;
-- PDF схем;
-- PDF production report.
-
-Preview ограничен первыми восемью монтажами, но PDF строится из полного выбранного плана. Интерактивный PDF схем имеет явный лимит 120 монтажей, чтобы не зависал браузер.
-
-### Цели и рекомендации
-
-При готовом прайсе доступны 11 целей:
-
-1. physical sheets;
-2. estimated total cost;
-3. layout forms;
-4. color plates;
-5. file overrun;
-6. pair overrun;
-7. press passes;
-8. split orders;
-9. imposition count;
-10. layout compactness;
-11. distinct orders per imposition.
-
-Оператор может:
-
-- применять presets `По умолчанию / Бумага / Стоимость / Формы / Прогоны / Перетираж`;
-- перемещать цели стрелками;
-- использовать drag-and-drop на desktop;
-- видеть фиксированные hard constraints отдельно.
-
-Повторное ранжирование:
-
-- использует те же plan-объекты;
-- не перестраивает layouts и reports;
-- меняет только objective order, ranks, recommendation и Pareto-аннотации;
-- сохраняет выбранный оператором plan ID.
-
-## 7. Фактическая граница поиска
-
-Текущий пользовательский каталог полный только внутри следующей finite scope:
+Она содержит полное состояние на commit:
 
 ```text
-один общий формат изделия
-× uniform grid
-× fitting rotation 0° или 90°
-× две plan-family
-× separate front/back forms
-× одна общая duplex-цветность для всех строк
-× полные front/back page pairs
+b9d83855ff685bb38831670fb0c3975bbd1bdbc4
 ```
 
-Следовательно, сейчас нельзя утверждать, что программа нашла все технологически возможные монтажи для произвольного реального заказа.
+Не удалять ветку до стабильного `1.0.0` и отдельного решения владельца.
 
-## 8. Что ещё не реализовано
+## 6. Solver architecture
 
-### Расширение пространства вариантов
+```text
+N — normalized demand/input
+G — geometric patterns with explicit slots
+P — production assignment
+R — integer run lengths
+C — restricted master + pricing/column generation
+M — machine/operator constraints
+E — explanation/export/case memory
+```
 
-- дополнительные plan-family;
-- bounded search разных последовательностей форм и тиражей;
-- комбинации частично заполненных форм;
-- общий user-driven automatic work-and-turn search;
-- вертикальный turn axis;
-- mixed-format automatic rectangle packing;
-- mixed rotations `0° + 90°` на одном листе;
-- оценка резки и сборки;
-- автоматическое доказательство полноты для расширенного search space.
+### Малые задачи
 
-### Полноценная строка заказа
+- exact exhaustive enumeration;
+- brute-force oracle;
+- deterministic structural signatures;
+- explicit complete/truncated status.
 
-Для каждого файла отдельно ещё нужны:
+### Большие задачи
 
-- ширина и высота;
-- выпуск и зазор;
-- режим резки;
-- цветность лица и оборота;
-- допустимая технология оборота;
-- тип/плотность бумаги;
-- редактирование, дублирование, удаление и сортировка.
+- initial pattern columns;
+- restricted master;
+- pricing subproblem;
+- add only improving structural columns;
+- final integer solve;
+- independent validation/report.
 
-### Другие типы работ
+Запрещено делать large-order search увеличением одного static candidate limit.
 
-- односторонние работы;
-- нечётные страницы и осознанно пустой оборот;
-- тетрадный/фальцевальный спуск;
-- доказанная пагинация 8/16/32-страничных изделий;
-- машинные профили и технологическая совместимость.
+## 7. Внешние проекты
 
-### Экономика
+Используются как research/differential oracles:
 
-Сейчас считается производственная себестоимость. Для понятия «убыточный вариант» ещё нужны:
+- PDF/imposition: `pdfcpu`, `Laidout`, `pdfcook`;
+- geometry: `rectpack`, PackingSolver, RectangleBinPack, `binpackingjs`;
+- integer optimization: OR-Tools, SCIP, Cbc;
+- column generation: cutting-stock master/pricing examples;
+- printing industry: packing/scheduling datasets;
+- PDF verification: qpdf, Ghostscript, Poppler.
 
-- цена продажи или выручка;
-- прибыль/убыток;
-- маржа;
-- минимальная допустимая маржа;
-- стоимость резки, фальцовки и других операций.
+Перед любым переносом кода проверить лицензию. Внешний ответ всегда повторно проходит наш validator.
 
-Убыточный вариант должен оставаться в каталоге, но получать явную метку и объяснение.
+## 8. Статус PR #85
 
-### Рабочий цикл
+Полезные идеи:
 
-- сохранение последнего проекта в browser storage;
-- versioned JSON export/import;
-- миграции старых проектов;
-- сохранение pricing profile и выбранного решения;
-- package export;
-- тяжёлый search worker;
-- progress, cancel, time/memory limits и безопасное восстановление.
+- exact BigInt theoretical counts;
+- deterministic signatures;
+- small bounded catalog;
+- coverage/truncation metadata.
 
-### Интерфейс и стабильность
+Неприемлемо:
 
-- единая компактная сравнительная таблица всех вариантов;
-- режим `Только различия`;
-- точные component deltas;
-- фильтр duplex strategy;
-- полная компактность всей страницы;
-- клавиатурная навигация и accessibility audit;
-- полная RU/EN parity;
-- browser/GitHub Pages matrix;
-- реальные beta production fixtures.
+- считать статическое перечисление всех candidates основой больших заказов;
+- merge без rebase/rewrite под новую G/P/R модель;
+- объявлять high-dimensional space complete.
 
-## 9. Архитектурная карта актуального M7.5
+Будущая роль — R0 exhaustive small oracle.
 
-### Ввод и геометрия
+## 9. Следующая кодовая цель
 
-- `src/config.js` — производственные пресеты и limits;
-- `src/geometry.js` — лист, зачистка, поля и fitting grids;
-- `src/orders.js` — строки заказа и page pairs;
-- `src/orientation.js` — направления и повороты.
+### G0-A — pure uniform geometry patterns
 
-### Формирование и проверка монтажей
+Создать:
 
-- `src/front-layout.js`;
-- `src/back-layout.js`;
-- `src/imposition-validation.js`;
-- `src/imposition-candidate.js`;
-- `src/candidate-generator.js`;
-- `src/paper-minimizer.js`;
-- `src/mixed-format-layout.js` — только validation заданного mixed fixture, не automatic packing.
+```text
+src/geometric-pattern.js
+src/uniform-grid-patterns.js
+tests/geometric-pattern.test.js
+tests/uniform-grid-patterns.test.js
+```
 
-### Duplex и work-and-turn
+Контракт:
 
-- `src/print-specification.js`;
-- `src/duplex-strategies.js`;
-- `src/work-and-turn-layout.js`;
-- `src/work-and-turn-control-case.js`;
-- `src/work-and-turn-runtime.js`;
-- `src/work-and-turn-ui.js`.
+```js
+GeometryPattern {
+  id,
+  printableArea,
+  occupiedProduct,
+  rotation,
+  rows,
+  columns,
+  capacity,
+  slots,
+  usedBounds,
+  unusedEdges,
+  structuralSignature,
+  coverage
+}
+```
 
-### Производство и стоимость
+Каждый slot:
 
-- `src/production-metrics.js`;
-- `src/production-validation.js`;
-- `src/production-report.js`;
-- `src/production-cost.js`;
-- `src/solution-metrics.js`;
-- `src/production-solution-metrics.js`.
+```js
+{
+  id,
+  xMm,
+  yMm,
+  widthMm,
+  heightMm,
+  rotation,
+  row,
+  column
+}
+```
 
-### Альтернативы и решения
+Acceptance:
 
-- `src/optimization-objectives.js`;
-- `src/decision-profile.js`;
-- `src/pareto-alternatives.js`;
-- `src/feasible-solution-catalog.js`;
-- `src/production-alternative-set.js`;
-- `src/alternative-explanations.js`.
+- patterns 0° и 90°;
+- exact coordinates;
+- margins/bleed/gap/cut input;
+- no overlap;
+- inside printable area;
+- deterministic row-major order;
+- stable signature;
+- monotonicity/property tests;
+- agreement with current capacity API;
+- no DOM, pricing or plan recommendation changes.
 
-### Пользовательский M7.5 pipeline
+## 10. Следующая последовательность
 
-- `src/user-uniform-production-plans.js` — создаёт пользовательские планы;
-- `src/user-production-plans-ui.js` — lossless-каталог;
-- `src/user-production-plans-runtime.js` — plan set, selection и objective preference;
-- `src/user-production-plan-details-ui.js` — выбранные схемы/report/PDF;
-- `src/user-objective-priority.js` — pure reranking;
-- `src/user-objective-priority-ui.js` — desktop/mobile редактор целей.
+1. G0-A pure patterns;
+2. G0-B application adapter;
+3. G1 mixed strips;
+4. P0 single product;
+5. P1 multiple products/allocations;
+6. R0 exhaustive small solver;
+7. restricted master;
+8. pricing/column generation;
+9. differential validation;
+10. historical 20-file benchmark;
+11. operator case memory;
+12. machine constraints.
 
-### PDF
+## 11. Production invariants
 
-- `src/pdf-document-model.js`;
-- `src/pdf-binary.js`;
-- `src/pdf-scheme-renderer.js`;
-- `src/pdf-report-renderer.js`;
-- `src/pdf-export-ui.js`.
+1. Underproduction is always invalid.
+2. Back is derived only from validated front.
+3. Geometry is separate from demand, colors and pricing.
+4. Layout forms and color plates are separate metrics.
+5. Missing cost stays unavailable.
+6. Operator selection is independent from recommendation.
+7. Catalog filters never delete source plans.
+8. Fixture/case answers are never trusted without recalculation.
+9. Heuristic result is not called proven optimum.
+10. Search scope, coverage and truncation are explicit.
+11. Renderer does not own production formulas.
+12. Version/release work is separate from feature work.
 
-### Проверки
+## 12. Quality and PR process
 
-- `package.json` / `npm run check`;
-- `tests/*.test.js`;
-- `.github/workflows/quality.yml`;
-- `.github/workflows/capture-screenshots.yml`;
-- `tools/screenshots/scenarios/*.json`;
-- `pdfinfo` и Poppler внутри Actions.
+```text
+one measurable goal
+→ feature branch
+→ draft PR
+→ exact-head npm run check
+→ Chromium/PDF when runtime/export changes
+→ visual artifact review
+→ merge
+```
 
-## 10. Release checkpoint M7.5 — завершён
-
-- version PR `#49` и publication PR `#50` объединены;
-- exact-head Quality: `173/173`;
-- exact-head Chromium/PDF: `16/16`;
-- focused image и permanent evidence ZIP опубликованы;
-- release PNG SHA-256: `bb5686efa1d0f75990885b6f5e8736c1c4c93233eae181c3ae68f81397cf5a6e`;
-- evidence ZIP SHA-256: `9ac0cfb4c01c34e530b4f734e499e6184cf2d6ab78f2157ea1216e6ee5742ec9`;
-- recovery branch, immutable tag и GitHub prerelease проверены;
-- patchnote ожидает следующего внешнего uNews FIFO scan, если Telegram-публикация ещё не появилась.
-
-Следующую работу начинать с небольшого pure-model патча M7.6, не с расширения solver/search space.
-
-## 11. Следующий функциональный этап после alpha.5
-
-Рекомендуемый M7.6:
-
-### Цель
-
-Завершить операторское сравнение и подготовить архитектуру к расширению search space.
-
-### Минимальный состав
-
-- компактная таблица: одна строка на каждый допустимый вариант;
-- `Все / Pareto / Рекомендуемые / Доминируемые`;
-- `Только различия`;
-- сортировка без удаления вариантов;
-- точные колонки: sheets, weight, layout forms, plates, passes, pair/file overrun, paper cost, form cost, total cost, unit cost;
-- duplex strategy и plan-family;
-- раскрытие схем/report только выбранного варианта;
-- desktop/mobile evidence;
-- отсутствие повторной генерации при фильтрах и сортировке.
-
-После M7.6 переходить к отдельным небольшим патчам расширения plan-family, а не пытаться реализовать весь mixed solver одним гигантским PR.
-
-## 12. Правильный процесс работы Codex
-
-Для каждого патча:
-
-1. определить одну измеримую цель;
-2. создать отдельную ветку;
-3. сначала добавить/уточнить pure model и tests;
-4. затем подключить runtime/UI;
-5. не ослаблять validation ради теста;
-6. добавить desktop/mobile Chromium scenario для пользовательского изменения;
-7. открыть draft PR;
-8. исправить все exact-head сбои;
-9. скачать quality/screenshot artifacts;
-10. визуально проверить focused screenshots;
-11. обновить документацию и PR body фактическими числами;
-12. перевести PR в ready и merge только по exact head;
-13. не менять version в обычном feature PR, если release checkpoint выделен отдельно;
-14. законченный публикуемый патч обязательно провести через полный release cycle.
-
-## 13. Запрещённые shortcuts
-
-- не писать формулы в DOM renderer;
-- не добавлять «временный» hardcoded ответ для одного fixture как рабочий solver;
-- не удалять доминируемые решения из catalog data;
-- не выбирать автоматически вариант вместо оператора;
-- не называть feasible результат доказанным минимумом без lower-bound proof;
-- не применять `null` cost как `0`;
-- не генерировать back layout независимо;
-- не пропускать browser evidence;
-- не считать release готовым только по tag или manifest;
-- не перемещать опубликованный tag;
-- не раскрывать secrets в screenshot, logs или patchnote;
-- не требовать локальный компьютер как обязательное условие.
-
-## 14. Известный неблокирующий долг
-
-Открытый issue `#40`: заменить некорректное изображение существующего Telegram-поста `0.7.0-alpha.2`, сообщение `@uNewsLog/76`, через функцию uNews `edit:media`. Пост не удалять и не публиковать заново.
-
-## 15. Требуемый отчёт Codex после каждого патча
-
-Codex должен сообщить:
-
-1. исходную ветку, version и точный commit;
-2. цель патча;
-3. изменённые файлы;
-4. архитектурные решения;
-5. фактический результат тестов;
-6. Actions и artifact IDs/digests;
-7. визуально проверенный screenshot;
-8. ограничения search scope;
-9. оставшиеся риски;
-10. PR и merge commit;
-11. изменялась ли version;
-12. создан ли полный release checkpoint, если патч публикуется.
-
----
-
-## English operational summary
-
-The verified functional M7.5 baseline is PR `#46` at merge commit `009451cce94d5cde05ee72305f30447aa65a646c`. M7.5 is published as prerelease `0.7.0-alpha.5`; its immutable release commit is `195d6496a291095a69cc9089a64154561ffbb1fa`, while later publication and documentation commits remain on `main`. Verify the live `main` head before changing files. The next functional milestone is M7.6: begin with a pure, lossless comparison-table model and tests before UI work or any search-space expansion. Never hide feasible alternatives, never accept underproduction, and never claim global completeness outside an explicitly bounded search space.
+No root cutover, version bump, tag or Release is implied by a pure solver PR.

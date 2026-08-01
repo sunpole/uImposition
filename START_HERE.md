@@ -1,182 +1,152 @@
 # uImposition — START HERE / НАЧАТЬ ЗДЕСЬ
 
-> Первая точка входа для нового чата, устройства, Codex-сессии или разработчика.  
+> Первая точка входа для нового чата, устройства или разработчика.  
 > GitHub — единственный источник истины.
 
-## Текущая точка
+## 1. Текущая точка
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
-- актуальная ветка: `main`;
-- текущий `main` после PR `#69`: `bcc9d39416d4dc0ac4cb325c07f9663a4072494c`;
-- опубликованный prerelease: **`0.7.0-alpha.5` / M7.5**;
-- release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
-- recovery branch и immutable tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
-- `VERSION.json` намеренно остаётся на последнем опубликованном checkpoint;
-- основная программа перестройки: **Issue #64 — operator-first product rebuild**;
-- R1 product reset: PR `#65`;
-- R2 versioned state и sheet/press presets: PR `#66`;
-- product-row foundation: PR `#69`;
-- PR `#62` закрыт без merge и не является основой нового UI;
-- текущий сайт остаётся временным техническим прототипом;
-- обязательный продуктовый контракт: `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md`;
-- state/preset foundation: `docs/R2_APPLICATION_STATE_AND_PRESETS.md`;
-- product rows: `docs/PRODUCT_ROW_MODEL.md`;
-- каталог документации: `docs/README.md`;
-- карта модулей: `docs/PROJECT_CATALOG.md`.
+- рабочая ветка: `main`;
+- последний архитектурный merge перед rebuild: PR `#87`, commit `b9d83855ff685bb38831670fb0c3975bbd1bdbc4`;
+- опубликованный version checkpoint остаётся `0.7.0-alpha.5`;
+- рабочее приложение: `https://sunpole.github.io/uImposition/` → `/app/`;
+- прежнее состояние сохранено в `archive/pre-universal-solver-rebuild-2026-08-01`;
+- основной universal-solver backlog: Issue `#83`;
+- PR `#85` закрыт без merge как superseded; его ветка сохраняется только как материал для будущего small-space exhaustive oracle;
+- production code, version и release не обновляются автоматически вместе с архитектурными PR.
 
-## Главное решение
+## 2. Главное решение
 
-Расчётное ядро, tests, lossless catalog, production reports и PDF сохраняются. Пользовательская оболочка строится заново как чистый state/render layer, а не как перестановка исторических панелей.
-
-Целевой сценарий:
+После аудита 50 GitHub-репозиториев solver строится слоями:
 
 ```text
-выбрать или создать пресет листа/машины
-→ добавить реальные виды продукции
-→ получить живой согласованный перерасчёт
-→ сравнить варианты по бумаге, формам и стоимости
-→ выбрать монтаж
-→ открыть схему
-→ экспортировать PDF
+N — нормализация заказа
+G — геометрические patterns и slots
+P — назначение изделий, страниц и сторон
+R — целочисленные прогоны
+C — restricted master + pricing/column generation
+M — machine/operator constraints
+E — explanation, export и case memory
 ```
 
-## Что уже завершено
+Большие заказы нельзя решать предварительным хранением всех возможных монтажей. Полный перебор используется только как точный oracle для малых задач. Основной large-order путь — restricted master и on-demand pricing.
 
-### R1 — новый продуктовый контракт
-
-- старое app-shell направление остановлено;
-- текущий UI признан техническим прототипом;
-- PR `#62` закрыт без merge;
-- новый workflow закреплён в Issue `#64` и документации.
-
-### R2 — application state и sheet/press presets
-
-В `main` находятся:
-
-- `src/sheet-press-presets.js`;
-- `src/application-state.js`;
-- `src/application-state-persistence.js`;
-- `src/local-state-repository.js`;
-- versioned storage keys;
-- local presets, favorite/recent ordering, migrations;
-- input revisions и stale-result protection;
-- interrupted calculation recovery.
-
-Проверка R2:
-
-- `207/207` Node tests;
-- `20/20` Chromium/PDF scenarios.
-
-### Product-row foundation
-
-В `main` находятся:
-
-- `src/product-row.js`;
-- `src/product-row-collection.js`;
-- `src/application-product-rows.js`;
-- реальные finished size, тираж, variant count, pages, color, simplex/duplex, bleed, cut/gap, rotation и duplex preference;
-- immutable add/duplicate/update/enable/remove/reorder operations;
-- field-level issues;
-- disabled non-blocking drafts;
-- legacy `file | quantity | pages` migration;
-- current uniform-pipeline compatibility validator;
-- adapter к R2 application state.
-
-Exact-head PR `#69`:
-
-- `236/236` Node tests;
-- `20/20` Chromium/PDF scenarios;
-- no HTML/CSS/solver/PDF changes;
-- merge commit `bcc9d39416d4dc0ac4cb325c07f9663a4072494c`.
-
-## Следующий обязательный этап — R3 visual direction gate
-
-Нельзя сразу писать новый HTML/CSS без выбранного направления.
-
-Сначала подготовить минимум три действительно разных operator-first направления:
-
-1. **Compact production desk** — пресеты сверху, строки продукции и живой итог в одном рабочем окне.
-2. **Split workspace** — ввод слева, схема/метрики справа, варианты снизу.
-3. **Table-first operator console** — максимально плотная таблица видов и результатов для опытного оператора.
-
-Для каждого направления показать:
-
-- desktop 1440/1024;
-- mobile 390/360;
-- preset switcher;
-- 1 и 5 product rows;
-- field error;
-- calculating/ready state;
-- result comparison;
-- selected layout preview;
-- primary action hierarchy;
-- no milestone/roadmap/diagnostic panels.
-
-После выбора одного направления — отдельный R3 implementation PR.
-
-## Что обязательно прочитать
+## 3. Что читать перед изменениями
 
 1. `AGENTS.md`;
 2. `START_HERE.md`;
-3. `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md`;
-4. `docs/R2_APPLICATION_STATE_AND_PRESETS.md`;
-5. `docs/PRODUCT_ROW_MODEL.md`;
-6. Issue `#64`, PR `#65`, `#66`, `#69`;
-7. `docs/CODEX_HANDOFF.md`;
-8. `docs/README.md` и `docs/PROJECT_CATALOG.md`;
-9. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
-10. `docs/CURRENT_STATE.md`;
-11. `docs/REMAINING_WORK.md`;
-12. `docs/TECHNICAL_SPECIFICATION_RU.md`;
-13. `docs/ARCHITECTURE.md`;
-14. `docs/M7_6_COMPARISON_TABLE_MODEL.md`;
-15. `docs/PRODUCTION_COSTING.md`;
-16. последние Actions, branches, tags, Releases и issues.
+3. `README.md`;
+4. `docs/CURRENT_STATE.md`;
+5. `docs/CODEX_HANDOFF.md`;
+6. `docs/ARCHITECTURE.md`;
+7. `docs/ALGORITHM_AND_OPTIMIZATION.md`;
+8. `docs/TEST_PLAN.md`;
+9. `docs/REMAINING_WORK.md`;
+10. `research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md`;
+11. `research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`;
+12. `research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md`;
+13. `docs/PROJECT_CATALOG.md`;
+14. Issue `#83`, open PR, latest Actions, branches, tags и Releases.
 
-## Честная граница solver
+Если документация противоречит фактическому GitHub, сначала исправить источник истины.
 
-Текущий пользовательский каталог полный только внутри:
+## 4. Рабочее приложение и архив
+
+Корневой GitHub Pages URL открывает operator-first приложение из `app/`.
+
+Ветка:
 
 ```text
-один общий формат изделия
-× uniform grids
-× 0°/90° search
-× paperMinimum/dedicatedPairForms
-× separate front/back forms
-× одна общая duplex-цветность
-× полные front/back page pairs
+archive/pre-universal-solver-rebuild-2026-08-01
 ```
 
-Product rows уже могут хранить более широкий заказ, но compatibility validator честно блокирует то, что нынешний solver ещё не рассчитывает.
-
-Не реализованы полностью:
-
-- clean R3 workspace;
-- automatic mixed-format packing;
-- разные форматы/цветность в одном search;
-- generalized simplex и odd-page pipeline;
-- forced rotation execution;
-- generalized user-driven work-and-turn;
-- bounded sequences частично заполненных форм;
-- heavy-search worker, progress и cancel;
-- production beta matrix.
-
-## Главные правила
-
-- недопечатка запрещена;
-- оборот не строится независимо от лица;
-- рабочие цены вводит оператор;
-- layout-формы и цветовые пластины не смешиваются;
-- отсутствующая стоимость не равна нулю;
-- допустимые варианты не скрываются;
-- recommendation не заменяет selection;
-- bounded search не выдаётся за globally complete;
-- новый UI не строится перестановкой старого DOM;
-- визуальное направление выбирается до production implementation;
-- одна ветка/PR — одна измеримая цель.
-
-## Prompt для следующей Codex-сессии
+сохраняет прежнюю корневую оболочку, legacy UI, расчётные модули, тесты и документацию на commit:
 
 ```text
-Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub-состоянию. Сначала прочитай AGENTS.md, START_HERE.md, docs/OPERATOR_FIRST_PRODUCT_REBUILD.md, docs/R2_APPLICATION_STATE_AND_PRESETS.md и docs/PRODUCT_ROW_MODEL.md. R1, R2 и product-row foundation уже завершены через PR #65, #66 и #69. Не продолжай UX-0–UX-5 и не используй PR #62 как основу. Следующий этап — подготовить минимум три действительно разных визуальных направления clean R3 desktop/mobile workspace, выбрать одно и только после этого начинать HTML/CSS implementation.
+b9d83855ff685bb38831670fb0c3975bbd1bdbc4
+```
+
+Архив не удалять до стабильного `1.0.0` и отдельного решения владельца.
+
+## 5. Что уже работает
+
+- application state, local persistence и sheet/press presets;
+- product rows, простой/расширенный TXT и контрольный заказ;
+- current uniform `0°/90°` geometry;
+- page pairs, odd technical blank, front и mirrored back;
+- separate duplex и ограниченный user work-and-turn;
+- production metrics, pricing, alternatives, priorities и selection;
+- schemes, report и PDF;
+- desktop/mobile Chromium/PDF regression.
+
+Эти модули являются regression foundation. Их нельзя удалять только потому, что они были созданы раньше.
+
+## 6. Честная граница текущего solver
+
+Текущий runtime не умеет полностью:
+
+- mixed physical formats;
+- mixed `0°+90°` slots на одной форме;
+- общий multi-pattern run-length search;
+- column generation;
+- все simplex/duplex/work-and-turn combinations;
+- machine defect zones;
+- operator case memory;
+- доказанный global optimum произвольного заказа.
+
+Сохранённые benchmark layouts не являются production answers.
+
+## 7. Следующий обязательный кодовый этап
+
+### G0-A — pure geometry
+
+Создать:
+
+```text
+src/geometric-pattern.js
+src/uniform-grid-patterns.js
+tests/geometric-pattern.test.js
+tests/uniform-grid-patterns.test.js
+```
+
+Требования:
+
+- реальные slot coordinates;
+- patterns 0° и 90°;
+- printable bounds;
+- gap/bleed/cut rules;
+- deterministic signatures;
+- no overlap;
+- property tests;
+- comparison с текущим `calculatePlacementOptions()`;
+- никаких UI, pricing или recommendation изменений.
+
+После G0-A — adapter G0-B, затем mixed strips G1.
+
+## 8. Неприкосновенные правила
+
+- недопечатка запрещена;
+- back выводится только из validated front;
+- geometry не содержит тиражей и цен;
+- production pattern ссылается на реальные slots;
+- layout forms и color plates различаются;
+- missing cost не равна нулю;
+- operator selection независим от recommendation;
+- case memory — warm start/benchmark, а не подстановка ответа;
+- heuristic result не называется proven optimum;
+- truncation и coverage всегда видимы;
+- одна ветка/PR — одна измеримая цель.
+
+## 9. Проверки
+
+```bash
+npm run check
+```
+
+Runtime/UI/PDF изменения дополнительно требуют полного Chromium/PDF workflow и визуального просмотра artifacts.
+
+## Prompt для следующей сессии
+
+```text
+Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub. Прочитай AGENTS.md, START_HERE.md, docs/CURRENT_STATE.md, docs/ARCHITECTURE.md, docs/ALGORITHM_AND_OPTIMIZATION.md, docs/TEST_PLAN.md и research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md. Состояние до rebuild находится в archive/pre-universal-solver-rebuild-2026-08-01. PR #85 закрыт без merge как superseded и не должен развиваться как large-order solver. Следующая кодовая цель — pure G0 uniform geometry patterns с реальными slots, строгой validation и тестами, без UI-изменений.
 ```

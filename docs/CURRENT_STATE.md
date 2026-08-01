@@ -1,252 +1,217 @@
 # uImposition — текущее фактическое состояние
 
-Последнее обновление: **31 июля 2026**.
+Последнее обновление: **1 августа 2026**.
 
 ## 1. Repository checkpoint
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - рабочая ветка: `main`;
-- текущий `main`: `1180ff5de008662db63b07d6b973af4f772326ed`;
-- последний объединённый PR: `#66` — R2 application state and sheet/press presets;
-- опубликованный prerelease: **`0.7.0-alpha.5` / M7.5**;
+- архитектурный baseline universal-solver rebuild: merge PR `#87`, commit `b9d83855ff685bb38831670fb0c3975bbd1bdbc4`;
+- опубликованный prerelease остаётся `0.7.0-alpha.5`;
 - release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
-- recovery branch: `release/v0.7.0-alpha.5`;
-- immutable tag: `v0.7.0-alpha.5`;
-- `VERSION.json` остаётся на последнем опубликованном checkpoint;
+- recovery branch/tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
+- `VERSION.json` намеренно остаётся на последнем опубликованном checkpoint;
 - `productionReady` остаётся `false`;
-- текущий сайт остаётся временным техническим прототипом;
 - GitHub — единственный источник истины.
 
-## 2. Функциональность после опубликованного alpha.5
+## 2. Архивная точка до rebuild
 
-### M7.6 comparison foundation
-
-PR `#53`:
-
-- pure lossless comparison rows;
-- view-only filters/sorting;
-- `Только различия`;
-- exact deltas;
-- missing pricing остаётся `null`;
-- plan objects не генерируются заново.
-
-PR `#61`:
-
-- technical desktop/mobile comparison workspace;
-- filters/sort/differences-only;
-- recommendation и selection разделены;
-- operator selection из строки;
-- `183/183` tests и `20/20` Chromium/PDF regression.
-
-Эти модули сохраняются как reusable calculation/view foundation, но текущий visual shell не является целевым продуктом.
-
-## 3. Product reset
-
-Реальная проверка владельцем показала:
-
-- интерфейс запутан и нелогичен;
-- верстка визуально нестабильна;
-- функции распределены по старым панелям;
-- app-shell не соответствует реальной работе оператора;
-- добавление вкладок не исправляет информационную архитектуру.
-
-Поэтому:
-
-- Issue `#64` задаёт operator-first rebuild;
-- `docs/OPERATOR_FIRST_PRODUCT_REBUILD.md` — обязательный продуктовый контракт;
-- PR `#62` закрыт без merge;
-- UI UX-0–UX-5 сохраняется как superseded experiment;
-- расчётное ядро, tests, PDF и production invariants сохраняются.
-
-R1 объединён через PR `#65`, merge commit `816f1d67844494864ae6a31bb0b493a7e30242ec`.
-
-## 4. R2 — завершён
-
-PR `#66` объединён в `main`, merge commit `1180ff5de008662db63b07d6b973af4f772326ed`.
-
-### Sheet/press presets
-
-`src/sheet-press-presets.js`:
-
-- complete built-in/local preset schema;
-- sheet size stage;
-- trim mode и стороны;
-- press margins;
-- favorite/recent metadata;
-- namespaces `builtin:` / `local:`;
-- deterministic local IDs;
-- legacy migration;
-- no duplicate trim for post-trim presets;
-- immutable normalized objects.
-
-### Application state
-
-`src/application-state.js`:
-
-- versioned project/input/runtime state;
-- sheet, press, products, pricing и objective preferences;
-- deterministic JSON;
-- input revisions;
-- begin/complete/fail calculation transitions;
-- stale calculation result protection;
-- selected plan и active screen вне production input.
-
-### Persistence normalization
-
-`src/application-state-persistence.js`:
-
-- browser request не восстанавливается как active после reload;
-- interrupted `calculating` state становится `dirty` и restartable;
-- последний valid revision сохраняется.
-
-### Local repositories
-
-`src/local-state-repository.js`:
-
-- project save/load/import/export/clear;
-- local preset CRUD;
-- favorite/recent ordering;
-- deterministic collection JSON;
-- legacy array migration;
-- corrupted data не стирается молча;
-- dependency injection позволяет тестировать без браузера.
-
-### R2 evidence
-
-Exact head: `374f410343417633c3ce55c168e1860b10c52288`.
-
-Quality:
-
-- run `30603877867` — success;
-- `207/207` Node tests;
-- artifact `8782884025`;
-- digest `sha256:da88043476c656419a22dbb59997dc5a7e53dfc8613980880eb85a948d152073`.
-
-Chromium/PDF regression:
-
-- run `30603877872` — success;
-- `20/20` Playwright scenarios;
-- PDF verification passed;
-- artifact `8782903792`;
-- digest `sha256:114e1b48a4a2135f1e1f44e939b67755716c63f7539dd9e0da667a8259de0c7e`.
-
-R2 не менял HTML, CSS, production formulas, solver, costing, PDF или version.
-
-## 5. Новый целевой сценарий
+Создана постоянная ветка:
 
 ```text
-выбрать или создать sheet/press preset
-→ добавить реальные виды продукции
-→ получить согласованный live calculation
-→ сравнить варианты по бумаге, формам, пластинам, прогонам и стоимости
-→ выбрать монтаж
-→ открыть понятную схему
+archive/pre-universal-solver-rebuild-2026-08-01
+```
+
+Она указывает на commit:
+
+```text
+b9d83855ff685bb38831670fb0c3975bbd1bdbc4
+```
+
+Ветка сохраняет прежний root UI, operator `/app/`, pure calculation modules, tests, fixtures и документацию. Её нельзя удалять до стабильного `1.0.0` и отдельного решения владельца.
+
+## 3. Рабочий пользовательский маршрут
+
+Актуальное приложение находится в `app/`. Корневой GitHub Pages URL должен переходить в `/app/`.
+
+Рабочий поток:
+
+```text
+выбрать sheet/press preset
+→ добавить виды продукции
+→ получить live calculation
+→ сравнить варианты
+→ выбрать план
+→ проверить лицо/зеркальный оборот или общую форму
+→ открыть production metrics
 → экспортировать PDF
 ```
 
-Основные классы результата:
+Поддерживаются:
 
-- минимум бумаги;
-- минимум форм;
-- минимум стоимости;
-- производственно удобный — только после формализации критериев;
-- остальные допустимые варианты без удаления из lossless catalog.
+- local application state и presets;
+- product rows и TXT import;
+- текущие uniform `0°/90°` grids;
+- odd technical blank;
+- verified front и mirrored back;
+- separate duplex;
+- ограниченная user work-and-turn family;
+- alternatives, priorities, selection и costing;
+- schemes, report и PDF;
+- responsive desktop/mobile interface.
 
-## 6. Следующий обязательный pure model
+## 4. Исследование и новое архитектурное решение
 
-До визуального R3 требуется полноценная product-row schema.
+PR `#86` объединил:
 
-Она должна описывать:
+- аудит 50 GitHub-репозиториев;
+- матрицу page-imposition, prepress, packing, cutting-stock и integer-optimization проектов;
+- лицензионные и архитектурные риски;
+- решение использовать внешние проекты как research/differential oracles.
 
-- stable ID;
-- name/file reference;
-- finished size;
-- quantity;
-- pages;
-- variant/file count;
-- front/back colors;
-- simplex/duplex;
-- bleed;
-- cut mode и gap;
-- allowed duplex technology;
-- enabled state;
-- notes;
-- field-level validation.
+PR `#87` перенёс устойчивые выводы в:
 
-Collection model должен поддерживать add, duplicate, update, enable/disable, remove, reorder, serialization и migration старого `file,quantity,pages` ввода.
+- `docs/ARCHITECTURE.md`;
+- `docs/ALGORITHM_AND_OPTIMIZATION.md`;
+- `docs/TEST_PLAN.md`;
+- `docs/REMAINING_WORK.md`.
 
-Этот patch не должен одновременно менять UI или solver.
+Основной implementation contract:
 
-## 7. Текущий production pipeline
+- `research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md`.
 
-```text
-sheet/product inputs
-→ printable geometry
-→ fitting 0°/90° grids
-→ page pairs
-→ paperMinimum/dedicatedPairForms
-→ front/back materialization
-→ validation
-→ production report
-→ metrics and cost
-→ lossless catalog
-→ annotations/ranking
-→ explicit operator selection
-→ schemes/report/PDF
-```
-
-## 8. Честная finite scope
-
-Полнота текущего пользовательского каталога относится только к:
+## 5. Целевая solver architecture
 
 ```text
-один общий формат изделия
-× uniform grid
-× fitting 0°/90°
-× paperMinimum и dedicatedPairForms
-× separate front/back forms
-× общая duplex-цветность
-× полные front/back page pairs
+N — normalized demand and machine input
+G — geometry patterns with explicit slots
+P — product/page/side assignment
+R — integer run lengths
+C — restricted master and pricing/column generation
+M — machine/operator constraints
+E — explanation, export and case memory
 ```
 
-Текущий движок ещё не является общим solver сложных многовидовых монтажей.
+### Малые задачи
 
-## 9. Что ещё отсутствует
+- полный перебор;
+- deterministic exhaustive catalog;
+- brute-force oracle;
+- exact proof внутри заявленной области.
 
-### Product layer
+### Большие задачи
 
-- окончательная product-row model;
-- clean R3 desktop workspace;
-- самостоятельный mobile workflow;
-- live calculation adapter;
-- field-level UI validation;
-- project file download/upload UX;
-- визуальный preset manager.
+- начальные допустимые patterns;
+- restricted master;
+- pricing subproblem;
+- on-demand generation полезных колонок;
+- final integer solve;
+- explicit coverage/truncation.
 
-### Solver
+Нельзя решать большие заказы простым увеличением static candidate limits.
 
-- automatic mixed-format packing;
-- разные форматы/тиражи в одном search;
-- mixed rotations;
-- bounded sequences частично заполненных форм;
-- automatic user-driven work-and-turn;
-- общий simplex/odd-page pipeline;
-- progress/cancel/time limits;
-- production beta matrix.
+## 6. Статус PR #85
 
-### Economics
+PR `#85` закрыт без merge как superseded после research PR `#86` и canonical-docs PR `#87`.
 
-- выручка;
-- прибыль/убыток;
-- маржа;
-- резка, фальцовка и дополнительные операции.
+Его ветка и полезные идеи сохранены:
+
+- BigInt candidate count;
+- deterministic candidate signatures;
+- exact small bounded catalog;
+- coverage/truncation contracts.
+
+Допустимая будущая роль:
+
+- переработанный exhaustive oracle для малых задач R0.
+
+Код нельзя сливать в прежнем виде. Нужен новый PR от актуального `main`, использующий слои G/P/R и не претендующий на large-order completeness.
+
+## 7. Честная граница текущего production solver
+
+Текущий runtime не доказывает полный поиск для:
+
+- mixed physical sizes;
+- mixed rotations внутри одного листа;
+- произвольного числа production patterns;
+- целочисленного multi-pattern master problem;
+- generalized work-and-turn/work-and-tumble;
+- machine defects и zone compatibility;
+- operator case memory;
+- global cost optimum произвольного реального заказа.
+
+Исторический control layout остаётся oracle/benchmark и не читается solver как готовый ответ.
+
+## 8. Следующий кодовый этап
+
+### G0-A
+
+Pure modules без UI:
+
+```text
+src/geometric-pattern.js
+src/uniform-grid-patterns.js
+```
+
+Тесты:
+
+```text
+tests/geometric-pattern.test.js
+tests/uniform-grid-patterns.test.js
+```
+
+Acceptance:
+
+- explicit slots `{xMm,yMm,widthMm,heightMm,rotation,row,column}`;
+- uniform patterns 0° и 90°;
+- printable boundaries;
+- bleed/gap/cut rules;
+- no overlap;
+- deterministic structural signature;
+- orientation and monotonicity property tests;
+- agreement with current capacity calculation for equivalent inputs;
+- no DOM/pricing/plan recommendation changes.
+
+### После G0-A
+
+1. G0-B adapter к application geometry;
+2. G1 mixed guillotine strips;
+3. P0/P1 product allocation;
+4. R0 exhaustive small oracle;
+5. restricted master;
+6. pricing/column generation;
+7. control benchmark;
+8. operator cases;
+9. machine constraints.
+
+## 9. Quality state
+
+Текущие обязательные проверки:
+
+```text
+npm run check:docs
+npm run check:source
+npm test
+```
+
+Runtime/UI/PDF изменения дополнительно проходят полный Chromium/PDF workflow и visual artifact review.
 
 ## 10. Release status
 
-- version не менялась;
-- tag/release/news для R1/R2 не создавались;
-- alpha.6 нельзя выпускать как удобный рабочий инструмент до реальной проверки владельцем нового R3–R4 flow.
+- root/application restructuring не меняет опубликованный version checkpoint автоматически;
+- `0.7.0-alpha.6` не выпускается только из-за документационного или pure-geometry PR;
+- version, recovery branch, tag, Release и uNews создаются отдельным release gate;
+- root cutover не означает production-ready или stable.
 
-## 11. Неблокирующий долг
+## 11. Неприкосновенные правила
 
-Issue `#40`: заменить некорректное изображение Telegram-поста `0.7.0-alpha.2` через uNews `edit:media`.
+- zero underproduction;
+- back derived only from validated front;
+- geometry separated from demand and pricing;
+- layout forms separated from color plates;
+- missing cost remains unavailable;
+- operator selection remains explicit;
+- fixtures/cases are never trusted without recalculation;
+- heuristic result is not called proven optimum;
+- search limits and coverage are visible;
+- archive branch remains recoverable.
