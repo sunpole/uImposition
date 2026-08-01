@@ -2,7 +2,7 @@
 
 Этот файл — единый каталог документации проекта. Он помогает отличить текущие источники истины от нормативных справочников, завершённых milestone-документов и исторических evidence-материалов.
 
-GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md), [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md), [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md), [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md), [`R3_OPERATOR_WORKSPACE.md`](R3_OPERATOR_WORKSPACE.md), [`R3_ACCEPTANCE_BLOCKERS.md`](R3_ACCEPTANCE_BLOCKERS.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
+GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md), [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md), [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md), [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md), [`R3_OPERATOR_WORKSPACE.md`](R3_OPERATOR_WORKSPACE.md), [`R3_ACCEPTANCE_BLOCKERS.md`](R3_ACCEPTANCE_BLOCKERS.md), [`R3_WORK_AND_TURN_PLAN_FAMILY.md`](R3_WORK_AND_TURN_PLAN_FAMILY.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
 
 ## Статусы документов
 
@@ -22,6 +22,7 @@ GitHub остаётся единственным источником истин
 | [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md) | Завершённый pure-code milestone | Versioned application state, sheet/press presets, persistence normalization, migrations и local repositories из PR `#66` |
 | [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md) | Завершённый pure-code milestone | Реальный вид продукции, collection operations, field-level validation, legacy migration и application-state adapter из PR `#69` |
 | [`R3_OPERATOR_WORKSPACE.md`](R3_OPERATOR_WORKSPACE.md) | **Активный production UI milestone** | Чистый рабочий маршрут `/app/`: presets, product rows, live calculation, alternatives, selection и layout preview |
+| [`R3_WORK_AND_TURN_PLAN_FAMILY.md`](R3_WORK_AND_TURN_PLAN_FAMILY.md) | **Активный расчётный контракт R3** | Реальный `workAndTurn` в lossless-каталоге, условия применимости, shared plate, стоимость, UI и одностраничный PDF общей формы |
 | [`R3_ACCEPTANCE_BLOCKERS.md`](R3_ACCEPTANCE_BLOCKERS.md) | **Активный acceptance patch contract** | Реальные замечания владельца перед root cutover и `0.7.0-alpha.6`: навигация, TXT, приоритеты, зеркальный оборот, ширина и независимая красочность |
 | [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md) | Актуальный для расчётного ядра и release-процесса | Полная передача существующего production pipeline и границ search space; UI-next-step заменён rebuild-контрактом |
 | [`CURRENT_STATE.md`](CURRENT_STATE.md) | Актуальный | Проверенное фактическое состояние функций, rebuild и release checkpoint |
@@ -71,13 +72,14 @@ GitHub остаётся единственным источником истин
 | [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md) | Завершённый R2 | State/preset/storage foundation, `207/207` tests и `20/20` Chromium/PDF regression |
 | [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md) | Завершённый foundation | Versioned product rows, list operations, compatibility boundaries and legacy order adapter |
 | [`R3_OPERATOR_WORKSPACE.md`](R3_OPERATOR_WORKSPACE.md) | Активный R3 | Новый `/app/` без legacy DOM: быстрые presets, строки продукции, live result, comparison и схема |
-| [`R3_ACCEPTANCE_BLOCKERS.md`](R3_ACCEPTANCE_BLOCKERS.md) | Активный acceptance PR `#78` | Blocker-only до повторной приёмки владельцем |
+| [`R3_ACCEPTANCE_BLOCKERS.md`](R3_ACCEPTANCE_BLOCKERS.md) | Активный acceptance cycle | Замечания реального operator acceptance и подтверждённые blocker-исправления |
+| [`R3_WORK_AND_TURN_PLAN_FAMILY.md`](R3_WORK_AND_TURN_PLAN_FAMILY.md) | Активный R3 расчётный этап | Dedicated-pair shared plates, честные ограничения, выбор оператора и PDF общей формы |
 
 Pure comparison model и часть app-shell эксперимента существуют в `main`, но новая пользовательская разработка **не продолжает** перестановку старых DOM-панелей.
 
 Design gate `#71` завершён. PR `#72` опубликовал три концепции; выбран hybrid: A как основной быстрый стол, B как live layout pane, C позже как дополнительный expert table mode.
 
-PR `#74` реализует первый рабочий uniform duplex маршрут `/app/`. PR `#76` подключает PDF выбранного плана. Draft PR `#78` исправляет подтверждённые acceptance blockers. Корневой сайт переключается только после повторной проверки владельцем.
+PR `#74` реализовал первый рабочий uniform duplex маршрут `/app/`. PR `#76` подключил PDF выбранного плана. PR `#78`, `#79` и `#80` закрыли подтверждённые acceptance-блокеры, включая зеркальный оборот и адаптацию телефонов. Draft PR `#81` подключает реальную пользовательскую plan-family своего оборота. Корневой сайт переключается только после повторной проверки владельцем.
 
 ## 5. Acceptance records
 
@@ -116,7 +118,7 @@ PR `#74` реализует первый рабочий uniform duplex марш�
 | [`codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md`](codex-tasks/2026-07-27_01_HANDOFF_AND_ALPHA5_RELEASE.md) | Выполненная история | Полное задание и completion record релиза `0.7.0-alpha.5` |
 | [`codex-tasks/2026-07-31_01_R3_ACCEPTANCE_BLOCKERS.md`](codex-tasks/2026-07-31_01_R3_ACCEPTANCE_BLOCKERS.md) | Активное задание | Реализация blocker-only PR `#78` до повторной owner acceptance |
 
-Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Operator-first rebuild закреплён в Issue #64, #68, #71, #73, #77 и PR #65/#66/#69/#72/#74/#76/#78.
+Новые задания сохраняются в `docs/codex-tasks/` только когда их полный текст и completion record нужны для передачи между сессиями. Operator-first rebuild закреплён в Issue #64, #68, #71, #73, #77 и PR #65/#66/#69/#72/#74/#76/#78/#79/#80/#81.
 
 ## 8. Проверка каталога
 
@@ -130,4 +132,4 @@ npm run check:docs
 
 ## English summary
 
-This is the canonical documentation index. R1 stopped the legacy app-shell direction, R2 completed versioned state and sheet/press presets, and the product-row foundation defines real production rows with field-level validation. The active R3 milestone builds a clean `/app/` route on top of those pure models and the existing uniform production pipeline. Draft PR `#78` is the owner-acceptance blocker patch and is fully registered in this catalog.
+This is the canonical documentation index. R1 stopped the legacy app-shell direction, R2 completed versioned state and sheet/press presets, and the product-row foundation defines real production rows with field-level validation. The active R3 milestone builds a clean `/app/` route on top of those pure models and the existing uniform production pipeline. PRs `#78`–`#80` completed the confirmed owner-acceptance blocker fixes, while draft PR `#81` connects a real horizontally eligible work-and-turn shared-plate family to comparison, operator selection and PDF export.
