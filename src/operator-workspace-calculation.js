@@ -88,10 +88,27 @@ function previewRecord(plan) {
   )) ?? plan.impositions[0] ?? null;
 }
 
+function previewCell(cell) {
+  return deepFreeze({
+    position: cell.position,
+    row: cell.row,
+    column: cell.column,
+    file: cell.file,
+    pairIndex: cell.pairIndex,
+    frontPage: cell.frontPage,
+    backPage: cell.backPage,
+    page: cell.page,
+    direction: cell.direction,
+    technicalBlankBack: cell.backPage === null,
+  });
+}
+
 function layoutPreview(plan) {
   const record = previewRecord(plan);
-  if (!record?.front) return null;
+  if (!record?.front || !record?.back) return null;
   const impositionIndex = plan.impositions.indexOf(record);
+  const frontCells = record.front.cells.map(previewCell);
+  const backCells = record.back.cells.map(previewCell);
   return deepFreeze({
     planId: plan.id,
     impositionId: record.front.id,
@@ -103,13 +120,9 @@ function layoutPreview(plan) {
     columns: record.front.columns,
     capacity: record.front.rows * record.front.columns,
     runLength: record.front.runLength,
-    cells: record.front.cells.map((cell) => deepFreeze({
-      file: cell.file,
-      pairIndex: cell.pairIndex,
-      frontPage: cell.frontPage,
-      backPage: cell.backPage,
-      technicalBlankBack: cell.backPage === null,
-    })),
+    cells: frontCells,
+    frontCells,
+    backCells,
   });
 }
 
