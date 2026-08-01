@@ -228,4 +228,4 @@ test("R1-A3 input-order permutations preserve the restricted optimum", () => {
   assert.equal(first.bestPlan.planSignature, second.bestPlan.planSignature);
   assert.deepEqual(first.bestPlan.metrics, second.bestPlan.metrics);
   assert.deepEqual(first.bounds, second.bounds);
-}
+});
