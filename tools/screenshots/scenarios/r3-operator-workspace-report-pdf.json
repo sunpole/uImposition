@@ -27,7 +27,7 @@
   ],
   "download": {
     "selector": "[data-workspace-pdf='report']",
-    "fileNamePattern": "^uImposition-uniform-r(0|90)-(paper-minimum|dedicated-pairs)-production-report\\.pdf$",
+    "fileNamePattern": "^uImposition-uniform-r(0|90)-(paper-minimum|dedicated-pairs|work-and-turn-dedicated-pairs)-production-report\\.pdf$",
     "artifact": "uimposition-r3-selected-plan-production-report.pdf",
     "expectedPages": 3
   },
