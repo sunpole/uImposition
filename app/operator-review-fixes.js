@@ -10,7 +10,7 @@ let controlReference = null;
 let controlReferenceActive = false;
 let rendering = false;
 let refreshQueued = false;
-let lastSignature = null;
+let layoutSignature = null;
 
 function snapshot() {
   return window.__uimpositionR3?.getSnapshot?.() ?? null;
@@ -158,71 +158,34 @@ async function prepareControlReference() {
   });
 }
 
-function selectedRealPlan() {
-  const result = snapshot()?.lastValidResult;
-  return result?.planSet?.plans?.find(({ id }) => id === result.selectedPlanId) ?? null;
-}
-
-function currentLayoutMode() {
-  const active = document.querySelector(".screen--layout .segmented button.is-active");
-  return active?.dataset.acceptanceLayout ?? active?.dataset.layoutSide ?? "front";
-}
-
-function validatedRecords(records) {
-  return records.map((record) => ({
-    ...record,
-    validation: record.validation ?? { valid: true, errors: [] },
-  }));
-}
-
-function planForRenderer() {
-  if (controlReferenceActive && controlReference) {
-    return {
-      id: controlReference.id,
-      label: controlReference.label,
-      records: controlReference.records,
-      reference: true,
-    };
-  }
-  if (currentLayoutMode() !== "both") return null;
-  const selected = selectedRealPlan();
-  if (!selected?.impositions?.length) return null;
-  return {
-    id: selected.id,
-    label: selected.label,
-    records: validatedRecords(selected.impositions),
-    reference: false,
-  };
-}
-
-function renderAllSchemePairs() {
-  if (rendering) return;
+function renderControlLayout() {
+  if (!controlReferenceActive || !controlReference || rendering) return;
   const host = document.querySelector("#layoutSheet");
-  const plan = planForRenderer();
-  if (!host || !plan) return;
-  const signature = `${plan.id}|${plan.records.length}|${controlReferenceActive}`;
-  if (lastSignature === signature && host.querySelector(".scheme-pairs")) return;
+  if (!host) return;
+  const signature = `${controlReference.id}|${controlReference.records.length}`;
+  if (layoutSignature === signature && host.querySelector(".scheme-pairs")) return;
 
   rendering = true;
   try {
     const wrapper = document.createElement("div");
     wrapper.className = "control-reference-render";
+    wrapper.dataset.layoutRenderedView = "both";
     const intro = document.createElement("div");
     intro.className = "control-reference-intro";
     intro.innerHTML = `
-      <div><strong>${plan.reference ? "Старый контрольный эталон" : "Все формы выбранного варианта"}</strong><span>${plan.label}</span></div>
+      <div><strong>Старый контрольный эталон</strong><span>Точный набор из data/control-layout-m3.json · 4 лица + 4 оборота = 8 форм</span></div>
       <div class="control-reference-turn"><b>→</b> лицо · <b>←</b> оборот · через короткую сторону слева направо</div>
     `;
     const pairs = document.createElement("div");
     pairs.className = "scheme-pairs";
-    renderSchemePairs(pairs, plan.records, { language: "ru" });
+    renderSchemePairs(pairs, controlReference.records, { language: "ru" });
     wrapper.append(intro, pairs);
     host.replaceChildren(wrapper);
     host.classList.add("layout-sheet--old-renderer");
     host.style.gridTemplateColumns = "";
     host.style.gridTemplateRows = "";
     host.style.aspectRatio = "auto";
-    lastSignature = signature;
+    layoutSignature = signature;
   } finally {
     rendering = false;
   }
@@ -239,6 +202,14 @@ function renderReferenceCard() {
     list.append(card);
   }
   const metrics = controlReference.metrics;
+  const signature = JSON.stringify({
+    active: controlReferenceActive,
+    sheets: metrics.physicalSheets,
+    passes: metrics.pressPasses,
+    cost: metrics.estimatedTotalCost,
+  });
+  if (card.dataset.signature === signature) return;
+  card.dataset.signature = signature;
   card.classList.toggle("is-selected", controlReferenceActive);
   card.innerHTML = `
     <div class="alternative-cell alternative-cell--title">
@@ -266,7 +237,8 @@ function renderReferenceSwitch() {
     button.dataset.controlReferenceSwitch = "true";
     actions.append(button);
   }
-  button.textContent = controlReferenceActive ? "Вернуться к расчёту" : "Эталон 4 лица + 4 оборота";
+  const text = controlReferenceActive ? "Вернуться к расчёту" : "Эталон 4 лица + 4 оборота";
+  if (button.textContent !== text) button.textContent = text;
 }
 
 function renderReferenceNote() {
@@ -279,9 +251,19 @@ function renderReferenceNote() {
     note.dataset.controlReferenceNote = "true";
     details.prepend(note);
   }
+  const signature = controlReferenceActive ? "active" : "available";
+  if (note.dataset.signature === signature) return;
+  note.dataset.signature = signature;
   note.innerHTML = controlReferenceActive
     ? "<strong>Показан точный прежний эталон.</strong><br>20 файлов A6, 1+1, 4 монтажа: 4 формы лица + 4 зеркальные формы оборота = 8 форм. Стрелка направления сохранена в каждой ячейке."
     : "<strong>Старый эталон доступен для сравнения.</strong><br>Он берётся напрямую из data/control-case.json и data/control-layout-m3.json.";
+}
+
+function restoreCalculatedLayout() {
+  layoutSignature = null;
+  const host = document.querySelector("#layoutSheet");
+  host?.classList.remove("layout-sheet--old-renderer");
+  window.__uimpositionAcceptanceControls?.renderLayout?.();
 }
 
 function scheduleRefresh() {
@@ -293,7 +275,7 @@ function scheduleRefresh() {
     renderReferenceCard();
     renderReferenceSwitch();
     renderReferenceNote();
-    renderAllSchemePairs();
+    renderControlLayout();
   });
 }
 
@@ -301,26 +283,29 @@ function attachEvents() {
   document.addEventListener("click", (event) => {
     if (event.target.closest("[data-control-reference-select]")) {
       controlReferenceActive = true;
+      layoutSignature = null;
       window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
       window.__uimpositionR3?.openScreen?.("layout");
-      lastSignature = null;
       setTimeout(scheduleRefresh, 0);
       return;
     }
     if (event.target.closest("[data-control-reference-switch]")) {
       controlReferenceActive = !controlReferenceActive;
-      if (controlReferenceActive) window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
-      lastSignature = null;
-      setTimeout(scheduleRefresh, 0);
+      if (controlReferenceActive) {
+        window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
+        layoutSignature = null;
+        setTimeout(scheduleRefresh, 0);
+      } else {
+        restoreCalculatedLayout();
+        setTimeout(scheduleRefresh, 0);
+      }
       return;
     }
-    if (event.target.closest("[data-select-plan]")) {
-      controlReferenceActive = false;
-      lastSignature = null;
-    }
-    if (event.target.closest(".screen--layout .segmented button")) {
-      controlReferenceActive = false;
-      lastSignature = null;
+    if (event.target.closest("[data-select-plan], .screen--layout .segmented button")) {
+      if (controlReferenceActive) {
+        controlReferenceActive = false;
+        restoreCalculatedLayout();
+      }
       setTimeout(scheduleRefresh, 0);
     }
   }, true);
@@ -359,7 +344,12 @@ window.__uimpositionOperatorReview = Object.freeze({
   getControlReference: () => controlReference,
   setControlReferenceActive(value) {
     controlReferenceActive = Boolean(value && controlReference);
-    lastSignature = null;
+    if (controlReferenceActive) {
+      window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
+      layoutSignature = null;
+    } else {
+      restoreCalculatedLayout();
+    }
     scheduleRefresh();
   },
   render: scheduleRefresh,
