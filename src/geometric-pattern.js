@@ -252,13 +252,12 @@ function createLayoutSignature(layout) {
   }
   const strips = layout.strips.map((strip) => [
     strip.index,
-    strip.id,
     strip.rotation,
     formatNumber(strip.xMm),
     formatNumber(strip.yMm),
     formatNumber(strip.widthMm),
     formatNumber(strip.heightMm),
-    strip.slotIds.join(","),
+    strip.slotIds.length,
   ].join(":"));
   return `mixedStrips:${layout.axis}:${strips.join(";")}`;
 }
@@ -271,6 +270,9 @@ function createStructuralSignature({
   layout,
   slots,
 }) {
+  const stripIndexById = layout.type === "mixedStrips"
+    ? new Map(layout.strips.map((strip) => [strip.id, strip.index]))
+    : new Map();
   const slotSignature = slots.map((slot) => [
     slot.row,
     slot.column,
@@ -279,7 +281,7 @@ function createStructuralSignature({
     formatNumber(slot.widthMm),
     formatNumber(slot.heightMm),
     slot.rotation,
-    slot.stripId ?? "-",
+    slot.stripId ? stripIndexById.get(slot.stripId) : "-",
     slot.positionInStrip ?? "-",
   ].join(":"));
   return [
