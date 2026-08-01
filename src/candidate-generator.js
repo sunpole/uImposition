@@ -51,6 +51,10 @@ function safeBigIntToNumber(value, label) {
   return Number(value);
 }
 
+function nullableSafeBigIntToNumber(value) {
+  return value <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(value) : null;
+}
+
 function* combinations(items, size, startIndex = 0, prefix = []) {
   if (prefix.length === size) {
     yield prefix;
@@ -131,7 +135,7 @@ export function candidateProductionSignature(candidate) {
   ]);
 }
 
-export function countCandidateSpace({
+export function countCandidateSpaceBigInt({
   selectedPairCount,
   capacity,
   minDistinctPairs = CONFIG.optimizer.candidateGeneration.minDistinctPairs,
@@ -152,7 +156,11 @@ export function countCandidateSpace({
     const allocations = binomialBigInt(normalizedCapacity - 1, distinct - 1);
     total += pairSubsets * allocations;
   }
-  return safeBigIntToNumber(total, "candidate space");
+  return total;
+}
+
+export function countCandidateSpace(input) {
+  return safeBigIntToNumber(countCandidateSpaceBigInt(input), "candidate space");
 }
 
 export function generateImpositionCandidates({
@@ -181,13 +189,17 @@ export function generateImpositionCandidates({
     throw new RangeError("minDistinctPairs exceeds the available pair or position count");
   }
 
-  const theoreticalCandidateCount = countCandidateSpace({
+  const theoreticalCandidateCountBigInt = countCandidateSpaceBigInt({
     selectedPairCount: selectedPairs.length,
     capacity,
     minDistinctPairs: normalizedMin,
     maxDistinctPairs: effectiveMax,
   });
-  const generatedTarget = Math.min(theoreticalCandidateCount, normalizedLimit);
+  const generatedTarget = Number(
+    theoreticalCandidateCountBigInt < BigInt(normalizedLimit)
+      ? theoreticalCandidateCountBigInt
+      : BigInt(normalizedLimit),
+  );
   const idDigits = Math.max(4, String(generatedTarget).length);
   const candidates = [];
   const signatures = new Set();
@@ -221,7 +233,9 @@ export function generateImpositionCandidates({
   }
 
   const frozenCandidates = Object.freeze(candidates);
-  const truncated = theoreticalCandidateCount > frozenCandidates.length;
+  const generatedCountBigInt = BigInt(frozenCandidates.length);
+  const truncated = theoreticalCandidateCountBigInt > generatedCountBigInt;
+  const truncatedCandidateCountBigInt = theoreticalCandidateCountBigInt - generatedCountBigInt;
   return Object.freeze({
     kind: CANDIDATE_GENERATION_RESULT_KIND,
     rows: normalizedRows,
@@ -231,9 +245,11 @@ export function generateImpositionCandidates({
     selectedPairCount: selectedPairs.length,
     minDistinctPairs: normalizedMin,
     maxDistinctPairs: effectiveMax,
-    theoreticalCandidateCount,
+    theoreticalCandidateCount: nullableSafeBigIntToNumber(theoreticalCandidateCountBigInt),
+    theoreticalCandidateCountExact: theoreticalCandidateCountBigInt.toString(),
     candidateCount: frozenCandidates.length,
-    truncatedCandidateCount: theoreticalCandidateCount - frozenCandidates.length,
+    truncatedCandidateCount: nullableSafeBigIntToNumber(truncatedCandidateCountBigInt),
+    truncatedCandidateCountExact: truncatedCandidateCountBigInt.toString(),
     truncated,
     completeWithinRequestedSpace: !truncated,
     candidates: frozenCandidates,
