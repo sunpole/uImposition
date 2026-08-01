@@ -444,8 +444,11 @@ export function solveRestrictedMaster({
   const limits = Object.freeze({
     maxSelectedColumns: Math.min(problem.limits.maxSelectedColumns, columns.length),
     maxRunLength: problem.limits.maxRunLength,
-    maxStates: asPositiveInteger(maxStates, "maxStates"),
-    maxMilliseconds: asPositiveInteger(maxMilliseconds, "maxMilliseconds"),
+    maxStates: Math.min(asPositiveInteger(maxStates, "maxStates"), problem.limits.maxStates),
+    maxMilliseconds: Math.min(
+      asPositiveInteger(maxMilliseconds, "maxMilliseconds"),
+      problem.limits.maxMilliseconds,
+    ),
   });
   const rootLowerBound = candidateSpecificRootLowerBound(problem, columns);
   const counters = {
