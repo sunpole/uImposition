@@ -49,6 +49,49 @@ async function runAssertions(page, assertions = []) {
   }
 }
 
+async function runPageAssertions(page, assertions = {}) {
+  if (assertions.noHorizontalOverflow) {
+    const metrics = await page.evaluate(() => ({
+      viewportWidth: document.documentElement.clientWidth,
+      documentScrollWidth: document.documentElement.scrollWidth,
+      bodyScrollWidth: document.body.scrollWidth,
+    }));
+    expect(metrics.documentScrollWidth).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+    expect(metrics.bodyScrollWidth).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  }
+
+  if (assertions.layoutFitsCanvas) {
+    const metrics = await page.evaluate(() => {
+      const canvas = document.querySelector(".layout-canvas");
+      const sheet = document.querySelector(".layout-pair__sheet");
+      if (!canvas || !sheet) return null;
+      return {
+        canvasClientWidth: canvas.clientWidth,
+        canvasScrollWidth: canvas.scrollWidth,
+        sheetWidth: sheet.getBoundingClientRect().width,
+      };
+    });
+    expect(metrics).not.toBeNull();
+    expect(metrics.canvasScrollWidth).toBeLessThanOrEqual(metrics.canvasClientWidth + 1);
+    expect(metrics.sheetWidth).toBeLessThanOrEqual(metrics.canvasClientWidth + 1);
+  }
+
+  if (assertions.mirroredBackDom) {
+    const sequences = await page.evaluate(() => {
+      const preview = window.__uimpositionR3?.getSnapshot?.()?.lastValidResult?.layoutPreview;
+      const expected = (preview?.backCells ?? []).map((cell) => {
+        const pageValue = cell.page ?? cell.backPage;
+        return pageValue === null || pageValue === undefined ? "blank" : String(pageValue);
+      });
+      const actual = [...document.querySelectorAll("[data-layout-side='back']")]
+        .map((cell) => cell.dataset.layoutPage);
+      return { expected, actual };
+    });
+    expect(sequences.expected.length).toBeGreaterThan(0);
+    expect(sequences.actual).toEqual(sequences.expected);
+  }
+}
+
 async function runBeforeScreenshotActions(page, actions = []) {
   for (const action of actions) {
     if (action.action === "click") {
@@ -141,6 +184,7 @@ for (const scenario of scenarios) {
 
     await runBeforeScreenshotActions(page, scenario.beforeScreenshot);
     await runAssertions(page, scenario.beforeScreenshotAssertions);
+    await runPageAssertions(page, scenario.pageAssertions);
 
     const screenshotPath = path.join(outputDir, scenario.screenshot);
     if (scenario.screenshotSelector) {
@@ -163,6 +207,7 @@ for (const scenario of scenarios) {
       beforeScreenshot: scenario.beforeScreenshot ?? [],
       beforeScreenshotAssertions: scenario.beforeScreenshotAssertions ?? [],
       assertions: scenario.assertions,
+      pageAssertions: scenario.pageAssertions ?? {},
       download: downloadEntry,
     };
 
