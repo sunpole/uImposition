@@ -45,12 +45,16 @@
       "selector": ".topbar__nav [data-open-screen='layout']"
     },
     {
+      "action": "wait",
+      "timeoutMs": 700
+    },
+    {
       "action": "click",
       "selector": "[data-acceptance-layout='both']"
     },
     {
       "action": "wait",
-      "timeoutMs": 700
+      "timeoutMs": 250
     }
   ],
   "beforeScreenshotAssertions": [
