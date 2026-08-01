@@ -174,7 +174,8 @@ function updatePricingSummary() {
   const target = document.querySelector("[data-pricing-summary]");
   const pricing = snapshot()?.state?.input?.pricing ?? repository.load()?.input?.pricing;
   if (!target || !pricing) return;
-  target.textContent = `${formatPrice(pricing.grammageGsm)} г/м² · бумага ${formatPrice(pricing.paperPricePerKg)} · пластина ${formatPrice(pricing.colorPlatePrice)} · форма ${formatPrice(pricing.layoutFormPreparationPrice)} ${pricing.currency}`;
+  const text = `${formatPrice(pricing.grammageGsm)} г/м² · бумага ${formatPrice(pricing.paperPricePerKg)} · пластина ${formatPrice(pricing.colorPlatePrice)} · форма ${formatPrice(pricing.layoutFormPreparationPrice)} ${pricing.currency}`;
+  if (target.textContent !== text) target.textContent = text;
 }
 
 function updateNavigationState() {
