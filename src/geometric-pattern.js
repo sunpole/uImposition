@@ -173,6 +173,9 @@ function normalizeStrip(strip, index, printableArea, axis) {
     }
     return slotId.trim();
   });
+  if (slotIds.length === 0) {
+    throw new RangeError(`layout strip ${strip.id} must contain at least one slot`);
+  }
   return freezeRecursively({
     id: strip.id.trim(),
     index,
@@ -234,6 +237,13 @@ function normalizeLayout({ layout, rotation, rows, columns, slots, printableArea
   for (const strip of strips) {
     if (stripIds.has(strip.id)) throw new RangeError(`duplicate strip id: ${strip.id}`);
     stripIds.add(strip.id);
+  }
+  for (let index = 1; index < strips.length; index += 1) {
+    const previousCoordinate = layout.axis === "horizontal" ? strips[index - 1].yMm : strips[index - 1].xMm;
+    const currentCoordinate = layout.axis === "horizontal" ? strips[index].yMm : strips[index].xMm;
+    if (currentCoordinate + EPSILON < previousCoordinate) {
+      throw new RangeError("mixedStrips strip regions must be ordered by their physical coordinate");
+    }
   }
   const rotations = new Set(slots.map((slot) => slot.rotation));
   if (!rotations.has(0) || !rotations.has(90)) {
@@ -302,6 +312,16 @@ function compareSlotOrder(a, b) {
   return a.id.localeCompare(b.id);
 }
 
+function compareSlotsInsideStrip(axis, a, b) {
+  const primaryA = axis === "horizontal" ? a.xMm : a.yMm;
+  const primaryB = axis === "horizontal" ? b.xMm : b.yMm;
+  if (Math.abs(primaryA - primaryB) > EPSILON) return primaryA - primaryB;
+  const secondaryA = axis === "horizontal" ? a.yMm : a.xMm;
+  const secondaryB = axis === "horizontal" ? b.yMm : b.xMm;
+  if (Math.abs(secondaryA - secondaryB) > EPSILON) return secondaryA - secondaryB;
+  return a.id.localeCompare(b.id);
+}
+
 function validateUniformLayout(pattern) {
   if (![0, 90].includes(pattern.rotation)) {
     throw new RangeError("uniform pattern rotation must be 0 or 90");
@@ -358,31 +378,41 @@ function validateMixedStripLayout(pattern, printableArea) {
     }
   }
 
+  const slotById = new Map(pattern.slots.map((slot) => [slot.id, slot]));
   const assignedSlotIds = new Set();
   for (const strip of pattern.layout.strips) {
-    for (let index = 0; index < strip.slotIds.length; index += 1) {
-      const slotId = strip.slotIds[index];
+    for (const slotId of strip.slotIds) {
       if (assignedSlotIds.has(slotId)) {
         throw new RangeError(`slot ${slotId} is assigned to more than one strip`);
       }
-      const slot = pattern.slots.find((candidate) => candidate.id === slotId);
-      if (!slot) throw new RangeError(`strip ${strip.id} references unknown slot ${slotId}`);
+      if (!slotById.has(slotId)) throw new RangeError(`strip ${strip.id} references unknown slot ${slotId}`);
       assignedSlotIds.add(slotId);
+    }
+  }
+
+  for (const strip of pattern.layout.strips) {
+    const stripSlots = strip.slotIds.map((slotId) => slotById.get(slotId));
+    const sortedStripSlots = [...stripSlots].sort((a, b) => compareSlotsInsideStrip(pattern.layout.axis, a, b));
+    for (let index = 0; index < stripSlots.length; index += 1) {
+      if (stripSlots[index].id !== sortedStripSlots[index].id) {
+        throw new RangeError(`strip ${strip.id} slotIds must follow strip coordinates`);
+      }
+      const slot = stripSlots[index];
       if (slot.stripId !== strip.id || slot.positionInStrip !== index) {
-        throw new RangeError(`slot ${slotId} strip metadata does not match layout`);
+        throw new RangeError(`slot ${slot.id} strip metadata does not match layout`);
       }
       if (slot.rotation !== strip.rotation) {
-        throw new RangeError(`slot ${slotId} rotation does not match strip ${strip.id}`);
+        throw new RangeError(`slot ${slot.id} rotation does not match strip ${strip.id}`);
       }
       if (!rectangleContains(strip, slot)) {
-        throw new RangeError(`slot ${slotId} exceeds strip ${strip.id}`);
+        throw new RangeError(`slot ${slot.id} exceeds strip ${strip.id}`);
       }
       if (pattern.layout.axis === "horizontal") {
         if (slot.row !== strip.index || slot.column !== index) {
-          throw new RangeError(`horizontal strip slot ${slotId} has invalid row/column metadata`);
+          throw new RangeError(`horizontal strip slot ${slot.id} has invalid row/column metadata`);
         }
       } else if (slot.column !== strip.index || slot.row !== index) {
-        throw new RangeError(`vertical strip slot ${slotId} has invalid row/column metadata`);
+        throw new RangeError(`vertical strip slot ${slot.id} has invalid row/column metadata`);
       }
     }
   }
@@ -460,7 +490,7 @@ export function createGeometryPattern({
   columns,
   layout = null,
   slots,
-  coverage = { scope: "uniformGrid", status: "completeWithinPatternFamily" },
+  coverage = {},
 }) {
   const normalizedPrintableArea = normalizeRectangle(printableArea, "printableArea");
   const normalizedOccupiedProduct = normalizeRectangle(occupiedProduct, "occupiedProduct");
