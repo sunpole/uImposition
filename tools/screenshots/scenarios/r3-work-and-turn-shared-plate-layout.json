@@ -1,0 +1,97 @@
+{
+  "id": "r3-work-and-turn-shared-plate-layout",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 900
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row]:nth-child(1) .product-row__details summary"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='pages']",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.frontColors']",
+      "value": "4"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.backColors']",
+      "value": "1"
+    },
+    {
+      "action": "select",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.duplexPreference']",
+      "value": "workAndTurn"
+    },
+    {
+      "action": "waitForHidden",
+      "selector": "#calculationError",
+      "timeoutMs": 10000
+    },
+    {
+      "action": "click",
+      "selector": ".topbar [data-open-screen='layout']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 700
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#calculationError",
+      "hidden": true
+    },
+    {
+      "selector": ".screen--layout .segmented",
+      "text": "Общая форма"
+    },
+    {
+      "selector": ".screen--layout .segmented [data-acceptance-layout='shared']",
+      "text": "Общая форма"
+    },
+    {
+      "selector": "[data-layout-rendered-view='shared']",
+      "text": "лицо"
+    },
+    {
+      "selector": "[data-layout-rendered-view='shared']",
+      "text": "обр."
+    },
+    {
+      "selector": "#layoutDetails",
+      "text": "Свой оборот"
+    },
+    {
+      "selector": "[data-work-and-turn-note]",
+      "text": "одна общая форма"
+    },
+    {
+      "selector": "[data-workspace-pdf='schemes']",
+      "text": "Схемы PDF"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "layoutFitsCanvas": true
+  },
+  "screenshotSelector": ".screen--layout",
+  "screenshot": "uimposition-r3-work-and-turn-shared-plate-layout.png"
+}
