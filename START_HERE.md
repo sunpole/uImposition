@@ -12,7 +12,7 @@
 - рабочее приложение: `https://sunpole.github.io/uImposition/` → `/app/`;
 - прежнее состояние сохранено в `archive/pre-universal-solver-rebuild-2026-08-01`;
 - основной universal-solver backlog: Issue `#83`;
-- draft PR `#85` не является будущим large-order solver и сохраняется только как материал для small-space exhaustive oracle;
+- PR `#85` закрыт без merge как superseded; его ветка сохраняется только как материал для будущего small-space exhaustive oracle;
 - production code, version и release не обновляются автоматически вместе с архитектурными PR.
 
 ## 2. Главное решение
@@ -148,5 +148,5 @@ Runtime/UI/PDF изменения дополнительно требуют по
 ## Prompt для следующей сессии
 
 ```text
-Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub. Прочитай AGENTS.md, START_HERE.md, docs/CURRENT_STATE.md, docs/ARCHITECTURE.md, docs/ALGORITHM_AND_OPTIMIZATION.md, docs/TEST_PLAN.md и research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md. Состояние до rebuild находится в archive/pre-universal-solver-rebuild-2026-08-01. Не развивай draft PR #85 как large-order solver. Следующая кодовая цель — pure G0 uniform geometry patterns с реальными slots, строгой validation и тестами, без UI-изменений.
+Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub. Прочитай AGENTS.md, START_HERE.md, docs/CURRENT_STATE.md, docs/ARCHITECTURE.md, docs/ALGORITHM_AND_OPTIMIZATION.md, docs/TEST_PLAN.md и research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md. Состояние до rebuild находится в archive/pre-universal-solver-rebuild-2026-08-01. PR #85 закрыт без merge как superseded и не должен развиваться как large-order solver. Следующая кодовая цель — pure G0 uniform geometry patterns с реальными slots, строгой validation и тестами, без UI-изменений.
 ```
