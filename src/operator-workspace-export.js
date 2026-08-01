@@ -3,6 +3,7 @@ import {
   PDF_PAGE_MODES,
   createProductionReportPdfDocument,
   createSchemePdfDocument,
+  createSharedPlatePdfDocument,
 } from "./pdf-document-model.js";
 import {
   downloadPdfBytes,
@@ -43,6 +44,13 @@ function requireReadyWorkspaceResult(value) {
   if (!selectedPlan.report || selectedPlan.report.valid !== true || selectedPlan.report.status !== "ready") {
     throw new TypeError("The selected plan does not contain a production-ready report");
   }
+  if (
+    selectedPlan.duplexMode === "workAndTurn"
+    && (!Array.isArray(selectedPlan.sharedPlates)
+      || selectedPlan.sharedPlates.length !== selectedPlan.impositions.length)
+  ) {
+    throw new TypeError("The selected work-and-turn plan does not contain one shared plate per imposition");
+  }
   return selectedPlan;
 }
 
@@ -56,6 +64,19 @@ function safeFileToken(value) {
   return token || "selected-plan";
 }
 
+function schemeDocumentForPlan(selectedPlan, options) {
+  if (selectedPlan.duplexMode === "workAndTurn") {
+    return createSharedPlatePdfDocument({
+      plates: selectedPlan.sharedPlates,
+      ...options,
+    });
+  }
+  return createSchemePdfDocument({
+    records: selectedPlan.impositions,
+    ...options,
+  });
+}
+
 export function createOperatorWorkspaceExportModels(workspaceResult, {
   language = CONFIG.app.defaultLanguage,
   schemePageMode = PDF_PAGE_MODES.A4,
@@ -63,8 +84,7 @@ export function createOperatorWorkspaceExportModels(workspaceResult, {
 } = {}) {
   const selectedPlan = requireReadyWorkspaceResult(workspaceResult);
   const planToken = safeFileToken(selectedPlan.id);
-  const schemeDocument = createSchemePdfDocument({
-    records: selectedPlan.impositions,
+  const schemeDocument = schemeDocumentForPlan(selectedPlan, {
     language,
     pageMode: schemePageMode,
     sheetSize: {
@@ -90,6 +110,7 @@ export function createOperatorWorkspaceExportModels(workspaceResult, {
       report: `uImposition-${planToken}-production-report.pdf`,
     },
     summary: {
+      duplexMode: selectedPlan.duplexMode,
       impositionCount: selectedPlan.impositions.length,
       schemePageCount: schemeDocument.pageCount,
       fileCount: selectedPlan.report.fileMetrics.length,
