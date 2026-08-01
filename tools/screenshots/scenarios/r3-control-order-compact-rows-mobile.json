@@ -47,8 +47,8 @@
       "value": "1"
     },
     {
-      "selector": "[data-product-row]:nth-child(20)",
-      "text": "Дополнительно"
+      "selector": "[data-product-row]:nth-child(20) .product-row__details summary",
+      "text": "Размер, виды и дополнительные параметры"
     }
   ],
   "pageAssertions": {
