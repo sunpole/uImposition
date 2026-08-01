@@ -1,0 +1,55 @@
+{
+  "id": "r3-control-reference-layout-mobile",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "[data-txt-import-controls] button:first-child",
+      "text": "Тест: 20 файлов · 1+1"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "click",
+      "selector": "[data-txt-import-controls] button:first-child"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 2200
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-control-reference-note]",
+      "text": "4 формы лица + 4 зеркальные формы оборота = 8 форм"
+    },
+    {
+      "selector": ".scheme-pair:nth-child(4)",
+      "text": "ЛИСТ-4_ЛИЦО"
+    },
+    {
+      "selector": ".scheme-pair:nth-child(4)",
+      "text": "ЛИСТ-4_ОБОРОТ"
+    },
+    {
+      "selector": ".scheme-pair:first-child .scheme-card:first-child .scheme-cell:first-child",
+      "text": "→"
+    },
+    {
+      "selector": ".scheme-pair:first-child .scheme-card:nth-child(2) .scheme-cell:first-child",
+      "text": "←"
+    },
+    {
+      "selector": ".control-reference-turn",
+      "text": "через короткую сторону слева направо"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": ".screen--layout",
+  "screenshot": "uimposition-r3-control-reference-layout-mobile.png"
+}
