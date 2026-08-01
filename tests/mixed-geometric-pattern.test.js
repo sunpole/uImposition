@@ -8,102 +8,14 @@ import { createUniformGridPattern } from "../src/uniform-grid-patterns.js";
 
 function createHorizontalMixedPattern(overrides = {}) {
   const slots = overrides.slots ?? [
-    {
-      id: "h0-1",
-      xMm: 0,
-      yMm: 0,
-      widthMm: 30,
-      heightMm: 20,
-      rotation: 0,
-      row: 0,
-      column: 0,
-      stripId: "strip-0",
-      positionInStrip: 0,
-    },
-    {
-      id: "h0-2",
-      xMm: 30,
-      yMm: 0,
-      widthMm: 30,
-      heightMm: 20,
-      rotation: 0,
-      row: 0,
-      column: 1,
-      stripId: "strip-0",
-      positionInStrip: 1,
-    },
-    {
-      id: "h0-3",
-      xMm: 60,
-      yMm: 0,
-      widthMm: 30,
-      heightMm: 20,
-      rotation: 0,
-      row: 0,
-      column: 2,
-      stripId: "strip-0",
-      positionInStrip: 2,
-    },
-    {
-      id: "h90-1",
-      xMm: 0,
-      yMm: 20,
-      widthMm: 20,
-      heightMm: 30,
-      rotation: 90,
-      row: 1,
-      column: 0,
-      stripId: "strip-90",
-      positionInStrip: 0,
-    },
-    {
-      id: "h90-2",
-      xMm: 20,
-      yMm: 20,
-      widthMm: 20,
-      heightMm: 30,
-      rotation: 90,
-      row: 1,
-      column: 1,
-      stripId: "strip-90",
-      positionInStrip: 1,
-    },
-    {
-      id: "h90-3",
-      xMm: 40,
-      yMm: 20,
-      widthMm: 20,
-      heightMm: 30,
-      rotation: 90,
-      row: 1,
-      column: 2,
-      stripId: "strip-90",
-      positionInStrip: 2,
-    },
-    {
-      id: "h90-4",
-      xMm: 60,
-      yMm: 20,
-      widthMm: 20,
-      heightMm: 30,
-      rotation: 90,
-      row: 1,
-      column: 3,
-      stripId: "strip-90",
-      positionInStrip: 3,
-    },
-    {
-      id: "h90-5",
-      xMm: 80,
-      yMm: 20,
-      widthMm: 20,
-      heightMm: 30,
-      rotation: 90,
-      row: 1,
-      column: 4,
-      stripId: "strip-90",
-      positionInStrip: 4,
-    },
+    { id: "h0-1", xMm: 0, yMm: 0, widthMm: 30, heightMm: 20, rotation: 0, row: 0, column: 0, stripId: "strip-0", positionInStrip: 0 },
+    { id: "h0-2", xMm: 30, yMm: 0, widthMm: 30, heightMm: 20, rotation: 0, row: 0, column: 1, stripId: "strip-0", positionInStrip: 1 },
+    { id: "h0-3", xMm: 60, yMm: 0, widthMm: 30, heightMm: 20, rotation: 0, row: 0, column: 2, stripId: "strip-0", positionInStrip: 2 },
+    { id: "h90-1", xMm: 0, yMm: 20, widthMm: 20, heightMm: 30, rotation: 90, row: 1, column: 0, stripId: "strip-90", positionInStrip: 0 },
+    { id: "h90-2", xMm: 20, yMm: 20, widthMm: 20, heightMm: 30, rotation: 90, row: 1, column: 1, stripId: "strip-90", positionInStrip: 1 },
+    { id: "h90-3", xMm: 40, yMm: 20, widthMm: 20, heightMm: 30, rotation: 90, row: 1, column: 2, stripId: "strip-90", positionInStrip: 2 },
+    { id: "h90-4", xMm: 60, yMm: 20, widthMm: 20, heightMm: 30, rotation: 90, row: 1, column: 3, stripId: "strip-90", positionInStrip: 3 },
+    { id: "h90-5", xMm: 80, yMm: 20, widthMm: 20, heightMm: 30, rotation: 90, row: 1, column: 4, stripId: "strip-90", positionInStrip: 4 },
   ];
   const layout = overrides.layout ?? {
     type: "mixedStrips",
@@ -137,10 +49,7 @@ function createHorizontalMixedPattern(overrides = {}) {
     gapMm: 0,
     layout,
     slots,
-    coverage: {
-      scope: "mixedStrips:horizontal",
-      status: "completeWithinPatternFamily",
-    },
+    coverage: overrides.coverage,
   });
 }
 
@@ -166,7 +75,12 @@ test("G1 generalized pattern preserves the existing uniform-grid contract", () =
 });
 
 test("G1 horizontal mixed-strips pattern validates both rotations and strip membership", () => {
-  const pattern = createHorizontalMixedPattern();
+  const pattern = createHorizontalMixedPattern({
+    coverage: {
+      scope: "mixedStrips:horizontal",
+      status: "completeWithinPatternFamily",
+    },
+  });
 
   assert.equal(pattern.layout.type, "mixedStrips");
   assert.equal(pattern.layout.axis, "horizontal");
@@ -178,6 +92,7 @@ test("G1 horizontal mixed-strips pattern validates both rotations and strip memb
     { rotation: 0, slotIds: ["h0-1", "h0-2", "h0-3"] },
     { rotation: 90, slotIds: ["h90-1", "h90-2", "h90-3", "h90-4", "h90-5"] },
   ]);
+  assert.equal(pattern.coverage.scope, "mixedStrips:horizontal");
   assert.equal(validateGeometryPattern(pattern), true);
   assert.match(pattern.structuralSignature, /layout=mixedStrips:horizontal/);
 });
@@ -227,6 +142,7 @@ test("G1 vertical mixed-strips pattern supports coordinate-order slots across st
 
   assert.equal(pattern.layout.axis, "vertical");
   assert.equal(pattern.capacity, 8);
+  assert.equal(pattern.coverage.scope, "mixedStrips");
   assert.equal(validateGeometryPattern(pattern), true);
 });
 
@@ -252,13 +168,60 @@ test("G1 mixed pattern requires both slot rotations", () => {
   }), /both 0 and 90/);
 });
 
+test("G1 mixed pattern rejects empty strips", () => {
+  const valid = createHorizontalMixedPattern();
+  const layout = {
+    type: "mixedStrips",
+    axis: "horizontal",
+    strips: [
+      { ...valid.layout.strips[0], slotIds: [] },
+      { ...valid.layout.strips[1] },
+    ],
+  };
+  assert.throws(() => createHorizontalMixedPattern({ id: "empty-strip", layout }), /at least one slot/);
+});
+
 test("G1 mixed pattern rejects non-deterministic slot ordering", () => {
   const valid = createHorizontalMixedPattern();
-  const reversed = [...valid.slots].reverse();
   assert.throws(() => createHorizontalMixedPattern({
     id: "reversed",
-    slots: reversed,
+    slots: [...valid.slots].reverse(),
   }), /top-left coordinate order/);
+});
+
+test("G1 mixed pattern requires strips and strip members in geometric order", () => {
+  const valid = createHorizontalMixedPattern();
+  const reversedStrips = {
+    type: "mixedStrips",
+    axis: "horizontal",
+    strips: [
+      { ...valid.layout.strips[1] },
+      { ...valid.layout.strips[0] },
+    ],
+  };
+  assert.throws(() => createHorizontalMixedPattern({
+    id: "reversed-strips",
+    layout: reversedStrips,
+  }), /strip regions must be ordered/);
+
+  const reorderedSlots = valid.slots.map((slot) => {
+    if (slot.id === "h0-1") return { ...slot, column: 1, positionInStrip: 1 };
+    if (slot.id === "h0-2") return { ...slot, column: 0, positionInStrip: 0 };
+    return slot;
+  });
+  const reorderedMembers = {
+    type: "mixedStrips",
+    axis: "horizontal",
+    strips: [
+      { ...valid.layout.strips[0], slotIds: ["h0-2", "h0-1", "h0-3"] },
+      { ...valid.layout.strips[1] },
+    ],
+  };
+  assert.throws(() => createHorizontalMixedPattern({
+    id: "reordered-members",
+    slots: reorderedSlots,
+    layout: reorderedMembers,
+  }), /slotIds must follow strip coordinates/);
 });
 
 test("G1 mixed pattern rejects duplicate or missing strip assignment", () => {
@@ -267,8 +230,8 @@ test("G1 mixed pattern rejects duplicate or missing strip assignment", () => {
     type: "mixedStrips",
     axis: "horizontal",
     strips: [
-      { ...valid.layout.strips[0], slotIds: ["h0-1", "h0-2", "h0-3", "h90-1"] },
-      { ...valid.layout.strips[1] },
+      { ...valid.layout.strips[0] },
+      { ...valid.layout.strips[1], slotIds: [...valid.layout.strips[1].slotIds, "h0-1"] },
     ],
   };
   assert.throws(() => createHorizontalMixedPattern({
@@ -330,16 +293,38 @@ test("G1 mixed strip regions must be guillotine-spanning and non-overlapping", (
   }), /strips overlap/);
 });
 
-test("G1 structural signatures distinguish strip axis and composition", () => {
-  const horizontal = createHorizontalMixedPattern();
-  const same = createHorizontalMixedPattern({ id: "same-geometry" });
-  assert.equal(horizontal.structuralSignature, same.structuralSignature);
+test("G1 structural signatures ignore labels but distinguish geometry", () => {
+  const original = createHorizontalMixedPattern();
+  const idMap = new Map(original.slots.map((slot, index) => [slot.id, `renamed-${index + 1}`]));
+  const renamedSlots = original.slots.map((slot) => ({
+    ...slot,
+    id: idMap.get(slot.id),
+    stripId: slot.stripId === "strip-0" ? "alpha" : "beta",
+  }));
+  const renamedLayout = {
+    type: "mixedStrips",
+    axis: "horizontal",
+    strips: original.layout.strips.map((strip) => ({
+      ...strip,
+      id: strip.id === "strip-0" ? "alpha" : "beta",
+      slotIds: strip.slotIds.map((slotId) => idMap.get(slotId)),
+    })),
+  };
+  const renamed = createHorizontalMixedPattern({
+    id: "renamed",
+    slots: renamedSlots,
+    layout: renamedLayout,
+  });
+  assert.equal(original.structuralSignature, renamed.structuralSignature);
 
-  const changedSlots = horizontal.slots.map((slot) => slot.id === "h90-5"
-    ? { ...slot, xMm: 79 }
-    : slot);
-  assert.throws(() => createHorizontalMixedPattern({
-    id: "overlapping-change",
-    slots: changedSlots,
-  }), /slots overlap/);
+  const shiftedSlots = original.slots.map((slot) => {
+    if (slot.id === "h0-2") return { ...slot, xMm: 35 };
+    if (slot.id === "h0-3") return { ...slot, xMm: 70 };
+    return slot;
+  });
+  const shifted = createHorizontalMixedPattern({
+    id: "shifted",
+    slots: shiftedSlots,
+  });
+  assert.notEqual(original.structuralSignature, shifted.structuralSignature);
 });
