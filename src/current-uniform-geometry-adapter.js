@@ -72,14 +72,15 @@ function normalizeFootprint(footprint) {
   });
 }
 
-function normalizeCandidate(candidate) {
+function normalizeCandidate(candidate, printable) {
+  const hasPositions = candidate.positions > 0;
   return {
     rotation: candidate.rotation,
     columns: candidate.columns,
     rows: candidate.rows,
     capacity: candidate.positions,
-    used: toSizeMm(candidate.used),
-    unused: toSizeMm(candidate.unused),
+    used: hasPositions ? toSizeMm(candidate.used) : { widthMm: 0, heightMm: 0 },
+    unused: hasPositions ? toSizeMm(candidate.unused) : toSizeMm(printable),
   };
 }
 
@@ -91,7 +92,10 @@ export function compareCurrentPlacementWithPatternSet(placementOptions, patternS
     throw new TypeError("patternSet must be an object");
   }
 
-  const legacyCandidates = placementOptions.candidates.map(normalizeCandidate);
+  const legacyCandidates = placementOptions.candidates.map((candidate) => normalizeCandidate(
+    candidate,
+    placementOptions.printable,
+  ));
   const currentCandidates = patternSet.patterns.map((pattern) => ({
     rotation: pattern.rotation,
     columns: pattern.columns,
@@ -117,7 +121,7 @@ export function compareCurrentPlacementWithPatternSet(placementOptions, patternS
     }
   }
 
-  const legacyBest = placementOptions.best
+  const legacyBest = placementOptions.fits && placementOptions.best
     ? {
       rotation: placementOptions.best.rotation,
       capacity: placementOptions.best.positions,
@@ -139,6 +143,7 @@ export function compareCurrentPlacementWithPatternSet(placementOptions, patternS
     fitsMatches,
     legacyBest,
     currentBest,
+    normalizedLegacyNoFitMetrics: !placementOptions.fits,
   });
 }
 
