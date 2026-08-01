@@ -1,0 +1,64 @@
+name: Agent Skills
+
+on:
+  pull_request:
+    paths:
+      - '.gitmodules'
+      - '.agent-vendor/**'
+      - 'agent-skills/**'
+      - 'docs/AGENT_SKILLS.md'
+      - 'docs/agents/**'
+      - 'scripts/install-agent-skills.sh'
+      - 'scripts/install-agent-skills.ps1'
+      - 'scripts/check-agent-skills.mjs'
+      - '.github/workflows/agent-skills.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.gitmodules'
+      - '.agent-vendor/**'
+      - 'agent-skills/**'
+      - 'docs/AGENT_SKILLS.md'
+      - 'docs/agents/**'
+      - 'scripts/install-agent-skills.sh'
+      - 'scripts/install-agent-skills.ps1'
+      - 'scripts/check-agent-skills.mjs'
+      - '.github/workflows/agent-skills.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  linux-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check pinned source
+        run: node scripts/check-agent-skills.mjs
+      - name: Install complete skill set
+        run: bash scripts/install-agent-skills.sh --root "$RUNNER_TEMP/uimposition-agent-skills"
+      - name: Check installed skill set
+        run: node scripts/check-agent-skills.mjs --install-root "$RUNNER_TEMP/uimposition-agent-skills"
+
+  windows-install:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check pinned source
+        run: node scripts/check-agent-skills.mjs
+      - name: Install complete skill set
+        shell: powershell
+        run: powershell -ExecutionPolicy Bypass -File .\scripts\install-agent-skills.ps1 -Root "$env:RUNNER_TEMP\uimposition-agent-skills"
+      - name: Check installed skill set
+        shell: powershell
+        run: node scripts/check-agent-skills.mjs --install-root "$env:RUNNER_TEMP\uimposition-agent-skills"
