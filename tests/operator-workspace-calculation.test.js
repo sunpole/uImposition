@@ -45,12 +45,32 @@ test("operator workspace builds real uniform plans from application product rows
   assert.ok(result.plans.some(({ recommended }) => recommended));
   assert.equal(result.selectedPlanId, result.plans.find(({ recommended }) => recommended).id);
   assert.equal(result.layoutPreview.cells.length, result.layoutPreview.capacity);
+  assert.equal(result.layoutPreview.frontCells.length, result.layoutPreview.capacity);
+  assert.equal(result.layoutPreview.backCells.length, result.layoutPreview.capacity);
   assert.equal(result.layoutPreview.rows * result.layoutPreview.columns, result.layoutPreview.capacity);
   assert.equal(result.geometry.source.width, 620);
   assert.equal(result.geometry.trimmed.width, 616);
   assert.equal(result.geometry.printable.width, 608);
   assert.equal(result.pricingReady, false);
   assert.equal(result.selectedPlan.metrics.estimatedTotalCost, null);
+});
+
+test("workspace preview exposes the core horizontal mirror: 1 2 3 4 becomes 4 3 2 1", () => {
+  const preview = calculateOperatorWorkspace(validState()).layoutPreview;
+
+  for (let row = 0; row < preview.rows; row += 1) {
+    for (let column = 0; column < preview.columns; column += 1) {
+      const back = preview.backCells[(row * preview.columns) + column];
+      const mirroredFront = preview.frontCells[
+        (row * preview.columns) + (preview.columns - column - 1)
+      ];
+      assert.equal(back.file, mirroredFront.file);
+      assert.equal(back.pairIndex, mirroredFront.pairIndex);
+      assert.equal(back.frontPage, mirroredFront.frontPage);
+      assert.equal(back.backPage, mirroredFront.backPage);
+      assert.equal(back.page, mirroredFront.backPage);
+    }
+  }
 });
 
 test("operator workspace calculates cost only after a complete pricing profile exists", () => {

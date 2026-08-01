@@ -1,0 +1,49 @@
+{
+  "id": "r3-responsive-layout-tablet",
+  "path": "/app/",
+  "viewport": {
+    "width": 768,
+    "height": 1024
+  },
+  "assertions": [
+    {
+      "selector": "#pricingButton",
+      "text": "Прайс"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 1000
+    },
+    {
+      "action": "click",
+      "selector": "[data-mobile-screen='layout']"
+    },
+    {
+      "action": "click",
+      "selector": "[data-acceptance-layout='both']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 500
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": ".layout-pair",
+      "text": "Оборот · зеркально"
+    },
+    {
+      "selector": "[data-workspace-pdf='schemes']",
+      "text": "Схемы PDF"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "layoutFitsCanvas": true,
+    "mirroredBackDom": true
+  },
+  "screenshotSelector": ".screen--layout",
+  "screenshot": "uimposition-r3-responsive-layout-tablet.png"
+}

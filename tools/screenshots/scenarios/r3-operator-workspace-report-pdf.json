@@ -39,14 +39,14 @@
   ],
   "beforeScreenshotAssertions": [
     {
-      "selector": "#layoutDetails",
-      "text": "PDF выбранного плана"
+      "selector": "[data-workspace-pdf='report']",
+      "text": "Отчёт PDF"
     },
     {
       "selector": "[data-workspace-export-status]",
       "text": "Скачан"
     }
   ],
-  "screenshotSelector": "#layoutDetails",
+  "screenshotSelector": ".screen--layout .screen-heading__actions",
   "screenshot": "uimposition-r3-selected-plan-report-download.png"
 }

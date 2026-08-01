@@ -9,6 +9,10 @@
     {
       "selector": "#orderTitle",
       "text": "Выберите рабочий пресет"
+    },
+    {
+      "selector": "#pricingButton",
+      "text": "Прайс"
     }
   ],
   "beforeScreenshot": [
@@ -76,8 +80,21 @@
     {
       "selector": "[data-mobile-screen='layout']",
       "text": "Схема"
+    },
+    {
+      "selector": "[data-workspace-pdf='schemes']",
+      "text": "Схемы PDF"
+    },
+    {
+      "selector": "[data-workspace-pdf='report']",
+      "text": "Отчёт PDF"
     }
   ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "layoutFitsCanvas": true,
+    "mirroredBackDom": true
+  },
   "screenshotSelector": ".screen--layout",
   "screenshot": "uimposition-r3-operator-workspace-layout-mobile.png"
 }
