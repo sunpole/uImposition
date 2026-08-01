@@ -4,8 +4,18 @@ import { PDF_DOCUMENT_KINDS } from "./pdf-document-model.js";
 import { createPdfFromJpegPages } from "./pdf-binary.js";
 
 const TEXT = Object.freeze({
-  ru: { run: "Тираж монтажа", positions: "позиций", validated: "Проверено" },
-  en: { run: "Imposition run", positions: "positions", validated: "Validated" },
+  ru: {
+    run: "Тираж монтажа",
+    positions: "позиций",
+    validated: "Проверено",
+    sharedOperation: "свой оборот · одна форма · горизонтальный переворот · 2 прогона",
+  },
+  en: {
+    run: "Imposition run",
+    positions: "positions",
+    validated: "Validated",
+    sharedOperation: "work-and-turn · one shared plate · horizontal turn · 2 passes",
+  },
 });
 
 function positiveNumber(value, label) {
@@ -126,7 +136,10 @@ function drawSchemePage(canvas, page, language, dpi) {
 
   const metaSize = Math.max(10, px(3.4));
   ctx.font = `400 ${metaSize}px ${CONFIG.pdf.canvasFontFamily}`;
-  const meta = `${text.run}: ${formatNumber(page.runLength, language)} · ${page.columns} × ${page.rows} · ${page.rotation}° · ${page.rows * page.columns} ${text.positions}`;
+  const operation = page.operation?.duplexMode === "workAndTurn"
+    ? ` · ${text.sharedOperation}`
+    : "";
+  const meta = `${text.run}: ${formatNumber(page.runLength, language)} · ${page.columns} × ${page.rows} · ${page.rotation}° · ${page.rows * page.columns} ${text.positions}${operation}`;
   ctx.fillStyle = "#444444";
   ctx.fillText(meta, margin, margin + titleSize + px(7));
 
