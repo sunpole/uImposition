@@ -16,6 +16,8 @@ const hints={order:'Заказ: основные входные параметр
 function padId(id){const width=Math.max(2,String(rows.length).length);return String(id).padStart(width,'0')}
 function rowMarkup(r){return `<td class="sticky-no numeric">${padId(r.id)}</td><td class="sticky-name name-cell" title="${r.name}">${r.name}</td><td class="order-col">${r.format}</td><td class="order-col numeric">${r.run}</td><td class="order-col numeric">${r.kinds}</td><td class="order-col numeric">${r.pages}</td><td class="print-col"><span class="print-pill">${r.front}</span></td><td class="print-col"><span class="print-pill">${r.back}</span></td><td class="print-col numeric">${r.bleed} мм</td><td class="print-col">${r.cut}</td><td class="print-col">${r.rotate}</td><td class="print-col">${r.turn}</td><td class="result-col numeric">${r.forms}</td><td class="result-col numeric">${r.sheets}</td><td class="result-col numeric">${r.nup}</td><td class="result-col numeric">${r.fill}%</td><td class="status-col"><span class="status ${r.warning?'warning':''}">${r.warning?'Проверить':'Готово'}</span></td>`}
 function renderRows(query=''){
+  const digits=Math.max(2,String(rows.length).length);
+  document.documentElement.style.setProperty('--no-w',`${Math.max(25,13+digits*6)}px`);
   body.innerHTML='';const normalized=query.trim().toLowerCase();
   rows.filter(r=>!normalized||r.name.toLowerCase().includes(normalized)||padId(r.id).includes(normalized)).forEach(r=>{
     const tr=document.createElement('tr');tr.dataset.id=String(r.id);tr.className=(r.id===selectedId?'is-selected ':'')+(r.warning?'has-warning':'');tr.innerHTML=rowMarkup(r);tr.addEventListener('click',()=>selectRow(r.id));body.append(tr);
@@ -24,7 +26,13 @@ function renderRows(query=''){
 }
 function selectRow(id){selectedId=id;renderRows(document.querySelector('#searchInput').value);const r=rows.find(x=>x.id===id);if(!r)return;document.querySelector('#selectedNo').textContent=padId(r.id);document.querySelector('#selectedName').textContent=r.name;document.querySelector('#selectedMeta').textContent=`${r.format} · ${r.run} шт. · ${r.front}+${r.back} · ${r.pages} страниц · ${r.warning?'проверить':'готово'}`}
 function setLens(lens){table.className=`order-table lens-${lens}`;document.querySelectorAll('.lens-button').forEach(b=>b.classList.toggle('is-active',b.dataset.lens===lens));document.querySelector('#viewHint').textContent=hints[lens];scroll.scrollLeft=0}
-function openScreen(screen){document.querySelectorAll('[data-screen-panel]').forEach(p=>p.classList.toggle('is-active',p.dataset.screenPanel===screen));document.querySelectorAll('.bottom-button').forEach(b=>b.classList.toggle('is-active',b.dataset.screen===screen));document.querySelectorAll('.workflow-step').forEach(b=>b.classList.toggle('is-active',b.dataset.screen===screen));document.querySelector('.lens-switch').hidden=screen!=='order';window.scrollTo({top:0,behavior:'auto'})}
+function openScreen(screen){
+  document.querySelectorAll('[data-screen-panel]').forEach(p=>p.classList.toggle('is-active',p.dataset.screenPanel===screen));
+  document.querySelectorAll('.bottom-button').forEach(b=>b.classList.toggle('is-active',b.dataset.screen===screen));
+  const steps=[...document.querySelectorAll('.workflow-step')];steps.forEach(s=>s.classList.remove('is-active'));
+  const activeIndex=screen==='order'?1:screen==='calc'?2:screen==='export'?3:-1;if(activeIndex>=0&&steps[activeIndex])steps[activeIndex].classList.add('is-active');
+  document.querySelector('.lens-switch').hidden=screen!=='order';window.scrollTo({top:0,behavior:'auto'});requestAnimationFrame(checkGlobalOverflow)
+}
 
 document.querySelectorAll('.lens-button').forEach(button=>button.addEventListener('click',()=>setLens(button.dataset.lens)));
 document.querySelectorAll('[data-screen]').forEach(button=>button.addEventListener('click',()=>openScreen(button.dataset.screen)));
