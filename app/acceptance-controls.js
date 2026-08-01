@@ -34,14 +34,24 @@ const initialPricing = Object.freeze({
 const pricingMigrationKey = "uImposition.pricingDefaultsApplied.2026-08-01";
 
 let layoutView = "front";
-let renderingLayout = false;
 let renderedPlanId = null;
+let renderingLayout = false;
+let refreshQueued = false;
 
 function snapshot() {
   return window.__uimpositionR3?.getSnapshot?.() ?? null;
 }
 
+function setText(node, value) {
+  if (!node) return false;
+  const text = String(value ?? "");
+  if (node.textContent === text) return false;
+  node.textContent = text;
+  return true;
+}
+
 function injectStyles() {
+  if (document.querySelector("[data-acceptance-styles]")) return;
   const style = document.createElement("style");
   style.dataset.acceptanceStyles = "true";
   style.textContent = `
@@ -122,11 +132,10 @@ function applyInitialPricingOnce() {
     if (!current) return false;
     window.localStorage.setItem(pricingMigrationKey, "1");
     if (!pricingIsEmpty(current.input.pricing)) return false;
-    const next = replaceApplicationInput(current, {
+    repository.save(replaceApplicationInput(current, {
       ...current.input,
       pricing: initialPricing,
-    });
-    repository.save(next);
+    }));
     window.location.reload();
     return true;
   } catch {
@@ -149,25 +158,13 @@ function injectTopNavigation() {
     nav.append(button);
   });
   topbar.insertBefore(nav, actions);
-  updateNavigationState();
 }
 
-function configureTopActions() {
-  const actions = document.querySelector(".topbar__actions");
-  const pricingButton = document.querySelector("#pricingButton");
-  if (!actions || !pricingButton) return;
-  pricingButton.classList.remove("button--quiet");
-  pricingButton.classList.add("pricing-button");
-  pricingButton.textContent = "Прайс";
-  pricingButton.title = "Редактировать рабочий прайс";
-  let summary = actions.querySelector("[data-pricing-summary]");
-  if (!summary) {
-    summary = document.createElement("span");
-    summary.className = "pricing-summary";
-    summary.dataset.pricingSummary = "true";
-    actions.prepend(summary);
-  }
-  updatePricingSummary();
+function updateNavigationState() {
+  const active = snapshot()?.state?.runtime?.activeScreen ?? "order";
+  document.querySelectorAll(".topbar__nav [data-open-screen]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.openScreen === active);
+  });
 }
 
 function formatPrice(value) {
@@ -179,15 +176,28 @@ function updatePricingSummary() {
   const target = document.querySelector("[data-pricing-summary]");
   const pricing = snapshot()?.state?.input?.pricing ?? repository.load()?.input?.pricing;
   if (!target || !pricing) return;
-  const text = `${formatPrice(pricing.grammageGsm)} г/м² · бумага ${formatPrice(pricing.paperPricePerKg)} · пластина ${formatPrice(pricing.colorPlatePrice)} · форма ${formatPrice(pricing.layoutFormPreparationPrice)} ${pricing.currency}`;
-  if (target.textContent !== text) target.textContent = text;
+  setText(
+    target,
+    `${formatPrice(pricing.grammageGsm)} г/м² · бумага ${formatPrice(pricing.paperPricePerKg)} · пластина ${formatPrice(pricing.colorPlatePrice)} · форма ${formatPrice(pricing.layoutFormPreparationPrice)} ${pricing.currency}`,
+  );
 }
 
-function updateNavigationState() {
-  const active = snapshot()?.state?.runtime?.activeScreen ?? "order";
-  document.querySelectorAll(".topbar__nav [data-open-screen]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.openScreen === active);
-  });
+function configureTopActions() {
+  const actions = document.querySelector(".topbar__actions");
+  const pricingButton = document.querySelector("#pricingButton");
+  if (!actions || !pricingButton) return;
+  pricingButton.classList.remove("button--quiet");
+  pricingButton.classList.add("pricing-button");
+  setText(pricingButton, "Прайс");
+  pricingButton.title = "Редактировать рабочий прайс";
+  let summary = actions.querySelector("[data-pricing-summary]");
+  if (!summary) {
+    summary = document.createElement("span");
+    summary.className = "pricing-summary";
+    summary.dataset.pricingSummary = "true";
+    actions.prepend(summary);
+  }
+  updatePricingSummary();
 }
 
 function presetOrder(prefix) {
@@ -200,11 +210,10 @@ function applyPriority(id) {
   if (!prefix) return;
   const current = repository.load();
   if (!current) return;
-  const next = replaceApplicationInput(current, {
+  repository.save(replaceApplicationInput(current, {
     ...current.input,
     objectivePreferences: { order: presetOrder(prefix) },
-  });
-  repository.save(next);
+  }));
   window.location.reload();
 }
 
@@ -257,13 +266,13 @@ function normalizeCalculationMessage() {
     && node.textContent.includes("все включённые строки должны иметь одинаковый формат")
   ) {
     node.hidden = true;
-    node.textContent = "";
+    setText(node, "");
     return;
   }
   if (node.textContent.includes("uniformPipelineWorkAndTurnRequiresCompletePagePairs")) {
-    node.textContent = "Свой оборот требует чётное число страниц: каждая страница лица должна иметь реальную оборотную пару.";
+    setText(node, "Свой оборот требует чётное число страниц: каждая страница лица должна иметь реальную оборотную пару.");
   } else if (node.textContent.includes("duplexPreferenceUnavailable")) {
-    node.textContent = "Свой оборот недоступен для текущей сетки. Нужна подходящая ориентация с чётным числом колонок.";
+    setText(node, "Свой оборот недоступен для текущей сетки. Нужна подходящая ориентация с чётным числом колонок.");
   }
 }
 
@@ -281,34 +290,28 @@ function decorateWorkAndTurnUi() {
   const result = snapshot()?.lastValidResult;
   if (!result) return;
   const plans = new Map(result.plans.map((plan) => [plan.id, plan]));
+
   document.querySelectorAll("#alternativesList [data-plan-id]").forEach((card) => {
     const plan = plans.get(card.dataset.planId);
     if (!plan) return;
-    card.dataset.duplexMode = plan.duplexMode;
-    const title = card.querySelector(".alternative-cell--title strong");
-    const text = planTitle(plan);
-    if (title && title.textContent !== text) title.textContent = text;
+    if (card.dataset.duplexMode !== plan.duplexMode) card.dataset.duplexMode = plan.duplexMode;
+    setText(card.querySelector(".alternative-cell--title strong"), planTitle(plan));
   });
 
   const selected = plans.get(result.selectedPlanId);
   if (selected) {
-    const summaryTitle = document.querySelector(".summary-hero > span");
-    const text = planTitle(selected);
-    if (summaryTitle && summaryTitle.textContent !== text) summaryTitle.textContent = text;
-    const layoutHeading = document.querySelector("#layoutDetails h2");
-    if (layoutHeading && layoutHeading.textContent !== text) layoutHeading.textContent = text;
+    setText(document.querySelector(".summary-hero > span"), planTitle(selected));
+    setText(document.querySelector("#layoutDetails h2"), planTitle(selected));
   }
 
   const scope = document.querySelector("#scopeNote");
   if (scope) {
-    const hasWorkAndTurn = result.scope?.workAndTurnEvaluated;
-    const excludedByBlank = result.scope?.workAndTurnExcludedByTechnicalBlank;
-    const text = excludedByBlank
+    const scopeText = result.scope?.workAndTurnExcludedByTechnicalBlank
       ? "Полный lossless-набор внутри текущей области. Свой оборот исключён: заказ содержит технически пустую оборотную страницу."
-      : hasWorkAndTurn
+      : result.scope?.workAndTurnEvaluated
         ? "Полный lossless-набор внутри текущей области. Свой оборот рассчитан для подходящих сеток с чётным числом колонок: одна общая форма, горизонтальный переворот, два прогона. Произвольный mixed work-and-turn не заявлен."
         : "Полный lossless-набор внутри текущей области. Для своего оборота не найдено подходящей сетки с чётным числом колонок.";
-    if (scope.textContent !== text) scope.textContent = text;
+    setText(scope, scopeText);
   }
 
   const details = document.querySelector("#layoutDetails");
@@ -320,7 +323,10 @@ function decorateWorkAndTurnUi() {
       note.dataset.workAndTurnNote = "true";
       details.append(note);
     }
-    note.textContent = "Свой оборот: одна общая форма печатает обе стороны после горизонтального переворота листа. Лицо и оборот ниже служат контролем готового изделия.";
+    setText(
+      note,
+      "Свой оборот: одна общая форма печатает обе стороны после горизонтального переворота листа. Лицо и оборот ниже служат контролем готового изделия.",
+    );
   } else {
     details?.querySelector("[data-work-and-turn-note]")?.remove();
   }
@@ -350,6 +356,7 @@ function makeSheet(preview, geometry, side) {
   sheet.style.setProperty("--sheet-ratio", `${geometry.trimmed.width} / ${geometry.trimmed.height}`);
   sheet.style.gridTemplateColumns = `repeat(${columns}, minmax(0,1fr))`;
   sheet.style.gridTemplateRows = `repeat(${rows}, minmax(0,1fr))`;
+
   cellsForSide(preview, side).forEach((cell, index) => {
     const node = document.createElement("div");
     node.className = "layout-cell";
@@ -367,13 +374,18 @@ function makeSheet(preview, geometry, side) {
   return sheet;
 }
 
+function availableModes(preview) {
+  return preview?.duplexMode === "workAndTurn" && preview?.sharedPlate
+    ? [["shared", "Общая форма"], ["front", "Лицо"], ["back", "Оборот"], ["both", "Вместе"]]
+    : [["front", "Лицо"], ["back", "Оборот"], ["both", "Вместе"]];
+}
+
 function syncLayoutModes(preview) {
   const segmented = document.querySelector(".screen--layout .segmented");
   if (!segmented) return;
-  const workAndTurn = preview?.duplexMode === "workAndTurn" && preview?.sharedPlate;
-  const modes = workAndTurn
-    ? [["shared", "Общая форма"], ["front", "Лицо"], ["back", "Оборот"], ["both", "Вместе"]]
-    : [["front", "Лицо"], ["back", "Оборот"], ["both", "Вместе"]];
+  const modes = availableModes(preview);
+  const allowed = new Set(modes.map(([id]) => id));
+  if (!allowed.has(layoutView)) layoutView = modes[0][0];
   const key = modes.map(([id]) => id).join("|");
   if (segmented.dataset.modeKey !== key) {
     segmented.dataset.modeKey = key;
@@ -393,31 +405,36 @@ function renderLayoutView() {
   const geometry = data?.lastValidResult?.geometry;
   const host = document.querySelector("#layoutSheet");
   if (!preview || !geometry || !host) return;
+
   if (renderedPlanId !== preview.planId) {
     renderedPlanId = preview.planId;
     layoutView = preview.duplexMode === "workAndTurn" && preview.sharedPlate ? "shared" : "front";
   }
-  syncLayoutModes(preview);
+
   renderingLayout = true;
   try {
-    host.innerHTML = "";
+    syncLayoutModes(preview);
+    host.replaceChildren();
     host.classList.add("layout-sheet--custom");
     host.style.display = "block";
     host.style.gridTemplateColumns = "";
     host.style.gridTemplateRows = "";
     host.style.aspectRatio = "auto";
+
     if (["shared", "front", "back"].includes(layoutView)) {
       host.append(makeSheet(preview, geometry, layoutView));
       return;
     }
+
     const pair = document.createElement("div");
     pair.className = "layout-pair";
     pair.dataset.layoutRenderedView = "both";
     ["front", "back"].forEach((side) => {
       const wrap = document.createElement("section");
       wrap.className = "layout-pair__side";
-      wrap.innerHTML = `<h3>${side === "front" ? "Лицо" : "Оборот · зеркально"}</h3>`;
-      wrap.append(makeSheet(preview, geometry, side));
+      const heading = document.createElement("h3");
+      heading.textContent = side === "front" ? "Лицо" : "Оборот · зеркально";
+      wrap.append(heading, makeSheet(preview, geometry, side));
       pair.append(wrap);
     });
     host.append(pair);
@@ -434,19 +451,27 @@ function injectLayoutModes() {
     const button = event.target.closest("[data-acceptance-layout]");
     if (!button) return;
     layoutView = button.dataset.acceptanceLayout;
-    segmented.querySelectorAll("button").forEach((entry) => entry.classList.toggle("is-active", entry === button));
     renderLayoutView();
   });
   syncLayoutModes(snapshot()?.lastValidResult?.layoutPreview);
 }
 
 function refreshUi() {
+  refreshQueued = false;
   updateNavigationState();
   updatePricingSummary();
   normalizeCalculationMessage();
   decorateWorkAndTurnUi();
   const host = document.querySelector("#layoutSheet");
-  if (host && !host.querySelector(`[data-layout-rendered-view="${layoutView}"]`)) renderLayoutView();
+  if (host && !host.querySelector(`[data-layout-rendered-view="${layoutView}"]`)) {
+    renderLayoutView();
+  }
+}
+
+function scheduleRefresh() {
+  if (refreshQueued) return;
+  refreshQueued = true;
+  queueMicrotask(refreshUi);
 }
 
 function boot() {
@@ -458,19 +483,23 @@ function boot() {
   injectLayoutModes();
   renderLayoutView();
   decorateWorkAndTurnUi();
-  document.addEventListener("input", () => queueMicrotask(normalizeCalculationMessage), true);
-  document.addEventListener("change", () => queueMicrotask(normalizeCalculationMessage), true);
-  document.addEventListener("click", () => setTimeout(refreshUi, 0));
-  const layoutHost = document.querySelector("#layoutSheet");
-  const observer = new MutationObserver(() => {
-    if (!renderingLayout) queueMicrotask(refreshUi);
-  });
-  observer.observe(document.querySelector("#appShell"), {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ["class", "hidden"],
-  });
+
+  document.addEventListener("input", scheduleRefresh, true);
+  document.addEventListener("change", scheduleRefresh, true);
+  document.addEventListener("click", () => setTimeout(scheduleRefresh, 0));
+
+  const shell = document.querySelector("#appShell");
+  if (shell) {
+    const observer = new MutationObserver(() => {
+      if (!renderingLayout) scheduleRefresh();
+    });
+    observer.observe(shell, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class", "hidden"],
+    });
+  }
 }
 
 const timer = setInterval(() => {
