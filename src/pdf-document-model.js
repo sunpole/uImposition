@@ -12,8 +12,8 @@ export const PDF_DOCUMENT_KINDS = Object.freeze({
 });
 
 const TITLES = Object.freeze({
-  ru: { sheet: "ЛИСТ", front: "ЛИЦО", back: "ОБОРОТ" },
-  en: { sheet: "SHEET", front: "FRONT", back: "BACK" },
+  ru: { sheet: "ЛИСТ", front: "ЛИЦО", back: "ОБОРОТ", shared: "ОБЩАЯ-ФОРМА" },
+  en: { sheet: "SHEET", front: "FRONT", back: "BACK", shared: "SHARED-PLATE" },
 });
 
 function positiveNumber(value, label) {
@@ -97,6 +97,22 @@ function requireLayout(layout, side, recordIndex) {
   return layout;
 }
 
+function requireSharedPlate(plate, index) {
+  if (!plate || plate.side !== "sharedPlate" || plate.duplexMode !== "workAndTurn") {
+    throw new TypeError(`plates[${index}] must be a work-and-turn shared plate`);
+  }
+  if (!Array.isArray(plate.cells) || plate.cells.length !== plate.rows * plate.columns) {
+    throw new RangeError(`plates[${index}] cell count does not match its grid`);
+  }
+  if (plate.samePlateForBothPasses !== true) {
+    throw new RangeError(`plates[${index}] must use the same plate for both passes`);
+  }
+  if (plate.turnAxis !== "horizontal") {
+    throw new RangeError(`plates[${index}] must use the supported horizontal turn axis`);
+  }
+  return plate;
+}
+
 function schemeTitle(impositionNumber, side, language) {
   const text = TITLES[language];
   return `${text.sheet}-${impositionNumber}_${text[side]}`;
@@ -114,6 +130,7 @@ function createSchemePage({
   language,
   orderIndex,
   pageSpec,
+  operation = null,
 }) {
   return Object.freeze({
     pageNumber: orderIndex + 1,
@@ -130,6 +147,7 @@ function createSchemePage({
     rotation: Number(layout.rotation),
     pageSpec,
     layout,
+    operation,
   });
 }
 
@@ -195,9 +213,61 @@ export function createSchemePdfDocument({
     language,
     fileName: CONFIG.pdf.schemeDocumentFileName,
     pageMode,
+    duplexMode: "separateFrontBackForms",
     pageCount: pages.length,
     impositionCount: records.length,
     oneSchemePerPage: true,
+    pages: Object.freeze(pages),
+  });
+}
+
+export function createSharedPlatePdfDocument({
+  plates,
+  language = CONFIG.app.defaultLanguage,
+  pageMode = CONFIG.pdf.defaultPageMode,
+  sheetSize = null,
+  customPageSize = null,
+} = {}) {
+  requireLanguage(language);
+  if (!Array.isArray(plates) || plates.length === 0) {
+    throw new TypeError("plates must be a non-empty array");
+  }
+
+  const pageSpec = resolvePdfPageSpec({ mode: pageMode, sheetSize, customPageSize });
+  const ids = new Set();
+  const pages = plates.map((plateInput, index) => {
+    const plate = requireSharedPlate(plateInput, index);
+    const id = String(plate.id);
+    if (ids.has(id)) throw new RangeError(`Duplicate shared plate id: ${id}`);
+    ids.add(id);
+    return createSchemePage({
+      layout: plate,
+      impositionNumber: index + 1,
+      side: "shared",
+      language,
+      orderIndex: index,
+      pageSpec,
+      operation: Object.freeze({
+        duplexMode: "workAndTurn",
+        turnAxis: plate.turnAxis,
+        samePlateForBothPasses: true,
+        passCount: 2,
+      }),
+    });
+  });
+
+  return Object.freeze({
+    schemaVersion: 1,
+    kind: PDF_DOCUMENT_KINDS.SCHEMES,
+    language,
+    fileName: CONFIG.pdf.schemeDocumentFileName,
+    pageMode,
+    duplexMode: "workAndTurn",
+    pageCount: pages.length,
+    impositionCount: plates.length,
+    oneSchemePerPage: true,
+    sharedPlateForBothPasses: true,
+    turnAxis: "horizontal",
     pages: Object.freeze(pages),
   });
 }
@@ -237,6 +307,7 @@ export function createProductionReportPdfDocument({
     fileName: CONFIG.pdf.reportDocumentFileName,
     pageMode,
     pageSpec,
+    duplexMode: report.duplexMode,
     separateFromSchemeDocument: true,
     sections,
     fileCount: report.fileMetrics.length,
