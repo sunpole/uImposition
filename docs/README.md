@@ -2,7 +2,7 @@
 
 Этот файл — единый каталог документации проекта. Он помогает отличить текущие источники истины от нормативных справочников, завершённых milestone-документов и исторических evidence-материалов.
 
-GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md), [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md), [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md), [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md), [`R3_OPERATOR_WORKSPACE.md`](R3_OPERATOR_WORKSPACE.md), [`R3_ACCEPTANCE_BLOCKERS.md`](R3_ACCEPTANCE_BLOCKERS.md), [`R3_WORK_AND_TURN_PLAN_FAMILY.md`](R3_WORK_AND_TURN_PLAN_FAMILY.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
+GitHub остаётся единственным источником истины. Перед разработкой сначала прочитайте [`../AGENTS.md`](../AGENTS.md), [`../START_HERE.md`](../START_HERE.md), [`OPERATOR_FIRST_PRODUCT_REBUILD.md`](OPERATOR_FIRST_PRODUCT_REBUILD.md), [`R2_APPLICATION_STATE_AND_PRESETS.md`](R2_APPLICATION_STATE_AND_PRESETS.md), [`PRODUCT_ROW_MODEL.md`](PRODUCT_ROW_MODEL.md), [`R3_OPERATOR_WORKSPACE.md`](R3_OPERATOR_WORKSPACE.md), [`R3_ACCEPTANCE_BLOCKERS.md`](R3_ACCEPTANCE_BLOCKERS.md), [`R3_WORK_AND_TURN_PLAN_FAMILY.md`](R3_WORK_AND_TURN_PLAN_FAMILY.md), [`AGENT_SKILLS.md`](AGENT_SKILLS.md) и [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md), затем проверьте фактические `main`, Pull Request, Actions, tags, Releases и issues.
 
 ## Статусы документов
 
@@ -49,6 +49,10 @@ GitHub остаётся единственным источником истин
 | Документ | Статус | Назначение |
 |---|---|---|
 | [`GITHUB_ONLY_DEVELOPMENT.md`](GITHUB_ONLY_DEVELOPMENT.md) | Нормативный | Ветки, draft PR, exact-head checks и GitHub-only процесс |
+| [`AGENT_SKILLS.md`](AGENT_SKILLS.md) | **Нормативный agent workflow** | Полная установка skills, mandatory clarification gate и flow `grill → spec → tickets → implement → review` |
+| [`agents/issue-tracker.md`](agents/issue-tracker.md) | Agent configuration | GitHub Issues как источник specifications и tickets |
+| [`agents/triage-labels.md`](agents/triage-labels.md) | Agent configuration | Канонические triage-роли и label vocabulary |
+| [`agents/domain.md`](agents/domain.md) | Agent configuration | Single-context domain docs, glossary и ADR consumer rules |
 | [`TEST_PLAN.md`](TEST_PLAN.md) | Нормативный | Unit, integration, Chromium, PDF и документационные проверки |
 | [`SCREENSHOT_AUTOMATION.md`](SCREENSHOT_AUTOMATION.md) | Нормативный | Реальные Chromium screenshots и PDF evidence |
 | [`VERSIONING.md`](VERSIONING.md) | Нормативный | Version checkpoint, recovery branch, immutable tag и GitHub Release |
