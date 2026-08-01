@@ -38,6 +38,7 @@ const pricing = createPricingProfile({
   colorPlatePrice: 15,
   layoutFormPreparationPrice: 2,
 });
+const workAndTurnId = "uniform-r90-work-and-turn-dedicated-pairs";
 
 function buildPlanSet(withPricing) {
   return createUserUniformProductionPlanSet({
@@ -82,7 +83,7 @@ test("cost priority survives temporary removal and restoration of pricing", () =
 
   const restored = setUserProductionPlanSet(buildPlanSet(true));
   assert.equal(restored.planSet.catalog.objectiveOrder[0], "estimatedTotalCost");
-  assert.equal(restored.planSet.catalog.recommendedId, "uniform-r90-dedicated-pairs");
+  assert.equal(restored.planSet.catalog.recommendedId, workAndTurnId);
 
   clearUserProductionPlanSet();
   resetUserProductionObjectivePreference();
@@ -103,7 +104,7 @@ test("recalculation preserves explicit plan selection and operator objective ord
     "impositionCount",
   ]);
   assert.equal(recalculated.selectedPlanId, "uniform-r90-paper-minimum");
-  assert.equal(recalculated.planSet.catalog.recommendedId, "uniform-r90-dedicated-pairs");
+  assert.equal(recalculated.planSet.catalog.recommendedId, workAndTurnId);
 
   const reset = resetUserProductionObjectivePreference();
   assert.deepEqual(reset.planSet.catalog.objectiveOrder.slice(0, 3), [
