@@ -27,12 +27,16 @@
   ],
   "beforeScreenshotAssertions": [
     {
-      "selector": "#productList [data-product-row]:nth-child(1)",
-      "text": "Листовка 70"
+      "selector": "#productList [data-product-row]:nth-child(1) [data-product-field='name']",
+      "value": "Листовка 70"
     },
     {
-      "selector": "#productList [data-product-row]:nth-child(20)",
-      "text": "Листовка 20"
+      "selector": "#productList [data-product-row]:nth-child(20) [data-product-field='name']",
+      "value": "Листовка 20"
+    },
+    {
+      "selector": "#productList [data-product-row]:nth-child(20) [data-product-field='pages']",
+      "value": "3"
     },
     {
       "selector": "#calculationError",
