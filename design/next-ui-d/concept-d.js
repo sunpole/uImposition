@@ -1,0 +1,37 @@
+const presetData=[
+{name:'616×446',w:616,h:446,l:4,r:4,t:2,b:13,m:'SM 52'},
+{name:'616×466',w:616,h:466,l:4,r:4,t:2,b:13,m:'SM 52'},
+{name:'636×448',w:636,h:448,l:4,r:4,t:2,b:13,m:'SM 52'},
+{name:'646×466',w:646,h:466,l:4,r:4,t:2,b:13,m:'SM 52'},
+{name:'650×313',w:650,h:313,l:4,r:4,t:2,b:13,m:'GTO'},
+{name:'716×326',w:716,h:326,l:4,r:4,t:2,b:13,m:'SM 74'},
+{name:'716×336',w:716,h:336,l:4,r:4,t:2,b:13,m:'SM 74'},
+{name:'716×516',w:716,h:516,l:4,r:4,t:2,b:13,m:'SM 74'},
+{name:'500×350',w:500,h:350,l:4,r:4,t:2,b:13,m:'GTO'},
+{name:'450×320',w:450,h:320,l:4,r:4,t:2,b:13,m:'GTO'}];
+let currentPaper=presetData[0];
+let orders=[
+{name:'визитка',w:90,h:50,qty:1000,kinds:1,pages:2,front:4,back:4,bleed:2,cut:'общий',turn:'авто'},
+{name:'листовка',w:105,h:148,qty:1500,kinds:1,pages:2,front:1,back:1,bleed:2,cut:'общий',turn:'чужой'},
+{name:'этикетка',w:70,h:100,qty:3200,kinds:4,pages:2,front:4,back:1,bleed:2,cut:'разд.',turn:'свой'},
+{name:'буклет',w:210,h:210,qty:700,kinds:1,pages:8,front:4,back:4,bleed:3,cut:'разд.',turn:'чужой'}];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const presets=$('#presets'), tableScroll=$('#ordersTableScroll'), warning=$('#overflowWarning');
+function calc(item){const bleed=+item.bleed||0,iw=(+item.w||1)+bleed*2,ih=(+item.h||1)+bleed*2,pw=currentPaper.w-currentPaper.l-currentPaper.r,ph=currentPaper.h-currentPaper.t-currentPaper.b;const a=Math.max(1,Math.floor(pw/iw)*Math.floor(ph/ih)),b=Math.max(1,Math.floor(pw/ih)*Math.floor(ph/iw)),nup=Math.max(a,b),sheets=Math.max(1,Math.ceil((+item.qty||1)*(+item.kinds||1)/nup)),forms=Math.max(1,Math.ceil((+item.pages||2)/2)*Math.max(+item.front||0,+item.back||0,1)),plates=forms,sides=(+item.front>0?1:0)+(+item.back>0?1:0),cost=Math.round(sheets*.025+plates*10+sides*8);return{nup,sheets,forms,plates,cost,pw,ph}}
+function quickItem(){return{name:$('#qName').value||'без имени',w:+$('#qW').value||1,h:+$('#qH').value||1,qty:+$('#qQty').value||1,kinds:+$('#qKinds').value||1,pages:+$('#qPages').value||2,front:+$('#qFront').value||0,back:+$('#qBack').value||0,bleed:+$('#qBleed').value||0,cut:$('#qCut').value,turn:$('#qTurn').value}}
+function updatePaper(){const pw=currentPaper.w-currentPaper.l-currentPaper.r,ph=currentPaper.h-currentPaper.t-currentPaper.b;$('#paperPhysical').textContent=`${currentPaper.w}×${currentPaper.h}`;$('#paperPrint').textContent=`${pw}×${ph}`;$('#paperMargins').textContent=`${currentPaper.l}/${currentPaper.r}/${currentPaper.t}/${currentPaper.b}`;$('#paperMachine').textContent=currentPaper.m||'Своя'}
+function updateLive(){const c=calc(quickItem());$('#liveNup').textContent=`${c.nup} шт.`;$('#liveSheets').textContent=c.sheets;$('#liveForms').textContent=c.forms;$('#livePlates').textContent=c.plates;$('#liveCost').textContent=`${c.cost} BYN`}
+function resetTable(){if(tableScroll)tableScroll.scrollLeft=0}
+function renderPresets(){presetData.forEach((p,i)=>{const b=document.createElement('button');b.className='preset'+(i===0?' active':'');b.textContent=p.name;b.onclick=()=>{currentPaper=p;$$('.preset').forEach(x=>x.classList.toggle('active',x===b));updatePaper();updateLive();renderOrders();resetTable()};presets.append(b)})}
+function renderOrders(){const grid=$('#ordersGrid');grid.querySelectorAll('.row.data').forEach(x=>x.remove());let totalSheets=0,totalKinds=0;const digits=Math.max(2,String(orders.length).length);document.documentElement.style.setProperty('--no-w',`${Math.max(23,13+digits*5)}px`);orders.forEach((o,i)=>{const c=calc(o);totalSheets+=c.sheets;totalKinds+=+o.kinds||1;const row=document.createElement('div');row.className='row data';row.innerHTML=`<div class="cell sticky-no">${String(i+1).padStart(digits,'0')}</div><div class="cell sticky-name" title="${o.name}">${o.name}</div><div class="cell">${o.w}×${o.h}</div><div class="cell num">${o.qty}</div><div class="cell num">${o.kinds}</div><div class="cell num">${o.pages}</div><div class="cell"><span class="tag">${o.front}</span></div><div class="cell"><span class="tag">${o.back}</span></div><div class="cell num">${o.bleed} мм</div><div class="cell">${o.cut}</div><div class="cell">${o.turn}</div><div class="cell num">${c.nup}</div><div class="cell num">${c.sheets}</div><div class="cell num">${c.forms}</div><div class="cell"><span class="state">Готово</span></div>`;row.onclick=()=>selectRow(row,o,i,c);grid.append(row)});$('#rowCount').textContent=`${orders.length} ${orders.length===1?'строка':orders.length<5?'строки':'строк'}`;$('#footerTotals').textContent=`Итого: ${totalKinds} видов · ${totalSheets} листов`;requestAnimationFrame(checkOverflow)}
+function selectRow(row,o,i,c){$$('.row.data').forEach(x=>x.classList.remove('selected'));row.classList.add('selected');$('#selectedName').textContent=`${String(i+1).padStart(2,'0')} · ${o.name} · ${o.w}×${o.h} · ${o.qty} экз.`;$('#selectedMeta').textContent=`${c.nup} на листе · ${c.sheets} листов · ${c.forms} форм`;$('#selectionBar').classList.add('show')}
+function openScreen(id){$$('[data-screen-panel]').forEach(x=>x.classList.toggle('active',x.dataset.screenPanel===id));$$('[data-screen]').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));$('#selectionBar').classList.remove('show');window.scrollTo({top:0,behavior:'instant'});requestAnimationFrame(checkOverflow)}
+function checkOverflow(){const root=document.documentElement,excess=root.scrollWidth-root.clientWidth;warning.classList.toggle('show',excess>1);warning.textContent=excess>1?`Ошибка вёрстки: страница шире экрана на ${excess}px. Сообщите разработчику.`:''}
+renderPresets();updatePaper();updateLive();renderOrders();resetTable();
+['qName','qW','qH','qQty','qKinds','qPages','qFront','qBack','qBleed','qCut','qTurn'].forEach(id=>$('#'+id).addEventListener('input',updateLive));
+$('#addOrder').onclick=()=>{orders.push(quickItem());renderOrders();tableScroll.scrollTop=tableScroll.scrollHeight;resetTable()};
+document.addEventListener('click',e=>{const nav=e.target.closest('[data-screen]');if(nav)openScreen(nav.dataset.screen)});
+const bulk=$('#bulkOverlay'),custom=$('#customOverlay');[$('#bulkTop'),$('#bulkBtn')].forEach(b=>b&&b.addEventListener('click',()=>bulk.classList.add('open')));$('#customPreset').onclick=()=>custom.classList.add('open');$$('[data-close]').forEach(b=>b.onclick=()=>{bulk.classList.remove('open');custom.classList.remove('open')});[bulk,custom].forEach(o=>o.onclick=e=>{if(e.target===o)o.classList.remove('open')});
+$('#importBulk').onclick=()=>{($('#bulkText').value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).forEach(line=>{const p=line.split(/[;\t]/).map(x=>x.trim());orders.push({name:p[0]||'без имени',w:+p[1]||90,h:+p[2]||50,qty:+p[3]||1000,kinds:+p[4]||1,pages:+p[5]||2,front:+p[6]||1,back:+p[7]||1,bleed:+p[8]||0,cut:'общий',turn:'авто'})});renderOrders();bulk.classList.remove('open');resetTable()};
+$('#applyCustom').onclick=()=>{currentPaper={name:'Свой',w:+$('#customW').value||700,h:+$('#customH').value||500,l:+$('#customLeft').value||0,r:+$('#customRight').value||0,t:+$('#customTop').value||0,b:+$('#customBottom').value||0,m:'Своя'};$$('.preset').forEach(x=>x.classList.remove('active'));updatePaper();updateLive();renderOrders();custom.classList.remove('open');resetTable()};
+window.addEventListener('resize',()=>requestAnimationFrame(checkOverflow));window.addEventListener('orientationchange',()=>setTimeout(checkOverflow,150));new ResizeObserver(checkOverflow).observe(document.documentElement);setTimeout(checkOverflow,0);
