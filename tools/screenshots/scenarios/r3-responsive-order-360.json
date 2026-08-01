@@ -24,7 +24,7 @@
   "beforeScreenshotAssertions": [
     {
       "selector": "[data-txt-import-controls]",
-      "text": "Пример: 20 видов"
+      "text": "Тест: 20 файлов · 1+1"
     },
     {
       "selector": "[data-txt-import-controls]",
