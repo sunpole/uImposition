@@ -1,3 +1,4 @@
+import "./responsive-actions.js";
 import "./acceptance-controls.js";
 import "./txt-import.js";
 
