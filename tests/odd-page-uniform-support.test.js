@@ -24,7 +24,12 @@ const placementOptions = calculatePlacementOptions({
   },
 });
 
-function collectionFor({ pages, frontColors = 1, backColors = 1 }) {
+function collectionFor({
+  pages,
+  frontColors = 1,
+  backColors = 1,
+  duplexPreference = "auto",
+}) {
   return normalizeProductRowCollection({ rows: [{
     id: "product:1",
     name: `Job-${pages}`,
@@ -36,7 +41,7 @@ function collectionFor({ pages, frontColors = 1, backColors = 1 }) {
       mode: "duplex",
       frontColors,
       backColors,
-      duplexPreference: "auto",
+      duplexPreference,
     },
     bleed: { mode: "uniform", uniformMm: 0 },
     cut: { mode: "commonCut", gapMm: 0 },
@@ -44,8 +49,18 @@ function collectionFor({ pages, frontColors = 1, backColors = 1 }) {
   }] });
 }
 
-function planSetFor({ pages, frontColors = 1, backColors = 1 }) {
-  const collection = collectionFor({ pages, frontColors, backColors });
+function planSetFor({
+  pages,
+  frontColors = 1,
+  backColors = 1,
+  duplexPreference = "auto",
+}) {
+  const collection = collectionFor({
+    pages,
+    frontColors,
+    backColors,
+    duplexPreference,
+  });
   const orders = expandOddPageProductRowsToLegacyOrders(collection);
   const pagePairs = expandPagePairs(orders);
   return {
@@ -55,6 +70,7 @@ function planSetFor({ pages, frontColors = 1, backColors = 1 }) {
       placementOptions,
       sourceSheet,
       printSpecification: createDuplexPrintSpecification({ frontColors, backColors }),
+      duplexPreference,
     }),
   };
 }
@@ -66,12 +82,21 @@ function dedicatedZero(result) {
   ));
 }
 
-test("odd page rows are valid in the current uniform pipeline", () => {
+test("odd page rows are valid in auto mode but forced work-and-turn is blocked", () => {
   for (const pages of [1, 3, 5]) {
     const validation = validateProductRowsForOddPageUniformPipeline(collectionFor({ pages }));
     assert.equal(validation.valid, true);
     assert.equal(validation.summary.technicalBlankPageCount, 1);
     assert.equal(validation.issues.some(({ code }) => code === "uniformPipelineRequiresCompletePagePairs"), false);
+
+    const forced = validateProductRowsForOddPageUniformPipeline(collectionFor({
+      pages,
+      duplexPreference: "workAndTurn",
+    }));
+    assert.equal(forced.valid, false);
+    assert.ok(forced.issues.some(({ code }) => (
+      code === "uniformPipelineWorkAndTurnRequiresCompletePagePairs"
+    )));
 
     const orders = expandOddPageProductRowsToLegacyOrders(collectionFor({ pages }));
     assert.equal(orders[0].pages, pages);
@@ -87,14 +112,57 @@ test("odd jobs expose a technical blank back page without inventing content", ()
     assert.equal(pagePairs.at(-1).backPage, null);
     assert.equal(result.technicalBlankPairCount, 1);
     assert.equal(result.scope.oddPageTechnicalBlanks, true);
+    assert.equal(result.scope.workAndTurnEvaluated, false);
+    assert.equal(result.scope.workAndTurnExcludedByTechnicalBlank, true);
+    assert.equal(result.plans.some(({ duplexMode }) => duplexMode === "workAndTurn"), false);
     result.plans.forEach((plan) => {
       assert.equal(plan.report.valid, true);
+      assert.equal(plan.report.duplexMode, "separateFrontBackForms");
       const blankBackCells = plan.impositions.flatMap(({ back }) => back.cells)
         .filter(({ backPage }) => backPage === null);
       assert.ok(blankBackCells.length > 0);
       assert.equal(blankBackCells.every(({ page, technicalBlank }) => page === null && technicalBlank === true), true);
     });
   }
+});
+
+test("even jobs preserve real work-and-turn reports and shared forms", () => {
+  const { result } = planSetFor({
+    pages: 2,
+    frontColors: 4,
+    backColors: 1,
+    duplexPreference: "workAndTurn",
+  });
+
+  assert.equal(result.technicalBlankPairCount, 0);
+  assert.equal(result.duplexPreference, "workAndTurn");
+  assert.equal(result.plans.length, 1);
+  const plan = result.plans[0];
+  assert.equal(plan.family, USER_UNIFORM_PLAN_FAMILY.WORK_AND_TURN_DEDICATED_PAIRS);
+  assert.equal(plan.duplexMode, "workAndTurn");
+  assert.equal(plan.report.duplexMode, "workAndTurn");
+  assert.equal(plan.report.totals.frontForms, 1);
+  assert.equal(plan.report.totals.backForms, 0);
+  assert.equal(plan.report.totals.forms, 1);
+  assert.equal(plan.metrics.layoutForms, 1);
+  assert.equal(plan.metrics.colorPlates, 4);
+  assert.equal(plan.sharedPlates.length, 1);
+  assert.equal(plan.sharedPlates[0].samePlateForBothPasses, true);
+});
+
+test("separate preference excludes work-and-turn without changing ordinary plans", () => {
+  const { result } = planSetFor({
+    pages: 2,
+    frontColors: 4,
+    backColors: 1,
+    duplexPreference: "separateFrontBackForms",
+  });
+
+  assert.equal(result.plans.length, 4);
+  assert.equal(result.plans.every(({ duplexMode }) => (
+    duplexMode === "separateFrontBackForms"
+  )), true);
+  assert.equal(result.scope.workAndTurnEvaluated, false);
 });
 
 test("dedicated odd-page forms count only actually printed backs", () => {
@@ -126,7 +194,12 @@ test("dedicated odd-page forms count only actually printed backs", () => {
 });
 
 test("even jobs keep their existing duplex form and plate totals", () => {
-  const { result } = planSetFor({ pages: 4, frontColors: 4, backColors: 1 });
+  const { result } = planSetFor({
+    pages: 4,
+    frontColors: 4,
+    backColors: 1,
+    duplexPreference: "separateFrontBackForms",
+  });
   const plan = dedicatedZero(result);
   assert.ok(plan);
   assert.equal(result.technicalBlankPairCount, 0);
