@@ -27,9 +27,9 @@
     { "selector": "#userObjectivePriorityEditor", "text": "По умолчанию" },
     { "selector": "[data-objective-id='estimatedTotalCost']", "text": "Расчётная стоимость" },
     { "selector": "[data-objective-id='estimatedTotalCost'] .objective-priority-position", "text": "1" },
-    { "selector": "#userObjectivePriorityEditor", "text": "4 готовых планов использовано повторно" },
+    { "selector": "#userObjectivePriorityEditor", "text": "5 готовых планов использовано повторно" },
     { "selector": "#userObjectivePriorityEditor", "text": "0 планов построено заново" },
-    { "selector": "#userObjectivePriorityEditor", "text": "uniform-r90-dedicated-pairs" }
+    { "selector": "#userObjectivePriorityEditor", "text": "uniform-r90-work-and-turn-dedicated-pairs" }
   ],
   "screenshotSelector": "#appObjectivesDrawer",
   "screenshot": "uimposition-m7-5-objective-priority-editor.png"
