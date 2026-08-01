@@ -120,7 +120,7 @@ test("G0 separated gap agrees with the current placement API", () => {
     current.candidates.map(({ rotation, positions }) => ({ rotation, capacity: positions })));
 });
 
-test("G0 no-fit patterns remain explicit and valid", () => {
+test("G0 no-fit patterns remain explicit and expose no fake best layout", () => {
   const result = createUniformGridPatternSet({
     printableArea: { widthMm: 50, heightMm: 50 },
     occupiedProduct: { widthMm: 60, heightMm: 70 },
@@ -128,6 +128,7 @@ test("G0 no-fit patterns remain explicit and valid", () => {
   });
 
   assert.equal(result.fits, false);
+  assert.equal(result.best, null);
   assert.deepEqual(result.patterns.map(({ capacity }) => capacity), [0, 0]);
   assert.deepEqual(result.patterns[0].slots, []);
   assert.deepEqual(result.patterns[1].slots, []);
