@@ -7,15 +7,21 @@
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - рабочая ветка: `main`;
-- последний архитектурный merge перед rebuild: PR `#87`, commit `b9d83855ff685bb38831670fb0c3975bbd1bdbc4`;
+- фактический post-R0 checkpoint: `a0fe6edb8092e706572493f2534cc698b935262e`;
 - опубликованный version checkpoint остаётся `0.7.0-alpha.5`;
-- рабочее приложение: `https://sunpole.github.io/uImposition/` → `/app/`;
-- прежнее состояние сохранено в `archive/pre-universal-solver-rebuild-2026-08-01`;
-- основной universal-solver backlog: Issue `#83`;
-- PR `#85` закрыт без merge как superseded; его ветка сохраняется только как материал для будущего small-space exhaustive oracle;
-- production code, version и release не обновляются автоматически вместе с архитектурными PR.
+- рабочее приложение: корневой GitHub Pages URL перенаправляет в `/app/`;
+- состояние до universal-solver rebuild сохранено в `archive/pre-universal-solver-rebuild-2026-08-01`;
+- основной backlog: Issue `#83`;
+- PR `#85`, `#96` и `#98` закрыты без merge как superseded; полезные идеи перенесены в новые слои;
+- version/release не обновляются автоматически вместе с pure solver PR.
 
-## 2. Главное решение
+Последний доказательный gate:
+
+- PR `#103` — random-small differential validation;
+- exact-head Quality: `405/405` Node tests;
+- simplex и separate-duplex master results совпали с независимым exhaustive oracle.
+
+## 2. Главное архитектурное решение
 
 После аудита 50 GitHub-репозиториев solver строится слоями:
 
@@ -46,9 +52,10 @@ E — explanation, export и case memory
 11. `research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`;
 12. `research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md`;
 13. `docs/PROJECT_CATALOG.md`;
-14. Issue `#83`, open PR, latest Actions, branches, tags и Releases.
+14. `VERSION.json`, `VERSION.md`, `CHANGELOG.md`;
+15. Issue `#83`, open PR, latest Actions, branches, tags и Releases.
 
-Если документация противоречит фактическому GitHub, сначала исправить источник истины.
+Если документация противоречит фактическому GitHub, сначала исправить канонический документ.
 
 ## 4. Рабочее приложение и архив
 
@@ -68,85 +75,132 @@ b9d83855ff685bb38831670fb0c3975bbd1bdbc4
 
 Архив не удалять до стабильного `1.0.0` и отдельного решения владельца.
 
-## 5. Что уже работает
+## 5. Что работает в пользовательском runtime
 
-- application state, local persistence и sheet/press presets;
+- versioned application state, local persistence и sheet/press presets;
 - product rows, простой/расширенный TXT и контрольный заказ;
-- current uniform `0°/90°` geometry;
-- page pairs, odd technical blank, front и mirrored back;
-- separate duplex и ограниченный user work-and-turn;
-- production metrics, pricing, alternatives, priorities и selection;
-- schemes, report и PDF;
+- current uniform `0°/90°` calculation;
+- page pairs и odd technical blank;
+- validated front и mirrored back;
+- separate duplex и ограниченная user work-and-turn family;
+- production metrics, pricing, alternatives, priorities и explicit selection;
+- schemes, report и selected-plan PDF;
 - desktop/mobile Chromium/PDF regression.
 
-Эти модули являются regression foundation. Их нельзя удалять только потому, что они были созданы раньше.
+Runtime пока не переключён на новый G/P/R/C pipeline. Старые проверенные модули являются regression foundation и не удаляются без migration parity.
 
-## 6. Честная граница текущего solver
+## 6. Что уже реализовано в новом solver foundation
 
-Текущий runtime не умеет полностью:
+### G — geometry
 
+- PR `#89`: immutable GeometryPattern и exact uniform grids `0°/90°`;
+- PR `#90`: adapter текущих sheet/trim/press inputs;
+- PR `#91`: generalized uniform/mixed-strip geometry contract;
+- PR `#92`: exact bounded horizontal/vertical mixed-strip generation.
+
+### P — production assignment
+
+- PR `#93`: single-product simplex/separate-duplex pattern;
+- PR `#94`: horizontal work-and-turn через реальные slot orbits;
+- PR `#95`: exact all-positive multi-product simplex allocations на одной форме;
+- PR `#97`: exact simplex candidate columns с нулевыми subsets;
+- PR `#100`: exact separate-duplex candidate columns с derived mirrored back.
+
+### R0 — exact small oracle
+
+- PR `#99`: bounded exact simplex small master;
+- PR `#102`: общий exact production master для simplex и separate-duplex families;
+- PR `#103`: independent random-small differential validation.
+
+Ключевые свойства:
+
+- exact BigInt state counts;
+- explicit bounded completeness;
+- zero underproduction;
+- immutable structural signatures;
+- lossless feasible plans;
+- Pareto как аннотация без удаления;
+- фактические forms/plates/passes из column contract;
+- запрет смешивания несовместимых print strategies.
+
+## 7. Честная граница текущего нового solver
+
+Новый foundation пока не является large-order runtime и не умеет полностью:
+
+- restricted-master relaxation и bounds/gap;
+- pricing subproblem и column generation;
+- большие заказы без полного static column catalog;
 - mixed physical formats;
-- mixed `0°+90°` slots на одной форме;
-- общий multi-pattern run-length search;
-- column generation;
-- все simplex/duplex/work-and-turn combinations;
-- machine defect zones;
+- arbitrary MaxRects/Skyline/general packing;
+- multi-product work-and-turn/work-and-tumble/perfecting;
+- machine defect zones и placement compatibility;
 - operator case memory;
+- pricing/cost objectives внутри нового master;
+- подключение нового master к `/app/`, report и PDF;
 - доказанный global optimum произвольного заказа.
 
 Сохранённые benchmark layouts не являются production answers.
 
-## 7. Следующий обязательный кодовый этап
+## 8. Следующий обязательный кодовый этап
 
-### G0-A — pure geometry
+### R1-A — restricted master contract
 
-Создать:
+Создать pure, solver-agnostic contract поверх существующих production columns:
 
-```text
-src/geometric-pattern.js
-src/uniform-grid-patterns.js
-tests/geometric-pattern.test.js
-tests/uniform-grid-patterns.test.js
-```
+- canonical coefficient matrix `a[p,i]`;
+- compatible print-family identity;
+- demand vector;
+- initial selected column set;
+- integer/relaxed solution models;
+- objective vector и production metrics projection;
+- lower/upper bounds, gap и solver status;
+- explicit complete/truncated/unsupported state;
+- no DOM, pricing UI или PDF dependency.
 
-Требования:
+Acceptance:
 
-- реальные slot coordinates;
-- patterns 0° и 90°;
-- printable bounds;
-- gap/bleed/cut rules;
-- deterministic signatures;
-- no overlap;
-- property tests;
-- comparison с текущим `calculatePlacementOptions()`;
-- никаких UI, pricing или recommendation изменений.
+- simplex и separate-duplex catalogs преобразуются в одинаковую master matrix;
+- every coefficient equals exact `positionsPerSheet`;
+- incompatible family/geometry/demand catalogs rejected;
+- dedicated/mixed columns retained losslessly;
+- small fixture solution can be checked against R0 exact oracle;
+- no claim that a restricted column set proves global optimum.
 
-После G0-A — adapter G0-B, затем mixed strips G1.
+После R1-A:
 
-## 8. Неприкосновенные правила
+1. relaxed/integer restricted-master backend;
+2. external OR-Tools/SCIP/Cbc differential fixtures;
+3. R2 pricing request/response contract;
+4. bounded master → pricing loop;
+5. historical 20-file benchmark;
+6. operator case memory;
+7. machine constraints.
+
+## 9. Неприкосновенные правила
 
 - недопечатка запрещена;
-- back выводится только из validated front;
+- back выводится только из validated front/transform;
 - geometry не содержит тиражей и цен;
-- production pattern ссылается на реальные slots;
+- production assignment ссылается на реальные slots;
 - layout forms и color plates различаются;
 - missing cost не равна нулю;
 - operator selection независим от recommendation;
 - case memory — warm start/benchmark, а не подстановка ответа;
-- heuristic result не называется proven optimum;
-- truncation и coverage всегда видимы;
-- одна ветка/PR — одна измеримая цель.
+- heuristic/restricted result не называется proven global optimum;
+- truncation, bounds и coverage всегда видимы;
+- одна ветка/PR — одна измеримая цель;
+- version/release work отделены от solver work.
 
-## 9. Проверки
+## 10. Проверки
 
 ```bash
 npm run check
 ```
 
-Runtime/UI/PDF изменения дополнительно требуют полного Chromium/PDF workflow и визуального просмотра artifacts.
+Pure solver/test PR требуют exact-head Quality. Runtime/UI/PDF изменения дополнительно требуют полного Chromium/PDF workflow и визуального просмотра artifacts.
 
 ## Prompt для следующей сессии
 
 ```text
-Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub. Прочитай AGENTS.md, START_HERE.md, docs/CURRENT_STATE.md, docs/ARCHITECTURE.md, docs/ALGORITHM_AND_OPTIMIZATION.md, docs/TEST_PLAN.md и research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md. Состояние до rebuild находится в archive/pre-universal-solver-rebuild-2026-08-01. PR #85 закрыт без merge как superseded и не должен развиваться как large-order solver. Следующая кодовая цель — pure G0 uniform geometry patterns с реальными slots, строгой validation и тестами, без UI-изменений.
+Открой https://github.com/sunpole/uImposition и работай только по фактическому GitHub. Прочитай AGENTS.md, START_HERE.md, docs/CURRENT_STATE.md, docs/CODEX_HANDOFF.md, docs/ARCHITECTURE.md, docs/ALGORITHM_AND_OPTIMIZATION.md, docs/TEST_PLAN.md и docs/REMAINING_WORK.md. Архив до rebuild находится в archive/pre-universal-solver-rebuild-2026-08-01. G0, G1, P0, P1 и R0 exact small oracle завершены через PR #89–#103; последний proof gate — 405/405 tests. Следующая кодовая цель — pure R1 restricted-master contract и canonical coefficient matrix поверх существующих simplex/separate-duplex production columns, без UI и без ложного global-optimum claim.
 ```
