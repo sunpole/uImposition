@@ -1,411 +1,420 @@
 # uImposition — актуальный остаток до 1.0
 
-Дата актуализации: **27 июля 2026**.
+Дата актуализации: **1 августа 2026 года**.
+
+Исследовательская основа:
+
+- [`../research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md`](../research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md);
+- [`../research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`](../research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md).
 
 ## 1. Текущая точка
 
-- функциональный baseline M7.5: `009451cce94d5cde05ee72305f30447aa65a646c`;
-- опубликованный prerelease: `0.7.0-alpha.5` / M7.5;
-- функциональный M7.5 объединён через PR `#44`, `#45`, `#46`;
-- version/publication объединены через PR `#49`, `#50`;
-- release commit, recovery branch и tag: `195d6496a291095a69cc9089a64154561ffbb1fa`, `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
-- GitHub prerelease и оба asset независимо проверены;
-- следующий функциональный milestone: M7.6 / `0.7.0-alpha.6`;
-- полный handoff: `docs/CODEX_HANDOFF.md`.
+Опубликованный prerelease остаётся `0.7.0-alpha.5`.
 
-## 2. Что уже завершено
+После него в `main` уже добавлены и проверены:
 
-### M1–M6
+- operator-first `/app/`;
+- persistent desktop navigation и mobile adaptation;
+- independent front/back colors;
+- odd-page technical blanks;
+- verified mirrored back;
+- user work-and-turn shared plate;
+- compact control-order input;
+- full display of every generated imposition;
+- bounded search contract;
+- audit 50 GitHub repositories и revised solver architecture.
 
-- sheet/product geometry;
+Root cutover и выпуск `0.7.0-alpha.6` по-прежнему требуют отдельной owner acceptance. Новый solver не должен автоматически переключать корневой сайт.
+
+## 2. Что доказано и сохраняется
+
 - trim и press margins;
-- page pairs;
-- front/back layouts;
-- imposition validation;
-- production report;
-- PDF schemes/report;
-- bounded uniform candidate generation;
-- paper minimizer;
-- доказанный minimum `3305` листов для контрольного набора;
-- manual mixed-format fixture validation;
-- production regression fixtures.
-
-### M7.1–M7.3
-
-- optimization objectives;
-- immutable decision profile;
-- lexicographic ranking;
-- guarded solution metrics;
-- operator pricing;
-- production cost model;
-- Pareto frontier;
-- materially different alternatives;
-- RU/EN explanations и component deltas;
-- sanitized alternatives runtime/UI.
-
-### M7.4 / `0.7.0-alpha.4`
-
-- separate front/back forms;
-- work-and-turn control model;
-- horizontal axis;
-- symmetric shared form validation;
-- strategy modes;
-- independent reports;
-- forms/plates comparison;
-- release checkpoint опубликован.
-
-### M7.5 / `0.7.0-alpha.5` — опубликованный prerelease
-
-PR `#44`:
-
-- user orders → verified production plans;
-- fitting `0°/90°`;
-- `paperMinimum` и `dedicatedPairForms`;
-- lossless catalog;
-- dynamic cost.
-
-PR `#45`:
-
+- uniform fitting 0°/90°;
+- page-pair expansion;
+- deterministic front и derived mirrored back;
+- odd-page blank semantics;
+- independent production validation;
+- paper-minimum lower-bound proof для контрольного input/capacity;
+- layout forms, color plates и passes как разные metrics;
+- guarded pricing/cost;
+- lossless feasible catalog;
+- Pareto/ranking/recommendation;
 - explicit operator selection;
-- real front/back schemes;
-- selected production report;
-- selected scheme/report PDF;
-- mobile details view.
+- selected plan scheme/report/PDF consistency;
+- shared-plate work-and-turn для текущей ограниченной family;
+- bounded complete/truncated search contract;
+- desktop/mobile Chromium и PDF regression.
 
-PR `#46`:
+Эти возможности не переписываются одним большим PR.
 
-- 11 objectives;
-- presets;
-- arrows и drag-and-drop;
-- persistent objective preference;
-- reranking without regeneration;
-- selected plan independent from recommendation;
-- `173/173` tests и full Chromium/PDF evidence.
+## 3. Главный архитектурный вывод аудита
 
-## 3. Publication checkpoint `0.7.0-alpha.5` — завершён
+Большой заказ нельзя решать предварительным перечислением и хранением всех возможных монтажей.
 
-### Version audit
+Основной путь:
 
-- [x] проверить фактический `main` и последние PR;
-- [x] обновить `VERSION.json`;
-- [x] обновить `VERSION.md`;
-- [x] обновить `CHANGELOG.md`;
-- [x] обновить README;
-- [x] обновить видимую версию сайта;
-- [x] обновить screenshot assertions;
-- [x] обновить status/milestone/nextTarget.
+```text
+normalization
+→ geometric patterns
+→ print-aware assignment
+→ restricted master
+→ pricing/column generation
+→ integer plan
+→ independent validation
+→ lossless alternatives
+```
 
-### Release evidence
+Полный static catalog остаётся только малым exact oracle.
 
-- [x] выбрать focused M7.5 scenario;
-- [x] снять реальный Chromium screenshot точного source commit;
-- [x] визуально проверить image;
-- [x] сохранить manifest, capture log и quality log;
-- [x] создать permanent evidence ZIP;
-- [x] посчитать SHA-256 assets;
-- [x] создать release manifest.
+## 4. Research/documentation gate — завершён
 
-### Publication
+- [x] исследовать не менее 50 репозиториев;
+- [x] разделить PDF imposition, geometry packing и production optimization;
+- [x] проверить сильнейшие core/test/license sources;
+- [x] зафиксировать pluggable geometry;
+- [x] выбрать restricted master + pricing/column generation;
+- [x] определить роль operator cases;
+- [x] определить роль external solvers как oracles;
+- [x] объединить research PR `#86`;
+- [x] пересмотреть `ARCHITECTURE.md`;
+- [x] пересмотреть `ALGORITHM_AND_OPTIMIZATION.md`;
+- [x] пересмотреть `TEST_PLAN.md`;
+- [x] пересмотреть этот backlog.
 
-- [x] patchnote `news/*.md`;
-- [x] новое release image;
-- [x] короткий uNews/Telegram payload;
-- [x] version PR exact-head checks;
-- [x] publication PR checks;
-- [x] merge version/publication;
-- [x] recovery branch `release/v0.7.0-alpha.5`;
-- [x] immutable tag `v0.7.0-alpha.5`;
-- [x] настоящий GitHub prerelease;
-- [x] image и evidence ZIP как assets;
-- [x] независимая проверка Release card;
-- [x] независимая проверка каждого asset;
-- [x] состояние uNews проверено: patchnote имеет `queued_at`, но последний scan предшествовал merge; Telegram URL появится после внешнего FIFO scan.
+## 5. Immediate D1 — решение по draft PR #85
 
-## 4. M7.6 — завершение операторской системы решений
+PR #85 не сливается как large-order solver.
 
-Предлагаемая версия: `0.7.0-alpha.6`.
+Требуется:
 
-### Compact comparison table
+- [ ] переименовать модуль и API в small-space exhaustive oracle;
+- [ ] сохранить BigInt exact candidate count;
+- [ ] сохранить deterministic structural signatures;
+- [ ] сохранить complete/truncated coverage;
+- [ ] ограничить назначение малым finite space;
+- [ ] добавить явное предупреждение против увеличения limits для больших заказов;
+- [ ] связать oracle с будущим geometry-pattern interface;
+- [ ] использовать его в differential tests pricing subproblem;
+- [ ] закрыть или заменить PR #85, если чистая переработка создаёт более понятную историю.
 
-- [ ] одна строка на каждый допустимый план;
-- [ ] lossless `Все` по умолчанию;
-- [ ] filters `Pareto / Recommended / Dominated`;
-- [ ] режим `Только различия`;
-- [ ] sorting по любой метрике;
-- [ ] фильтр plan-family;
-- [ ] фильтр duplex strategy;
-- [ ] выбранный оператором plan выделен отдельно;
-- [ ] recommendation не заменяет selection.
+## 6. G0 — exact uniform geometry
 
-### Columns
+Первый следующий code milestone.
 
-- [ ] physical sheets;
-- [ ] paper weight;
-- [ ] layout forms;
-- [ ] color plates;
-- [ ] press passes;
-- [ ] pair overrun;
-- [ ] file overrun;
-- [ ] split orders;
-- [ ] imposition count;
-- [ ] paper cost;
-- [ ] form/plate cost;
-- [ ] preparation cost;
-- [ ] total cost;
-- [ ] unit cost;
-- [ ] proof/feasible status;
-- [ ] orientation/grid;
-- [ ] plan-family и duplex strategy.
+- [ ] ввести immutable `GeometricPattern` и `Slot` models;
+- [ ] pure 0° grid;
+- [ ] pure 90° grid;
+- [ ] exact coordinates;
+- [ ] trim/press margins;
+- [ ] bleed/gap/cut family;
+- [ ] occupied/waste area;
+- [ ] deterministic structural signature;
+- [ ] `completeWithinPureGridSpace` status;
+- [ ] G001–G003, G005–G007 fixtures/property tests;
+- [ ] adapter из текущих placement options без поломки `/app/`.
 
-### Explanation
+## 7. G1 — mixed-orientation strips
 
+- [ ] horizontal strips;
+- [ ] vertical strips;
+- [ ] 0°/90° per strip;
+- [ ] exact/bounded integer strip boundaries;
+- [ ] no overlap and boundary proof;
+- [ ] G004 fixture, где mixed лучше обеих pure grids;
+- [ ] multiple materially different patterns retained;
+- [ ] exact/truncated status;
+- [ ] performance budget.
+
+## 8. G2/G3 — general packing и external oracles
+
+### Internal heuristic backends
+
+- [ ] MaxRects adapter;
+- [ ] Skyline adapter;
+- [ ] Guillotine adapter;
+- [ ] deterministic sorting/scoring profiles;
+- [ ] clear heuristic status;
+- [ ] no false global optimum claim.
+
+### Differential research harness
+
+- [ ] record exact external repo/version/commit;
+- [ ] run selected fixtures through `rectpack`;
+- [ ] run selected fixtures through PackingSolver;
+- [ ] compare capacity, coordinates and validity;
+- [ ] preserve only license-compatible fixture outputs;
+- [ ] block reuse when license metadata conflicts.
+
+## 9. P0 — basic production assignment
+
+### Simplex
+
+- [ ] one kind;
+- [ ] multiple kinds;
+- [ ] integer allocations inside one geometry pattern;
+- [ ] exact run calculation;
+- [ ] zero underproduction;
+- [ ] P001, P006–P010 tests.
+
+### Separate duplex
+
+- [ ] geometry slots independent from page assignment;
+- [ ] front primary structure;
+- [ ] transform-generated back;
+- [ ] horizontal short-edge mirror;
+- [ ] odd-page blanks;
+- [ ] independent side activity/forms/plates/passes;
+- [ ] P002–P003 tests.
+
+### Work-and-turn
+
+- [ ] explicit `T(slot)` model;
+- [ ] involution validation;
+- [ ] paired and fixed slot orbits;
+- [ ] horizontal reflection;
+- [ ] vertical reflection as separate capability;
+- [ ] 180° transform as separate capability;
+- [ ] shared plate and control views;
+- [ ] P004–P005 tests.
+
+## 10. R0 — exhaustive small master oracle
+
+- [ ] small finite set of production patterns;
+- [ ] bounded integer run lengths;
+- [ ] complete plan enumeration;
+- [ ] exact zero-underproduction filtering;
+- [ ] structural plan signatures;
+- [ ] full Pareto frontier;
+- [ ] brute-force random-small oracle;
+- [ ] R001–R005 tests;
+- [ ] explicit maximum problem size.
+
+Этот этап должен быть медленным, но доказательным. Он нужен как oracle, а не как final large-order runtime.
+
+## 11. R1 — restricted master interface
+
+- [ ] canonical coefficient matrix `a[p,i]`;
+- [ ] initial columns from dedicated/paper-minimum/work-and-turn;
+- [ ] operator-case warm-start columns;
+- [ ] integer and relaxed solution models;
+- [ ] bounds/gap/counters;
+- [ ] production metrics projection;
+- [ ] no DOM dependency;
+- [ ] external OR-Tools/SCIP/Cbc differential fixtures for small problems.
+
+## 12. R2 — first pricing subproblem
+
+- [ ] pricing request/response contract;
+- [ ] dual-value input;
+- [ ] geometry-pattern selection;
+- [ ] assignment generation;
+- [ ] reduced-cost calculation;
+- [ ] canonical deduplication;
+- [ ] add only improving columns;
+- [ ] deterministic tie-breaking;
+- [ ] R006 test against full small catalog;
+- [ ] honest no-column/truncated distinction.
+
+## 13. R3 — bounded column-generation loop
+
+- [ ] master → pricing iterations;
+- [ ] time/state/memory limits;
+- [ ] cancellation;
+- [ ] progress events;
+- [ ] upper/lower bounds and gap;
+- [ ] final integer restricted master;
+- [ ] partial feasible plans retained;
+- [ ] complete/truncated status;
+- [ ] R007–R008 tests;
+- [ ] no global claim without proof.
+
+## 14. Control benchmark integration
+
+Только после G0/G1/P0/R0/R1/R2.
+
+`data/control-case.json`:
+
+- [ ] production solver читает только input;
+- [ ] `data/control-layout-m3.json` используется только как oracle/evidence;
+- [ ] paper-first сохраняет 3305-sheet extreme;
+- [ ] forms-first находит plan не хуже 4 impositions / 8 layout forms или объясняет validated better plan;
+- [ ] intermediate Pareto plans retained;
+- [ ] zero underproduction;
+- [ ] pricing changes recommendation correctly;
+- [ ] exact selected plan drives screen/report/PDF;
+- [ ] no special-case file IDs in production code.
+
+## 15. Layer C — operator case memory
+
+- [ ] versioned case schema;
+- [ ] exact input signature;
+- [ ] structural similarity signature;
+- [ ] normalized quantity ratios;
+- [ ] approved plan and rejected alternatives;
+- [ ] operator reason;
+- [ ] pricing and machine snapshot;
+- [ ] solver version;
+- [ ] warm-start validation;
+- [ ] exact-case and analogous-case tests;
+- [ ] UI to save a selected plan as operator evidence;
+- [ ] no silent automatic selection from memory.
+
+## 16. Layer M — machine and placement constraints
+
+Добавляется после базовой G/P/R корректности.
+
+- [ ] machine profile;
+- [ ] gripper/side-lay direction;
+- [ ] top/bottom/left/right/center zones;
+- [ ] defects/forbidden areas;
+- [ ] quality classes;
+- [ ] ink coverage/solid fill;
+- [ ] color compatibility;
+- [ ] preferred/forbidden zones;
+- [ ] adjacency/separation rules;
+- [ ] hard/soft/operator-only distinction;
+- [ ] explanations;
+- [ ] M001–M004 fixtures.
+
+## 17. Heavy-search worker
+
+- [ ] Web Worker boundary only around search;
+- [ ] progress;
+- [ ] cancel;
+- [ ] time/state/memory budgets;
+- [ ] deterministic request signature;
+- [ ] safe partial results;
+- [ ] no private data upload;
+- [ ] UI remains responsive;
+- [ ] resume/retry only when deterministic and validated.
+
+## 18. Comparison and operator UX
+
+Existing lossless comparison work is reused.
+
+- [ ] compact expert table;
+- [ ] all/Pareto/recommended/dominated filters;
+- [ ] only differences;
+- [ ] sorting by any metric;
+- [ ] plan-family/duplex/geometry filters;
+- [ ] proof/heuristic/truncated column;
+- [ ] bounds/gap/progress;
+- [ ] selected plan highlighted independently;
 - [ ] exact component deltas;
-- [ ] первая цель, по которой recommendation победила;
-- [ ] что лучше и что хуже;
-- [ ] равные метрики;
-- [ ] technical boundaries.
+- [ ] mobile and dense desktop modes;
+- [ ] no page-level horizontal overflow.
 
-### Quality
+## 19. Mixed physical product sizes
 
-- [ ] pure table model tests;
-- [ ] no recalculation on filter/sort;
-- [ ] desktop Chromium evidence;
-- [ ] mobile Chromium evidence;
-- [ ] selected scheme/report/PDF regression;
-- [ ] release checkpoint.
+После G2 и stable R-loop:
 
-## 5. Расширение search space после M7.6
+- [ ] multiple product rectangles on one sheet;
+- [ ] compatibility groups;
+- [ ] individual bleed/gap/cut;
+- [ ] common/separate cut constraints;
+- [ ] multiple valid packings;
+- [ ] cutting complexity;
+- [ ] compare uniform and mixed patterns;
+- [ ] supplied fixture remains validation oracle;
+- [ ] no automatic claim from a manually supplied layout.
 
-Нельзя выполнять одним гигантским PR. Каждый новый plan-family — отдельный bounded patch с собственной полнотой и validation.
+## 20. One-sided, folded and advanced duplex products
 
-### 5.1 Additional uniform plan-family
+### Simplex/odd
 
-- [ ] частично заполненные формы;
-- [ ] controlled pair mixing;
-- [ ] несколько event run lengths;
-- [ ] bounded sequences of forms;
-- [ ] explicit search limits;
-- [ ] truncation status;
-- [ ] deterministic signatures;
-- [ ] no duplicate production-equivalent plans;
-- [ ] lossless retention of materially different plans.
+Базовая support уже есть частично; после new architecture требуется regression parity:
 
-### 5.2 User-driven work-and-turn
-
-- [ ] eligibility detection;
-- [ ] symmetric shared-form candidates;
-- [ ] horizontal axis search;
-- [ ] separate vs work-and-turn in one user catalog;
-- [ ] exact forms/plates/passes/cost;
-- [ ] operator machine warning;
-- [ ] no automatic compatibility claim;
-- [ ] later vertical axis as separate patch.
-
-### 5.3 Search completeness contract
-
-- [ ] describe each bounded search family;
-- [ ] expose candidate counts;
-- [ ] expose truncation/time limits;
-- [ ] distinguish `complete within scope`, `feasible`, `lower bound reached`;
-- [ ] never label partial search as global all-options search.
-
-## 6. M8.1 — automatic mixed-format packing
-
-- [ ] different product rectangles on one sheet;
-- [ ] sheet/printable boundaries;
-- [ ] individual bleed/gap;
-- [ ] no overlap;
-- [ ] deterministic result;
-- [ ] free-area explanation;
-- [ ] control fixture `1×A4 + 2×A5 + 8×A6`;
-- [ ] compare mixed packing with uniform plans;
-- [ ] multiple valid packings retained.
-
-## 7. M8.2 — mixed rotations and cutting
-
-- [ ] `0°` и `90°` на одном sheet;
-- [ ] common-cut constraints;
-- [ ] separate-cut constraints;
-- [ ] grouping identical products;
-- [ ] cutting complexity metrics;
-- [ ] assembly convenience metrics;
-- [ ] optional explicit cutting cost;
-- [ ] no hidden heuristic penalty.
-
-## 8. M8.3 — full order-row model
-
-Каждая строка должна иметь собственные:
-
-- [ ] file/name;
-- [ ] quantity;
-- [ ] pages;
-- [ ] width/height;
-- [ ] bleed;
-- [ ] gap/cutting mode;
-- [ ] front colors;
-- [ ] back colors;
-- [ ] allowed duplex strategy;
-- [ ] paper/material profile;
-- [ ] note;
-- [ ] status/errors.
-
-UI:
-
-- [ ] add/edit;
-- [ ] duplicate;
-- [ ] delete;
-- [ ] reorder;
-- [ ] bulk paste/import;
-- [ ] one invalid row does not delete valid rows.
-
-## 9. M8.4 — one-sided, odd and folded products
-
-### One-sided and odd pages
-
-- [ ] explicit one-sided job;
+- [ ] explicit simplex production family;
 - [ ] intentional blank back;
-- [ ] correct plates/forms/cost;
-- [ ] odd final page;
-- [ ] no fake back plate.
+- [ ] correct forms/plates/cost;
+- [ ] no fake side.
 
-### Multi-page imposition
+### Folded/signature imposition
 
-- [ ] decide 1.0 boundary for 8/16/32 pages;
-- [ ] either implement signature/folding imposition;
-- [ ] or explicitly limit stable to sequential pairs;
-- [ ] page-order validation after folding;
-- [ ] orientation/turn validation.
+- [ ] separate product family;
+- [ ] signatures and folding rules;
+- [ ] creep/binding direction;
+- [ ] page order after folding;
+- [ ] no mixing with flat gang-run assumptions.
 
-## 10. M8.5 — project persistence and portability
+### Advanced duplex
+
+- [ ] work-and-tumble;
+- [ ] perfecting;
+- [ ] machine-specific transforms;
+- [ ] independent fixtures and warnings.
+
+## 21. Persistence and portability
 
 - [ ] versioned project schema;
-- [ ] auto-save latest state;
-- [ ] `localStorage`;
-- [ ] export JSON;
-- [ ] import JSON;
-- [ ] validation and migration;
+- [ ] auto-save input/operator state;
+- [ ] JSON export/import;
+- [ ] migrations;
+- [ ] case library export/import;
 - [ ] pricing profile;
 - [ ] objective preference;
-- [ ] selected plan reference;
-- [ ] safe recovery from corrupted/incompatible file;
-- [ ] clear/reset workflow.
+- [ ] selected plan reference with recalculation;
+- [ ] safe recovery from corrupted/incompatible data.
 
-## 11. M8.6 — profitability model
+## 22. Cost and profitability
 
-Сейчас есть cost, но нет revenue/profit.
-
-- [ ] sale price or order revenue;
+- [ ] cutting/setup/changeover costs;
+- [ ] finishing/binding;
+- [ ] revenue;
 - [ ] profit/loss;
-- [ ] margin percent;
-- [ ] minimum margin threshold;
-- [ ] cost of cutting;
-- [ ] folding/binding/finishing costs;
-- [ ] transport/other explicit components;
-- [ ] unprofitable status;
+- [ ] margin;
+- [ ] explicit business thresholds;
 - [ ] unprofitable plans remain visible;
-- [ ] no hidden business coefficient;
-- [ ] exact explanation of loss.
+- [ ] no hidden coefficients.
 
-## 12. M8.7 — heavy search worker
+## 23. Beta matrix
 
-- [ ] Web Worker or equivalent isolated search;
-- [ ] progress events;
-- [ ] cancel;
-- [ ] time budget;
-- [ ] memory/candidate budget;
-- [ ] partial results marked incomplete;
-- [ ] deterministic resume/retry if feasible;
-- [ ] UI remains responsive;
-- [ ] safe error recovery;
-- [ ] no private data upload.
-
-## 13. M8.8 — compactness, accessibility and parity
-
-- [ ] super-compact mobile mode;
-- [ ] dense desktop operator mode;
-- [ ] collapsible sections;
-- [ ] keyboard navigation;
-- [ ] visible focus;
-- [ ] screen-reader labels;
-- [ ] color-independent states;
-- [ ] large touch targets;
-- [ ] RU/EN feature parity;
-- [ ] no horizontal overflow except local dense tables;
-- [ ] performance on large catalogs.
-
-## 14. Beta matrix
-
-### B1 — production combinations
-
-- [ ] all current sheet presets;
-- [ ] arbitrary sheet sizes;
-- [ ] A4/A5/A6 and custom products;
-- [ ] grammage/price variations;
-- [ ] bleed `0/2/5`;
-- [ ] common/separate cut;
-- [ ] separate/work-and-turn;
-- [ ] one-sided/duplex;
-- [ ] odd/multipage;
+- [ ] all sheet presets and arbitrary sheets;
+- [ ] standard and custom products;
+- [ ] square, narrow and wide rectangles;
 - [ ] equal and very different quantities;
-- [ ] zero/max margins and trim;
-- [ ] real anonymized work orders.
+- [ ] 1..capacity kinds in small fixtures;
+- [ ] large anonymized orders;
+- [ ] simplex/separate/work-and-turn;
+- [ ] odd pages;
+- [ ] multiple colors;
+- [ ] trim/margins/bleed/gap extremes;
+- [ ] mixed orientations;
+- [ ] mixed product sizes;
+- [ ] machine zones/defects;
+- [ ] browser/performance matrix;
+- [ ] worker failure recovery.
 
-### B2 — technology boundaries
+## 24. Release and root cutover
 
-- [ ] machine profiles or explicit operator-only checks;
-- [ ] gripper/side-lay rules;
-- [ ] work-and-turn compatibility warnings;
-- [ ] folding boundary;
-- [ ] printable geometry edge cases.
+`0.7.0-alpha.6` не создаётся автоматически только из-за завершения research/docs.
 
-### B3 — stability
+Перед выпуском:
 
-- [ ] stress tests;
-- [ ] browser matrix;
-- [ ] GitHub Pages verification;
-- [ ] project migrations;
-- [ ] worker failure recovery;
-- [ ] performance budgets.
-
-## 15. RC and stable
-
-### RC1
-
-- [ ] feature freeze;
-- [ ] full geometry/production/cost audit;
-- [ ] security/workflow/secret audit;
-- [ ] user guide;
-- [ ] real examples;
-- [ ] clean public page;
-- [ ] final evidence package.
-
-### 1.0.0
-
-- [ ] only RC blockers;
+- [ ] owner acceptance текущего `/app/`;
+- [ ] определить точную функциональную границу alpha.6;
+- [ ] exact-head Quality;
+- [ ] exact-head Chromium/PDF;
+- [ ] focused evidence manually reviewed;
+- [ ] current docs/status/version/changelog;
 - [ ] recovery branch;
 - [ ] immutable tag;
-- [ ] GitHub Release;
-- [ ] final uNews/Telegram post;
-- [ ] archive policy;
-- [ ] next-version policy.
+- [ ] GitHub prerelease and assets;
+- [ ] root cutover только по отдельному подтверждению.
 
-## 16. Known non-blocking debt
-
-- [ ] issue `#40`: replace bad image of Telegram message `@uNewsLog/76` for `0.7.0-alpha.2` using uNews `edit:media`;
-- [ ] do not delete/repost the Telegram message;
-- [ ] verify final media visually and update uNews state.
-
-## 17. Principles that must survive every milestone
+## 25. Принципы, которые сохраняются до 1.0
 
 - user chooses; software recommends;
-- all feasible variants inside stated scope remain available;
-- filters never delete catalog data;
-- underproduction is forbidden;
-- back is derived from front;
-- pricing is explicit;
-- missing money is not zero;
+- zero underproduction;
+- geometry and production are separate layers;
+- back/shared plate comes from one verified structure;
 - layout forms and color plates stay separate;
-- paper minimum is not global business optimum;
-- manual fixtures are not automatic solvers;
-- truncated search is visibly truncated;
-- every published patch gets full release evidence and immutable recovery checkpoint.
+- missing money is not zero;
+- feasible alternatives inside declared scope are not hidden;
+- structural variants are not merged by metrics alone;
+- heuristic is not proof;
+- truncation is visible;
+- external and saved plans are revalidated;
+- operator cases are memory, not hardcoded answers;
+- PDF/report use the exact selected plan;
+- every release has immutable evidence and recovery checkpoint.
