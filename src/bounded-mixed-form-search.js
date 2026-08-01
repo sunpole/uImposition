@@ -7,7 +7,7 @@ export const BOUNDED_SEARCH_COVERAGE = Object.freeze({
 });
 
 export const BOUNDED_SEARCH_TRUNCATION_REASONS = Object.freeze({
-  CANDIDATE_FORM_LIMIT: "candidateFormLimit",
+  CANDIDATE_IMPOSITION_LIMIT: "candidateImpositionLimit",
   STATE_LIMIT: "stateLimit",
   TIME_BUDGET: "timeBudget",
   CANCELLED: "cancelled",
@@ -138,17 +138,17 @@ function normalizeDuplexModes(duplexModes) {
 }
 
 export function createBoundedSearchLimits({
-  maxForms,
-  maxCandidateForms,
+  maxImpositions,
+  maxCandidateImpositions,
   maxStates,
   timeBudgetMs,
   maxRunLength = null,
 } = {}) {
   return deepFreeze({
-    maxForms: requirePositiveInteger(maxForms, "limits.maxForms"),
-    maxCandidateForms: requirePositiveInteger(
-      maxCandidateForms,
-      "limits.maxCandidateForms",
+    maxImpositions: requirePositiveInteger(maxImpositions, "limits.maxImpositions"),
+    maxCandidateImpositions: requirePositiveInteger(
+      maxCandidateImpositions,
+      "limits.maxCandidateImpositions",
     ),
     maxStates: requirePositiveInteger(maxStates, "limits.maxStates"),
     timeBudgetMs: requirePositiveInteger(timeBudgetMs, "limits.timeBudgetMs"),
@@ -198,7 +198,7 @@ export function createBoundedMixedFormSearchRequest({
     duplexModes: normalizedDuplexModes,
     allowPartialForms,
     allowPairMixing,
-    maxForms: normalizedLimits.maxForms,
+    maxImpositions: normalizedLimits.maxImpositions,
     maxRunLength: normalizedLimits.maxRunLength,
   };
   const requestedSpaceSignature = stableStringify(requestedSpace);
@@ -234,10 +234,10 @@ function normalizeCandidateCell(cell, index) {
 }
 
 /**
- * Produces a structural signature. Cell order and blanks are intentional: two forms
+ * Produces a structural signature. Cell order and blanks are intentional: two impositions
  * with equal metrics but different production layouts must remain distinguishable.
  */
-export function createCandidateFormSignature({
+export function createCandidateImpositionSignature({
   rows,
   columns,
   rotation,
@@ -258,12 +258,23 @@ export function createCandidateFormSignature({
   const normalizedTurnMode = turnMode === null || turnMode === undefined
     ? null
     : requireNonEmptyString(turnMode, "turnMode");
+  if (normalizedDuplexMode === "workAndTurn" && normalizedTurnMode === null) {
+    throw new RangeError("workAndTurn candidate imposition requires turnMode");
+  }
+  if (normalizedDuplexMode !== "workAndTurn" && normalizedTurnMode !== null) {
+    throw new RangeError("turnMode is only valid for workAndTurn candidate impositions");
+  }
   if (!Array.isArray(cells) || cells.length !== normalizedRows * normalizedColumns) {
     throw new RangeError(`cells must contain exactly ${normalizedRows * normalizedColumns} entries`);
   }
   const normalizedCells = cells.map(normalizeCandidateCell);
+  normalizedCells.forEach((cell, index) => {
+    if (cell !== null && cell.frontPage === null && cell.backPage === null) {
+      throw new RangeError(`cells[${index}] must contain frontPage or backPage`);
+    }
+  });
   if (normalizedCells.every((cell) => cell === null)) {
-    throw new RangeError("candidate form must contain at least one occupied cell");
+    throw new RangeError("candidate imposition must contain at least one occupied cell");
   }
   return stableStringify({
     v: 1,
@@ -278,30 +289,31 @@ export function createCandidateFormSignature({
 
 function normalizeSequenceEntry(entry, index) {
   requireObject(entry, `entries[${index}]`);
-  const formSignature = entry.formSignature
-    ? requireNonEmptyString(entry.formSignature, `entries[${index}].formSignature`)
-    : createCandidateFormSignature(entry.form);
+  const impositionSignature = entry.impositionSignature
+    ? requireNonEmptyString(entry.impositionSignature, `entries[${index}].impositionSignature`)
+    : createCandidateImpositionSignature(entry.imposition);
   return {
-    formSignature,
+    impositionSignature,
     runLength: requirePositiveInteger(entry.runLength, `entries[${index}].runLength`),
   };
 }
 
 /**
- * Canonicalizes a production sequence as a multiset of structural forms and integer
+ * Canonicalizes a production sequence as a multiset of structural impositions and integer
  * run lengths. Permuting identical press runs does not create a new production plan.
  */
-export function createFormSequenceSignature(entries) {
+export function createImpositionSequenceSignature(entries) {
   if (!Array.isArray(entries) || entries.length === 0) {
     throw new TypeError("entries must be a non-empty array");
   }
-  const runLengthByForm = new Map();
-  entries.map(normalizeSequenceEntry).forEach(({ formSignature, runLength }) => {
-    runLengthByForm.set(formSignature, (runLengthByForm.get(formSignature) ?? 0) + runLength);
+  const runLengthByImposition = new Map();
+  entries.map(normalizeSequenceEntry).forEach(({ impositionSignature, runLength }) => {
+    const total = (runLengthByImposition.get(impositionSignature) ?? 0) + runLength;
+    runLengthByImposition.set(impositionSignature, total);
   });
-  const canonicalEntries = [...runLengthByForm]
+  const canonicalEntries = [...runLengthByImposition]
     .sort(([left], [right]) => left.localeCompare(right, "en"));
-  return stableStringify({ v: 1, forms: canonicalEntries });
+  return stableStringify({ v: 1, impositions: canonicalEntries });
 }
 
 function requireSearchRequest(request) {
@@ -347,8 +359,8 @@ export function calculateSearchLowerBounds(request, demand = request?.demand) {
 }
 
 export function createBoundedSearchCounters({
-  candidateFormsGenerated = 0,
-  candidateFormsAccepted = 0,
+  candidateImpositionsGenerated = 0,
+  candidateImpositionsAccepted = 0,
   statesExpanded = 0,
   statesPrunedByBound = 0,
   statesPrunedByDominance = 0,
@@ -356,13 +368,13 @@ export function createBoundedSearchCounters({
   elapsedMs = 0,
 } = {}) {
   const counters = {
-    candidateFormsGenerated: requireNonNegativeInteger(
-      candidateFormsGenerated,
-      "counters.candidateFormsGenerated",
+    candidateImpositionsGenerated: requireNonNegativeInteger(
+      candidateImpositionsGenerated,
+      "counters.candidateImpositionsGenerated",
     ),
-    candidateFormsAccepted: requireNonNegativeInteger(
-      candidateFormsAccepted,
-      "counters.candidateFormsAccepted",
+    candidateImpositionsAccepted: requireNonNegativeInteger(
+      candidateImpositionsAccepted,
+      "counters.candidateImpositionsAccepted",
     ),
     statesExpanded: requireNonNegativeInteger(statesExpanded, "counters.statesExpanded"),
     statesPrunedByBound: requireNonNegativeInteger(
@@ -379,8 +391,8 @@ export function createBoundedSearchCounters({
     ),
     elapsedMs: requireNonNegativeNumber(elapsedMs, "counters.elapsedMs"),
   };
-  if (counters.candidateFormsAccepted > counters.candidateFormsGenerated) {
-    throw new RangeError("candidateFormsAccepted cannot exceed candidateFormsGenerated");
+  if (counters.candidateImpositionsAccepted > counters.candidateImpositionsGenerated) {
+    throw new RangeError("candidateImpositionsAccepted cannot exceed candidateImpositionsGenerated");
   }
   return deepFreeze(counters);
 }
@@ -403,14 +415,14 @@ function normalizeTruncationReasons(reasons) {
 
 /**
  * Final coverage contract for one bounded run. Completeness is legal only when every
- * candidate in the declared requested space was generated; global completeness is
+ * candidate imposition in the declared requested space was generated; global completeness is
  * deliberately impossible to claim through this API.
  */
 export function createBoundedSearchCoverage({
   request,
   counters = {},
   enumerationComplete,
-  theoreticalCandidateFormCount = null,
+  theoreticalCandidateImpositionCount = null,
   truncationReasons = [],
 } = {}) {
   const normalizedRequest = requireSearchRequest(request);
@@ -419,16 +431,21 @@ export function createBoundedSearchCoverage({
     throw new TypeError("enumerationComplete must be boolean");
   }
   const normalizedReasons = normalizeTruncationReasons(truncationReasons);
-  const normalizedTheoreticalCount = theoreticalCandidateFormCount === null
-    || theoreticalCandidateFormCount === undefined
+  const normalizedTheoreticalCount = theoreticalCandidateImpositionCount === null
+    || theoreticalCandidateImpositionCount === undefined
     ? null
     : requireNonNegativeInteger(
-      theoreticalCandidateFormCount,
-      "theoreticalCandidateFormCount",
+      theoreticalCandidateImpositionCount,
+      "theoreticalCandidateImpositionCount",
     );
 
-  if (normalizedCounters.candidateFormsGenerated > normalizedRequest.limits.maxCandidateForms) {
-    throw new RangeError("candidateFormsGenerated exceeds request.limits.maxCandidateForms");
+  if (
+    normalizedCounters.candidateImpositionsGenerated
+    > normalizedRequest.limits.maxCandidateImpositions
+  ) {
+    throw new RangeError(
+      "candidateImpositionsGenerated exceeds request.limits.maxCandidateImpositions",
+    );
   }
   if (normalizedCounters.statesExpanded > normalizedRequest.limits.maxStates) {
     throw new RangeError("statesExpanded exceeds request.limits.maxStates");
@@ -438,11 +455,11 @@ export function createBoundedSearchCoverage({
       throw new RangeError("Complete coverage cannot have truncation reasons");
     }
     if (normalizedTheoreticalCount === null) {
-      throw new RangeError("Complete coverage requires theoreticalCandidateFormCount");
+      throw new RangeError("Complete coverage requires theoreticalCandidateImpositionCount");
     }
-    if (normalizedTheoreticalCount !== normalizedCounters.candidateFormsGenerated) {
+    if (normalizedTheoreticalCount !== normalizedCounters.candidateImpositionsGenerated) {
       throw new RangeError(
-        "Complete coverage requires generated candidates to equal theoreticalCandidateFormCount",
+        "Complete coverage requires generated candidates to equal theoreticalCandidateImpositionCount",
       );
     }
   } else if (normalizedReasons.length === 0) {
@@ -457,7 +474,7 @@ export function createBoundedSearchCoverage({
       : BOUNDED_SEARCH_COVERAGE.TRUNCATED,
     completeWithinRequestedSpace: enumerationComplete,
     globalCompletenessClaimed: false,
-    theoreticalCandidateFormCount: normalizedTheoreticalCount,
+    theoreticalCandidateImpositionCount: normalizedTheoreticalCount,
     truncationReasons: normalizedReasons,
     counters: normalizedCounters,
   });

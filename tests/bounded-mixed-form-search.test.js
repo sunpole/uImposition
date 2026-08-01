@@ -10,9 +10,9 @@ import {
   createBoundedSearchCounters,
   createBoundedSearchCoverage,
   createBoundedSearchLimits,
-  createCandidateFormSignature,
+  createCandidateImpositionSignature,
   createDemandSignature,
-  createFormSequenceSignature,
+  createImpositionSequenceSignature,
 } from "../src/bounded-mixed-form-search.js";
 
 function request(overrides = {}) {
@@ -29,8 +29,8 @@ function request(overrides = {}) {
     ],
     duplexModes: ["separateFrontBackForms"],
     limits: {
-      maxForms: 4,
-      maxCandidateForms: 500,
+      maxImpositions: 4,
+      maxCandidateImpositions: 500,
       maxStates: 25000,
       timeBudgetMs: 5000,
     },
@@ -54,23 +54,23 @@ const pairB = { pairId: "b:1", frontPage: 1, backPage: 2 };
 
 test("search limits require explicit positive bounds", () => {
   assert.deepEqual(createBoundedSearchLimits({
-    maxForms: 4,
-    maxCandidateForms: 100,
+    maxImpositions: 4,
+    maxCandidateImpositions: 100,
     maxStates: 1000,
     timeBudgetMs: 5000,
   }), {
-    maxForms: 4,
-    maxCandidateForms: 100,
+    maxImpositions: 4,
+    maxCandidateImpositions: 100,
     maxStates: 1000,
     timeBudgetMs: 5000,
     maxRunLength: null,
   });
   assert.throws(() => createBoundedSearchLimits({
-    maxForms: 0,
-    maxCandidateForms: 100,
+    maxImpositions: 0,
+    maxCandidateImpositions: 100,
     maxStates: 1000,
     timeBudgetMs: 5000,
-  }), /maxForms/);
+  }), /maxImpositions/);
 });
 
 test("request canonicalization is independent from demand, grid, and duplex input order", () => {
@@ -112,54 +112,79 @@ test("demand signature keeps quantities but ignores input order", () => {
   );
 });
 
-test("candidate form signature preserves grid, duplex strategy, cell order, pages, and blanks", () => {
-  const original = createCandidateFormSignature(form([pairA, pairB, null, pairA]));
+test("candidate imposition signature preserves grid, duplex strategy, cell order, pages, and blanks", () => {
+  const original = createCandidateImpositionSignature(form([pairA, pairB, null, pairA]));
   assert.equal(
     original,
-    createCandidateFormSignature(form([pairA, pairB, null, pairA])),
+    createCandidateImpositionSignature(form([pairA, pairB, null, pairA])),
   );
   assert.notEqual(
     original,
-    createCandidateFormSignature(form([pairB, pairA, null, pairA])),
+    createCandidateImpositionSignature(form([pairB, pairA, null, pairA])),
   );
   assert.notEqual(
     original,
-    createCandidateFormSignature(form([pairA, pairB, pairA, null])),
+    createCandidateImpositionSignature(form([pairA, pairB, pairA, null])),
   );
   assert.notEqual(
     original,
-    createCandidateFormSignature(form([pairA, pairB, null, pairA], { rotation: 90 })),
+    createCandidateImpositionSignature(form([pairA, pairB, null, pairA], { rotation: 90 })),
   );
   assert.notEqual(
     original,
-    createCandidateFormSignature(form([pairA, pairB, null, pairA], {
+    createCandidateImpositionSignature(form([pairA, pairB, null, pairA], {
       duplexMode: "workAndTurn",
       turnMode: "horizontalLeftToRight",
     })),
   );
 });
 
-test("candidate form signature rejects empty and incorrectly sized forms", () => {
-  assert.throws(() => createCandidateFormSignature(form([pairA])), /exactly 4/);
-  assert.throws(() => createCandidateFormSignature(form([null, null, null, null])), /occupied cell/);
+test("candidate imposition signature rejects empty and incorrectly sized impositions", () => {
+  assert.throws(() => createCandidateImpositionSignature(form([pairA])), /exactly 4/);
+  assert.throws(() => createCandidateImpositionSignature(form([null, null, null, null])), /occupied cell/);
 });
 
-test("form sequence signature ignores run ordering and combines identical form runs", () => {
-  const formA = createCandidateFormSignature(form([pairA, pairA, null, null]));
-  const formB = createCandidateFormSignature(form([pairB, null, pairB, null]));
-  const left = createFormSequenceSignature([
-    { formSignature: formB, runLength: 20 },
-    { formSignature: formA, runLength: 10 },
-    { formSignature: formA, runLength: 5 },
+test("candidate imposition signature enforces duplex and page identity", () => {
+  assert.throws(() => createCandidateImpositionSignature(form([
+    { pairId: "a:1", frontPage: null, backPage: null },
+    null,
+    null,
+    null,
+  ])), /frontPage or backPage/);
+  assert.throws(() => createCandidateImpositionSignature(form([
+    pairA,
+    null,
+    null,
+    null,
+  ], {
+    duplexMode: "workAndTurn",
+  })), /requires turnMode/);
+  assert.throws(() => createCandidateImpositionSignature(form([
+    pairA,
+    null,
+    null,
+    null,
+  ], {
+    turnMode: "horizontalLeftToRight",
+  })), /only valid for workAndTurn/);
+});
+
+test("imposition sequence signature ignores run ordering and combines identical imposition runs", () => {
+  const impositionA = createCandidateImpositionSignature(form([pairA, pairA, null, null]));
+  const impositionB = createCandidateImpositionSignature(form([pairB, null, pairB, null]));
+  const left = createImpositionSequenceSignature([
+    { impositionSignature: impositionB, runLength: 20 },
+    { impositionSignature: impositionA, runLength: 10 },
+    { impositionSignature: impositionA, runLength: 5 },
   ]);
-  const right = createFormSequenceSignature([
-    { formSignature: formA, runLength: 15 },
-    { formSignature: formB, runLength: 20 },
+  const right = createImpositionSequenceSignature([
+    { impositionSignature: impositionA, runLength: 15 },
+    { impositionSignature: impositionB, runLength: 20 },
   ]);
   assert.equal(left, right);
-  assert.notEqual(left, createFormSequenceSignature([
-    { formSignature: formA, runLength: 14 },
-    { formSignature: formB, runLength: 20 },
+  assert.notEqual(left, createImpositionSequenceSignature([
+    { impositionSignature: impositionA, runLength: 14 },
+    { impositionSignature: impositionB, runLength: 20 },
   ]));
 });
 
@@ -195,8 +220,8 @@ test("work-and-turn lowers only the safe layout-form bound", () => {
 
 test("search counters are immutable and reject impossible candidate counts", () => {
   const counters = createBoundedSearchCounters({
-    candidateFormsGenerated: 20,
-    candidateFormsAccepted: 12,
+    candidateImpositionsGenerated: 20,
+    candidateImpositionsAccepted: 12,
     statesExpanded: 200,
     statesPrunedByBound: 40,
     statesPrunedByDominance: 30,
@@ -205,8 +230,8 @@ test("search counters are immutable and reject impossible candidate counts", () 
   });
   assert.equal(Object.isFrozen(counters), true);
   assert.throws(() => createBoundedSearchCounters({
-    candidateFormsGenerated: 2,
-    candidateFormsAccepted: 3,
+    candidateImpositionsGenerated: 2,
+    candidateImpositionsAccepted: 3,
   }), /cannot exceed/);
 });
 
@@ -215,8 +240,8 @@ test("complete coverage is claimed only for the declared requested space", () =>
   const coverage = createBoundedSearchCoverage({
     request: searchRequest,
     counters: {
-      candidateFormsGenerated: 120,
-      candidateFormsAccepted: 80,
+      candidateImpositionsGenerated: 120,
+      candidateImpositionsAccepted: 80,
       statesExpanded: 2000,
       statesPrunedByBound: 500,
       statesPrunedByDominance: 300,
@@ -224,7 +249,7 @@ test("complete coverage is claimed only for the declared requested space", () =>
       elapsedMs: 750,
     },
     enumerationComplete: true,
-    theoreticalCandidateFormCount: 120,
+    theoreticalCandidateImpositionCount: 120,
   });
 
   assert.equal(coverage.kind, BOUNDED_MIXED_FORM_SEARCH_COVERAGE_KIND);
@@ -239,17 +264,17 @@ test("truncated coverage records all deterministic stop reasons without claiming
   const coverage = createBoundedSearchCoverage({
     request: request(),
     counters: {
-      candidateFormsGenerated: 500,
-      candidateFormsAccepted: 320,
+      candidateImpositionsGenerated: 500,
+      candidateImpositionsAccepted: 320,
       statesExpanded: 25000,
       feasiblePlansFound: 7,
       elapsedMs: 5001,
     },
     enumerationComplete: false,
-    theoreticalCandidateFormCount: null,
+    theoreticalCandidateImpositionCount: null,
     truncationReasons: [
       BOUNDED_SEARCH_TRUNCATION_REASONS.TIME_BUDGET,
-      BOUNDED_SEARCH_TRUNCATION_REASONS.CANDIDATE_FORM_LIMIT,
+      BOUNDED_SEARCH_TRUNCATION_REASONS.CANDIDATE_IMPOSITION_LIMIT,
       BOUNDED_SEARCH_TRUNCATION_REASONS.STATE_LIMIT,
     ],
   });
@@ -258,7 +283,7 @@ test("truncated coverage records all deterministic stop reasons without claiming
   assert.equal(coverage.completeWithinRequestedSpace, false);
   assert.equal(coverage.globalCompletenessClaimed, false);
   assert.deepEqual(coverage.truncationReasons, [
-    "candidateFormLimit",
+    "candidateImpositionLimit",
     "stateLimit",
     "timeBudget",
   ]);
@@ -268,26 +293,26 @@ test("coverage rejects contradictory or out-of-budget claims", () => {
   const searchRequest = request();
   assert.throws(() => createBoundedSearchCoverage({
     request: searchRequest,
-    counters: { candidateFormsGenerated: 10 },
+    counters: { candidateImpositionsGenerated: 10 },
     enumerationComplete: true,
-    theoreticalCandidateFormCount: 10,
+    theoreticalCandidateImpositionCount: 10,
     truncationReasons: [BOUNDED_SEARCH_TRUNCATION_REASONS.CANCELLED],
   }), /cannot have truncation/);
   assert.throws(() => createBoundedSearchCoverage({
     request: searchRequest,
-    counters: { candidateFormsGenerated: 10 },
+    counters: { candidateImpositionsGenerated: 10 },
     enumerationComplete: false,
   }), /requires at least one/);
   assert.throws(() => createBoundedSearchCoverage({
     request: searchRequest,
-    counters: { candidateFormsGenerated: 501 },
+    counters: { candidateImpositionsGenerated: 501 },
     enumerationComplete: false,
-    truncationReasons: [BOUNDED_SEARCH_TRUNCATION_REASONS.CANDIDATE_FORM_LIMIT],
+    truncationReasons: [BOUNDED_SEARCH_TRUNCATION_REASONS.CANDIDATE_IMPOSITION_LIMIT],
   }), /exceeds request/);
   assert.throws(() => createBoundedSearchCoverage({
     request: searchRequest,
-    counters: { candidateFormsGenerated: 9 },
+    counters: { candidateImpositionsGenerated: 9 },
     enumerationComplete: true,
-    theoreticalCandidateFormCount: 10,
+    theoreticalCandidateImpositionCount: 10,
   }), /equal theoretical/);
 });
