@@ -1,0 +1,59 @@
+{
+  "id": "r3-control-order-compact-rows-mobile",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "[data-txt-import-controls] button:first-child",
+      "text": "Тест: 20 файлов · 1+1"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "click",
+      "selector": "[data-txt-import-controls] button:first-child"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 2200
+    },
+    {
+      "action": "click",
+      "selector": "[data-mobile-screen='order']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 350
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='name']",
+      "value": "70"
+    },
+    {
+      "selector": "[data-product-row]:nth-child(20) [data-product-field='name']",
+      "value": "20"
+    },
+    {
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.frontColors']",
+      "value": "1"
+    },
+    {
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.backColors']",
+      "value": "1"
+    },
+    {
+      "selector": "[data-product-row]:nth-child(20)",
+      "text": "Дополнительно"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": ".products-panel",
+  "screenshot": "uimposition-r3-control-order-compact-rows-mobile.png"
+}
