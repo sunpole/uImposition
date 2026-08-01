@@ -1,0 +1,81 @@
+{
+  "id": "r3-work-and-turn-shared-plate-pdf",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#orderTitle",
+      "text": "Выберите рабочий пресет"
+    }
+  ],
+  "beforeDownload": [
+    {
+      "action": "wait",
+      "timeoutMs": 900
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row]:nth-child(1) .product-row__details summary"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='pages']",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.frontColors']",
+      "value": "4"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.backColors']",
+      "value": "1"
+    },
+    {
+      "action": "select",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.duplexPreference']",
+      "value": "workAndTurn"
+    },
+    {
+      "action": "waitForHidden",
+      "selector": "#calculationError",
+      "timeoutMs": 10000
+    },
+    {
+      "action": "click",
+      "selector": ".topbar [data-open-screen='layout']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 700
+    }
+  ],
+  "download": {
+    "selector": "[data-workspace-pdf='schemes']",
+    "fileNamePattern": "^uImposition-uniform-r(0|90)-work-and-turn-dedicated-pairs-schemes\\.pdf$",
+    "artifact": "uimposition-r3-work-and-turn-shared-plate.pdf",
+    "expectedPages": 1
+  },
+  "afterDownloadAssertions": [
+    {
+      "selector": "[data-workspace-export-status]",
+      "text": "Скачан"
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-layout-rendered-view='shared']",
+      "text": "лицо"
+    },
+    {
+      "selector": "[data-workspace-export-status]",
+      "text": "Скачан"
+    }
+  ],
+  "screenshotSelector": ".screen--layout .screen-heading__actions",
+  "screenshot": "uimposition-r3-work-and-turn-shared-plate-download.png"
+}

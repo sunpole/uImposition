@@ -17,6 +17,8 @@ import {
 } from "../src/user-production-plans-runtime.js";
 import { createUserUniformProductionPlanSet } from "../src/user-uniform-production-plans.js";
 
+const workAndTurnId = "uniform-r90-work-and-turn-dedicated-pairs";
+
 function buildPlanSet() {
   return createUserUniformProductionPlanSet({
     pagePairs: expandPagePairs([
@@ -61,7 +63,7 @@ test("runtime priority presets change recommendation without overriding operator
   assert.equal(paper.planSet.plans, original.plans);
 
   const cost = applyUserProductionObjectivePreset(USER_OBJECTIVE_PRESETS.COST_FIRST);
-  assert.equal(cost.planSet.catalog.recommendedId, "uniform-r90-dedicated-pairs");
+  assert.equal(cost.planSet.catalog.recommendedId, workAndTurnId);
   assert.equal(cost.selectedPlanId, "uniform-r90-dedicated-pairs");
   assert.equal(cost.planSet.plans, original.plans);
   assert.equal(cost.planSet.reranking.regeneratedPlanCount, 0);
@@ -87,7 +89,7 @@ test("manual runtime move publishes a new ranking snapshot only", () => {
   rerankUserProductionPlans(order);
 
   const snapshot = getUserProductionPlanRuntime();
-  assert.equal(snapshot.planSet.catalog.recommendedId, "uniform-r90-dedicated-pairs");
+  assert.equal(snapshot.planSet.catalog.recommendedId, workAndTurnId);
   assert.equal(snapshot.planSet.plans, original.plans);
   assert.equal(snapshot.planSet.reranking.reusedGeneratedPlans, true);
   assert.equal(seen.at(-1).plans, original.plans);

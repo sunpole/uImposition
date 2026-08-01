@@ -1,18 +1,14 @@
 {
-  "id": "r3-odd-pages-4-plus-1-desktop",
+  "id": "r3-work-and-turn-shared-plate-layout",
   "path": "/app/",
   "viewport": {
-    "width": 1440,
+    "width": 1280,
     "height": 900
   },
   "assertions": [
     {
       "selector": "#orderTitle",
       "text": "Выберите рабочий пресет"
-    },
-    {
-      "selector": "#pricingButton",
-      "text": "Прайс"
     }
   ],
   "beforeScreenshot": [
@@ -21,9 +17,13 @@
       "timeoutMs": 900
     },
     {
+      "action": "click",
+      "selector": "[data-product-row]:nth-child(1) .product-row__details summary"
+    },
+    {
       "action": "fill",
       "selector": "[data-product-row]:nth-child(1) [data-product-field='pages']",
-      "value": "3"
+      "value": "2"
     },
     {
       "action": "fill",
@@ -36,25 +36,22 @@
       "value": "1"
     },
     {
+      "action": "select",
+      "selector": "[data-product-row]:nth-child(1) [data-product-field='print.duplexPreference']",
+      "value": "workAndTurn"
+    },
+    {
       "action": "waitForHidden",
       "selector": "#calculationError",
       "timeoutMs": 10000
     },
     {
       "action": "click",
-      "selector": ".topbar__nav [data-open-screen='layout']"
+      "selector": ".topbar [data-open-screen='layout']"
     },
     {
       "action": "wait",
       "timeoutMs": 700
-    },
-    {
-      "action": "click",
-      "selector": "[data-acceptance-layout='both']"
-    },
-    {
-      "action": "wait",
-      "timeoutMs": 250
     }
   ],
   "beforeScreenshotAssertions": [
@@ -63,27 +60,38 @@
       "hidden": true
     },
     {
-      "selector": "#layoutDetails",
-      "text": "Выбранный план"
+      "selector": ".screen--layout .segmented",
+      "text": "Общая форма"
     },
     {
-      "selector": ".layout-pair",
-      "text": "обр. —"
+      "selector": ".screen--layout .segmented [data-acceptance-layout='shared']",
+      "text": "Общая форма"
+    },
+    {
+      "selector": "[data-layout-rendered-view='shared']",
+      "text": "лицо"
+    },
+    {
+      "selector": "[data-layout-rendered-view='shared']",
+      "text": "обр."
+    },
+    {
+      "selector": "#layoutDetails",
+      "text": "Свой оборот"
+    },
+    {
+      "selector": "[data-work-and-turn-note]",
+      "text": "одна общая форма"
     },
     {
       "selector": "[data-workspace-pdf='schemes']",
       "text": "Схемы PDF"
-    },
-    {
-      "selector": "[data-workspace-pdf='report']",
-      "text": "Отчёт PDF"
     }
   ],
   "pageAssertions": {
     "noHorizontalOverflow": true,
-    "layoutFitsCanvas": true,
-    "mirroredBackDom": true
+    "layoutFitsCanvas": true
   },
   "screenshotSelector": ".screen--layout",
-  "screenshot": "uimposition-r3-odd-pages-4-plus-1-desktop.png"
+  "screenshot": "uimposition-r3-work-and-turn-shared-plate-layout.png"
 }

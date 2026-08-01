@@ -83,11 +83,11 @@
     },
     {
       "selector": "#userProductionPlans",
-      "text": "4 варианта"
+      "text": "5 варианта"
     },
     {
       "selector": "#userProductionPlans",
-      "text": "Все · 4"
+      "text": "Все · 5"
     },
     {
       "selector": "#userProductionPlans",
@@ -102,11 +102,15 @@
       "text": "21"
     },
     {
-      "selector": "[data-plan-id='uniform-r90-dedicated-pairs']",
+      "selector": "[data-plan-id='uniform-r90-work-and-turn-dedicated-pairs']",
+      "text": "Свой оборот"
+    },
+    {
+      "selector": "[data-plan-id='uniform-r90-work-and-turn-dedicated-pairs']",
       "text": "Pareto"
     },
     {
-      "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]",
+      "selector": "[data-plan-id='uniform-r90-work-and-turn-dedicated-pairs'] [data-select-user-plan]",
       "text": "Выбрать"
     }
   ],

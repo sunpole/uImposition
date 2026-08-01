@@ -15,18 +15,18 @@ import {
   resolveOperatorWorkspaceCalculation,
 } from "../src/operator-workspace-calculation.js";
 
-function validState() {
+function validState({ pages = 2, duplexPreference = "auto" } = {}) {
   return addApplicationProductRow(createDefaultApplicationState(), {
     name: "Листовка А6",
     finished: { widthMm: 105, heightMm: 148 },
     quantityPerVariant: 1000,
     variantCount: 2,
-    pages: 2,
+    pages,
     print: {
       mode: "duplex",
       frontColors: 4,
       backColors: 4,
-      duplexPreference: "auto",
+      duplexPreference,
     },
     bleed: { mode: "uniform", uniformMm: 0 },
     cut: { mode: "commonCut", gapMm: 0 },
@@ -41,7 +41,7 @@ test("operator workspace builds real uniform plans from application product rows
   assert.equal(result.summary.enabledRowCount, 1);
   assert.equal(result.summary.variantCount, 2);
   assert.equal(result.pagePairs.length, 2);
-  assert.equal(result.plans.length, 4);
+  assert.equal(result.plans.length, 5);
   assert.ok(result.plans.some(({ recommended }) => recommended));
   assert.equal(result.selectedPlanId, result.plans.find(({ recommended }) => recommended).id);
   assert.equal(result.layoutPreview.cells.length, result.layoutPreview.capacity);
@@ -53,6 +53,44 @@ test("operator workspace builds real uniform plans from application product rows
   assert.equal(result.geometry.printable.width, 608);
   assert.equal(result.pricingReady, false);
   assert.equal(result.selectedPlan.metrics.estimatedTotalCost, null);
+});
+
+test("operator duplex preference filters actual plan families", () => {
+  const separate = calculateOperatorWorkspace(validState({
+    duplexPreference: "separateFrontBackForms",
+  }));
+  assert.equal(separate.status, "ready");
+  assert.equal(separate.plans.length, 4);
+  assert.equal(separate.plans.every(({ duplexMode }) => (
+    duplexMode === "separateFrontBackForms"
+  )), true);
+
+  const workAndTurn = calculateOperatorWorkspace(validState({
+    duplexPreference: "workAndTurn",
+  }));
+  assert.equal(workAndTurn.status, "ready");
+  assert.equal(workAndTurn.plans.length, 1);
+  assert.equal(workAndTurn.selectedPlan.duplexMode, "workAndTurn");
+  assert.equal(workAndTurn.layoutPreview.duplexMode, "workAndTurn");
+  assert.equal(workAndTurn.layoutPreview.sharedPlate.samePlateForBothPasses, true);
+  assert.equal(workAndTurn.layoutPreview.sharedPlate.turnAxis, "horizontal");
+  assert.equal(
+    workAndTurn.layoutPreview.sharedPlate.cells.length,
+    workAndTurn.layoutPreview.capacity,
+  );
+});
+
+test("forced work-and-turn rejects an odd-page technical blank", () => {
+  const result = calculateOperatorWorkspace(validState({
+    pages: 3,
+    duplexPreference: "workAndTurn",
+  }));
+
+  assert.equal(result.status, "invalid");
+  assert.ok(result.issues.some(({ code }) => (
+    code === "uniformPipelineWorkAndTurnRequiresCompletePagePairs"
+  )));
+  assert.equal(result.planSet, null);
 });
 
 test("workspace preview exposes the core horizontal mirror: 1 2 3 4 becomes 4 3 2 1", () => {

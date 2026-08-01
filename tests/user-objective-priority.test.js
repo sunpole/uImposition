@@ -40,6 +40,7 @@ const pricing = createPricingProfile({
   colorPlatePrice: 15,
   layoutFormPreparationPrice: 2,
 });
+const workAndTurnId = "uniform-r90-work-and-turn-dedicated-pairs";
 
 function planSet(withPricing = true) {
   return createUserUniformProductionPlanSet({
@@ -66,7 +67,7 @@ test("cost-first and paper-first change recommendation while reusing exact plans
   assert.equal(paperFirst.reranking.regeneratedPlanCount, 0);
   assert.equal(costFirst.reranking.regeneratedPlanCount, 0);
   assert.equal(paperFirst.catalog.recommendedId, "uniform-r90-paper-minimum");
-  assert.equal(costFirst.catalog.recommendedId, "uniform-r90-dedicated-pairs");
+  assert.equal(costFirst.catalog.recommendedId, workAndTurnId);
   assert.notEqual(paperFirst.catalog.recommendedId, costFirst.catalog.recommendedId);
 });
 
@@ -97,7 +98,7 @@ test("forms preset moves the complete forms group to the front", () => {
     "impositionCount",
   ]);
   const reranked = rerankUserProductionPlanSet(original, order);
-  assert.equal(reranked.catalog.recommendedId, "uniform-r90-dedicated-pairs");
+  assert.equal(reranked.catalog.recommendedId, workAndTurnId);
 });
 
 test("cost objective and cost-first preset remain unavailable without pricing", () => {

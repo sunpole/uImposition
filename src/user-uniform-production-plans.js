@@ -1,4 +1,5 @@
 import { createBackLayout } from "./back-layout.js";
+import { DUPLEX_STRATEGIES } from "./duplex-strategies.js";
 import { buildFeasibleSolutionCatalog } from "./feasible-solution-catalog.js";
 import { createFrontLayout } from "./front-layout.js";
 import {
@@ -18,6 +19,10 @@ import {
 import { PRINT_SPECIFICATION_KIND } from "./print-specification.js";
 import { buildProductionReport } from "./production-report.js";
 import { createProductionReportSolutionMetrics } from "./production-solution-metrics.js";
+import {
+  createWorkAndTurnPlateLayout,
+  materializeWorkAndTurnImposition,
+} from "./work-and-turn-layout.js";
 
 export const USER_UNIFORM_PRODUCTION_PLAN_SET_KIND = "userUniformProductionPlanSet";
 export const USER_UNIFORM_PRODUCTION_PLAN_KIND = "userUniformProductionPlan";
@@ -25,11 +30,13 @@ export const USER_UNIFORM_PRODUCTION_PLAN_KIND = "userUniformProductionPlan";
 export const USER_UNIFORM_PLAN_FAMILY = Object.freeze({
   PAPER_MINIMUM: "paperMinimum",
   DEDICATED_PAIR_FORMS: "dedicatedPairForms",
+  WORK_AND_TURN_DEDICATED_PAIRS: "workAndTurnDedicatedPairs",
 });
 
-const SUPPORTED_FAMILIES = Object.freeze([
+const DECLARED_FAMILIES = Object.freeze([
   USER_UNIFORM_PLAN_FAMILY.PAPER_MINIMUM,
   USER_UNIFORM_PLAN_FAMILY.DEDICATED_PAIR_FORMS,
+  USER_UNIFORM_PLAN_FAMILY.WORK_AND_TURN_DEDICATED_PAIRS,
 ]);
 
 function requirePositiveInteger(value, label) {
@@ -190,6 +197,56 @@ function dedicatedPairRunDescriptors({ pagePairs, grid, idPrefix }) {
   }));
 }
 
+function workAndTurnEligible(grid) {
+  return grid.columns % 2 === 0;
+}
+
+function workAndTurnHalfRows(row, grid) {
+  const halfColumns = grid.columns / 2;
+  return Object.freeze(Array.from({ length: grid.rows }, () => Object.freeze(
+    Array.from({ length: halfColumns }, () => Object.freeze({
+      file: row.file,
+      frontPage: row.frontPage,
+    })),
+  )));
+}
+
+function workAndTurnDedicatedPairRunDescriptors({ pagePairs, grid, idPrefix }) {
+  if (!workAndTurnEligible(grid)) {
+    throw new RangeError("work-and-turn requires an even uniform-grid column count");
+  }
+
+  const demandState = createInitialDemandState(pagePairs);
+  return Object.freeze(demandState.rows.map((row, index) => {
+    const id = `${idPrefix}-PAIR-${String(index + 1).padStart(4, "0")}`;
+    const runLength = Math.ceil(row.requiredQuantity / grid.capacity);
+    const candidate = createImpositionCandidate({
+      id,
+      rows: grid.rows,
+      columns: grid.columns,
+      rotation: grid.rotation,
+      pagePairs,
+      blocks: [{
+        file: row.file,
+        frontPage: row.frontPage,
+        count: grid.capacity,
+      }],
+    });
+    const plate = createWorkAndTurnPlateLayout({
+      id,
+      runLength,
+      rows: grid.rows,
+      columns: grid.columns,
+      rotation: grid.rotation,
+      halfRows: workAndTurnHalfRows(row, grid),
+      pagePairs,
+    });
+    const imposition = materializeWorkAndTurnImposition({ plate, pagePairs });
+
+    return Object.freeze({ candidate, runLength, plate, imposition });
+  }));
+}
+
 function createPlan({
   id,
   label,
@@ -202,8 +259,9 @@ function createPlan({
   pricing,
   printSpecification,
   proof,
+  duplexMode = DUPLEX_STRATEGIES.SEPARATE_FRONT_BACK_FORMS,
 }) {
-  const report = buildProductionReport({ pagePairs, impositions: records });
+  const report = buildProductionReport({ pagePairs, impositions: records, duplexMode });
   if (!report.valid || report.totals.underproduction !== 0 || report.totals.fileUnderproduction !== 0) {
     throw new Error(`Generated plan ${id} is not production ready`);
   }
@@ -228,10 +286,12 @@ function createPlan({
     id,
     label,
     family,
+    duplexMode,
     grid,
     printSpecification,
     runDescriptors,
     impositions: records,
+    sharedPlates: Object.freeze(runDescriptors.map(({ plate }) => plate).filter(Boolean)),
     report,
     metrics,
     structure,
@@ -305,6 +365,42 @@ function dedicatedPairPlan({ pagePairs, grid, sourceSheet, pricing, printSpecifi
   });
 }
 
+function workAndTurnDedicatedPairPlan({
+  pagePairs,
+  grid,
+  sourceSheet,
+  pricing,
+  printSpecification,
+}) {
+  const id = `uniform-r${grid.rotation}-work-and-turn-dedicated-pairs`;
+  const runDescriptors = workAndTurnDedicatedPairRunDescriptors({
+    pagePairs,
+    grid,
+    idPrefix: `USER-R${grid.rotation}-WORK-AND-TURN`,
+  });
+  const records = Object.freeze(runDescriptors.map(({ imposition }) => imposition));
+
+  return createPlan({
+    id,
+    label: `Work-and-turn dedicated pairs · ${grid.rotation}° · ${grid.columns}×${grid.rows}`,
+    family: USER_UNIFORM_PLAN_FAMILY.WORK_AND_TURN_DEDICATED_PAIRS,
+    duplexMode: DUPLEX_STRATEGIES.WORK_AND_TURN,
+    grid,
+    pagePairs,
+    runDescriptors,
+    records,
+    sourceSheet,
+    pricing,
+    printSpecification,
+    proof: Object.freeze({
+      type: "constructedFeasible",
+      completeWithinFamily: true,
+      horizontalTurnOnly: true,
+      explanation: "Every page pair receives a symmetric shared plate; the shortest integer run satisfies its quantity after horizontal sheet turning.",
+    }),
+  });
+}
+
 function activeObjectiveIds(pricing) {
   const ids = pricing
     ? [...OPTIMIZATION_OBJECTIVE_IDS]
@@ -319,14 +415,39 @@ function activeObjectiveOrder(pricing, objectiveOrder) {
   return Object.freeze(requested.filter((id) => pricing || id !== "estimatedTotalCost"));
 }
 
+function plansForGrid({
+  pagePairs,
+  grid,
+  sourceSheet,
+  pricing,
+  printSpecification,
+}) {
+  const plans = [
+    paperMinimumPlan({ pagePairs, grid, sourceSheet, pricing, printSpecification }),
+    dedicatedPairPlan({ pagePairs, grid, sourceSheet, pricing, printSpecification }),
+  ];
+  if (workAndTurnEligible(grid)) {
+    plans.push(workAndTurnDedicatedPairPlan({
+      pagePairs,
+      grid,
+      sourceSheet,
+      pricing,
+      printSpecification,
+    }));
+  }
+  return plans;
+}
+
 /**
  * Builds real, independently validated production plans from the user's current
  * uniform product, page pairs, printable geometry and explicit duplex colors.
  *
- * The current requested search space is intentionally finite and transparent:
- * every fitting 0°/90° uniform grid × two complete plan families. The returned
- * catalog is exhaustive inside that declared family set, but never claims a
- * global enumeration of all possible imposition sequences or mixed layouts.
+ * The requested search space is finite and transparent: every fitting 0°/90°
+ * uniform grid receives the two separate-front/back families; grids with an even
+ * column count additionally receive the horizontally symmetric work-and-turn
+ * dedicated-pair family. The returned catalog is exhaustive inside that declared
+ * family set, but never claims a global enumeration of mixed layouts, arbitrary
+ * work-and-turn mixes or every possible imposition sequence.
  */
 export function createUserUniformProductionPlanSet({
   pagePairs,
@@ -341,22 +462,13 @@ export function createUserUniformProductionPlanSet({
   const normalizedSourceSheet = requireSourceSheet(sourceSheet);
   const normalizedPrintSpecification = requireDuplexPrintSpecification(printSpecification);
 
-  const plans = Object.freeze(grids.flatMap((grid) => [
-    paperMinimumPlan({
-      pagePairs: normalizedPagePairs,
-      grid,
-      sourceSheet: normalizedSourceSheet,
-      pricing,
-      printSpecification: normalizedPrintSpecification,
-    }),
-    dedicatedPairPlan({
-      pagePairs: normalizedPagePairs,
-      grid,
-      sourceSheet: normalizedSourceSheet,
-      pricing,
-      printSpecification: normalizedPrintSpecification,
-    }),
-  ]));
+  const plans = Object.freeze(grids.flatMap((grid) => plansForGrid({
+    pagePairs: normalizedPagePairs,
+    grid,
+    sourceSheet: normalizedSourceSheet,
+    pricing,
+    printSpecification: normalizedPrintSpecification,
+  })));
 
   const objectiveIds = activeObjectiveIds(pricing);
   const normalizedObjectiveOrder = activeObjectiveOrder(pricing, objectiveOrder);
@@ -366,23 +478,29 @@ export function createUserUniformProductionPlanSet({
       label: plan.label,
       family: plan.family,
       grid: plan.grid,
+      duplexMode: plan.duplexMode,
       metrics: plan.metrics,
     })),
     {
       objectiveIds,
       objectiveOrder: normalizedObjectiveOrder,
       searchCoverage: {
-        theoreticalCandidateCount: grids.length * SUPPORTED_FAMILIES.length,
+        theoreticalCandidateCount: plans.length,
         evaluatedCandidateCount: plans.length,
       },
     },
   );
 
+  const workAndTurnGrids = Object.freeze(grids.filter(workAndTurnEligible));
+  const supportedFamilies = Object.freeze(DECLARED_FAMILIES.filter((family) => (
+    plans.some((plan) => plan.family === family)
+  )));
+
   return Object.freeze({
     kind: USER_UNIFORM_PRODUCTION_PLAN_SET_KIND,
     pagePairCount: normalizedPagePairs.length,
     grids,
-    supportedFamilies: SUPPORTED_FAMILIES,
+    supportedFamilies,
     printSpecification: normalizedPrintSpecification,
     pricingReady: Boolean(pricing),
     plans,
@@ -392,7 +510,13 @@ export function createUserUniformProductionPlanSet({
       rotations: Object.freeze(grids.map(({ rotation }) => rotation)),
       mixedRotationsEvaluated: false,
       mixedFormatsEvaluated: false,
-      workAndTurnEvaluated: false,
+      workAndTurnEvaluated: workAndTurnGrids.length > 0,
+      workAndTurnMode: "horizontalDedicatedPairs",
+      workAndTurnEligibleRotations: Object.freeze(workAndTurnGrids.map(({ rotation }) => rotation)),
+      workAndTurnRejectedRotations: Object.freeze(
+        grids.filter((grid) => !workAndTurnEligible(grid)).map(({ rotation }) => rotation),
+      ),
+      arbitraryMixedWorkAndTurnEvaluated: false,
       completeWithinDeclaredFamilies: true,
       globalCompletenessClaimed: false,
     }),

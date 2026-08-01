@@ -20,13 +20,16 @@
   ],
   "beforeScreenshotAssertions": [
     { "selector": "[data-app-screen='alternatives']", "text": "Варианты производства" },
-    { "selector": "#userProductionPlans", "text": "4 варианта" },
-    { "selector": "#userProductionPlans", "text": "Полный набор внутри текущей области" },
+    { "selector": "#userProductionPlans", "text": "5 варианта" },
+    { "selector": "#userProductionPlans", "text": "Полный набор внутри заявленной области" },
+    { "selector": "#userProductionPlans", "text": "Свой оборот" },
+    { "selector": "#userProductionPlans", "text": "чётным числом колонок" },
     { "selector": "#userProductionPlans", "text": "Pareto" },
     { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "20" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "21" },
-    { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "BYN" },
-    { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "Pareto" }
+    { "selector": "[data-plan-id='uniform-r90-work-and-turn-dedicated-pairs']", "text": "Свой оборот" },
+    { "selector": "[data-plan-id='uniform-r90-work-and-turn-dedicated-pairs']", "text": "12" },
+    { "selector": "[data-plan-id='uniform-r90-paper-minimum']", "text": "BYN" }
   ],
   "screenshotSelector": "[data-app-screen='alternatives']",
   "screenshot": "uimposition-m7-5-user-order-plan-catalog.png"

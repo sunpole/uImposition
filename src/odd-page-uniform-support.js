@@ -77,8 +77,16 @@ export function validateProductRowsForOddPageUniformPipeline(collection, config 
     if (row.print.mode !== PRODUCT_PRINT_MODES.DUPLEX) {
       issues.push(issue("uniformPipelineRequiresDuplex", "print.mode", {}, row.id));
     }
-    if (row.print.duplexPreference === PRODUCT_DUPLEX_PREFERENCES.WORK_AND_TURN) {
-      issues.push(issue("uniformPipelineWorkAndTurnNotGeneralized", "print.duplexPreference", {}, row.id));
+    if (
+      row.print.duplexPreference === PRODUCT_DUPLEX_PREFERENCES.WORK_AND_TURN
+      && row.pages % 2 === 1
+    ) {
+      issues.push(issue(
+        "uniformPipelineWorkAndTurnRequiresCompletePagePairs",
+        "print.duplexPreference",
+        { pages: row.pages },
+        row.id,
+      ));
     }
     if (row.rotationPolicy !== PRODUCT_ROTATION_POLICIES.AUTO) {
       issues.push(issue(
@@ -186,6 +194,17 @@ function activeObjectiveOrder(pricing, objectiveOrder) {
   return deepFreeze(requested.filter((id) => pricing || id !== "estimatedTotalCost"));
 }
 
+function normalizedDuplexPreference(value) {
+  return Object.values(PRODUCT_DUPLEX_PREFERENCES).includes(value)
+    ? value
+    : PRODUCT_DUPLEX_PREFERENCES.AUTO;
+}
+
+function planMatchesPreference(plan, preference) {
+  if (preference === PRODUCT_DUPLEX_PREFERENCES.AUTO) return true;
+  return plan.duplexMode === preference;
+}
+
 function rebuildPlan(plan, {
   pagePairs,
   blankKeys,
@@ -194,7 +213,11 @@ function rebuildPlan(plan, {
   printSpecification,
 }) {
   const impositions = restoreImpositions(plan.impositions, blankKeys);
-  const report = buildProductionReport({ pagePairs, impositions });
+  const report = buildProductionReport({
+    pagePairs,
+    impositions,
+    duplexMode: plan.duplexMode,
+  });
   const metrics = createProductionReportSolutionMetrics({
     report,
     sourceSheet,
@@ -218,11 +241,18 @@ export function createOddPageUniformProductionPlanSet({
   printSpecification,
   pricing = null,
   objectiveOrder = DEFAULT_OBJECTIVE_ORDER,
+  duplexPreference = PRODUCT_DUPLEX_PREFERENCES.AUTO,
 } = {}) {
+  const preference = normalizedDuplexPreference(duplexPreference);
   const completedPairs = completePagePairs(pagePairs);
   const blankKeys = new Set(pagePairs
     .filter(({ backPage }) => backPage === null)
     .map(({ file, pairIndex }) => pairKey(file, pairIndex)));
+
+  if (blankKeys.size > 0 && preference === PRODUCT_DUPLEX_PREFERENCES.WORK_AND_TURN) {
+    throw new RangeError("work-and-turn requires complete front/back page pairs");
+  }
+
   const base = createUserUniformProductionPlanSet({
     pagePairs: completedPairs,
     placementOptions,
@@ -231,7 +261,19 @@ export function createOddPageUniformProductionPlanSet({
     pricing,
     objectiveOrder,
   });
-  const plans = deepFreeze(base.plans.map((plan) => rebuildPlan(plan, {
+  const eligibleBasePlans = base.plans.filter((plan) => (
+    (blankKeys.size === 0 || plan.duplexMode !== PRODUCT_DUPLEX_PREFERENCES.WORK_AND_TURN)
+    && planMatchesPreference(plan, preference)
+  ));
+  if (eligibleBasePlans.length === 0) {
+    throw new RangeError(
+      preference === PRODUCT_DUPLEX_PREFERENCES.WORK_AND_TURN
+        ? "work-and-turn requires a fitting grid with an even column count"
+        : "No production plans match the selected duplex preference",
+    );
+  }
+
+  const plans = deepFreeze(eligibleBasePlans.map((plan) => rebuildPlan(plan, {
     pagePairs,
     blankKeys,
     sourceSheet,
@@ -246,14 +288,15 @@ export function createOddPageUniformProductionPlanSet({
       label: plan.label,
       family: plan.family,
       grid: plan.grid,
+      duplexMode: plan.duplexMode,
       metrics: plan.metrics,
     })),
     {
       objectiveIds,
       objectiveOrder: normalizedObjectiveOrder,
       searchCoverage: {
-        theoreticalCandidateCount: base.catalog.coverage.theoreticalCandidateCount,
-        evaluatedCandidateCount: base.catalog.coverage.evaluatedCandidateCount,
+        theoreticalCandidateCount: plans.length,
+        evaluatedCandidateCount: plans.length,
       },
     },
   );
@@ -262,9 +305,21 @@ export function createOddPageUniformProductionPlanSet({
     ...base,
     pagePairCount: pagePairs.length,
     technicalBlankPairCount: blankKeys.size,
+    duplexPreference: preference,
+    supportedFamilies: deepFreeze([
+      ...new Set(plans.map(({ family }) => family)),
+    ]),
     plans,
     catalog,
-    scope: deepFreeze({ ...base.scope, oddPageTechnicalBlanks: true }),
+    scope: deepFreeze({
+      ...base.scope,
+      oddPageTechnicalBlanks: true,
+      duplexPreference: preference,
+      workAndTurnEvaluated: plans.some(
+        ({ duplexMode }) => duplexMode === PRODUCT_DUPLEX_PREFERENCES.WORK_AND_TURN,
+      ),
+      workAndTurnExcludedByTechnicalBlank: blankKeys.size > 0,
+    }),
   });
 }
 

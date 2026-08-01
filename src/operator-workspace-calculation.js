@@ -71,6 +71,7 @@ function formatPlan(plan, entry) {
     id: plan.id,
     label: plan.label,
     family: plan.family,
+    duplexMode: plan.duplexMode,
     rank: entry.rank,
     recommended: Boolean(entry.recommended),
     pareto: Boolean(entry.pareto),
@@ -103,6 +104,31 @@ function previewCell(cell) {
   });
 }
 
+function sharedPlatePreview(plan, impositionIndex) {
+  const plate = plan.sharedPlates?.[impositionIndex] ?? null;
+  if (!plate) return null;
+  return deepFreeze({
+    side: plate.side,
+    duplexMode: plate.duplexMode,
+    turnAxis: plate.turnAxis,
+    samePlateForBothPasses: plate.samePlateForBothPasses,
+    rows: plate.rows,
+    columns: plate.columns,
+    rotation: plate.rotation,
+    runLength: plate.runLength,
+    cells: plate.cells.map((cell) => deepFreeze({
+      position: cell.position,
+      row: cell.row,
+      column: cell.column,
+      file: cell.file,
+      pairIndex: cell.pairIndex,
+      page: cell.page,
+      pageRole: cell.pageRole,
+      direction: cell.direction,
+    })),
+  });
+}
+
 function layoutPreview(plan) {
   const record = previewRecord(plan);
   if (!record?.front || !record?.back) return null;
@@ -111,6 +137,7 @@ function layoutPreview(plan) {
   const backCells = record.back.cells.map(previewCell);
   return deepFreeze({
     planId: plan.id,
+    duplexMode: plan.duplexMode,
     impositionId: record.front.id,
     impositionIndex: impositionIndex + 1,
     impositionCount: plan.impositions.length,
@@ -123,6 +150,7 @@ function layoutPreview(plan) {
     cells: frontCells,
     frontCells,
     backCells,
+    sharedPlate: sharedPlatePreview(plan, impositionIndex),
   });
 }
 
@@ -203,17 +231,30 @@ export function calculateOperatorWorkspace(state, config = CONFIG) {
   }
 
   const pricing = pricingProfile(normalizedState.input.pricing);
-  const planSet = createOddPageUniformProductionPlanSet({
-    pagePairs,
-    placementOptions,
-    sourceSheet: geometry.source,
-    printSpecification: createDuplexPrintSpecification({
-      frontColors: sharedRow.print.frontColors,
-      backColors: sharedRow.print.backColors,
-    }),
-    pricing,
-    objectiveOrder: normalizedState.input.objectivePreferences.order,
-  });
+  let planSet;
+  try {
+    planSet = createOddPageUniformProductionPlanSet({
+      pagePairs,
+      placementOptions,
+      sourceSheet: geometry.source,
+      printSpecification: createDuplexPrintSpecification({
+        frontColors: sharedRow.print.frontColors,
+        backColors: sharedRow.print.backColors,
+      }),
+      pricing,
+      objectiveOrder: normalizedState.input.objectivePreferences.order,
+      duplexPreference: sharedRow.print.duplexPreference,
+    });
+  } catch (error) {
+    return invalidResult({
+      state: normalizedState,
+      validation,
+      extraIssues: [issue("duplexPreferenceUnavailable", "print.duplexPreference", {
+        duplexPreference: sharedRow.print.duplexPreference,
+        reason: error.message,
+      })],
+    });
+  }
   const entries = planSet.catalog.entries;
   const plans = entries.map((entry) => formatPlan(
     planSet.plans.find(({ id }) => id === entry.id),
