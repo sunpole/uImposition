@@ -11,7 +11,7 @@ import {
   createOperatorWorkspaceExportModels,
 } from "../src/operator-workspace-export.js";
 
-function validState() {
+function validState({ duplexPreference = "auto" } = {}) {
   return addApplicationProductRow(createDefaultApplicationState(), {
     name: "Листовка А6",
     finished: { widthMm: 105, heightMm: 148 },
@@ -22,7 +22,7 @@ function validState() {
       mode: "duplex",
       frontColors: 4,
       backColors: 4,
-      duplexPreference: "auto",
+      duplexPreference,
     },
     bleed: { mode: "uniform", uniformMm: 0 },
     cut: { mode: "commonCut", gapMm: 0 },
@@ -40,11 +40,43 @@ test("workspace export models use the actual selected production plan", () => {
   assert.equal(models.schemeDocument.impositionCount, selected.impositions.length);
   assert.equal(models.schemeDocument.pageCount, selected.impositions.length * 2);
   assert.equal(models.summary.schemePageCount, selected.impositions.length * 2);
+  assert.equal(models.summary.duplexMode, "separateFrontBackForms");
   assert.equal(models.reportDocument.fileCount, selected.report.fileMetrics.length);
   assert.equal(models.reportDocument.pairCount, selected.report.pairMetrics.length);
   assert.match(models.files.schemes, /selected-plan|uniform-/);
   assert.match(models.files.schemes, /-schemes\.pdf$/);
   assert.match(models.files.report, /-production-report\.pdf$/);
+});
+
+test("work-and-turn exports one shared plate page per imposition", () => {
+  const workspace = calculateOperatorWorkspace(validState({
+    duplexPreference: "workAndTurn",
+  }));
+  const models = createOperatorWorkspaceExportModels(workspace);
+
+  assert.equal(workspace.status, "ready");
+  assert.equal(models.selectedPlan.duplexMode, "workAndTurn");
+  assert.equal(models.schemeDocument.duplexMode, "workAndTurn");
+  assert.equal(models.schemeDocument.sharedPlateForBothPasses, true);
+  assert.equal(models.schemeDocument.turnAxis, "horizontal");
+  assert.equal(models.schemeDocument.pageCount, models.selectedPlan.impositions.length);
+  assert.equal(models.summary.schemePageCount, models.selectedPlan.impositions.length);
+  assert.equal(models.summary.duplexMode, "workAndTurn");
+
+  models.schemeDocument.pages.forEach((page, index) => {
+    assert.equal(page.side, "shared");
+    assert.equal(page.layout, models.selectedPlan.sharedPlates[index]);
+    assert.equal(page.operation.duplexMode, "workAndTurn");
+    assert.equal(page.operation.turnAxis, "horizontal");
+    assert.equal(page.operation.passCount, 2);
+    assert.match(page.title, /ОБЩАЯ-ФОРМА/);
+  });
+
+  const summary = models.reportDocument.sections.find(({ kind }) => kind === "summary").totals;
+  assert.equal(models.reportDocument.duplexMode, "workAndTurn");
+  assert.equal(summary.forms, models.selectedPlan.impositions.length);
+  assert.equal(summary.backForms, 0);
+  assert.equal(summary.pressPasses, summary.physicalSheets * 2);
 });
 
 test("explicit operator selection overrides recommendation for both PDF models", () => {
@@ -63,7 +95,7 @@ test("explicit operator selection overrides recommendation for both PDF models",
   );
 });
 
-test("scheme document preserves validated face/back order for every imposition", () => {
+test("scheme document preserves validated face/back order for every separate imposition", () => {
   const models = createOperatorWorkspaceExportModels(calculateOperatorWorkspace(validState()));
 
   models.selectedPlan.impositions.forEach((record, index) => {
