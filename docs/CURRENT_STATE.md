@@ -6,7 +6,7 @@
 
 - репозиторий: `https://github.com/sunpole/uImposition`;
 - рабочая ветка: `main`;
-- universal-solver pure-core baseline: merge PR `#102`, commit `9d16a24eec2cf437731ef6a5e74b182d8fa6eaa5`;
+- universal-solver proof baseline: merge PR `#103`, commit `a0fe6edb8092e706572493f2534cc698b935262e`;
 - опубликованный prerelease остаётся `0.7.0-alpha.5`;
 - release commit: `195d6496a291095a69cc9089a64154561ffbb1fa`;
 - recovery branch/tag: `release/v0.7.0-alpha.5`, `v0.7.0-alpha.5`;
@@ -33,8 +33,6 @@ b9d83855ff685bb38831670fb0c3975bbd1bdbc4
 ## 3. Рабочий пользовательский маршрут
 
 Корневой GitHub Pages URL перенаправляется в актуальный `/app/`.
-
-Рабочий поток:
 
 ```text
 sheet/press preset
@@ -64,22 +62,16 @@ sheet/press preset
 
 ## 4. Research и документация
 
-PR `#86` объединил аудит 50 GitHub-репозиториев по:
+PR `#86` объединил аудит 50 GitHub-репозиториев по page imposition, prepress, packing, cutting stock, integer optimization и printing scheduling.
 
-- page imposition и prepress;
-- rectangle packing/nesting;
-- cutting stock;
-- integer optimization;
-- printing-industry scheduling.
-
-PR `#87` перенёс устойчивые выводы в канонические:
+PR `#87` перенёс устойчивые выводы в:
 
 - `docs/ARCHITECTURE.md`;
 - `docs/ALGORITHM_AND_OPTIMIZATION.md`;
 - `docs/TEST_PLAN.md`;
 - `docs/REMAINING_WORK.md`.
 
-Актуальный подробный implementation contract:
+Актуальный подробный contract:
 
 - `research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md`.
 
@@ -95,7 +87,7 @@ M — machine/operator constraints
 E — explanation, export and case memory
 ```
 
-Малые задачи решаются полным перебором как proof oracle. Большие задачи должны использовать restricted master и on-demand pricing/column generation. Простое увеличение static candidate/state limits запрещено как основной large-order путь.
+Малые задачи решаются полным перебором как proof oracle. Большие задачи должны использовать restricted master и on-demand pricing/column generation. Простое увеличение exact limits запрещено как основной large-order путь.
 
 ## 6. Завершённый pure-core progress
 
@@ -109,8 +101,6 @@ E — explanation, export and case memory
 - PR `#90`: adapter и differential parity с application geometry;
 - PR `#91`: validated mixed horizontal/vertical strip model;
 - PR `#92`: bounded exact mixed-strip generator и coverage.
-
-Основные модули:
 
 ```text
 src/geometric-pattern.js
@@ -127,8 +117,6 @@ src/current-uniform-geometry-adapter.js
 - PR `#97`: run-length-free simplex candidate columns с zero-count subsets;
 - PR `#100`: run-length-free separate-duplex candidate columns и зеркальный оборот.
 
-Основные модули:
-
 ```text
 src/single-product-production-pattern.js
 src/work-and-turn-slot-orbits.js
@@ -142,8 +130,6 @@ src/multi-product-duplex-columns.js
 
 - PR `#99`: bounded exact simplex small master;
 - PR `#102`: generic exact production master для одной совместимой simplex или separate-duplex family.
-
-Основные модули:
 
 ```text
 src/exact-simplex-small-master.js
@@ -164,6 +150,34 @@ Master:
 - отклоняет oversized exact search до enumeration;
 - не заявляет global completeness.
 
+### Independent differential proof R3-A
+
+PR `#103` добавил отдельный exhaustive test oracle:
+
+```text
+tests/exact-production-small-master-random.test.js
+```
+
+Фиксированные seeds создают:
+
+- 16 random-small simplex cases;
+- 16 random-small separate-duplex cases;
+- capacity 2–3;
+- 2–3 demands;
+- 1–2 selected columns;
+- max run length 2–3;
+- разные quantities, input order и color counts.
+
+Для всех 32 задач production master и независимый oracle совпадают по:
+
+- theoretical/evaluated state count;
+- полному feasible structural-plan set;
+- run vectors;
+- sheets/forms/plates/passes/overrun/blanks;
+- Pareto frontier;
+- minima каждой objective;
+- отсутствию feasible result, когда bounded space его действительно не содержит.
+
 ## 7. Закрытые proof cases
 
 - exact uniform 0°/90° slots;
@@ -180,13 +194,14 @@ Master:
 - asymmetric duplex `4+1` с пятью пластинами;
 - simplex master parity со старым exact oracle;
 - duplex forms/plates/passes из фактического column contract;
+- 32 random-small tasks против независимого oracle;
 - deterministic signatures, immutability и corruption rejection.
 
 ## 8. Superseded branches и PR
 
-- PR `#85` закрыт после research gate; его допустимая роль ограничена historical small-space ideas;
+- PR `#85` закрыт после research gate;
 - PR `#96` закрыт как дубликат PR `#95`;
-- PR `#98` и `#101` закрыты как дубликаты объединённого PR `#100`.
+- PR `#98` и `#101` закрыты как дубликаты PR `#100`.
 
 Их ветки не являются источником истины. Рабочий код читается только из `main`.
 
@@ -194,7 +209,6 @@ Master:
 
 Пока отсутствуют:
 
-- independent random-small brute-force differential suite;
 - branch-and-bound и lower-bound pruning;
 - restricted master для больших задач;
 - pricing subproblem и column generation;
@@ -208,37 +222,43 @@ Master:
 - operator case memory;
 - `/app/` integration.
 
-Текущие exact modules являются proof oracle для малых bounded областей, а не production large-order solver.
+Текущие exact modules являются доказательным oracle для малых bounded областей, а не production large-order solver.
 
-## 10. Следующий обязательный этап
+## 10. Следующий обязательный этап — R1 bounded restricted master
 
-### R3-A random-small differential proof
+Новый search layer должен:
 
-Нужно создать независимый brute-force oracle, который не вызывает internals production master, и сравнивать с ним generated tiny cases:
+- начинать с dedicated и нескольких balanced mixed columns;
+- использовать canonical coefficient matrix;
+- вычислять demand lower bounds;
+- поддерживать incumbent feasible plans;
+- применять deterministic branch-and-bound;
+- иметь state/time/memory budgets;
+- выдавать progress и cancel-safe partial result;
+- показывать upper/lower bounds и gap;
+- явно различать complete и truncated;
+- сохранять structurally different feasible incumbents;
+- совпадать с exact oracle на каждой маленькой задаче;
+- не включать pricing, UI или 20-file benchmark в первый PR.
 
-- capacity `1…6`;
-- demand count `1…4`;
-- simplex и separate duplex;
-- разные quantity vectors;
-- разные max columns/run lengths.
+## 11. После R1 — pricing и column generation
 
-Проверяются:
+```text
+initial columns
+→ restricted master
+→ pricing finds improving column
+→ add structurally new column
+→ repeat
+→ final integer restricted master
+```
 
-- полный feasible structural plan set;
-- minimum sheets;
-- forms/plates/passes;
-- per-demand output/overrun;
-- Pareto membership;
-- deterministic replay;
-- zero underproduction.
+Каждая generated column проходит существующие geometry/production validators. Heuristic result не называется доказанным optimum.
 
-После R3-A разрешён bounded restricted-master этап с progress/limits/incumbent и обязательной differential parity на малых задачах.
+## 12. Поздний control benchmark
 
-## 11. Поздний control benchmark
+`data/control-case.json` запускается после доказанного restricted master и первого pricing loop.
 
-`data/control-case.json` запускается после R3-A и первого restricted master.
-
-Известные ориентиры:
+Ориентиры:
 
 - paper extreme: `3305` sheets;
 - operator plan: `3395` sheets;
@@ -247,7 +267,7 @@ Master:
 
 Solver не читает `data/control-layout-m3.json` как готовый ответ.
 
-## 12. Quality state
+## 13. Quality state
 
 Обязательные проверки:
 
@@ -259,15 +279,15 @@ npm test
 
 Каждый PR дополнительно проходит полный Chromium/PDF regression, даже если UI не менялся. Runtime/UI/PDF изменение требует visual artifact review.
 
-## 13. Release status
+## 14. Release status
 
 - published version остаётся `0.7.0-alpha.5`;
 - pure-core PR не выпускает `alpha.6` автоматически;
 - version/recovery branch/tag/Release/uNews создаются отдельным release gate;
 - root cutover не означает production-ready или stable;
-- owner acceptance опубликованного `/app/` остаётся отдельным решением.
+- owner acceptance `/app/` остаётся отдельным решением.
 
-## 14. Неприкосновенные правила
+## 15. Неприкосновенные правила
 
 - zero underproduction;
 - back derived only from validated front/source slots;
