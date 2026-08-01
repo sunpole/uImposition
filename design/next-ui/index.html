@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <title>uImposition Next UI — design prototype</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg:#eef1f5;
+      --surface:#ffffff;
+      --surface-2:#f7f8fa;
+      --surface-3:#edf2f8;
+      --ink:#18202b;
+      --muted:#647083;
+      --line:#d9e0e8;
+      --line-strong:#bcc7d5;
+      --accent:#2356d7;
+      --accent-soft:#e7efff;
+      --success:#16825d;
+      --warning:#a96700;
+      --danger:#c53d49;
+      --topbar:#111827;
+      --topbar-ink:#f8fafc;
+      --row-h:36px;
+      --control-h:30px;
+      --radius:8px;
+      --shadow:0 10px 28px rgba(27,39,58,.09);
+      --safe-bottom:env(safe-area-inset-bottom,0px);
+      --safe-top:env(safe-area-inset-top,0px);
+      --sidebar-w:252px;
+      --summary-w:278px;
+      --font:Inter,Roboto,"Segoe UI",Arial,sans-serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    body[data-density="comfortable"]{--row-h:42px;--control-h:34px;--radius:10px}
+    body[data-density="compact"]{--row-h:36px;--control-h:30px}
+    body[data-density="ultra"]{--row-h:31px;--control-h:27px;--radius:6px;font-size:13px}
+    body[data-economy="true"]{--shadow:none}
+    body[data-economy="true"] *{transition:none!important;animation:none!important}
+    .app{min-height:100dvh;display:grid;grid-template-rows:auto 1fr}
+    .topbar{position:sticky;top:0;z-index:60;display:grid;grid-template-columns:auto minmax(240px,1fr) auto;align-items:center;gap:10px;min-height:48px;padding:calc(6px + var(--safe-top)) 10px 6px;background:var(--topbar);color:var(--topbar-ink);box-shadow:0 2px 12px rgba(0,0,0,.16)}
+    .brand{display:flex;align-items:center;gap:8px;min-width:0}
+    .brand-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:7px;background:#fff;color:#111827;font-weight:900;letter-spacing:-.08em}
+    .brand-copy{min-width:0}
+    .brand-copy strong{display:block;font-size:13px;line-height:1.05;white-space:nowrap}
+    .brand-copy span{display:block;margin-top:2px;color:#9eabc0;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .primary-nav{display:flex;align-items:center;justify-content:center;gap:2px;min-width:0;overflow:auto;scrollbar-width:none}
+    .primary-nav::-webkit-scrollbar{display:none}
+    .nav-btn{position:relative;display:flex;align-items:center;gap:5px;min-height:32px;padding:5px 9px;border:0;border-radius:6px;background:transparent;color:#b8c3d3;font-size:12px;font-weight:700;white-space:nowrap}
+    .nav-btn:hover,.nav-btn.is-active{background:#263246;color:#fff}
+    .nav-btn.is-active:after{content:"";position:absolute;left:9px;right:9px;bottom:2px;height:2px;border-radius:2px;background:#7ea2ff}
+    .top-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px}
+    .icon-btn,.action-btn{display:inline-grid;place-items:center;min-width:32px;height:32px;border:1px solid #364256;border-radius:6px;background:#1b2638;color:#eef3fb;font-weight:800}
+    .action-btn{display:inline-flex;gap:6px;width:auto;padding:0 9px}
+    .save-state{display:flex;align-items:center;gap:5px;color:#b9c5d5;font-size:10px;white-space:nowrap}
+    .save-dot{width:7px;height:7px;border-radius:50%;background:#42d79b;box-shadow:0 0 0 3px rgba(66,215,155,.12)}
+    .workspace{min-width:0;display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr) var(--summary-w);gap:8px;padding:8px 8px calc(8px + var(--safe-bottom))}
+    .panel{min-width:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
+    .sidebar{position:sticky;top:64px;align-self:start;max-height:calc(100dvh - 72px);overflow:auto}
+    .section{padding:10px;border-bottom:1px solid var(--line)}
+    .section:last-child{border-bottom:0}
+    .eyebrow{margin:0 0 3px;color:var(--muted);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    h1,h2,h3,p{margin-top:0}
+    .section h2{margin:0;font-size:14px}
+    .preset-card{margin-top:8px;padding:8px;border:1px solid #b9c9e9;border-radius:7px;background:linear-gradient(180deg,#f8fbff,#eef4ff)}
+    .preset-card strong{display:block;font-size:13px}
+    .preset-card small{display:block;margin-top:3px;color:var(--muted);line-height:1.35}
+    .facts{display:grid;grid-template-columns:1fr auto;gap:5px 8px;margin-top:8px;font-size:11px}
+    .facts span{color:var(--muted)}
+    .facts b{font-family:var(--mono);font-size:10px}
+    .compact-btn{min-height:var(--control-h);padding:4px 8px;border:1px solid var(--line-strong);border-radius:6px;background:#fff;color:var(--ink);font-size:11px;font-weight:700}
+    .compact-btn.primary{border-color:var(--accent);background:var(--accent);color:#fff}
+    .compact-btn.soft{border-color:#c9d8fb;background:var(--accent-soft);color:#173d9a}
+    .compact-btn.ghost{background:transparent}
+    .button-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+    .segmented{display:flex;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--surface-2)}
+    .segmented button{flex:1;min-width:0;height:25px;padding:2px 5px;border:0;border-radius:5px;background:transparent;color:var(--muted);font-size:10px;font-weight:800}
+    .segmented button.is-active{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(18,31,49,.12)}
+    .main{min-width:0;display:flex;flex-direction:column;gap:8px}
+    .screen{display:none;min-width:0}
+    .screen.is-active{display:block}
+    .command-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px}
+    .command-left,.command-right{display:flex;align-items:center;gap:5px;min-width:0}
+    .title-stack{min-width:0;margin-right:4px}
+    .title-stack strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .title-stack small{display:block;color:var(--muted);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .status-chip{display:inline-flex;align-items:center;gap:4px;height:23px;padding:0 7px;border-radius:999px;background:#e8f7f1;color:#0c6d4c;font-size:9px;font-weight:900;white-space:nowrap}
+    .status-chip.warn{background:#fff2d9;color:#895500}
+    .status-chip.info{background:#e9effd;color:#264ea6}
+    .table-panel{overflow:hidden}
+    .table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+    .toolbar-group{display:flex;align-items:center;gap:5px;min-width:0}
+    .search{width:160px;height:var(--control-h);padding:4px 8px;border:1px solid var(--line-strong);border-radius:6px;background:#fff;font-size:11px}
+    .order-scroller{position:relative;overflow:auto;overscroll-behavior:contain;background:#fff;scrollbar-color:#aeb9c8 transparent;scrollbar-width:thin}
+    .order-grid{min-width:1110px;display:grid;grid-template-columns:38px 220px 90px 88px 58px 58px 64px 64px 66px 70px 92px 78px 108px}
+    .grid-head{position:sticky;top:0;z-index:15;display:contents}
+    .cell{min-width:0;height:var(--row-h);display:flex;align-items:center;padding:3px 6px;border-right:1px solid #edf0f4;border-bottom:1px solid var(--line);background:#fff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .head-cell{height:30px;background:#f2f5f8;color:#566174;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.035em}
+    .sticky-index{position:sticky;left:0;z-index:12;justify-content:center;padding:0;background:#f8fafc;font-family:var(--mono);font-size:10px}
+    .sticky-name{position:sticky;left:38px;z-index:11;background:#fff;box-shadow:5px 0 8px -8px rgba(18,31,49,.7)}
+    .head-cell.sticky-index,.head-cell.sticky-name{z-index:25;background:#eaf0f6}
+    .grid-row{display:contents}
+    .grid-row:hover .cell{background:#f7faff}
+    .grid-row:hover .sticky-index,.grid-row:hover .sticky-name{background:#f0f5ff}
+    .grid-row.is-selected .cell{background:#edf3ff}
+    .grid-row.is-selected .sticky-index,.grid-row.is-selected .sticky-name{background:#dfeaff}
+    .file-name{display:flex;align-items:center;gap:6px;min-width:0}
+    .file-badge{display:grid;place-items:center;flex:0 0 20px;height:20px;border-radius:5px;background:#dfe8fb;color:#1e4aa5;font-size:8px;font-weight:900}
+    .file-text{min-width:0;overflow:hidden;text-overflow:ellipsis}
+    .mini-input,.mini-select{width:100%;height:calc(var(--control-h) - 3px);min-width:0;padding:2px 5px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--ink);font-size:11px}
+    .grid-row:hover .mini-input,.grid-row:hover .mini-select,.mini-input:focus,.mini-select:focus{border-color:#b7c5d8;background:#fff;outline:0}
+    .num{justify-content:flex-end;font-family:var(--mono);font-size:10px;font-variant-numeric:tabular-nums}
+    .print-badge{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:22px;padding:0 5px;border-radius:5px;background:#eef1f5;font-family:var(--mono);font-size:10px;font-weight:800}
+    .row-state{display:inline-flex;align-items:center;gap:4px;color:var(--success);font-size:9px;font-weight:900}
+    .row-state.warning{color:var(--warning)}
+    .row-state:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+    .row-actions{display:flex;align-items:center;justify-content:flex-end;gap:2px;width:100%}
+    .row-actions button{display:grid;place-items:center;width:25px;height:25px;padding:0;border:1px solid transparent;border-radius:5px;background:transparent;color:#536176;font-size:12px;font-weight:900}
+    .row-actions button:hover{border-color:#cbd5e1;background:#fff;color:#18202b}
+    .row-actions .danger:hover{color:var(--danger)}
+    .table-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;background:#f7f9fb;color:var(--muted);font-size:9px}
+    .summary{position:sticky;top:64px;align-self:start;max-height:calc(100dvh - 72px);overflow:auto}
+    .summary-head{padding:10px;border-bottom:1px solid var(--line)}
+    .summary-head h2{margin:0;font-size:14px}
+    .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:8px}
+    .metric{padding:7px;border:1px solid var(--line);border-radius:7px;background:var(--surface-2)}
+    .metric span{display:block;color:var(--muted);font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+    .metric strong{display:block;margin-top:3px;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+    .metric.primary{border-color:#9eb8f2;background:#eef4ff}
+    .metric.primary strong{color:#173f9e}
+    .summary-block{padding:9px;border-top:1px solid var(--line)}
+    .summary-block h3{margin:0 0 7px;font-size:11px}
+    .plan-item{display:grid;grid-template-columns:auto 1fr auto;gap:6px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:6px;background:#fff}
+    .plan-item+.plan-item{margin-top:5px}
+    .plan-item.is-active{border-color:#7d9fe9;background:#edf3ff}
+    .plan-radio{width:12px;height:12px;border:2px solid #8190a3;border-radius:50%}
+    .plan-item.is-active .plan-radio{border:4px solid var(--accent)}
+    .plan-copy{min-width:0}
+    .plan-copy strong{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .plan-copy small{display:block;margin-top:2px;color:var(--muted);font-size:8px}
+    .plan-price{font-family:var(--mono);font-size:9px;font-weight:800}
+    .comparison{overflow:auto}
+    .comparison table{width:100%;min-width:760px;border-collapse:collapse}
+    .comparison th,.comparison td{height:34px;padding:4px 7px;border-bottom:1px solid var(--line);text-align:right;font-size:10px;white-space:nowrap}
+    .comparison th:first-child,.comparison td:first-child{text-align:left;position:sticky;left:0;background:#fff}
+    .comparison th{background:#f2f5f8;color:var(--muted);font-size:9px;text-transform:uppercase}
+    .comparison tr.is-active td{background:#edf3ff}
+    .comparison tr.is-active td:first-child{background:#dfeaff}
+    .layout-stage{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:8px}
+    .sheet-wrap{min-height:460px;display:grid;place-items:center;padding:16px;background:#dfe5ec}
+    .sheet{position:relative;width:min(92%,720px);aspect-ratio:1.38;border:1px solid #9aa8b8;background:#fff;box-shadow:0 14px 36px rgba(30,42,60,.18);display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:4px;padding:18px 14px 28px}
+    .sheet-cell{display:grid;place-items:center;border:1px solid #94a3b8;background:#f8fafc;color:#334155;font-size:10px;text-align:center}
+    .sheet-cell b{display:block;font-family:var(--mono);font-size:12px}
+    .sheet-mark{position:absolute;color:#7c8796;font-size:8px}
+    .sheet-mark.top{top:4px;left:50%;transform:translateX(-50%)}
+    .sheet-mark.bottom{bottom:5px;left:50%;transform:translateX(-50%)}
+    .detail-list{padding:8px}
+    .detail-row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:10px}
+    .detail-row span{color:var(--muted)}
+    .detail-row b{font-family:var(--mono)}
+    .placeholder-screen{padding:16px}
+    .placeholder-screen h2{margin-bottom:5px}
+    .placeholder-screen p{color:var(--muted);max-width:720px}
+    .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .card{padding:12px}
+    .card h3{margin:0 0 5px;font-size:12px}
+    .card p{margin:0;color:var(--muted);font-size:10px;line-height:1.45}
+    .mobile-dock{display:none}
+    .mobile-summary-toggle{display:none}
+    .overlay{position:fixed;inset:0;z-index:100;display:none;background:rgba(15,23,42,.44)}
+    .overlay.is-open{display:block}
+    .palette{position:absolute;left:50%;top:12%;transform:translateX(-50%);width:min(620px,calc(100% - 24px));overflow:hidden;border:1px solid #aeb9c8;border-radius:12px;background:#fff;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+    .palette input{width:100%;height:48px;padding:0 14px;border:0;border-bottom:1px solid var(--line);outline:0;font-size:14px}
+    .palette-list{padding:6px}
+    .palette-item{display:flex;justify-content:space-between;align-items:center;padding:9px;border-radius:7px;font-size:12px}
+    .palette-item:hover{background:#edf3ff}
+    .palette-item kbd{padding:2px 5px;border:1px solid var(--line);border-radius:4px;background:#f7f9fb;color:var(--muted);font-size:9px}
+    @media (max-width:1180px){
+      :root{--sidebar-w:220px;--summary-w:250px}
+      .brand-copy span,.save-state span{display:none}
+      .nav-btn{padding-inline:7px}
+    }
+    @media (max-width:960px){
+      .workspace{grid-template-columns:200px minmax(0,1fr)}
+      .summary{display:none}
+      .mobile-summary-toggle{display:inline-flex}
+      .layout-stage{grid-template-columns:1fr}
+      .layout-stage .panel:last-child{display:none}
+    }
+    @media (max-width:720px){
+      :root{--row-h:36px;--control-h:30px;--radius:6px}
+      html,body{font-size:13px}
+      .app{padding-bottom:calc(48px + var(--safe-bottom))}
+      .topbar{grid-template-columns:auto 1fr auto;min-height:43px;padding:calc(4px + var(--safe-top)) 6px 4px;gap:5px}
+      .brand-mark{width:28px;height:28px}
+      .brand-copy{display:none}
+      .primary-nav{justify-content:flex-start}
+      .primary-nav .nav-btn{display:none}
+      .primary-nav .nav-btn.is-active{display:flex;max-width:170px;background:transparent;padding-inline:4px;font-size:12px}
+      .primary-nav .nav-btn.is-active:after{display:none}
+      .top-actions .save-state,.top-actions .action-btn span{display:none}
+      .top-actions .action-btn{width:32px;padding:0}
+      .workspace{display:block;padding:5px 5px calc(5px + var(--safe-bottom))}
+      .sidebar{position:static;display:none;max-height:none;margin-bottom:5px}
+      .sidebar.is-mobile-open{display:block}
+      .main{gap:5px}
+      .command-strip{padding:5px 6px}
+      .command-right .hide-mobile,.command-left .hide-mobile{display:none}
+      .table-toolbar{padding:5px}
+      .search{width:120px}
+      .order-scroller{max-height:calc(100dvh - 190px)}
+      .order-grid{min-width:1030px;grid-template-columns:34px 170px 82px 76px 52px 52px 58px 58px 60px 64px 84px 72px 96px}
+      .sticky-name{left:34px}
+      .cell{padding-inline:4px;font-size:10px}
+      .head-cell{font-size:8px}
+      .file-badge{display:none}
+      .row-actions button{width:23px;height:24px}
+      .summary{display:none}
+      .mobile-dock{position:fixed;left:0;right:0;bottom:0;z-index:70;display:grid;grid-template-columns:repeat(5,1fr);padding:4px 4px calc(4px + var(--safe-bottom));border-top:1px solid #263246;background:#111827;color:#c7d0df}
+      .dock-btn{display:grid;place-items:center;gap:1px;min-height:39px;padding:2px;border:0;border-radius:6px;background:transparent;color:inherit;font-size:8px;font-weight:800}
+      .dock-btn b{font-size:15px;line-height:1}
+      .dock-btn.is-active{background:#263246;color:#fff}
+      .metric-grid{grid-template-columns:repeat(3,1fr)}
+      .sheet-wrap{min-height:calc(100dvh - 145px);padding:7px}
+      .sheet{width:100%;padding:11px 8px 18px;gap:2px}
+      .sheet-cell{font-size:8px}
+      .sheet-cell b{font-size:9px}
+      .cards{grid-template-columns:1fr}
+    }
+    @media (max-width:360px){
+      .top-actions .icon-btn:nth-of-type(2){display:none}
+      .status-chip{display:none}
+      .command-left{gap:3px}
+      .title-stack strong{font-size:11px}
+      .search{width:98px}
+      .compact-btn{padding-inline:6px;font-size:10px}
+      .order-grid{min-width:970px;grid-template-columns:32px 150px 76px 70px 48px 48px 54px 54px 56px 60px 80px 68px 92px}
+      .sticky-name{left:32px}
+    }
+    @media (max-height:620px) and (orientation:landscape){
+      .topbar{position:static}
+      .order-scroller{max-height:calc(100vh - 132px)}
+      .mobile-dock{grid-template-columns:repeat(5,70px);justify-content:center}
+    }
+    @media (prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+    @media (forced-colors:active){.panel,.cell,.compact-btn,.icon-btn,.action-btn{border:1px solid CanvasText}.save-dot,.row-state:before{forced-color-adjust:none}}
+    @supports not (height:100dvh){.app{min-height:100vh}.sidebar,.summary{max-height:calc(100vh - 72px)}}
+  </style>
+</head>
+<body data-density="compact" data-economy="false">
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">uI</span>
+        <span class="brand-copy"><strong>uImposition</strong><span>Заказ UI-2026-081 · рабочее пространство</span></span>
+      </div>
+      <nav class="primary-nav" aria-label="Разделы">
+        <button class="nav-btn is-active" data-screen="order">▦ Заказ</button>
+        <button class="nav-btn" data-screen="plans">≋ Варианты</button>
+        <button class="nav-btn" data-screen="layout">▧ Схема</button>
+        <button class="nav-btn" data-screen="forms">▤ Формы</button>
+        <button class="nav-btn" data-screen="cost">₽ Стоимость</button>
+        <button class="nav-btn" data-screen="export">⇩ Экспорт</button>
+      </nav>
+      <div class="top-actions">
+        <div class="save-state"><i class="save-dot"></i><span>Сохранено</span></div>
+        <button class="icon-btn" id="undoButton" title="Отменить">↶</button>
+        <button class="icon-btn" id="paletteButton" title="Команды">⌘</button>
+        <button class="action-btn" id="summaryButton"><b>Σ</b><span>Итог</span></button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar panel" id="sidebar">
+        <section class="section">
+          <p class="eyebrow">Лист и машина</p>
+          <h2>Рабочий пресет</h2>
+          <div class="preset-card">
+            <strong>Speedmaster · 620×450</strong>
+            <small>После зачистки 616×446 · печать 608×431 мм</small>
+            <div class="facts"><span>Поля</span><b>4 / 4 / 2 / 13</b><span>Зачистка</span><b>2×4</b><span>Клапан</span><b>13 мм</b></div>
+          </div>
+          <div class="button-row"><button class="compact-btn soft">Сменить</button><button class="compact-btn">Новый</button></div>
+        </section>
+        <section class="section">
+          <p class="eyebrow">Режим отображения</p>
+          <div class="segmented" id="densityControl"><button data-density="comfortable">Обычный</button><button class="is-active" data-density="compact">Плотный</button><button data-density="ultra">Ультра</button></div>
+          <div class="button-row"><button class="compact-btn ghost" id="economyButton">⚡ Экономичный режим</button></div>
+        </section>
+        <section class="section">
+          <p class="eyebrow">Колонки таблицы</p>
+          <div class="button-row"><button class="compact-btn primary">Производство</button><button class="compact-btn">Минимум</button><button class="compact-btn">Полный</button></div>
+        </section>
+        <section class="section">
+          <p class="eyebrow">Быстрые действия</p>
+          <div class="button-row"><button class="compact-btn">TXT</button><button class="compact-btn">20 файлов</button><button class="compact-btn">Очистить</button></div>
+        </section>
+      </aside>
+
+      <main class="main">
+        <section class="screen is-active" data-screen-panel="order">
+          <div class="command-strip panel">
+            <div class="command-left">
+              <button class="compact-btn" id="mobilePresetButton">☰</button>
+              <div class="title-stack"><strong>Строки заказа</strong><small>8 видов · однострочный операторский ввод</small></div>
+              <span class="status-chip">● расчёт готов</span>
+            </div>
+            <div class="command-right">
+              <button class="compact-btn hide-mobile">Импорт TXT</button>
+              <button class="compact-btn primary">＋ Строка</button>
+            </div>
+          </div>
+
+          <section class="table-panel panel">
+            <div class="table-toolbar">
+              <div class="toolbar-group"><input class="search" placeholder="Поиск файла…"><button class="compact-btn">Фильтр</button><button class="compact-btn hide-mobile">Колонки</button></div>
+              <div class="toolbar-group"><span class="status-chip info">8 / 8 включено</span><button class="compact-btn">⋮</button></div>
+            </div>
+            <div class="order-scroller" tabindex="0" aria-label="Таблица заказа с горизонтальной прокруткой">
+              <div class="order-grid" id="orderGrid">
+                <div class="grid-head">
+                  <div class="cell head-cell sticky-index">№</div><div class="cell head-cell sticky-name">Файл / название</div><div class="cell head-cell">Формат</div><div class="cell head-cell">Тираж</div><div class="cell head-cell">Видов</div><div class="cell head-cell">Стр.</div><div class="cell head-cell">Лицо</div><div class="cell head-cell">Оборот</div><div class="cell head-cell">Выпуск</div><div class="cell head-cell">Рез</div><div class="cell head-cell">Оборот</div><div class="cell head-cell">Статус</div><div class="cell head-cell">Действия</div>
+                </div>
+              </div>
+            </div>
+            <footer class="table-footer"><span>Shift + колесо — по колонкам · Enter — редактировать</span><b>8 строк · 12 печатных пар</b></footer>
+          </section>
+        </section>
+
+        <section class="screen" data-screen-panel="plans">
+          <div class="command-strip panel"><div class="title-stack"><strong>Допустимые варианты</strong><small>Все планы сохранены, рекомендация не удаляет альтернативы</small></div><div class="command-right"><button class="compact-btn">Приоритеты</button><button class="compact-btn primary">Пересчитать</button></div></div>
+          <section class="comparison panel"><table><thead><tr><th>План</th><th>Листы</th><th>Монтажи</th><th>Формы</th><th>Пластины</th><th>Прогоны</th><th>Перетираж</th><th>Стоимость</th></tr></thead><tbody><tr class="is-active"><td><b>Смешанный оптимум</b> · рекомендуется</td><td>3 305</td><td>4</td><td>8</td><td>8</td><td>6 610</td><td>0</td><td>1 284 BYN</td></tr><tr><td>Минимум бумаги</td><td>3 305</td><td>56</td><td>112</td><td>112</td><td>6 610</td><td>0</td><td>2 730 BYN</td></tr><tr><td>Минимум форм</td><td>3 395</td><td>4</td><td>8</td><td>8</td><td>6 790</td><td>180</td><td>1 319 BYN</td></tr><tr><td>Свой оборот</td><td>3 520</td><td>6</td><td>6</td><td>6</td><td>7 040</td><td>430</td><td>1 241 BYN</td></tr></tbody></table></section>
+        </section>
+
+        <section class="screen" data-screen-panel="layout">
+          <div class="command-strip panel"><div class="command-left"><div class="title-stack"><strong>Схема выбранного плана</strong><small>Монтаж 1 из 4 · лицо и зеркальный оборот</small></div></div><div class="command-right"><div class="segmented"><button class="is-active">Лицо</button><button>Оборот</button><button>Вместе</button></div></div></div>
+          <div class="layout-stage"><div class="panel sheet-wrap"><div class="sheet"><span class="sheet-mark top">верх · 2 мм</span><span class="sheet-mark bottom">клапан · 13 мм</span><div class="sheet-cell"><span>A-01<b>1</b></span></div><div class="sheet-cell"><span>A-01<b>2</b></span></div><div class="sheet-cell"><span>B-02<b>1</b></span></div><div class="sheet-cell"><span>B-02<b>2</b></span></div><div class="sheet-cell"><span>C-03<b>1</b></span></div><div class="sheet-cell"><span>C-03<b>2</b></span></div><div class="sheet-cell"><span>D-04<b>1</b></span></div><div class="sheet-cell"><span>D-04<b>2</b></span></div><div class="sheet-cell"><span>E-05<b>1</b></span></div><div class="sheet-cell"><span>E-05<b>2</b></span></div><div class="sheet-cell"><span>F-06<b>1</b></span></div><div class="sheet-cell"><span>F-06<b>2</b></span></div><div class="sheet-cell"><span>G-07<b>1</b></span></div><div class="sheet-cell"><span>G-07<b>2</b></span></div><div class="sheet-cell"><span>H-08<b>1</b></span></div><div class="sheet-cell"><span>H-08<b>2</b></span></div></div></div><aside class="panel"><div class="summary-head"><p class="eyebrow">Монтаж 1</p><h2>16 мест · 90°</h2></div><div class="detail-list"><div class="detail-row"><span>Физический лист</span><b>616×446</b></div><div class="detail-row"><span>Печатное поле</span><b>608×431</b></div><div class="detail-row"><span>Изделие с выпуском</span><b>109×152</b></div><div class="detail-row"><span>Тираж формы</span><b>825</b></div><div class="detail-row"><span>Лицо / оборот</span><b>1+1</b></div><div class="detail-row"><span>Формы</span><b>2</b></div></div></aside></div>
+        </section>
+
+        <section class="screen" data-screen-panel="forms"><div class="placeholder-screen panel"><h2>Все формы выбранного плана</h2><p>Отдельный рабочий раздел для просмотра монтажей, а не длинная вставка под основной схемой. Здесь будут фильтры по файлу, форме, лицу/обороту и номеру прогона.</p><div class="cards"><div class="card panel"><h3>Форма 1 · лицо</h3><p>16 мест · прогон 825 · 1 пластина</p></div><div class="card panel"><h3>Форма 2 · оборот</h3><p>Зеркальная раскладка · прогон 825</p></div><div class="card panel"><h3>Форма 3 · лицо</h3><p>Смешанный тираж · прогон 740</p></div></div></div></section>
+        <section class="screen" data-screen-panel="cost"><div class="placeholder-screen panel"><h2>Стоимость и прайс</h2><p>Бумага, пластины, подготовка форм и стоимость прогонов объединяются в отдельной таблице с явными допущениями и отсутствующими ценами.</p><div class="cards"><div class="card panel"><h3>Бумага</h3><p>80 г/м² · 2.50 BYN/кг · 3 305 листов</p></div><div class="card panel"><h3>Пластины</h3><p>8 шт. · 15 BYN · 120 BYN</p></div><div class="card panel"><h3>Итого</h3><p>1 284 BYN · без скрытых нулевых цен</p></div></div></div></section>
+        <section class="screen" data-screen-panel="export"><div class="placeholder-screen panel"><h2>Экспорт</h2><p>PDF схем, производственный отчёт, TXT заказа и диагностический JSON доступны из одного раздела. Экспорт всегда относится к выбранному плану.</p><div class="button-row"><button class="compact-btn primary">Схемы PDF</button><button class="compact-btn">Отчёт PDF</button><button class="compact-btn">Заказ TXT</button><button class="compact-btn">JSON</button></div></div></section>
+      </main>
+
+      <aside class="summary panel" id="summaryPanel">
+        <div class="summary-head"><p class="eyebrow">Живой итог</p><h2>Смешанный оптимум</h2></div>
+        <div class="metric-grid"><div class="metric primary"><span>Листы</span><strong>3 305</strong></div><div class="metric"><span>Формы</span><strong>8</strong></div><div class="metric"><span>Пластины</span><strong>8</strong></div><div class="metric"><span>Прогоны</span><strong>6 610</strong></div><div class="metric"><span>Перетираж</span><strong>0</strong></div><div class="metric"><span>Стоимость</span><strong>1 284</strong></div></div>
+        <div class="summary-block"><h3>Быстрый выбор плана</h3><div class="plan-item is-active"><i class="plan-radio"></i><span class="plan-copy"><strong>Смешанный оптимум</strong><small>баланс бумаги и форм</small></span><b class="plan-price">1 284</b></div><div class="plan-item"><i class="plan-radio"></i><span class="plan-copy"><strong>Минимум бумаги</strong><small>больше форм</small></span><b class="plan-price">2 730</b></div><div class="plan-item"><i class="plan-radio"></i><span class="plan-copy"><strong>Минимум форм</strong><small>+90 листов</small></span><b class="plan-price">1 319</b></div></div>
+        <div class="summary-block"><button class="compact-btn primary" style="width:100%">Открыть выбранную схему</button></div>
+      </aside>
+    </div>
+
+    <nav class="mobile-dock" aria-label="Мобильная навигация"><button class="dock-btn is-active" data-screen="order"><b>▦</b>Заказ</button><button class="dock-btn" data-screen="plans"><b>≋</b>Варианты</button><button class="dock-btn" data-screen="layout"><b>▧</b>Схема</button><button class="dock-btn" data-screen="forms"><b>▤</b>Формы</button><button class="dock-btn" data-screen="export"><b>•••</b>Ещё</button></nav>
+  </div>
+
+  <div class="overlay" id="paletteOverlay"><div class="palette"><input id="paletteInput" placeholder="Перейти, добавить строку, открыть схему…"><div class="palette-list"><div class="palette-item" data-command="order"><span>Открыть строки заказа</span><kbd>G O</kbd></div><div class="palette-item" data-command="plans"><span>Сравнить варианты</span><kbd>G V</kbd></div><div class="palette-item" data-command="layout"><span>Открыть схему</span><kbd>G S</kbd></div><div class="palette-item"><span>Добавить строку продукции</span><kbd>N</kbd></div><div class="palette-item"><span>Переключить экономичный режим</span><kbd>E</kbd></div></div></div></div>
+
+  <script>
+    const rows = [
+      ["A-01_визитка.pdf","90×50","1000",1,2,"4","4","2","общий","авто","Готово"],
+      ["B-02_листовка.pdf","105×148","1500",1,2,"1","1","2","общий","чужой","Готово"],
+      ["C-03_меню.pdf","210×297","500",2,4,"4","4","3","разд.","авто","Готово"],
+      ["D-04_этикетка.pdf","70×100","3200",4,2,"4","1","2","общий","свой","Проверить"],
+      ["E-05_буклет.pdf","210×210","700",1,8,"4","4","3","разд.","чужой","Готово"],
+      ["F-06_открытка.pdf","148×210","1200",3,2,"4","0","2","общий","авто","Готово"],
+      ["G-07_вкладыш.pdf","100×150","2500",2,2,"1","1","2","общий","чужой","Готово"],
+      ["H-08_купон.pdf","74×105","5000",5,2,"1","1","0","общий","авто","Готово"]
+    ];
+    const grid = document.querySelector('#orderGrid');
+    rows.forEach((r,index)=>{
+      const row=document.createElement('div');row.className='grid-row'+(index===0?' is-selected':'');
+      row.innerHTML=`<div class="cell sticky-index">${String(index+1).padStart(2,'0')}</div><div class="cell sticky-name"><span class="file-name"><i class="file-badge">PDF</i><span class="file-text">${r[0]}</span></span></div><div class="cell"><input class="mini-input" value="${r[1]}"></div><div class="cell num"><input class="mini-input" value="${r[2]}"></div><div class="cell num">${r[3]}</div><div class="cell num">${r[4]}</div><div class="cell"><span class="print-badge">${r[5]}+${r[6]}</span></div><div class="cell"><span class="print-badge">${r[6]}</span></div><div class="cell num">${r[7]} мм</div><div class="cell">${r[8]}</div><div class="cell">${r[9]}</div><div class="cell"><span class="row-state ${r[10]==='Проверить'?'warning':''}">${r[10]}</span></div><div class="cell"><div class="row-actions"><button title="Подробности">⋯</button><button title="Дублировать">⧉</button><button title="Отключить">✓</button><button class="danger" title="Удалить">×</button></div></div>`;
+      grid.append(row);
+    });
+
+    function openScreen(id){
+      document.querySelectorAll('[data-screen-panel]').forEach(p=>p.classList.toggle('is-active',p.dataset.screenPanel===id));
+      document.querySelectorAll('[data-screen]').forEach(b=>b.classList.toggle('is-active',b.dataset.screen===id));
+      document.querySelector('.workspace').scrollIntoView({block:'start'});
+    }
+    document.addEventListener('click',e=>{const b=e.target.closest('[data-screen]');if(b)openScreen(b.dataset.screen)});
+    document.querySelectorAll('#densityControl button').forEach(b=>b.addEventListener('click',()=>{document.body.dataset.density=b.dataset.density;document.querySelectorAll('#densityControl button').forEach(x=>x.classList.toggle('is-active',x===b))}));
+    document.querySelector('#economyButton').addEventListener('click',e=>{const next=document.body.dataset.economy!=='true';document.body.dataset.economy=String(next);e.currentTarget.textContent=next?'✓ Экономичный режим':'⚡ Экономичный режим'});
+    document.querySelector('#mobilePresetButton').addEventListener('click',()=>document.querySelector('#sidebar').classList.toggle('is-mobile-open'));
+    const overlay=document.querySelector('#paletteOverlay');
+    const openPalette=()=>{overlay.classList.add('is-open');setTimeout(()=>document.querySelector('#paletteInput').focus(),0)};
+    const closePalette=()=>overlay.classList.remove('is-open');
+    document.querySelector('#paletteButton').addEventListener('click',openPalette);
+    overlay.addEventListener('click',e=>{if(e.target===overlay)closePalette();const c=e.target.closest('[data-command]');if(c){openScreen(c.dataset.command);closePalette()}});
+    document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPalette()}if(e.key==='Escape')closePalette()});
+    document.querySelectorAll('.grid-row').forEach(row=>row.addEventListener('click',()=>{document.querySelectorAll('.grid-row').forEach(x=>x.classList.remove('is-selected'));row.classList.add('is-selected')}));
+  </script>
+</body>
+</html>
