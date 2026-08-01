@@ -1,0 +1,47 @@
+{
+  "id": "r3-control-order-20-products",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "[data-txt-import-controls]",
+      "text": "Пример: 20 видов"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 900
+    },
+    {
+      "action": "click",
+      "selector": "[data-txt-import-controls] button:first-child"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 2200
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#productList [data-product-row]:nth-child(1)",
+      "text": "Листовка 70"
+    },
+    {
+      "selector": "#productList [data-product-row]:nth-child(20)",
+      "text": "Листовка 20"
+    },
+    {
+      "selector": "#calculationError",
+      "hidden": true
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": ".products-panel",
+  "screenshot": "uimposition-r3-control-order-20-products.png"
+}
