@@ -8,6 +8,7 @@ import {
 } from "../src/operator-workspace-export.js";
 
 const details = document.querySelector("#layoutDetails");
+const toolbarHost = document.querySelector(".screen--layout .screen-heading__actions");
 let rendering = false;
 let busy = false;
 let lastSignature = null;
@@ -44,6 +45,7 @@ function removePlaceholder() {
   [...details.querySelectorAll("button[disabled]")].forEach((button) => {
     if (button.textContent.includes("PDF")) button.remove();
   });
+  details.querySelector("[data-workspace-export]")?.remove();
 }
 
 function exportButton(type, label, enabled) {
@@ -59,53 +61,52 @@ function exportButton(type, label, enabled) {
 }
 
 function renderControls({ force = false } = {}) {
-  if (!details || rendering) return;
+  if (!toolbarHost || rendering) return;
   const snapshot = readySnapshot();
   const signature = controlSignature(snapshot);
   if (
     !force
     && signature === lastSignature
-    && details.querySelector("[data-workspace-export]")
-  ) {
-    return;
-  }
+    && toolbarHost.querySelector("[data-workspace-export]")
+  ) return;
 
   rendering = true;
   lastSignature = signature;
   try {
     removePlaceholder();
-    details.querySelector("[data-workspace-export]")?.remove();
+    toolbarHost.querySelector("[data-workspace-export]")?.remove();
     if (!snapshot.result) return;
 
     const section = document.createElement("section");
     section.dataset.workspaceExport = "true";
-    section.style.marginTop = "12px";
-    section.style.paddingTop = "12px";
-    section.style.borderTop = "1px solid var(--line)";
-    section.innerHTML = `
-      <p class="kicker">PDF выбранного плана</p>
-      <p class="muted" data-workspace-export-status>${snapshot.ready
-        ? "Схемы и отчёт будут сформированы из текущего выбора оператора."
-        : "Исправьте текущий ввод: экспорт предыдущей ревизии отключён."}</p>
-      <div data-workspace-export-actions style="display:grid;gap:7px;margin-top:10px"></div>
-    `;
-    const actions = section.querySelector("[data-workspace-export-actions]");
-    actions.append(
+    section.className = "workspace-export-toolbar";
+    const status = document.createElement("span");
+    status.className = "workspace-export-status";
+    status.dataset.workspaceExportStatus = "true";
+    status.textContent = snapshot.ready
+      ? "PDF текущего выбора"
+      : "Исправьте ввод — PDF отключён";
+    section.append(
       exportButton(
         OPERATOR_WORKSPACE_EXPORT_TYPES.SCHEMES,
-        "Скачать схемы PDF",
+        "Схемы PDF",
         snapshot.ready && !busy,
       ),
       exportButton(
         OPERATOR_WORKSPACE_EXPORT_TYPES.REPORT,
-        "Скачать отчёт PDF",
+        "Отчёт PDF",
         snapshot.ready && !busy,
       ),
+      status,
     );
-    details.append(section);
+    toolbarHost.append(section);
   } finally {
     rendering = false;
   }
+}
+
+function statusNode() {
+  return toolbarHost?.querySelector("[data-workspace-export-status]") ?? null;
 }
 
 function releaseBusyState() {
@@ -127,18 +128,18 @@ async function handleExport(type) {
   const models = createOperatorWorkspaceExportModels(result);
   busy = true;
   renderControls({ force: true });
-  const activeStatus = details.querySelector("[data-workspace-export-status]");
+  const activeStatus = statusNode();
   if (activeStatus) activeStatus.textContent = type === OPERATOR_WORKSPACE_EXPORT_TYPES.SCHEMES
-    ? "Формируем страницы схем…"
-    : "Формируем производственный отчёт…";
+    ? "Формируем схемы…"
+    : "Формируем отчёт…";
 
   try {
     const receipt = await downloadOperatorWorkspacePdf(models, type);
-    const nextStatus = details.querySelector("[data-workspace-export-status]");
-    if (nextStatus) nextStatus.textContent = `Скачан ${receipt.fileName} · ${receipt.byteLength.toLocaleString("ru-RU")} байт.`;
+    const nextStatus = statusNode();
+    if (nextStatus) nextStatus.textContent = `Скачан ${receipt.fileName}`;
     window.dispatchEvent(new CustomEvent("uimposition:r3-pdf-download", { detail: receipt }));
   } catch (error) {
-    const nextStatus = details.querySelector("[data-workspace-export-status]");
+    const nextStatus = statusNode();
     if (nextStatus) nextStatus.textContent = `PDF не создан: ${error.message}`;
     window.dispatchEvent(new CustomEvent("uimposition:r3-pdf-error", {
       detail: { type, message: error.message },
@@ -148,14 +149,14 @@ async function handleExport(type) {
   }
 }
 
-details?.addEventListener("click", (event) => {
+toolbarHost?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-workspace-pdf]");
   if (button) handleExport(button.dataset.workspacePdf);
 });
 
-if (details) {
+if (toolbarHost) {
   const observer = new MutationObserver(() => queueMicrotask(() => renderControls()));
-  observer.observe(details, { childList: true, subtree: true });
+  if (details) observer.observe(details, { childList: true, subtree: true });
   const waitForWorkspace = setInterval(() => {
     if (!window.__uimpositionR3) return;
     clearInterval(waitForWorkspace);
