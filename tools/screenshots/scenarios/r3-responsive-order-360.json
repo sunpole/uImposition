@@ -1,0 +1,47 @@
+{
+  "id": "r3-responsive-order-360",
+  "path": "/app/",
+  "viewport": {
+    "width": 360,
+    "height": 640
+  },
+  "assertions": [
+    {
+      "selector": "#pricingButton",
+      "text": "Прайс"
+    },
+    {
+      "selector": "[data-pricing-summary]",
+      "text": "80 г/м²"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 1000
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-txt-import-controls]",
+      "text": "Пример: 20 видов"
+    },
+    {
+      "selector": "[data-txt-import-controls]",
+      "text": "Шаблон TXT"
+    },
+    {
+      "selector": "[data-txt-import-controls]",
+      "text": "Импорт TXT"
+    },
+    {
+      "selector": "#addProductButton",
+      "text": "Добавить вид"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": ".screen--order",
+  "screenshot": "uimposition-r3-responsive-order-360.png"
+}
