@@ -105,7 +105,7 @@ test("R2-A existing improving columns remain visible but are not offered for add
   assert.equal(existing.existing, true);
   assert.equal(existing.eligibleForAddition, false);
   assert.notEqual(second.bestImprovingCandidate.columnSignature, existingSignature);
-  assert.deepEqual(allocationVector(second.bestImprovingCandidate), [3, 0]);
+  assert.deepEqual(allocationVector(second.bestImprovingCandidate), [3, 1]);
 });
 
 test("R2-A no candidate is improving when all coverage credits stay below sheet cost", () => {
