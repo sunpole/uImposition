@@ -1,4 +1,7 @@
-import { replaceApplicationInput } from "../src/application-state.js";
+import {
+  replaceApplicationInput,
+  setApplicationActiveScreen,
+} from "../src/application-state.js";
 import { addApplicationProductRow } from "../src/application-product-rows.js";
 import { createApplicationStateRepository } from "../src/local-state-repository.js";
 import { parseProductRowsTxt } from "../src/product-row-txt.js";
@@ -11,6 +14,8 @@ import {
 const addButton = document.querySelector("#addProductButton");
 const heading = addButton?.parentElement ?? null;
 const repository = createApplicationStateRepository({ storage: window.localStorage });
+
+window.localStorage.removeItem("uImposition.controlReference.active.2026-08-01");
 
 function downloadText(text, fileName) {
   const blob = new Blob([`\uFEFF${text}`], { type: "text/plain;charset=utf-8" });
@@ -60,21 +65,26 @@ function parseImportText(text) {
     : parseSimpleProductRowsTxt(text, { baseRow: currentBaseRow() });
 }
 
-function buildImportedState(rows) {
+function buildImportedState(rows, {
+  inputPatch = null,
+  activeScreen = null,
+} = {}) {
   const loaded = repository.load();
   if (!loaded) throw new Error("Текущий проект не найден в локальном хранилище.");
   let next = replaceApplicationInput(loaded, {
     ...loaded.input,
+    ...(inputPatch ?? {}),
     products: [],
   });
   rows.forEach((row) => {
     next = addApplicationProductRow(next, row);
   });
+  if (activeScreen) next = setApplicationActiveScreen(next, activeScreen);
   return next;
 }
 
-function applyRows(rows, status, message) {
-  repository.save(buildImportedState(rows));
+function applyRows(rows, status, message, options = {}) {
+  repository.save(buildImportedState(rows, options));
   status.hidden = false;
   status.textContent = `${message} Обновляем рабочий экран…`;
   window.setTimeout(() => window.location.reload(), 80);
@@ -97,20 +107,23 @@ async function importFile(file, status) {
 }
 
 function controlCaseRows(controlCase) {
-  const base = currentBaseRow();
   return controlCase.orders.map((order) => ({
-    name: `Листовка ${order.file}`,
+    name: String(order.file),
     sourceFileName: null,
     finished: {
-      widthMm: order.width ?? base.finished.widthMm,
-      heightMm: order.height ?? base.finished.heightMm,
+      widthMm: order.width ?? controlCase.product.width,
+      heightMm: order.height ?? controlCase.product.height,
     },
     quantityPerVariant: order.quantity,
     variantCount: 1,
     pages: order.pages,
-    print: { ...base.print },
+    print: {
+      mode: "duplex",
+      frontColors: 1,
+      backColors: 1,
+      duplexPreference: "separateFrontBackForms",
+    },
     bleed: {
-      ...base.bleed,
       mode: "uniform",
       uniformMm: order.bleed ?? 0,
       sidesMm: {
@@ -122,21 +135,54 @@ function controlCaseRows(controlCase) {
     },
     cut: (order.bleed ?? 0) === 0
       ? { mode: "commonCut", gapMm: 0 }
-      : { mode: "separated", gapMm: base.cut?.gapMm ?? 0 },
+      : { mode: "separated", gapMm: 0 },
     rotationPolicy: "auto",
-    notes: "Контрольный заказ uImposition",
+    notes: "Контрольный заказ M3 · чёрно-белый 1+1",
   }));
+}
+
+function controlCaseInput(controlCase) {
+  const trim = controlCase.sheet.trim;
+  return {
+    selectedSheetPressPresetId: null,
+    sheet: {
+      width: controlCase.sheet.width,
+      height: controlCase.sheet.height,
+      sizeStage: controlCase.sheet.sizeStage,
+      trim: {
+        enabled: trim.enabled,
+        mode: "sides",
+        uniformMm: 0,
+        sidesMm: {
+          left: trim.left,
+          right: trim.right,
+          top: trim.top,
+          bottom: trim.bottom,
+        },
+      },
+    },
+    press: {
+      marginsMm: { ...controlCase.sheet.pressMargins },
+    },
+  };
+}
+
+async function fetchControlCase() {
+  const response = await fetch("../data/control-case.json", { cache: "no-store" });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
 }
 
 async function loadControlCase(status) {
   status.hidden = false;
-  status.textContent = "Загружаем контрольный заказ…";
+  status.textContent = "Загружаем контрольный заказ 1+1…";
   try {
-    const response = await fetch("../data/control-case.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const controlCase = await response.json();
+    const controlCase = await fetchControlCase();
     const rows = controlCaseRows(controlCase);
-    applyRows(rows, status, `Загружен пример: ${rows.length} видов A6.`);
+    applyRows(rows, status, "Загружены исходные данные: 20 файлов A6, 1+1. Все варианты рассчитываются программой заново.", {
+      inputPatch: controlCaseInput(controlCase),
+      activeScreen: "layout",
+    });
   } catch (error) {
     status.textContent = `Пример не загружен: ${error.message}`;
   }
@@ -152,7 +198,8 @@ function installControls() {
   const exampleButton = document.createElement("button");
   exampleButton.type = "button";
   exampleButton.className = "button button--quiet";
-  exampleButton.textContent = "Пример: 20 видов";
+  exampleButton.textContent = "Тест: 20 файлов · 1+1";
+  exampleButton.title = "Загрузить только исходные данные старого контрольного заказа и пересчитать их текущим оптимизатором";
 
   const templateButton = document.createElement("button");
   templateButton.type = "button";
@@ -197,11 +244,13 @@ window.__uimpositionR3TxtImport = Object.freeze({
     repository.save(buildImportedState(result.rows));
     return result;
   },
-  loadControlCase: async () => {
-    const response = await fetch("../data/control-case.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const rows = controlCaseRows(await response.json());
-    repository.save(buildImportedState(rows));
+  async loadControlCase() {
+    const controlCase = await fetchControlCase();
+    const rows = controlCaseRows(controlCase);
+    repository.save(buildImportedState(rows, {
+      inputPatch: controlCaseInput(controlCase),
+      activeScreen: "layout",
+    }));
     return rows;
   },
 });

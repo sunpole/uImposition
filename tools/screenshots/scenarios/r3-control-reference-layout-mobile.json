@@ -1,0 +1,59 @@
+{
+  "id": "r3-generated-control-plan-layout-mobile",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "[data-txt-import-controls] button:first-child",
+      "text": "Тест: 20 файлов · 1+1"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "click",
+      "selector": "[data-txt-import-controls] button:first-child"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 3000
+    },
+    {
+      "action": "click",
+      "selector": ".screen--layout .segmented [data-acceptance-layout='both']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 650
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": ".all-selected-forms-intro",
+      "text": "Все формы выбранного рассчитанного варианта"
+    },
+    {
+      "selector": ".all-selected-forms-intro",
+      "text": "56 монтажей"
+    },
+    {
+      "selector": "[data-generated-imposition-count='56'] .scheme-pair:nth-child(56)",
+      "text": "ОБОРОТ"
+    },
+    {
+      "selector": ".scheme-pair:first-child .scheme-card:first-child .scheme-cell:first-child",
+      "text": "→"
+    },
+    {
+      "selector": ".scheme-pair:first-child .scheme-card:nth-child(2) .scheme-cell:first-child",
+      "text": "←"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": ".screen--layout",
+  "screenshot": "uimposition-r3-generated-control-plan-layout-mobile.png"
+}
