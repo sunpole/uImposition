@@ -47,11 +47,13 @@ const TEXT = Object.freeze({
     onlyDifferences: "Только различия",
     family: "Семейство",
     allFamilies: "Все семейства",
-    duplex: "Оборот",
+    duplex: "Способ оборота",
     allDuplex: "Все способы",
     shown: "показано",
     variants: "варианта(ов)",
-    exactScope: "Полный набор внутри текущей области: fitting 0°/90° × две uniform plan-family. Это не глобальный перебор mixed-layout и всех последовательностей форм.",
+    exactScope: "Полный набор внутри заявленной области: uniform-сетки 0°/90° и поддерживаемые plan-family. Это не глобальный перебор mixed-layout и всех последовательностей форм.",
+    workAndTurnScope: "«Свой оборот» рассчитывается только для сеток с чётным числом колонок: одна общая форма, горизонтальный переворот, два прогона.",
+    workAndTurnBlankExcluded: "«Свой оборот» исключён для текущего заказа из-за технически пустой оборотной страницы.",
     from: "из",
     reference: "Дельты относительно",
     selectedReference: "выбранного плана",
@@ -86,11 +88,13 @@ const TEXT = Object.freeze({
     onlyDifferences: "Differences only",
     family: "Family",
     allFamilies: "All families",
-    duplex: "Duplex",
-    allDuplex: "All modes",
+    duplex: "Duplex method",
+    allDuplex: "All methods",
     shown: "shown",
     variants: "variant(s)",
-    exactScope: "Complete inside the current scope: fitting 0°/90° × two uniform plan families. This is not a global enumeration of mixed layouts or every form sequence.",
+    exactScope: "Complete inside the declared scope: uniform 0°/90° grids and supported plan families. This is not a global enumeration of mixed layouts or every form sequence.",
+    workAndTurnScope: "Work-and-turn is evaluated only for grids with an even column count: one shared plate, horizontal turn and two passes.",
+    workAndTurnBlankExcluded: "Work-and-turn is excluded for this order because it contains a technical blank back page.",
     from: "of",
     reference: "Deltas relative to",
     selectedReference: "the selected plan",
@@ -114,6 +118,23 @@ const TEXT = Object.freeze({
     details: "Details",
     rowsReused: "generated plans reused",
     rowsRegenerated: "plans regenerated",
+  }),
+});
+
+const VALUE_LABELS = Object.freeze({
+  ru: Object.freeze({
+    paperMinimum: "Минимум бумаги",
+    dedicatedPairForms: "Отдельные формы лица и оборота",
+    workAndTurnDedicatedPairs: "Свой оборот — общая форма",
+    separateFrontBackForms: "Чужой оборот",
+    workAndTurn: "Свой оборот",
+  }),
+  en: Object.freeze({
+    paperMinimum: "Paper minimum",
+    dedicatedPairForms: "Separate front/back forms",
+    workAndTurnDedicatedPairs: "Work-and-turn shared plate",
+    separateFrontBackForms: "Separate front/back forms",
+    workAndTurn: "Work-and-turn",
   }),
 });
 
@@ -185,6 +206,10 @@ function t(key) {
   return TEXT[language()][key] ?? TEXT.ru[key] ?? key;
 }
 
+function valueLabel(value) {
+  return VALUE_LABELS[language()][value] ?? VALUE_LABELS.ru[value] ?? String(value);
+}
+
 function columnLabel(columnId) {
   return COLUMN_LABELS[language()][columnId] ?? COLUMN_LABELS.ru[columnId] ?? columnId;
 }
@@ -212,6 +237,7 @@ function formatValue(columnId, value, row) {
     return MONEY_COLUMNS.has(columnId) ? t("pricingMissing") : "—";
   }
   if (columnId === "orientation") return `${formatNumber(value, 0)}°`;
+  if (columnId === "family" || columnId === "duplexMode") return valueLabel(value);
   if (MONEY_COLUMNS.has(columnId)) {
     const currency = row.plan.metrics.currency ?? "BYN";
     return `${formatNumber(value, columnId === "estimatedUnitCost" ? 4 : 2)} ${currency}`;
@@ -263,7 +289,7 @@ function statusButton(filterId, label, count) {
 
 function uniqueOptions(rows, key) {
   return [...new Set(rows.map((row) => row[key]).filter(Boolean))].sort((left, right) => (
-    String(left).localeCompare(String(right), locale())
+    valueLabel(left).localeCompare(valueLabel(right), locale())
   ));
 }
 
@@ -273,7 +299,7 @@ function selectControl(labelText, dataName, allText, values, currentValue) {
   const select = document.createElement("select");
   select.dataset[dataName] = "";
   select.append(new Option(allText, ""));
-  values.forEach((value) => select.append(new Option(String(value), String(value))));
+  values.forEach((value) => select.append(new Option(valueLabel(value), String(value))));
   select.value = currentValue ?? "";
   label.append(select);
   return label;
@@ -304,6 +330,12 @@ function renderHeaderCell(columnId) {
   return th;
 }
 
+function localizedPlanTitle(row) {
+  const family = valueLabel(row.family ?? row.values.family);
+  const duplex = valueLabel(row.duplexMode ?? row.values.duplexMode);
+  return `${family} · ${duplex}`;
+}
+
 function renderValueCell(row, columnId) {
   const td = element("td", `comparison-table__cell comparison-table__cell--${columnId}`);
   td.dataset.label = columnLabel(columnId);
@@ -311,7 +343,7 @@ function renderValueCell(row, columnId) {
   if (columnId === "label") {
     const copy = element("div", "comparison-plan-copy");
     copy.append(
-      element("strong", "comparison-plan-copy__title", row.values.label),
+      element("strong", "comparison-plan-copy__title", localizedPlanTitle(row)),
       element("span", "comparison-plan-copy__meta", `${row.values.orientation ?? 0}° · ${row.values.grid ?? "—"} · #${row.rank}`),
       element("span", "comparison-plan-copy__proof", proofText(row.values.proofStatus)),
     );
@@ -334,6 +366,8 @@ function renderValueCell(row, columnId) {
 function renderRow(row, columnIds) {
   const tr = element("tr", "comparison-table__row");
   tr.dataset.planId = row.id;
+  tr.dataset.duplexMode = row.duplexMode ?? "";
+  tr.dataset.planFamily = row.family ?? "";
   tr.classList.toggle("is-recommended", row.recommended);
   tr.classList.toggle("is-operator-selected", row.selected);
   columnIds.forEach((columnId) => tr.append(renderValueCell(row, columnId)));
@@ -376,6 +410,12 @@ function renderMobileReference(tableModel) {
   const referenceIsSelected = tableModel.referencePlanId === tableModel.selectedPlanId && tableModel.selectedPlanId;
   const label = referenceIsSelected ? t("selectedReference") : t("recommendedReference");
   return `${t("reference")}: ${label}`;
+}
+
+function workAndTurnScopeText(planSet) {
+  if (planSet.scope?.workAndTurnExcludedByTechnicalBlank) return t("workAndTurnBlankExcluded");
+  if (planSet.scope?.workAndTurnEvaluated) return t("workAndTurnScope");
+  return null;
 }
 
 function handleControls(panel, renderAgain) {
@@ -464,10 +504,14 @@ export function renderUserProductionComparisonPanel(panel, planSet, {
   controls.append(differences);
 
   const status = element("div", "comparison-view-status");
+  const workAndTurnStatus = workAndTurnScopeText(planSet);
   status.append(
     element("strong", "", `${t("shown")}: ${tableModel.summary.viewRowCount} ${t("from")} ${tableModel.summary.catalogFeasibleSolutionCount}`),
     element("span", "", renderMobileReference(tableModel)),
     element("span", "", t("exactScope")),
+  );
+  if (workAndTurnStatus) status.append(element("span", "comparison-work-and-turn-scope", workAndTurnStatus));
+  status.append(
     element("span", "", t("retained")),
     element("span", "comparison-runtime-proof", `${tableModel.summary.reusedPlanCount} ${t("rowsReused")} · ${tableModel.summary.regeneratedPlanCount} ${t("rowsRegenerated")}`),
   );
