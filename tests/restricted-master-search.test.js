@@ -121,8 +121,9 @@ test("R1-A2 separate-duplex branch-and-bound matches exact forms, plates and pas
   assert.equal(result.bestPlan.planSignature, exact.plan.planSignature);
   assert.deepEqual(result.bestPlan.metrics, exact.plan.metrics);
   assert.equal(result.bestPlan.metrics.physicalSheets, 3);
-  assert.equal(result.bestPlan.metrics.layoutForms, 2);
-  assert.equal(result.bestPlan.metrics.colorPlates, 5);
+  assert.equal(result.bestPlan.metrics.selectedColumnCount, 2);
+  assert.equal(result.bestPlan.metrics.layoutForms, 4);
+  assert.equal(result.bestPlan.metrics.colorPlates, 10);
   assert.equal(result.bestPlan.metrics.pressPasses, 6);
   assert.equal(result.coverage.provenOptimalWithinRestrictedSpace, true);
 });
