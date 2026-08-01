@@ -65,10 +65,10 @@ E — экспорт, объяснение и operator case memory
 
 - [Аудит 50 репозиториев](research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md)
 - [Архитектурное решение после аудита](research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md)
+- [Порядок реализации universal solver](research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md)
 - [Актуальная архитектура](docs/ARCHITECTURE.md)
 - [Алгоритм и оптимизация](docs/ALGORITHM_AND_OPTIMIZATION.md)
 - [План доказательных тестов](docs/TEST_PLAN.md)
-- [Порядок реализации universal solver](docs/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md)
 - [Оставшиеся работы](docs/REMAINING_WORK.md)
 
 ## Внешние опоры
