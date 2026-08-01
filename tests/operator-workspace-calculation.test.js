@@ -41,7 +41,7 @@ test("operator workspace builds real uniform plans from application product rows
   assert.equal(result.summary.enabledRowCount, 1);
   assert.equal(result.summary.variantCount, 2);
   assert.equal(result.pagePairs.length, 2);
-  assert.equal(result.plans.length, 4);
+  assert.equal(result.plans.length, 5);
   assert.ok(result.plans.some(({ recommended }) => recommended));
   assert.equal(result.selectedPlanId, result.plans.find(({ recommended }) => recommended).id);
   assert.equal(result.layoutPreview.cells.length, result.layoutPreview.capacity);
