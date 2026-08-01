@@ -1,3 +1,4 @@
+import { DUPLEX_STRATEGIES } from "./duplex-strategies.js";
 import { calculateProductionCost } from "./production-cost.js";
 import { createSolutionMetrics } from "./solution-metrics.js";
 
@@ -42,7 +43,7 @@ export function calculateColorPlatesForReport(report, {
   return layoutForms * colors;
 }
 
-function productionShape({ totals, printSpecification, colorsPerLayoutForm }) {
+function productionShape({ totals, duplexMode, printSpecification, colorsPerLayoutForm }) {
   const layoutForms = nonNegativeInteger(totals.forms, "report.totals.forms");
   const pressPasses = nonNegativeInteger(totals.pressPasses, "report.totals.pressPasses");
 
@@ -59,6 +60,15 @@ function productionShape({ totals, printSpecification, colorsPerLayoutForm }) {
   const backForms = nonNegativeInteger(totals.backForms, "report.totals.backForms");
   const frontColors = nonNegativeInteger(printSpecification.frontColors, "printSpecification.frontColors");
   const backColors = nonNegativeInteger(printSpecification.backColors, "printSpecification.backColors");
+
+  if (duplexMode === DUPLEX_STRATEGIES.WORK_AND_TURN) {
+    return Object.freeze({
+      layoutForms,
+      colorPlates: layoutForms * Math.max(frontColors, backColors),
+      pressPasses,
+      colorMode: printSpecification.label,
+    });
+  }
 
   return Object.freeze({
     layoutForms,
@@ -84,7 +94,12 @@ export function createProductionReportSolutionMetrics({
 } = {}) {
   const totals = reportTotals(report);
   const physicalSheets = nonNegativeInteger(totals.physicalSheets, "report.totals.physicalSheets");
-  const shape = productionShape({ totals, printSpecification, colorsPerLayoutForm });
+  const shape = productionShape({
+    totals,
+    duplexMode: report.duplexMode,
+    printSpecification,
+    colorsPerLayoutForm,
+  });
   const fileOverrun = nonNegativeInteger(totals.fileOverrun, "report.totals.fileOverrun");
   const pairOverrun = nonNegativeInteger(totals.overrun, "report.totals.overrun");
   const fileUnderproduction = nonNegativeInteger(totals.fileUnderproduction, "report.totals.fileUnderproduction");
