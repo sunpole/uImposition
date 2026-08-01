@@ -106,6 +106,12 @@ async function runBeforeScreenshotActions(page, actions = []) {
       await locator.fill(String(action.value ?? ""));
       continue;
     }
+    if (action.action === "select") {
+      const locator = page.locator(action.selector).first();
+      await expect(locator).toBeVisible();
+      await locator.selectOption(String(action.value ?? ""));
+      continue;
+    }
     if (action.action === "hide") {
       const locator = page.locator(action.selector).first();
       await locator.evaluate((element) => {
