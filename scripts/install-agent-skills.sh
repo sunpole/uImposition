@@ -2,7 +2,8 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE="$REPO_ROOT/.agent-vendor/mattpocock-skills"
+UPSTREAM_SOURCE="$REPO_ROOT/.agent-vendor/mattpocock-skills"
+PROJECT_SOURCE="$REPO_ROOT/agent-skills"
 EXPECTED_COMMIT="2ab958093e83e0ec752e6c1c5932da465bf23e0c"
 INSTALL_ROOT="${HOME}"
 FORCE=0
@@ -12,7 +13,7 @@ usage() {
 Usage: scripts/install-agent-skills.sh [--root PATH] [--force]
 
 Installs every non-deprecated skill from the pinned Matt Pocock skills
-submodule into:
+submodule plus uImposition project skills into:
   PATH/.agents/skills  (Codex / Agent Skills)
   PATH/.claude/skills  (Claude Code)
 
@@ -45,11 +46,11 @@ done
 
 command -v git >/dev/null 2>&1 || { echo "error: git is required" >&2; exit 1; }
 
-if [ ! -e "$SOURCE/.git" ] && [ ! -f "$SOURCE/.git" ]; then
+if [ ! -e "$UPSTREAM_SOURCE/.git" ] && [ ! -f "$UPSTREAM_SOURCE/.git" ]; then
   git -C "$REPO_ROOT" submodule update --init --recursive .agent-vendor/mattpocock-skills
 fi
 
-ACTUAL_COMMIT="$(git -C "$SOURCE" rev-parse HEAD)"
+ACTUAL_COMMIT="$(git -C "$UPSTREAM_SOURCE" rev-parse HEAD)"
 if [ "$ACTUAL_COMMIT" != "$EXPECTED_COMMIT" ]; then
   echo "error: unexpected skills commit" >&2
   echo "expected: $EXPECTED_COMMIT" >&2
@@ -59,22 +60,41 @@ if [ "$ACTUAL_COMMIT" != "$EXPECTED_COMMIT" ]; then
 fi
 
 TMP_DIRS="$(mktemp)"
-trap 'rm -f "$TMP_DIRS"' EXIT
-find "$SOURCE/skills" -name SKILL.md -not -path '*/deprecated/*' -print \
-  | sed 's#/SKILL.md$##' \
-  | sort > "$TMP_DIRS"
+TMP_NAMES="$(mktemp)"
+trap 'rm -f "$TMP_DIRS" "$TMP_NAMES"' EXIT
+
+find "$UPSTREAM_SOURCE/skills" -name SKILL.md -not -path '*/deprecated/*' -print \
+  | sed 's#/SKILL.md$##' >> "$TMP_DIRS"
+
+if [ -d "$PROJECT_SOURCE" ]; then
+  find "$PROJECT_SOURCE" -name SKILL.md -print \
+    | sed 's#/SKILL.md$##' >> "$TMP_DIRS"
+fi
+
+sort -u -o "$TMP_DIRS" "$TMP_DIRS"
+while IFS= read -r skill_dir; do
+  [ -n "$skill_dir" ] || continue
+  basename "$skill_dir" >> "$TMP_NAMES"
+done < "$TMP_DIRS"
+sort -o "$TMP_NAMES" "$TMP_NAMES"
 
 if [ ! -s "$TMP_DIRS" ]; then
   echo "error: no installable skills found" >&2
   exit 1
 fi
 
+DUPLICATES="$(uniq -d "$TMP_NAMES")"
+if [ -n "$DUPLICATES" ]; then
+  echo "error: duplicate skill names were found:" >&2
+  echo "$DUPLICATES" >&2
+  exit 1
+fi
+
 install_into() {
-  destination="$1"
-  manifest="$destination/.matt-pocock-skills-uimposition"
+  local destination="$1"
+  local manifest="$destination/.matt-pocock-skills-uimposition"
+  local previous
   previous="$(mktemp)"
-  names="$(mktemp)"
-  trap 'rm -f "$TMP_DIRS" "$previous" "$names"' EXIT
 
   mkdir -p "$destination"
   if [ -f "$manifest" ]; then
@@ -83,20 +103,16 @@ install_into() {
     : > "$previous"
   fi
 
-  while IFS= read -r skill_dir; do
-    [ -n "$skill_dir" ] || continue
-    basename "$skill_dir" >> "$names"
-  done < "$TMP_DIRS"
-
   while IFS= read -r name; do
     [ -n "$name" ] || continue
-    target="$destination/$name"
+    local target="$destination/$name"
     if [ -e "$target" ] && ! grep -Fxq "$name" "$previous" && [ "$FORCE" -ne 1 ]; then
+      rm -f "$previous"
       echo "error: unmanaged skill already exists: $target" >&2
       echo "Re-run with --force only if replacing it is intentional." >&2
       exit 1
     fi
-  done < "$names"
+  done < "$TMP_NAMES"
 
   while IFS= read -r old_name; do
     [ -n "$old_name" ] || continue
@@ -105,6 +121,7 @@ install_into() {
 
   while IFS= read -r skill_dir; do
     [ -n "$skill_dir" ] || continue
+    local name
     name="$(basename "$skill_dir")"
     rm -rf "$destination/$name"
     cp -R "$skill_dir" "$destination/$name"
@@ -112,18 +129,17 @@ install_into() {
 
   {
     echo "source=$EXPECTED_COMMIT"
-    sort -u "$names"
+    cat "$TMP_NAMES"
   } > "$manifest"
 
-  count="$(wc -l < "$names" | tr -d ' ')"
+  local count
+  count="$(wc -l < "$TMP_NAMES" | tr -d ' ')"
   echo "installed $count skills into $destination"
-
-  rm -f "$previous" "$names"
-  trap 'rm -f "$TMP_DIRS"' EXIT
+  rm -f "$previous"
 }
 
 install_into "$INSTALL_ROOT/.agents/skills"
 install_into "$INSTALL_ROOT/.claude/skills"
 
-echo "Matt Pocock skills are installed from pinned commit $EXPECTED_COMMIT."
+echo "Upstream and uImposition skills are installed from pinned commit $EXPECTED_COMMIT."
 echo "Restart Codex/Claude Code so the skill index is refreshed."
