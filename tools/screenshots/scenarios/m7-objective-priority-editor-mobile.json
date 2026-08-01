@@ -95,11 +95,15 @@
     },
     {
       "selector": "#userObjectivePriorityEditor",
+      "text": "5 готовых планов использовано повторно"
+    },
+    {
+      "selector": "#userObjectivePriorityEditor",
       "text": "0 планов построено заново"
     },
     {
       "selector": "#userObjectivePriorityEditor",
-      "text": "uniform-r90-dedicated-pairs"
+      "text": "uniform-r90-work-and-turn-dedicated-pairs"
     },
     {
       "selector": "#userObjectivePriorityEditor [data-move-objective='estimatedTotalCost'][data-offset='1']",
