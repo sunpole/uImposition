@@ -11,7 +11,8 @@
 5. Issue `#64`;
 6. `docs/CODEX_HANDOFF.md`;
 7. `docs/README.md` и `docs/PROJECT_CATALOG.md`;
-8. фактические `main`, PR, Actions, tags, Releases и issues.
+8. `docs/AGENT_SKILLS.md`;
+9. фактические `main`, PR, Actions, tags, Releases и issues.
 
 Не опираться на память предыдущего чата. GitHub — единственный источник истины.
 
@@ -34,7 +35,8 @@
 13. `docs/ARCHITECTURE.md`;
 14. `src/config.js`;
 15. tests и fixtures;
-16. process/release/news документы.
+16. process/release/news документы;
+17. `docs/AGENT_SKILLS.md` и `docs/agents/` для agent workflow.
 
 `docs/UI_UX_APPLICATION_REDESIGN.md` и PR `#62` — superseded-история. Они не задают новый UI.
 
@@ -49,6 +51,36 @@
 - merge только проверенного head;
 - терминал может дополнять проверку, но не заменяет GitHub evidence;
 - важный результат сохраняется как code, test, document, issue или artifact.
+
+## Agent skills
+
+### Issue tracker
+
+Задачи, specifications и investigation tickets ведутся в GitHub Issues. См. `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Используются стандартные роли `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. См. `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Проект использует single-context layout. См. `docs/agents/domain.md`.
+
+### Обязательный clarification gate
+
+До написания production-кода для любого нетривиального изменения frontend/UX, backend/API, solver/формул, persistence/schema, pricing, import/export/PDF, performance или operator workflow обязательно использовать установленный skill `uimposition-product-gate` и дисциплину `grill-with-docs`/`grilling`.
+
+- факты искать в GitHub, коде, tests, fixtures и документации, а не спрашивать у владельца;
+- владельцу задавать только вопросы решений;
+- задавать ровно один вопрос за сообщение;
+- к каждому вопросу давать рекомендуемый ответ;
+- пройти зависимости, исключения и edge cases;
+- не писать production-код, не менять поведение и не мигрировать данные до завершения интервью;
+- реализация разрешена только после явного подтверждения владельца: `Общее понимание достигнуто. Можно переходить к спецификации и реализации.`
+
+После подтверждения использовать flow `to-spec → to-tickets → implement → tdd → code-review` по масштабу задачи.
+
+Gate можно пропустить только для механической правки, однозначного bug fix с уже зафиксированным expected behaviour или явного waiver владельца для конкретной ограниченной задачи. Полные правила: `docs/AGENT_SKILLS.md`.
 
 ## Неприкосновенные производственные правила
 
