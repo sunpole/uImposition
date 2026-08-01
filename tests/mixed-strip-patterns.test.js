@@ -100,7 +100,7 @@ test("G1 strip count limit is visible and never presented as complete", () => {
 
   assert.equal(result.coverage.status, "truncated");
   assert.ok(result.coverage.truncationReasons.includes("stripCountLimit"));
-  assert.deepEqual(result.coverage.stripCountTruncatedAxes.sort(), ["horizontal", "vertical"]);
+  assert.deepEqual([...result.coverage.stripCountTruncatedAxes].sort(), ["horizontal", "vertical"]);
   assert.ok(result.coverage.axisCatalogs.every(({ truncatedByStripCount }) => truncatedByStripCount));
   assert.ok(result.best.capacity < 15);
 });
