@@ -25,13 +25,14 @@
   ],
   "beforeScreenshotAssertions": [
     { "selector": "#userProductionPlans", "text": "Сравнение производственных вариантов" },
-    { "selector": "#userProductionPlans", "text": "4 варианта" },
-    { "selector": "#userProductionPlans", "text": "Полный набор внутри текущей области" },
-    { "selector": "#userProductionPlans", "text": "4 готовых планов использовано повторно" },
+    { "selector": "#userProductionPlans", "text": "5 варианта" },
+    { "selector": "#userProductionPlans", "text": "Полный набор внутри заявленной области" },
+    { "selector": "#userProductionPlans", "text": "5 готовых планов использовано повторно" },
     { "selector": "#userProductionPlans", "text": "0 планов построено заново" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs']", "text": "Выбран" },
     { "selector": "[data-plan-id='uniform-r90-dedicated-pairs'] [data-select-user-plan]", "text": "Выбран" },
-    { "selector": ".comparison-table tbody tr:first-child[data-plan-id='uniform-r90-dedicated-pairs']", "text": "240,05 BYN" },
+    { "selector": ".comparison-table tbody tr:first-child[data-plan-id='uniform-r90-work-and-turn-dedicated-pairs']", "text": "189,05 BYN" },
+    { "selector": ".comparison-table tbody tr:first-child[data-duplex-mode='workAndTurn']", "text": "Свой оборот" },
     { "selector": "[data-comparison-differences]", "text": "" }
   ],
   "screenshotSelector": "[data-app-screen='alternatives']",
