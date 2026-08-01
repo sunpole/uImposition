@@ -1,0 +1,57 @@
+{
+  "id": "r3-responsive-layout-320",
+  "path": "/app/",
+  "viewport": {
+    "width": 320,
+    "height": 568
+  },
+  "assertions": [
+    {
+      "selector": "#pricingButton",
+      "text": "Прайс"
+    },
+    {
+      "selector": ".topbar__actions [data-open-screen='layout']",
+      "text": "Открыть схему"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 1000
+    },
+    {
+      "action": "click",
+      "selector": "[data-mobile-screen='layout']"
+    },
+    {
+      "action": "click",
+      "selector": "[data-acceptance-layout='both']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 500
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": ".layout-pair",
+      "text": "Оборот · зеркально"
+    },
+    {
+      "selector": "[data-workspace-pdf='schemes']",
+      "text": "Схемы PDF"
+    },
+    {
+      "selector": "[data-workspace-pdf='report']",
+      "text": "Отчёт PDF"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "layoutFitsCanvas": true,
+    "mirroredBackDom": true
+  },
+  "screenshotSelector": ".screen--layout",
+  "screenshot": "uimposition-r3-responsive-layout-320.png"
+}
