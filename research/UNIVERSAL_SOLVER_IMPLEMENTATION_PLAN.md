@@ -2,7 +2,7 @@
 
 Дата: **1 августа 2026**  
 Статус: **актуальный обязательный implementation contract**  
-Фактический baseline: merge PR `#102`, commit `9d16a24eec2cf437731ef6a5e74b182d8fa6eaa5`
+Фактический baseline: merge PR `#103`, commit `a0fe6edb8092e706572493f2534cc698b935262e`
 
 ## 1. Архитектурное решение
 
@@ -87,14 +87,13 @@ b9d83855ff685bb38831670fb0c3975bbd1bdbc4
 | P1 separate-duplex columns | **Завершён** | `#100`: зеркальный оборот, two-form column contract |
 | R0 simplex exact master | **Завершён** | `#99`: bounded exhaustive columns × integer run lengths |
 | R0 generic production master | **Завершён** | `#102`: simplex и separate duplex через единый family adapter |
+| R3-A random-small differential proof | **Завершён** | `#103`: 32 seeded cases против независимого exhaustive oracle |
 
-Superseded PR `#96`, `#98` и `#101` закрыты без merge как параллельные дубликаты уже объединённых реализаций. Их зелёные checks сохранены как evidence, но они не являются источниками рабочего кода.
+Superseded PR `#85`, `#96`, `#98` и `#101` закрыты без merge как исторические или параллельные дубликаты уже объединённых реализаций. Они не являются источниками рабочего кода.
 
 ## 5. Реализованные contracts
 
 ### GeometryPattern
-
-Основные модули:
 
 ```text
 src/geometric-pattern.js
@@ -191,6 +190,34 @@ run[j] ∈ Z+, если column j выбрана
 - отклоняет oversized search до enumeration;
 - никогда не заявляет global completeness.
 
+### Independent differential proof
+
+```text
+tests/exact-production-small-master-random.test.js
+```
+
+PR `#103` добавил независимый test-only exhaustive oracle, который не вызывает production master internals. Фиксированные seeds создают:
+
+- 16 simplex cases;
+- 16 separate-duplex cases;
+- capacity `2…3`;
+- `2…3` demand;
+- `1…2` selected columns;
+- maximum run length `2…3`;
+- разные quantity vectors, input order и color counts.
+
+Для каждой задачи совпадают:
+
+- theoretical/evaluated state count;
+- полный feasible structural-plan set;
+- run vectors;
+- production metrics;
+- Pareto frontier;
+- minimum value по sheets/forms/plates/passes/overrun/blanks;
+- корректный пустой результат, когда bounded space не имеет feasible plan.
+
+Это доказательство малой ограниченной области, а не claim о large-order completeness.
+
 ## 6. Закрытые proof fixtures
 
 ### Geometry
@@ -223,13 +250,13 @@ run[j] ∈ Z+, если column j выбрана
 - duplex forms/plates/passes берутся из column contract;
 - asymmetric `4+1` даёт пять пластин на duplex column;
 - incompatible families/geometry/catalog coverage отклоняются;
-- state-space limits проверяются до перебора.
+- state-space limits проверяются до перебора;
+- 32 random-small cases совпадают с независимым exhaustive oracle.
 
 ## 7. Текущая честная граница
 
 Пока не реализованы:
 
-- random-small independent brute-force differential suite;
 - branch-and-bound и lower-bound pruning;
 - restricted master для больших задач;
 - pricing subproblem и column generation;
@@ -245,68 +272,54 @@ run[j] ∈ Z+, если column j выбрана
 
 Текущий `/app/` продолжает использовать прежний проверенный bounded runtime. Новое ядро развивается отдельно и не выдаётся за подключённую пользовательскую функцию.
 
-## 8. Следующий обязательный этап R3-A
+## 8. Следующий обязательный этап R1-A
 
-До large-order search нужен независимый доказательный набор.
+Exact oracle уже доказан на выбранных и random-small fixtures. Следующий слой — bounded restricted master, который должен выдавать те же результаты на малых задачах, но не перечислять полное пространство больших задач.
 
-### Random-small differential tests
+### Контракт
 
-Для небольших параметров генерируются задачи:
+- immutable request/result;
+- одна совместимая column family и GeometryPattern;
+- initial dedicated columns;
+- несколько balanced mixed columns;
+- canonical coefficient matrix `a[column,demand]`;
+- deterministic branch order;
+- demand lower bounds;
+- incumbent feasible plans;
+- branch-and-bound/pruning;
+- explicit time/state/memory budgets;
+- progress counters;
+- cancel-safe partial result;
+- upper/lower bounds и gap;
+- `completeWithinRequestedSpace` только при доказанном завершении;
+- `truncated` с причинами при остановке;
+- все найденные structurally different feasible incumbents сохраняются.
 
-- capacity `1…6`;
-- demand count `1…4`;
-- quantities в малом диапазоне;
-- simplex и separate duplex отдельно;
-- разные max selected columns/run lengths.
+### Обязательный differential gate
 
-Каждая задача решается двумя независимыми способами:
+Для каждой маленькой задачи restricted master сравнивается с `exact-production-small-master`:
 
-1. `exact-production-small-master`;
-2. отдельный простой brute-force oracle, который не вызывает production master internals.
-
-Сравниваются:
-
-- полный набор feasible structural plans;
 - minimum sheets;
 - forms/plates/passes;
-- output и overrun каждого demand;
-- Pareto membership;
-- deterministic replay.
+- per-demand output/overrun;
+- feasible/Pareto set внутри заявленного режима сохранения;
+- deterministic replay;
+- zero underproduction.
 
-Обязательны property tests:
+Первый R1-A PR не включает pricing, UI, 20-file benchmark или Web Worker.
 
-- ни один feasible plan не имеет underproduction;
-- увеличение demand не уменьшает proven minimum sheets внутри той же полной области;
-- увеличение capacity не увеличивает minimum sheets при сохранении доступных columns;
-- перестановка input rows не меняет normalized result;
-- simplex и duplex с одинаковыми allocations имеют одинаковые sheets/output, но разные forms/passes.
-
-## 9. После R3-A: R1 restricted master
-
-Exact oracle остаётся только тестовым эталоном. Следующий production-oriented search должен:
-
-- начинать с dedicated и нескольких mixed columns;
-- использовать demand-state/lower bounds;
-- сохранять incumbent plans;
-- поддерживать time/state/memory budgets;
-- возвращать progress и cancel-safe partial result;
-- помечать incomplete search;
-- сравниваться с exact oracle на каждой малой задаче.
-
-Нельзя увеличивать exact `maxStates` как основной путь больших заказов.
-
-## 10. R2 pricing / column generation
+## 9. После R1-A: R2 pricing / column generation
 
 ```text
 initial columns
-→ solve restricted master
+→ restricted master
 → pricing ищет улучшающую production column
 → добавить только новую structural signature
 → повторить
 → final integer solve
 ```
 
-Pricing должен использовать те же immutable GeometryPattern и column validators. Heuristic column допускается как кандидат, но не как доказательство оптимума.
+Pricing использует те же immutable GeometryPattern и column validators. Heuristic column допускается как кандидат, но не как доказательство оптимума.
 
 Цели:
 
@@ -318,9 +331,9 @@ Pricing должен использовать те же immutable GeometryPatter
 - cost;
 - lexicographic objective order.
 
-## 11. Поздний benchmark 20 файлов
+## 10. Поздний benchmark 20 файлов
 
-`data/control-case.json` запускается только после R3-A и первого restricted master.
+`data/control-case.json` запускается после первого доказанного restricted master и pricing loop.
 
 Известные точки:
 
@@ -331,7 +344,7 @@ Pricing должен использовать те же immutable GeometryPatter
 
 Solver обязан найти paper extreme, compact-form extreme и промежуточные Pareto plans без чтения `data/control-layout-m3.json` как ответа.
 
-## 12. Operator case memory
+## 11. Operator case memory
 
 Подтверждённый case хранит:
 
@@ -344,7 +357,7 @@ Solver обязан найти paper extreme, compact-form extreme и проме
 
 Case используется как benchmark, warm start и upper bound, но всегда повторно валидируется и пересчитывается.
 
-## 13. Machine/operator constraints
+## 12. Machine/operator constraints
 
 Добавляются после доказанной базовой математики:
 
@@ -358,7 +371,7 @@ Case используется как benchmark, warm start и upper bound, но 
 
 Различаются hard constraints, soft penalties и operator warnings.
 
-## 14. Неприкосновенные правила
+## 13. Неприкосновенные правила
 
 - zero underproduction;
 - back строится только из validated front/source slots;
@@ -373,28 +386,27 @@ Case используется как benchmark, warm start и upper bound, но 
 - operator selection не заменяется recommendation;
 - архивная ветка сохраняется до стабильного `1.0.0`.
 
-## 15. Ближайшие PR
+## 14. Ближайшие PR
 
-### R3-A1
+### R1-A1
 
-- independent brute-force oracle;
-- deterministic generated tiny cases;
-- simplex differential comparison;
-- no production-code optimization.
+- restricted-master request/result contract;
+- canonical coefficient matrix;
+- dedicated/balanced initial column selection;
+- deterministic lower bounds;
+- no pruning yet beyond immediately impossible branches.
 
-### R3-A2
+### R1-A2
 
-- separate-duplex differential comparison;
-- metric parity sheets/output;
-- forms/plates/passes family differences;
-- property tests.
+- branch-and-bound;
+- incumbent management;
+- progress/state/time budgets;
+- exact-oracle parity fixtures.
 
-### R1-A
+### R1-A3
 
-- bounded restricted-master contract;
-- initial dedicated/mixed columns;
-- lower bounds и incumbent;
-- explicit progress/coverage;
-- exact-oracle differential gate.
+- separate-duplex parity;
+- Pareto incumbent retention;
+- cancellation/truncation evidence.
 
-Каждый PR имеет одну измеримую цель и exact-head Quality. UI/PDF workflow обязателен как regression даже для pure-code изменения.
+Каждый PR имеет одну измеримую цель и exact-head Quality. Полный Chromium/PDF workflow обязателен как regression даже для pure-code изменения.
