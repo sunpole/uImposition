@@ -74,10 +74,10 @@ test("P0-B every paired orbit places one front and one back image on the shared 
     { imageSide: "back", sourceSlotId: "uniform-grid-r0-row1-col4" },
   ]);
   assert.deepEqual(pattern.passTwoCells.map(({ page, physicalSlotId }) => ({ page, physicalSlotId })), [
-    { page: 1, physicalSlotId: "uniform-grid-r0-row1-col3" },
-    { page: 1, physicalSlotId: "uniform-grid-r0-row1-col4" },
     { page: 2, physicalSlotId: "uniform-grid-r0-row1-col1" },
     { page: 2, physicalSlotId: "uniform-grid-r0-row1-col2" },
+    { page: 1, physicalSlotId: "uniform-grid-r0-row1-col3" },
+    { page: 1, physicalSlotId: "uniform-grid-r0-row1-col4" },
   ]);
   for (const position of pattern.finishedPositions) {
     assert.deepEqual([...position.pages].sort((a, b) => a - b), [1, 2]);
