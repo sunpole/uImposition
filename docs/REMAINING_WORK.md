@@ -1,250 +1,289 @@
 # uImposition — актуальный остаток до 1.0
 
-Дата актуализации: **1 августа 2026 года**.
+Дата актуализации: **1 августа 2026 года**.  
+Pure-core baseline: merge PR `#103`, commit `a0fe6edb8092e706572493f2534cc698b935262e`.
 
 Исследовательская основа:
 
 - [`../research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md`](../research/PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md);
-- [`../research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`](../research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md).
+- [`../research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`](../research/SOLVER_ARCHITECTURE_DECISION_2026-08-01.md);
+- [`../research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md`](../research/UNIVERSAL_SOLVER_IMPLEMENTATION_PLAN.md).
 
 ## 1. Текущая точка
 
-Опубликованный prerelease остаётся `0.7.0-alpha.5`.
+Опубликованный prerelease остаётся `0.7.0-alpha.5`. Корневой GitHub Pages URL ведёт в актуальный `/app/`, но universal-solver core пока не подключён к пользовательскому runtime.
 
-После него в `main` уже добавлены и проверены:
+Завершены:
 
-- operator-first `/app/`;
-- persistent desktop navigation и mobile adaptation;
-- independent front/back colors;
-- odd-page technical blanks;
-- verified mirrored back;
-- user work-and-turn shared plate;
-- compact control-order input;
-- full display of every generated imposition;
-- bounded search contract;
-- audit 50 GitHub repositories и revised solver architecture.
+- архив и root cutover;
+- G0 uniform geometry и application adapter;
+- G1 mixed-strip geometry и bounded generator;
+- P0 single-product simplex/separate duplex;
+- P0 horizontal work-and-turn slot orbits;
+- P1 multi-product simplex allocations;
+- P1 simplex candidate columns;
+- P1 separate-duplex candidate columns;
+- R0 exact simplex master;
+- R0 generic exact production master;
+- R3-A independent random-small differential proof.
 
-Root cutover и выпуск `0.7.0-alpha.6` по-прежнему требуют отдельной owner acceptance. Новый solver не должен автоматически переключать корневой сайт.
+Фактический ledger: PR `#88`–`#103`. Superseded PR `#85`, `#96`, `#98`, `#101` не являются рабочим кодом.
 
-## 2. Что доказано и сохраняется
+## 2. Что уже доказано
 
-- trim и press margins;
-- uniform fitting 0°/90°;
-- page-pair expansion;
-- deterministic front и derived mirrored back;
-- odd-page blank semantics;
-- independent production validation;
-- paper-minimum lower-bound proof для контрольного input/capacity;
-- layout forms, color plates и passes как разные metrics;
-- guarded pricing/cost;
-- lossless feasible catalog;
-- Pareto/ranking/recommendation;
-- explicit operator selection;
-- selected plan scheme/report/PDF consistency;
-- shared-plate work-and-turn для текущей ограниченной family;
-- bounded complete/truncated search contract;
-- desktop/mobile Chromium и PDF regression.
+### Geometry
 
-Эти возможности не переписываются одним большим PR.
+- immutable GeometryPattern и explicit slots;
+- exact uniform 0°/90°;
+- printable boundaries, bleed, gap и cut semantics;
+- deterministic structural signatures;
+- horizontal/vertical mixed strips;
+- bounded exact coverage и no-overlap validation.
 
-## 3. Главный архитектурный вывод аудита
+### Production assignment
 
-Большой заказ нельзя решать предварительным перечислением и хранением всех возможных монтажей.
+- simplex и separate duplex одного вида;
+- horizontal work-and-turn через actual slot orbits;
+- paired/fixed slots и технические blanks;
+- multi-product allocations;
+- dedicated, mixed, partial и subset columns;
+- `8+8`, `10+5+1 blank`, `4+4+4+4`, `4+3+2+1`;
+- demand count больше capacity внутри subset catalog;
+- зеркальный оборот `1 2 3 4 → 4 3 2 1`;
+- формы, пластины и passes разделены.
 
-Основной путь:
+### Exact small master
+
+- bounded unique columns × positive integer run lengths;
+- exact BigInt state count;
+- pre-enumeration refusal для oversized space;
+- zero underproduction;
+- lossless feasible plan set;
+- Pareto annotation без удаления;
+- sheets/forms/plates/passes/overrun/blanks;
+- одна совместимая simplex или separate-duplex family;
+- no mixed strategy/geometry catalog;
+- no global-completeness claim.
+
+### Differential proof
+
+PR `#103` завершил независимую проверку exact master:
+
+- [x] отдельный exhaustive oracle без вызова production master internals;
+- [x] 16 seeded simplex cases;
+- [x] 16 seeded separate-duplex cases;
+- [x] capacity 2–3;
+- [x] 2–3 demands;
+- [x] 1–2 selected columns;
+- [x] max run length 2–3;
+- [x] state-count parity;
+- [x] full feasible structural-plan parity;
+- [x] run-vector parity;
+- [x] production-metric parity;
+- [x] Pareto parity;
+- [x] objective-minimum parity;
+- [x] deterministic empty result when no feasible bounded plan exists.
+
+## 3. Неприкосновенная архитектура
 
 ```text
-normalization
-→ geometric patterns
-→ print-aware assignment
-→ restricted master
-→ pricing/column generation
-→ integer plan
-→ independent validation
-→ lossless alternatives
+N — normalization
+G — geometry patterns
+P — product/page/side assignment
+R — integer runs
+C — restricted master + pricing/column generation
+M — machine/operator constraints
+E — explanation/export/case memory
 ```
 
-Полный static catalog остаётся только малым exact oracle.
+Запрещено:
 
-## 4. Research/documentation gate — завершён
+- решать large orders увеличением exact limits;
+- смешивать geometry и demand/pricing/DOM;
+- хранить run length внутри candidate column;
+- выдавать heuristic за proven optimum;
+- читать benchmark answer как production result;
+- удалять feasible plans при Pareto/ranking;
+- скрывать search limits и truncation;
+- удалять архивную ветку до stable `1.0.0`.
 
-- [x] исследовать не менее 50 репозиториев;
-- [x] разделить PDF imposition, geometry packing и production optimization;
-- [x] проверить сильнейшие core/test/license sources;
-- [x] зафиксировать pluggable geometry;
-- [x] выбрать restricted master + pricing/column generation;
-- [x] определить роль operator cases;
-- [x] определить роль external solvers как oracles;
-- [x] объединить research PR `#86`;
-- [x] пересмотреть `ARCHITECTURE.md`;
-- [x] пересмотреть `ALGORITHM_AND_OPTIMIZATION.md`;
-- [x] пересмотреть `TEST_PLAN.md`;
-- [x] пересмотреть этот backlog.
+## 4. Ближайший gate R1 — bounded restricted master
 
-## 5. Immediate D1 — решение по draft PR #85
+Цель: production-oriented search, который совпадает с exact oracle на малых задачах, но не перечисляет полное пространство больших задач.
 
-PR #85 не сливается как large-order solver.
+### R1-A1: contract и bounds
 
-Требуется:
+- [ ] immutable request/result;
+- [ ] одна совместимая column family и GeometryPattern;
+- [ ] canonical coefficient matrix `a[column,demand]`;
+- [ ] initial dedicated columns;
+- [ ] initial balanced mixed columns;
+- [ ] deterministic branch order;
+- [ ] per-demand lower bounds;
+- [ ] trivial infeasibility detection;
+- [ ] incumbent representation;
+- [ ] explicit coverage model;
+- [ ] no UI/pricing/benchmark.
 
-- [ ] переименовать модуль и API в small-space exhaustive oracle;
-- [ ] сохранить BigInt exact candidate count;
-- [ ] сохранить deterministic structural signatures;
-- [ ] сохранить complete/truncated coverage;
-- [ ] ограничить назначение малым finite space;
-- [ ] добавить явное предупреждение против увеличения limits для больших заказов;
-- [ ] связать oracle с будущим geometry-pattern interface;
-- [ ] использовать его в differential tests pricing subproblem;
-- [ ] закрыть или заменить PR #85, если чистая переработка создаёт более понятную историю.
+### R1-A2: branch-and-bound
 
-## 6. G0 — exact uniform geometry
+- [ ] integer branch state;
+- [ ] admissible lower-bound pruning;
+- [ ] incumbent update;
+- [ ] duplicate-state/signature control;
+- [ ] state/time/memory budgets;
+- [ ] progress counters;
+- [ ] cancellation;
+- [ ] partial feasible plans retained;
+- [ ] complete/truncated distinction;
+- [ ] upper/lower bounds and gap.
 
-Первый следующий code milestone.
+### R1-A3: proof parity
 
-- [ ] ввести immutable `GeometricPattern` и `Slot` models;
-- [ ] pure 0° grid;
-- [ ] pure 90° grid;
-- [ ] exact coordinates;
-- [ ] trim/press margins;
-- [ ] bleed/gap/cut family;
-- [ ] occupied/waste area;
-- [ ] deterministic structural signature;
-- [ ] `completeWithinPureGridSpace` status;
-- [ ] G001–G003, G005–G007 fixtures/property tests;
-- [ ] adapter из текущих placement options без поломки `/app/`.
+- [ ] simplex exact-oracle parity;
+- [ ] separate-duplex exact-oracle parity;
+- [ ] minimum sheets parity;
+- [ ] forms/plates/passes parity;
+- [ ] per-demand output/overrun parity;
+- [ ] Pareto incumbent retention;
+- [ ] deterministic replay;
+- [ ] zero underproduction;
+- [ ] no global claim outside searched column set.
 
-## 7. G1 — mixed-orientation strips
+## 5. R2 — pricing subproblem
 
-- [ ] horizontal strips;
-- [ ] vertical strips;
-- [ ] 0°/90° per strip;
-- [ ] exact/bounded integer strip boundaries;
-- [ ] no overlap and boundary proof;
-- [ ] G004 fixture, где mixed лучше обеих pure grids;
-- [ ] multiple materially different patterns retained;
-- [ ] exact/truncated status;
-- [ ] performance budget.
+- [ ] pricing request/response contract;
+- [ ] master penalties/dual-like input;
+- [ ] GeometryPattern selection;
+- [ ] assignment generation;
+- [ ] reduced-cost or lexicographic-improvement score;
+- [ ] canonical deduplication;
+- [ ] add only structurally new improving columns;
+- [ ] deterministic ties;
+- [ ] explicit no-improving-column result;
+- [ ] truncated pricing status;
+- [ ] exact small comparison against complete column catalog;
+- [ ] validation of every generated column.
 
-## 8. G2/G3 — general packing и external oracles
+External OR-Tools/SCIP/Cbc may be CI/research oracles, not mandatory browser dependencies.
 
-### Internal heuristic backends
+## 6. R3-B — bounded column-generation loop
+
+```text
+initial columns
+→ restricted master
+→ pricing
+→ add new columns
+→ repeat
+→ final integer restricted master
+```
+
+- [ ] iteration contract;
+- [ ] progress events;
+- [ ] time/state/memory limits;
+- [ ] cancel-safe result;
+- [ ] lower/upper bound history;
+- [ ] final integer plan;
+- [ ] incomplete results visibly marked;
+- [ ] all feasible incumbents retained;
+- [ ] no global claim without proof;
+- [ ] small-case parity with complete R0 catalog.
+
+## 7. Cost and decision integration
+
+После доказанной R1 parity:
+
+- [ ] paper cost;
+- [ ] layout-form preparation cost;
+- [ ] color plate cost;
+- [ ] press pass/setup cost;
+- [ ] cutting/finishing costs;
+- [ ] explicit missing-price state;
+- [ ] lexicographic objectives;
+- [ ] total-cost objective;
+- [ ] component deltas;
+- [ ] Pareto annotations;
+- [ ] operator selection independent from recommendation;
+- [ ] cost changes rerank without corrupting geometry/output.
+
+## 8. Additional production families
+
+### Multi-product work-and-turn
+
+- [ ] shared-form candidate column contract;
+- [ ] slot-orbit allocation for several demands;
+- [ ] fixed/unmatched blanks;
+- [ ] named-ink compatibility;
+- [ ] forms/plates/passes projection;
+- [ ] exact small catalog;
+- [ ] master differential tests.
+
+### Advanced duplex
+
+- [ ] vertical work-and-turn transform;
+- [ ] work-and-tumble;
+- [ ] perfecting;
+- [ ] machine-specific transform profiles;
+- [ ] independent fixtures and warnings.
+
+### Simplex/odd parity
+
+- [ ] intentional blank back as explicit universal family;
+- [ ] odd technical page in universal demand model;
+- [ ] no fake form/plate/pass;
+- [ ] parity with current `/app/` behavior.
+
+## 9. G2/G3 — general packing and external geometry oracles
+
+### Internal backends
 
 - [ ] MaxRects adapter;
 - [ ] Skyline adapter;
 - [ ] Guillotine adapter;
 - [ ] deterministic sorting/scoring profiles;
-- [ ] clear heuristic status;
+- [ ] heuristic status;
+- [ ] multiple materially different packings retained;
 - [ ] no false global optimum claim.
 
-### Differential research harness
+### Differential harness
 
-- [ ] record exact external repo/version/commit;
-- [ ] run selected fixtures through `rectpack`;
-- [ ] run selected fixtures through PackingSolver;
-- [ ] compare capacity, coordinates and validity;
-- [ ] preserve only license-compatible fixture outputs;
-- [ ] block reuse when license metadata conflicts.
+- [ ] pin external repository/version/commit;
+- [ ] compare fixtures with `rectpack`;
+- [ ] compare fixtures with PackingSolver;
+- [ ] verify capacity, coordinates and validity;
+- [ ] preserve only license-compatible outputs;
+- [ ] isolate external tools from browser runtime.
 
-## 9. P0 — basic production assignment
+## 10. Mixed physical product sizes
 
-### Simplex
+После stable G2 и R-loop:
 
-- [ ] one kind;
-- [ ] multiple kinds;
-- [ ] integer allocations inside one geometry pattern;
-- [ ] exact run calculation;
-- [ ] zero underproduction;
-- [ ] P001, P006–P010 tests.
+- [ ] several product rectangles on one sheet;
+- [ ] compatibility groups;
+- [ ] individual bleed/gap/cut;
+- [ ] common/separate-cut constraints;
+- [ ] multiple valid geometry patterns;
+- [ ] cutting complexity;
+- [ ] compare uniform and mixed patterns;
+- [ ] historical layout remains validation oracle only.
 
-### Separate duplex
+## 11. Control benchmark — 20 files
 
-- [ ] geometry slots independent from page assignment;
-- [ ] front primary structure;
-- [ ] transform-generated back;
-- [ ] horizontal short-edge mirror;
-- [ ] odd-page blanks;
-- [ ] independent side activity/forms/plates/passes;
-- [ ] P002–P003 tests.
-
-### Work-and-turn
-
-- [ ] explicit `T(slot)` model;
-- [ ] involution validation;
-- [ ] paired and fixed slot orbits;
-- [ ] horizontal reflection;
-- [ ] vertical reflection as separate capability;
-- [ ] 180° transform as separate capability;
-- [ ] shared plate and control views;
-- [ ] P004–P005 tests.
-
-## 10. R0 — exhaustive small master oracle
-
-- [ ] small finite set of production patterns;
-- [ ] bounded integer run lengths;
-- [ ] complete plan enumeration;
-- [ ] exact zero-underproduction filtering;
-- [ ] structural plan signatures;
-- [ ] full Pareto frontier;
-- [ ] brute-force random-small oracle;
-- [ ] R001–R005 tests;
-- [ ] explicit maximum problem size.
-
-Этот этап должен быть медленным, но доказательным. Он нужен как oracle, а не как final large-order runtime.
-
-## 11. R1 — restricted master interface
-
-- [ ] canonical coefficient matrix `a[p,i]`;
-- [ ] initial columns from dedicated/paper-minimum/work-and-turn;
-- [ ] operator-case warm-start columns;
-- [ ] integer and relaxed solution models;
-- [ ] bounds/gap/counters;
-- [ ] production metrics projection;
-- [ ] no DOM dependency;
-- [ ] external OR-Tools/SCIP/Cbc differential fixtures for small problems.
-
-## 12. R2 — first pricing subproblem
-
-- [ ] pricing request/response contract;
-- [ ] dual-value input;
-- [ ] geometry-pattern selection;
-- [ ] assignment generation;
-- [ ] reduced-cost calculation;
-- [ ] canonical deduplication;
-- [ ] add only improving columns;
-- [ ] deterministic tie-breaking;
-- [ ] R006 test against full small catalog;
-- [ ] honest no-column/truncated distinction.
-
-## 13. R3 — bounded column-generation loop
-
-- [ ] master → pricing iterations;
-- [ ] time/state/memory limits;
-- [ ] cancellation;
-- [ ] progress events;
-- [ ] upper/lower bounds and gap;
-- [ ] final integer restricted master;
-- [ ] partial feasible plans retained;
-- [ ] complete/truncated status;
-- [ ] R007–R008 tests;
-- [ ] no global claim without proof.
-
-## 14. Control benchmark integration
-
-Только после G0/G1/P0/R0/R1/R2.
+Запускается после доказанного R1 и первого pricing loop.
 
 `data/control-case.json`:
 
-- [ ] production solver читает только input;
-- [ ] `data/control-layout-m3.json` используется только как oracle/evidence;
-- [ ] paper-first сохраняет 3305-sheet extreme;
-- [ ] forms-first находит plan не хуже 4 impositions / 8 layout forms или объясняет validated better plan;
-- [ ] intermediate Pareto plans retained;
+- [ ] solver reads input only;
+- [ ] `data/control-layout-m3.json` is oracle/evidence only;
+- [ ] find paper extreme `3305` sheets;
+- [ ] find compact plan no worse than `4` impositions / `8` layout forms or validated better result;
+- [ ] retain intermediate Pareto plans;
 - [ ] zero underproduction;
-- [ ] pricing changes recommendation correctly;
-- [ ] exact selected plan drives screen/report/PDF;
-- [ ] no special-case file IDs in production code.
+- [ ] no special-case file IDs;
+- [ ] price changes recommendation correctly;
+- [ ] selected plan drives screen/report/PDF only after integration gate.
 
-## 15. Layer C — operator case memory
+## 12. Operator case memory
 
 - [ ] versioned case schema;
 - [ ] exact input signature;
@@ -252,169 +291,122 @@ PR #85 не сливается как large-order solver.
 - [ ] normalized quantity ratios;
 - [ ] approved plan and rejected alternatives;
 - [ ] operator reason;
-- [ ] pricing and machine snapshot;
-- [ ] solver version;
+- [ ] pricing/machine snapshot;
+- [ ] solver/validator version;
 - [ ] warm-start validation;
-- [ ] exact-case and analogous-case tests;
-- [ ] UI to save a selected plan as operator evidence;
+- [ ] exact and analogous case tests;
 - [ ] no silent automatic selection from memory.
 
-## 16. Layer M — machine and placement constraints
+Cases are benchmarks, warm starts and upper bounds, never unconditional answers.
 
-Добавляется после базовой G/P/R корректности.
+## 13. Machine/operator constraints
+
+Добавляются после доказанной G/P/R корректности.
 
 - [ ] machine profile;
 - [ ] gripper/side-lay direction;
 - [ ] top/bottom/left/right/center zones;
 - [ ] defects/forbidden areas;
-- [ ] quality classes;
-- [ ] ink coverage/solid fill;
-- [ ] color compatibility;
+- [ ] ink coverage and solid-fill risk;
+- [ ] named-color compatibility;
 - [ ] preferred/forbidden zones;
 - [ ] adjacency/separation rules;
 - [ ] hard/soft/operator-only distinction;
-- [ ] explanations;
-- [ ] M001–M004 fixtures.
+- [ ] explanations and fixtures.
 
-## 17. Heavy-search worker
+## 14. Heavy-search worker
 
-- [ ] Web Worker boundary only around search;
+- [ ] Web Worker around search only;
+- [ ] immutable request/result messages;
 - [ ] progress;
 - [ ] cancel;
 - [ ] time/state/memory budgets;
 - [ ] deterministic request signature;
 - [ ] safe partial results;
 - [ ] no private data upload;
-- [ ] UI remains responsive;
-- [ ] resume/retry only when deterministic and validated.
+- [ ] responsive UI;
+- [ ] validated resume/retry only.
 
-## 18. Comparison and operator UX
+## 15. `/app/` integration gate
 
-Existing lossless comparison work is reused.
+Universal core подключается к пользователю только после R1 parity.
 
-- [ ] compact expert table;
-- [ ] all/Pareto/recommended/dominated filters;
-- [ ] only differences;
-- [ ] sorting by any metric;
-- [ ] plan-family/duplex/geometry filters;
-- [ ] proof/heuristic/truncated column;
-- [ ] bounds/gap/progress;
-- [ ] selected plan highlighted independently;
-- [ ] exact component deltas;
-- [ ] mobile and dense desktop modes;
-- [ ] no page-level horizontal overflow.
+- [ ] feature flag / parallel calculation route;
+- [ ] same normalized input as current workspace;
+- [ ] old/new solver differential display for development;
+- [ ] no automatic replacement of selected plan;
+- [ ] proof/coverage/truncation visible;
+- [ ] all found variants available;
+- [ ] selected universal plan drives scheme/report/PDF;
+- [ ] mobile and dense desktop layouts;
+- [ ] no page-level horizontal overflow;
+- [ ] full Chromium/PDF evidence;
+- [ ] owner acceptance.
 
-## 19. Mixed physical product sizes
+## 16. Folded/signature imposition
 
-После G2 и stable R-loop:
+Отдельная product family:
 
-- [ ] multiple product rectangles on one sheet;
-- [ ] compatibility groups;
-- [ ] individual bleed/gap/cut;
-- [ ] common/separate cut constraints;
-- [ ] multiple valid packings;
-- [ ] cutting complexity;
-- [ ] compare uniform and mixed patterns;
-- [ ] supplied fixture remains validation oracle;
-- [ ] no automatic claim from a manually supplied layout.
-
-## 20. One-sided, folded and advanced duplex products
-
-### Simplex/odd
-
-Базовая support уже есть частично; после new architecture требуется regression parity:
-
-- [ ] explicit simplex production family;
-- [ ] intentional blank back;
-- [ ] correct forms/plates/cost;
-- [ ] no fake side.
-
-### Folded/signature imposition
-
-- [ ] separate product family;
-- [ ] signatures and folding rules;
-- [ ] creep/binding direction;
+- [ ] signatures;
+- [ ] folding rules;
+- [ ] creep;
+- [ ] binding direction;
 - [ ] page order after folding;
-- [ ] no mixing with flat gang-run assumptions.
+- [ ] blank/signature completion;
+- [ ] fixtures from page-imposition research projects.
 
-### Advanced duplex
+## 17. Persistence, portability and profitability
 
-- [ ] work-and-tumble;
-- [ ] perfecting;
-- [ ] machine-specific transforms;
-- [ ] independent fixtures and warnings.
-
-## 21. Persistence and portability
+### Persistence
 
 - [ ] versioned project schema;
-- [ ] auto-save input/operator state;
 - [ ] JSON export/import;
 - [ ] migrations;
-- [ ] case library export/import;
-- [ ] pricing profile;
-- [ ] objective preference;
-- [ ] selected plan reference with recalculation;
-- [ ] safe recovery from corrupted/incompatible data.
+- [ ] case-library portability;
+- [ ] selected-plan reference with recalculation;
+- [ ] corrupted-data recovery.
 
-## 22. Cost and profitability
+### Profitability
 
-- [ ] cutting/setup/changeover costs;
-- [ ] finishing/binding;
 - [ ] revenue;
 - [ ] profit/loss;
 - [ ] margin;
-- [ ] explicit business thresholds;
+- [ ] explicit thresholds;
+- [ ] finishing/transport/other costs;
 - [ ] unprofitable plans remain visible;
 - [ ] no hidden coefficients.
 
-## 23. Beta matrix
+## 18. Beta matrix
 
 - [ ] all sheet presets and arbitrary sheets;
-- [ ] standard and custom products;
-- [ ] square, narrow and wide rectangles;
-- [ ] equal and very different quantities;
-- [ ] 1..capacity kinds in small fixtures;
+- [ ] standard/custom/square/narrow/wide products;
+- [ ] equal and strongly different quantities;
+- [ ] `1…capacity` kinds in exact fixtures;
 - [ ] large anonymized orders;
-- [ ] simplex/separate/work-and-turn;
+- [ ] simplex/separate/work-and-turn/advanced duplex;
 - [ ] odd pages;
-- [ ] multiple colors;
+- [ ] independent colors;
 - [ ] trim/margins/bleed/gap extremes;
-- [ ] mixed orientations;
-- [ ] mixed product sizes;
+- [ ] mixed rotations and product sizes;
 - [ ] machine zones/defects;
 - [ ] browser/performance matrix;
 - [ ] worker failure recovery.
 
-## 24. Release and root cutover
+## 19. Release gates
 
-`0.7.0-alpha.6` не создаётся автоматически только из-за завершения research/docs.
+Published version remains `0.7.0-alpha.5`.
 
-Перед выпуском:
+`0.7.0-alpha.6` requires a separate decision:
 
-- [ ] owner acceptance текущего `/app/`;
-- [ ] определить точную функциональную границу alpha.6;
+- [ ] define exact release scope;
+- [ ] owner acceptance of current `/app/`;
 - [ ] exact-head Quality;
 - [ ] exact-head Chromium/PDF;
-- [ ] focused evidence manually reviewed;
+- [ ] visual evidence review;
 - [ ] current docs/status/version/changelog;
 - [ ] recovery branch;
 - [ ] immutable tag;
 - [ ] GitHub prerelease and assets;
-- [ ] root cutover только по отдельному подтверждению.
+- [ ] uNews/Telegram publication verification.
 
-## 25. Принципы, которые сохраняются до 1.0
-
-- user chooses; software recommends;
-- zero underproduction;
-- geometry and production are separate layers;
-- back/shared plate comes from one verified structure;
-- layout forms and color plates stay separate;
-- missing money is not zero;
-- feasible alternatives inside declared scope are not hidden;
-- structural variants are not merged by metrics alone;
-- heuristic is not proof;
-- truncation is visible;
-- external and saved plans are revalidated;
-- operator cases are memory, not hardcoded answers;
-- PDF/report use the exact selected plan;
-- every release has immutable evidence and recovery checkpoint.
+Pure-core progress does not automatically change version, release or production-ready status.

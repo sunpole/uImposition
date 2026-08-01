@@ -1,32 +1,31 @@
 # uImposition — план реализации универсального solver
 
 Дата: **1 августа 2026**  
-Статус: **актуальный обязательный implementation contract**
+Статус: **актуальный обязательный implementation contract**  
+Фактический baseline: merge PR `#103`, commit `a0fe6edb8092e706572493f2534cc698b935262e`
 
-## 1. Решение после исследования
+## 1. Архитектурное решение
 
-После аудита 50 GitHub-репозиториев проект больше не развивается как один растущий генератор всех возможных монтажей.
-
-Основная архитектура:
+После аудита 50 GitHub-репозиториев проект не развивается как один растущий генератор всех возможных монтажей.
 
 ```text
 N — нормализация заказа
-G — геометрические patterns
-P — назначение изделий/страниц/сторон
+G — геометрические patterns с реальными slots
+P — назначение изделий, страниц и сторон
 R — целочисленные прогоны
-C — restricted master + pricing/column generation
-M — machine/operator constraints
-E — explanation/export/case memory
+C — restricted master + pricing / column generation
+M — ограничения машины и оператора
+E — объяснения, экспорт и память подтверждённых cases
 ```
 
-Полный аудит:
+Источники исследования:
 
-- [`PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md`](PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md)
-- [`SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`](SOLVER_ARCHITECTURE_DECISION_2026-08-01.md)
+- [`PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md`](PRINTING_IMPOSITION_GITHUB_AUDIT_2026-08-01.md);
+- [`SOLVER_ARCHITECTURE_DECISION_2026-08-01.md`](SOLVER_ARCHITECTURE_DECISION_2026-08-01.md).
 
-## 2. Архив и рабочая ветка
+## 2. Архив и рабочая линия
 
-Состояние проекта до root cutover и начала universal-solver rebuild сохранено в:
+Состояние до root cutover и universal-solver rebuild сохранено в постоянной ветке:
 
 ```text
 archive/pre-universal-solver-rebuild-2026-08-01
@@ -38,81 +37,72 @@ archive/pre-universal-solver-rebuild-2026-08-01
 b9d83855ff685bb38831670fb0c3975bbd1bdbc4
 ```
 
-`main` содержит актуальное приложение и новую документацию. Удалённый legacy UI восстанавливается из архивной ветки, а не возвращается копированием в новые модули.
+Корневой GitHub Pages URL ведёт в актуальный `/app/`. Старый root UI удалён из рабочего `main`, но полностью восстанавливается из архивной ветки. Архив нельзя удалять до стабильного `1.0.0` и отдельного решения владельца.
 
-## 3. Внешние опоры и их роль
+## 3. Внешние опоры
 
-### Page imposition и PDF
+### PDF и page imposition
 
-| Проект | Использование |
+| Проект | Роль |
 |---|---|
-| `pdfcpu/pdfcpu` | N-up/booklet, blank pages, rotation и API/CLI/core tests |
-| `Laidout/laidout` | доменная модель imposition/signatures и произвольные схемы |
+| `pdfcpu/pdfcpu` | N-up/booklet, blank pages, rotation, API/CLI/core tests |
+| `Laidout/laidout` | доменная модель imposition/signatures |
 | `ksharindam/pdfcook` | цепочки prepress transformations |
-| `qpdf/qpdf`, Ghostscript, Poppler | независимая structural/render validation PDF |
-
-Эти проекты не решают gang-run quantities и cost master problem.
+| `qpdf/qpdf`, Ghostscript, Poppler | structural/render validation PDF |
 
 ### Geometry packing
 
-| Проект | Использование |
+| Проект | Роль |
 |---|---|
 | `secnot/rectpack` | differential oracle MaxRects/Skyline/Guillotine |
-| `fontanf/packingsolver` | сильный oracle для rotation, trims, cut thickness, defects и time limits |
-| `juj/RectangleBinPack` | reference implementations алгоритмов |
+| `fontanf/packingsolver` | rotation, trims, cut thickness, defects, time limits |
+| `juj/RectangleBinPack` | reference implementations |
 | `olragon/binpackingjs` | browser/TypeScript experimental backend |
-| `bozokopic/opcut` | cutting layout UX и pattern output |
+| `bozokopic/opcut` | cutting-layout UX и pattern output |
 
-Heuristic packing не доказывает global optimum. Все ответы проходят наш validator.
+### Integer optimization
 
-### Integer optimization и column generation
-
-| Проект/класс | Использование |
+| Проект/класс | Роль |
 |---|---|
-| OR-Tools | small/medium independent integer oracle |
+| OR-Tools | независимый integer oracle для малых/средних задач |
 | SCIP / Cbc | exact/reference solves в research/CI |
 | cutting-stock column-generation examples | master/pricing decomposition |
-| printing-industry packing/scheduling research | datasets, objectives и stress tests |
+| printing-industry packing/scheduling research | datasets, objectives, stress tests |
 
-Внешний solver не становится обязательной browser dependency. Production runtime остаётся локальным JS/Web Worker; внешние engines используются для differential validation и исследований.
+Внешний solver не становится доверенной browser dependency. Его ответы проходят наши geometry/production validators.
 
-## 4. Этап D1 — нормализованная модель задачи
+## 4. Фактический progress ledger
 
-Нужно создать immutable plain-data contracts:
+| Этап | Статус | PR / основной результат |
+|---|---|---|
+| Архив и root cutover | **Завершён** | `#88`: архивная ветка, корень → `/app/`, legacy root удалён |
+| G0 exact uniform geometry | **Завершён** | `#89`: immutable `GeometryPattern`, slots 0°/90°, validation |
+| G0 application adapter | **Завершён** | `#90`: differential parity с текущей application geometry |
+| G1 mixed-strip model | **Завершён** | `#91`: validated horizontal/vertical strip composition |
+| G1 bounded generator | **Завершён** | `#92`: exact bounded strip enumeration и coverage |
+| P0 single-product assignment | **Завершён** | `#93`: simplex/separate-duplex production patterns |
+| P0 work-and-turn orbits | **Завершён** | `#94`: exact horizontal slot orbits, shared form, fixed blanks |
+| P1 positive simplex allocations | **Завершён** | `#95`: один общий прогон, exact small allocation oracle |
+| P1 simplex candidate columns | **Завершён** | `#97`: zero-count subsets, без run length |
+| P1 separate-duplex columns | **Завершён** | `#100`: зеркальный оборот, two-form column contract |
+| R0 simplex exact master | **Завершён** | `#99`: bounded exhaustive columns × integer run lengths |
+| R0 generic production master | **Завершён** | `#102`: simplex и separate duplex через единый family adapter |
+| R3-A random-small differential proof | **Завершён** | `#103`: 32 seeded cases против независимого exhaustive oracle |
 
-```js
-OrderDemand
-PrintableSheet
-ProductGeometry
-GeometryPattern
-ProductionPattern
-RunPlan
-SearchCoverage
-```
+Superseded PR `#85`, `#96`, `#98` и `#101` закрыты без merge как исторические или параллельные дубликаты уже объединённых реализаций. Они не являются источниками рабочего кода.
 
-Обязательные свойства:
+## 5. Реализованные contracts
 
-- размеры хранятся в миллиметрах без DOM;
-- demand отделён от layout;
-- geometry pattern не содержит тиражей или красочности;
-- production pattern ссылается на реальные slots;
-- deterministic canonical signature;
-- serialization не хранит доверенные derived totals;
-- каждый результат можно независимо пересчитать и валидировать.
-
-## 5. Этап G0 — точные uniform grids
-
-Первый кодовый этап.
-
-Для каждой разрешённой ориентации вычислить:
+### GeometryPattern
 
 ```text
-columns = floor((printableWidth + gapX) / (occupiedWidth + gapX))
-rows    = floor((printableHeight + gapY) / (occupiedHeight + gapY))
-capacity = columns × rows
+src/geometric-pattern.js
+src/uniform-grid-patterns.js
+src/mixed-strip-patterns.js
+src/current-uniform-geometry-adapter.js
 ```
 
-Результат содержит реальные slots:
+Геометрия содержит реальные slots:
 
 ```js
 {
@@ -121,167 +111,253 @@ capacity = columns × rows
   yMm,
   widthMm,
   heightMm,
-  rotation: 0 | 90,
+  rotation,
   row,
   column
 }
 ```
 
-Нужны оба pattern, даже когда один хуже, потому что orientation может влиять на дальнейший производственный выбор.
+Геометрия не содержит тиражей, страниц, красочности, цен или рекомендаций.
 
-Acceptance G0:
+### Production patterns и work-and-turn
 
-- точные 0° и 90° grids;
-- margins, bleed, gap и common/separate cut;
-- zero overlap;
-- все slots внутри printable area;
-- deterministic ordering;
-- monotonicity/property tests;
-- mirror/rotation invariants;
-- старый `calculatePlacementOptions()` остаётся regression reference, но новый API возвращает координаты.
+```text
+src/single-product-production-pattern.js
+src/work-and-turn-slot-orbits.js
+src/single-product-work-and-turn-pattern.js
+src/multi-product-simplex-patterns.js
+```
 
-## 6. Этап G1 — mixed guillotine strips
-
-После зелёного G0:
-
-- horizontal strip decomposition;
-- vertical strip decomposition;
-- внутри полосы одна ориентация;
-- комбинации `0°+90°`;
-- exact enumeration внутри явных limits;
-- lower/upper bounds;
-- deduplication по geometry signature;
-- differential tests против `rectpack`/PackingSolver на малых задачах.
-
-G1 не должен объявлять general rectangle packing полным.
-
-## 7. Этап P0/P1 — назначение изделий
-
-### P0: один вид
+Доказаны:
 
 - simplex;
 - separate duplex;
-- work-and-turn через явное преобразование slots;
-- нечётные страницы и техническая пустая сторона;
-- physical sheets = `ceil(quantity / usefulPositions)`;
-- no underproduction.
+- горизонтальный work-and-turn одного двустороннего изделия;
+- физические paired/fixed slot orbits;
+- технические пустые позиции;
+- `physicalSheets = ceil(quantity / usefulPositions)`;
+- отсутствие недопечатки;
+- формы, пластины и passes считаются раздельно.
 
-### P1: несколько видов на одном pattern
-
-Для allocation `a[i]`:
-
-```text
-sum(a[i]) <= capacity
-run = max(ceil(quantity[i] / a[i]))
-```
-
-Обязательные тесты:
-
-- два одинаковых тиража `8+8` при capacity 16;
-- два разных тиража, полный перебор allocations;
-- четыре одинаковых `4+4+4+4`;
-- четыре разных;
-- 1…capacity видов;
-- simplex и duplex отдельно;
-- page/color compatibility.
-
-## 8. Этап R0 — полный малый solver
-
-Малые задачи решаются полным перебором и становятся oracle.
-
-Границы задаются явно:
-
-- `maxProducts`;
-- `maxCapacity`;
-- `maxPatterns`;
-- `maxForms`;
-- `maxRunLength`;
-- `maxStates`.
-
-Solver сохраняет все конструктивно разные Pareto-планы и возвращает:
-
-- `completeWithinRequestedSpace`;
-- `truncated`;
-- причины усечения;
-- число рассмотренных states/patterns.
-
-Draft PR #85 после переработки может использоваться только здесь — как exhaustive small-space catalog/oracle.
-
-## 9. Этап R1/R2 — restricted master и pricing
-
-Master problem:
+### Candidate columns
 
 ```text
-minimize selected objective
-subject to
-sum(patternContribution[p,i] × run[p]) >= demand[i]
-run[p] >= 0, integer in final solve
+src/multi-product-simplex-columns.js
+src/multi-product-duplex-columns.js
 ```
 
-Pricing problem получает dual/penalty information и ищет новый production pattern, который улучшает master objective.
+Column описывает вклад **одного физического листа**:
 
-Цикл:
+- allocation counts по demand;
+- реальные front/back cells;
+- forms/plates/passes per column;
+- structural и label-aware signatures;
+- print-family compatibility.
+
+Column намеренно не содержит:
+
+- `runLength`;
+- produced quantity;
+- overrun/underproduction claim;
+- рекомендацию.
+
+### Exact small master
+
+```text
+src/exact-simplex-small-master.js
+src/exact-production-small-master.js
+```
+
+Математическая модель:
+
+```text
+printed[i] = Σ(columnContribution[j,i] × run[j])
+printed[i] >= required[i]
+run[j] ∈ Z+, если column j выбрана
+```
+
+В текущей bounded exact области master:
+
+- выбирает уникальные columns;
+- перебирает положительные целые run lengths;
+- запрещает недопечатку;
+- сохраняет все конструктивно разные feasible plans;
+- Pareto помечает, но не удаляет планы;
+- считает sheets/forms/plates/passes/overrun/blanks;
+- поддерживает одну совместимую simplex **или** separate-duplex family;
+- не смешивает разные стратегии и GeometryPattern;
+- считает exact BigInt state-space до поиска;
+- отклоняет oversized search до enumeration;
+- никогда не заявляет global completeness.
+
+### Independent differential proof
+
+```text
+tests/exact-production-small-master-random.test.js
+```
+
+PR `#103` добавил независимый test-only exhaustive oracle, который не вызывает production master internals. Фиксированные seeds создают:
+
+- 16 simplex cases;
+- 16 separate-duplex cases;
+- capacity `2…3`;
+- `2…3` demand;
+- `1…2` selected columns;
+- maximum run length `2…3`;
+- разные quantity vectors, input order и color counts.
+
+Для каждой задачи совпадают:
+
+- theoretical/evaluated state count;
+- полный feasible structural-plan set;
+- run vectors;
+- production metrics;
+- Pareto frontier;
+- minimum value по sheets/forms/plates/passes/overrun/blanks;
+- корректный пустой результат, когда bounded space не имеет feasible plan.
+
+Это доказательство малой ограниченной области, а не claim о large-order completeness.
+
+## 6. Закрытые proof fixtures
+
+### Geometry
+
+- uniform 0°/90°;
+- printable boundaries;
+- bleed/gap/common и separate cut;
+- deterministic slots/signatures;
+- mixed horizontal/vertical strips;
+- zero overlap;
+- exact bounded coverage.
+
+### P0/P1
+
+- один simplex/duplex вид;
+- `8+8` при capacity 16;
+- `10+5+1 blank` для тиражей `1000/500`;
+- `4+4+4+4`;
+- `4+3+2+1`;
+- dedicated, mixed, partial и subset columns;
+- demand count больше capacity;
+- `1 2 3 4 → 4 3 2 1` на обороте;
+- work-and-turn `4×4` и нечётная `3×3` с fixed blanks;
+- одинаковая allocation space у simplex и duplex.
+
+### Exact master
+
+- simplex generic result совпадает со старым simplex oracle;
+- mixed и dedicated plans сохраняются отдельно;
+- duplex forms/plates/passes берутся из column contract;
+- asymmetric `4+1` даёт пять пластин на duplex column;
+- incompatible families/geometry/catalog coverage отклоняются;
+- state-space limits проверяются до перебора;
+- 32 random-small cases совпадают с независимым exhaustive oracle.
+
+## 7. Текущая честная граница
+
+Пока не реализованы:
+
+- branch-and-bound и lower-bound pruning;
+- restricted master для больших задач;
+- pricing subproblem и column generation;
+- несколько GeometryPattern в одном search;
+- multi-product work-and-turn columns;
+- work-and-tumble/perfecting;
+- mixed physical product sizes в автоматическом search;
+- named-ink compatibility;
+- production cost inside universal master;
+- machine zones/defects;
+- operator case memory;
+- подключение нового universal solver к `/app/`.
+
+Текущий `/app/` продолжает использовать прежний проверенный bounded runtime. Новое ядро развивается отдельно и не выдаётся за подключённую пользовательскую функцию.
+
+## 8. Следующий обязательный этап R1-A
+
+Exact oracle уже доказан на выбранных и random-small fixtures. Следующий слой — bounded restricted master, который должен выдавать те же результаты на малых задачах, но не перечислять полное пространство больших задач.
+
+### Контракт
+
+- immutable request/result;
+- одна совместимая column family и GeometryPattern;
+- initial dedicated columns;
+- несколько balanced mixed columns;
+- canonical coefficient matrix `a[column,demand]`;
+- deterministic branch order;
+- demand lower bounds;
+- incumbent feasible plans;
+- branch-and-bound/pruning;
+- explicit time/state/memory budgets;
+- progress counters;
+- cancel-safe partial result;
+- upper/lower bounds и gap;
+- `completeWithinRequestedSpace` только при доказанном завершении;
+- `truncated` с причинами при остановке;
+- все найденные structurally different feasible incumbents сохраняются.
+
+### Обязательный differential gate
+
+Для каждой маленькой задачи restricted master сравнивается с `exact-production-small-master`:
+
+- minimum sheets;
+- forms/plates/passes;
+- per-demand output/overrun;
+- feasible/Pareto set внутри заявленного режима сохранения;
+- deterministic replay;
+- zero underproduction.
+
+Первый R1-A PR не включает pricing, UI, 20-file benchmark или Web Worker.
+
+## 9. После R1-A: R2 pricing / column generation
 
 ```text
 initial columns
-→ solve restricted master
-→ pricing finds improving pattern
-→ add structurally new pattern
-→ repeat
+→ restricted master
+→ pricing ищет улучшающую production column
+→ добавить только новую structural signature
+→ повторить
 → final integer solve
 ```
 
-Нужно поддержать разные цели:
+Pricing использует те же immutable GeometryPattern и column validators. Heuristic column допускается как кандидат, но не как доказательство оптимума.
+
+Цели:
 
 - sheets;
-- impositions/layout forms;
+- layout forms;
 - color plates;
 - press passes;
 - overrun;
 - cost;
 - lexicographic objective order.
 
-## 10. Этап R3 — proof и differential validation
+## 10. Поздний benchmark 20 файлов
 
-Каждая новая версия solver проходит:
-
-1. exact tiny fixtures;
-2. generated random small cases против brute force;
-3. differential geometry tests против `rectpack`/PackingSolver;
-4. differential integer tests против OR-Tools/SCIP/Cbc;
-5. independent production report;
-6. deterministic replay;
-7. no-underproduction audit.
-
-Внешнее решение никогда не принимается без нашего geometry/production validator.
-
-## 11. Поздний benchmark: 20 файлов
-
-`data/control-case.json` используется только после прохождения D1–R3.
+`data/control-case.json` запускается после первого доказанного restricted master и pricing loop.
 
 Известные точки:
 
-- paper lower bound / найденный extreme: `3305` sheets;
-- известный операторский вариант: `3395` sheets;
+- paper extreme: `3305` sheets;
+- операторский вариант: `3395` sheets;
 - операторский вариант: `4` impositions / `8` layout forms;
 - underproduction: `0`.
 
 Solver обязан найти paper extreme, compact-form extreme и промежуточные Pareto plans без чтения `data/control-layout-m3.json` как ответа.
 
-## 12. Operator case memory
+## 11. Operator case memory
 
-Подтверждённый оператором case хранит:
+Подтверждённый case хранит:
 
-- нормализованный input signature;
+- normalized input signature;
 - выбранный production plan;
 - metrics и pricing context;
 - operator notes;
 - validation version;
 - source/approval metadata.
 
-Case используется как benchmark, warm start, upper bound и пользовательский пример, но не как безусловный ответ. При изменении заказа или прайса выполняется полный перерасчёт и повторная validation.
+Case используется как benchmark, warm start и upper bound, но всегда повторно валидируется и пересчитывается.
 
-## 13. Machine/operator constraints
+## 12. Machine/operator constraints
 
 Добавляются после доказанной базовой математики:
 
@@ -295,39 +371,42 @@ Case используется как benchmark, warm start, upper bound и по�
 
 Различаются hard constraints, soft penalties и operator warnings.
 
-## 14. Что нельзя делать
+## 13. Неприкосновенные правила
 
-- увеличивать static candidate limits как основной путь больших заказов;
-- смешивать geometry и тиражи в DOM-коде;
-- выдавать heuristic answer за proven optimum;
-- читать benchmark answer в production solver;
-- подменять operator selection рекомендацией;
-- считать сохранённые derived metrics без повторной validation;
-- добавлять machine heuristics до прохождения базовых G/P/R тестов;
-- удалять архивную ветку до стабильного 1.0 checkpoint.
+- zero underproduction;
+- back строится только из validated front/source slots;
+- geometry отделена от demand, pricing и DOM;
+- layout forms и color plates не смешиваются;
+- column не владеет run length;
+- exact master не выдаётся за large-order solver;
+- Pareto annotation не удаляет feasible source plans;
+- benchmark answer не читается production solver;
+- heuristic result не называется proven optimum;
+- search limits и coverage всегда видимы;
+- operator selection не заменяется recommendation;
+- архивная ветка сохраняется до стабильного `1.0.0`.
 
-## 15. Ближайшие PR
+## 14. Ближайшие PR
 
-### PR G0-A
+### R1-A1
 
-- `src/geometric-pattern.js`;
-- `src/uniform-grid-patterns.js`;
-- exact slot coordinates;
-- validation helpers;
-- tests G0.1–G0.8;
-- no UI changes.
+- restricted-master request/result contract;
+- canonical coefficient matrix;
+- dedicated/balanced initial column selection;
+- deterministic lower bounds;
+- no pruning yet beyond immediately impossible branches.
 
-### PR G0-B
+### R1-A2
 
-- adapter из current application geometry;
-- result comparison со старым placement API;
-- source checks и regression;
-- no recommendation changes.
+- branch-and-bound;
+- incumbent management;
+- progress/state/time budgets;
+- exact-oracle parity fixtures.
 
-### PR G1
+### R1-A3
 
-- bounded mixed strip patterns;
-- exact small tests;
-- differential oracle fixtures.
+- separate-duplex parity;
+- Pareto incumbent retention;
+- cancellation/truncation evidence.
 
-Каждый PR имеет одну измеримую цель и exact-head Quality.
+Каждый PR имеет одну измеримую цель и exact-head Quality. Полный Chromium/PDF workflow обязателен как regression даже для pure-code изменения.
