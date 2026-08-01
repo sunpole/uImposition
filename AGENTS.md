@@ -16,6 +16,8 @@
 
 Не опираться на память предыдущего чата. GitHub — единственный источник истины.
 
+Эти правила обязательны во всех средах: Codex, Claude Code, терминал, ChatGPT в браузере или на телефоне, GitHub connector и GitHub-only работа без локального checkout.
+
 ## Источники истины
 
 Порядок приоритета:
@@ -52,6 +54,59 @@
 - терминал может дополнять проверку, но не заменяет GitHub evidence;
 - важный результат сохраняется как code, test, document, issue или artifact.
 
+## AGENTS.md — обязательный диспетчер skills
+
+`AGENTS.md` контролирует применение всех project и upstream skills. Агент не должен начинать планирование реализации, изменять файлы, создавать implementation issue/PR или писать production-код, пока не выполнит маршрутизацию skills.
+
+Перед каждой задачей агент обязан:
+
+1. классифицировать запрос и определить, какие решения и риски он затрагивает;
+2. выбрать обязательные skills по таблице ниже;
+3. прочитать полные `SKILL.md` выбранных skills до действия;
+4. применять все выбранные skills совместно, соблюдая их порядок и зависимости;
+5. указать использованные skills в specification, issue, PR или итоговом отчёте;
+6. при появлении нового типа работы остановиться, повторить маршрутизацию и подключить дополнительный skill.
+
+### Как загружать skills
+
+Локальная установка не является условием соблюдения правил.
+
+- Если skill установлен и доступен агенту, использовать установленную версию.
+- Если работа идёт с телефона, через ChatGPT/GitHub connector или без локального checkout, прочитать project skill из `agent-skills/<name>/SKILL.md`, а upstream skill — из pinned submodule `.agent-vendor/mattpocock-skills/skills/**/<name>/SKILL.md` через GitHub.
+- Upstream должен соответствовать commit, закреплённому в `docs/AGENT_SKILLS.md`.
+- Отсутствие slash-команды, локального skill index или терминала не разрешает пропустить skill: его инструкции выполняются вручную как обязательный протокол.
+- Если обязательный `SKILL.md` невозможно открыть, нельзя продолжать работу. Нужно сообщить блокер владельцу.
+
+### Приоритет правил
+
+1. system/safety ограничения среды;
+2. этот `AGENTS.md` и неприкосновенные правила uImposition;
+3. project skills из `agent-skills/`;
+4. upstream skills из pinned `mattpocock/skills`;
+5. specification/ticket текущей задачи;
+6. предпочтения и стандартные рекомендации skill.
+
+Upstream skill не может отменить production invariants, GitHub-only процесс, exact-head проверки или явное решение владельца, принятое после clarification gate.
+
+### Обязательная маршрутизация
+
+| Тип работы | Обязательные skills / порядок |
+|---|---|
+| Новый продуктовый сценарий, frontend/UX, backend/API, solver, persistence, pricing, import/export/PDF, performance | `uimposition-product-gate` → `grill-with-docs` или `grilling`; при терминах/архитектуре также `domain-modeling` |
+| Большая или неясная задача, которая не помещается в одну сессию | `wayfinder`; для решений — `grill-with-docs` |
+| Исследование внешнего стандарта, алгоритма или технологии | `research` |
+| Одноразовый эксперимент для ответа на конкретный вопрос | `prototype`; только после явного разрешения владельца во время gate |
+| Ошибка или регрессия | `diagnosing-bugs` → `tdd` → `code-review` |
+| Реализация утверждённой функции | `to-spec` → `to-tickets` при нескольких slices → `implement` → `tdd` → `code-review` |
+| Архитектурное улучшение | `improve-codebase-architecture` → `codebase-design`; при изменении языка проекта также `domain-modeling` |
+| Обработка issues и готовности задач | `triage` |
+| Конфликт merge/rebase | `resolving-merge-conflicts` |
+| Передача между чатами, устройствами или агентами | `handoff` |
+| Обучение пользователя | `teach` |
+| Неясно, какой flow выбрать | `ask-matt`, затем выполнить выбранный flow |
+
+User-invoked skills (`grill-me`, `grill-with-docs`, `to-spec`, `to-tickets`, `implement`, `wayfinder`, `handoff`, `teach`, `ask-matt` и другие с таким режимом) не вызываются агентом как slash-команда без пользователя, но `AGENTS.md` всё равно требует применять их опубликованный процесс вручную либо попросить владельца явно запустить соответствующий flow.
+
 ## Agent skills
 
 ### Issue tracker
@@ -68,7 +123,7 @@
 
 ### Обязательный clarification gate
 
-До написания production-кода для любого нетривиального изменения frontend/UX, backend/API, solver/формул, persistence/schema, pricing, import/export/PDF, performance или operator workflow обязательно использовать установленный skill `uimposition-product-gate` и дисциплину `grill-with-docs`/`grilling`.
+До написания production-кода для любого нетривиального изменения frontend/UX, backend/API, solver/формул, persistence/schema, pricing, import/export/PDF, performance или operator workflow обязательно использовать skill `uimposition-product-gate` и дисциплину `grill-with-docs`/`grilling`.
 
 - факты искать в GitHub, коде, tests, fixtures и документации, а не спрашивать у владельца;
 - владельцу задавать только вопросы решений;
@@ -80,7 +135,7 @@
 
 После подтверждения использовать flow `to-spec → to-tickets → implement → tdd → code-review` по масштабу задачи.
 
-Gate можно пропустить только для механической правки, однозначного bug fix с уже зафиксированным expected behaviour или явного waiver владельца для конкретной ограниченной задачи. Полные правила: `docs/AGENT_SKILLS.md`.
+Gate можно пропустить только для механической правки, однозначного bug fix с уже зафиксированным expected behaviour или явного waiver владельца для конкретной ограниченной задачи. Даже при исключении агент обязан выполнить маршрутизацию и записать основание исключения. Полные правила: `docs/AGENT_SKILLS.md`.
 
 ## Неприкосновенные производственные правила
 
@@ -263,16 +318,17 @@ Mixed-format/multi-product solver расширяется отдельными bo
 
 1. исходную branch/version/commit;
 2. измеримую цель;
-3. изменённые файлы и решения;
-4. фактические tests и Actions;
-5. artifact IDs/digests;
-6. screenshot evidence, если UI менялся;
-7. сохранённые invariants и оставшиеся boundaries;
-8. version/release status;
-9. PR, exact head и merge commit.
+3. применённые skills и основание маршрутизации;
+4. изменённые файлы и решения;
+5. фактические tests и Actions;
+6. artifact IDs/digests;
+7. screenshot evidence, если UI менялся;
+8. сохранённые invariants и оставшиеся boundaries;
+9. version/release status;
+10. PR, exact head и merge commit.
 
 ---
 
 ## English summary
 
-R1, R2 and the product-row foundation are complete. Preserve the validated production core and do not return to the legacy app-shell direction. The next mandatory gate is visual exploration of at least three genuinely different operator-first desktop/mobile workspaces. Select and document one direction before implementing R3. The production UI must consume the versioned application state and product-row collection, not rearrange the legacy DOM.
+`AGENTS.md` is the mandatory, device-independent skill router for uImposition. Every agent session, including phone and GitHub-only chat, must classify the task, load the applicable project and pinned upstream `SKILL.md` files, and follow their process before taking action. Local installation is optional convenience and never a reason to bypass a skill. The product clarification gate remains mandatory before non-trivial implementation.

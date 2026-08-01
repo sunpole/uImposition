@@ -1,14 +1,62 @@
 # Agent Skills for uImposition
 
+`AGENTS.md` is the mandatory skill router for every uImposition session.
+
 uImposition vendors the complete non-deprecated skill set from `mattpocock/skills` as a pinned Git submodule.
 
 - Upstream: `mattpocock/skills`
 - Pinned commit: `2ab958093e83e0ec752e6c1c5932da465bf23e0c`
 - Vendor path: `.agent-vendor/mattpocock-skills`
+- Project skills: `agent-skills/`
 - License: MIT, retained in the vendored repository
 - Updates are manual and reviewed; nothing changes automatically.
 
 The installation follows the upstream repository's own discovery rule: install every directory containing `SKILL.md`, except directories under `deprecated/`. This includes supported engineering/productivity skills and upstream `misc`, `personal` and `in-progress` skills.
+
+## Device-independent enforcement
+
+The workflow is controlled by repository rules, not by the computer on which the agent runs.
+
+The same requirements apply when working through:
+
+- Codex desktop application;
+- Claude Code or a terminal agent;
+- ChatGPT in a desktop browser;
+- ChatGPT on a phone;
+- GitHub connector without a local checkout;
+- any later agent that can read this repository.
+
+Before taking action, the agent must read `AGENTS.md`, classify the task and load every skill selected by its routing table.
+
+### When skills are installed
+
+Use the installed skill through the agent's normal discovery mechanism.
+
+### When skills are not installed
+
+This includes many phone and GitHub-only sessions. The agent must read and execute the skill directly from the repository:
+
+- project skill: `agent-skills/<name>/SKILL.md`;
+- upstream skill: `.agent-vendor/mattpocock-skills/skills/**/<name>/SKILL.md`;
+- exact upstream revision: the pinned commit listed above.
+
+A slash-command is only one invocation interface. Its absence does not disable the protocol in its `SKILL.md`.
+
+If an obligatory skill file cannot be read, work is blocked. The agent must not silently substitute memory, invent a shortened version or continue without it.
+
+## AGENTS.md routing responsibilities
+
+For every request, `AGENTS.md` requires the agent to:
+
+1. classify the work;
+2. identify all applicable skills;
+3. read their full instructions before acting;
+4. resolve skill dependencies and ordering;
+5. apply project rules before upstream defaults;
+6. record the selected skills in the specification, issue, PR or final report;
+7. rerun routing if the scope changes.
+
+The canonical task-to-skill table is maintained directly in `AGENTS.md` so it is visible before local skill discovery.
 
 ## Install on a machine
 
@@ -67,7 +115,7 @@ Before writing implementation code for any non-trivial change to:
 - performance, cancellation, concurrency or long-running calculations;
 - public terminology or operator workflow;
 
-run `grill-with-docs` (preferred for engineering/product work) or `grill-me` (for a pure decision/design session).
+apply `uimposition-product-gate`, then run the `grill-with-docs` process for engineering/product work or the `grilling` process for a pure decision session.
 
 The session must obey these rules:
 
@@ -91,7 +139,7 @@ Until that confirmation, prototypes may be created only when the owner explicitl
 For substantial work:
 
 ```text
-grill-with-docs
+grill-with-docs / grilling
 → to-spec
 → to-tickets (when more than one vertical slice is needed)
 → implement
@@ -121,10 +169,11 @@ The interview can be skipped only when one of these is clearly true:
 - bug fix whose expected behaviour is already explicit in tests, specification and accepted evidence;
 - the owner explicitly waives the gate for a named, bounded change.
 
-If an apparently technical fix introduces a product choice, stop and return to the gate.
+Even when an exception applies, the agent still performs skill routing and records the exception. If an apparently technical fix introduces a product choice, stop and return to the gate.
 
 ## Per-repository configuration
 
+- Main router: `AGENTS.md`
 - Issue tracker: `docs/agents/issue-tracker.md`
 - Triage vocabulary: `docs/agents/triage-labels.md`
 - Domain documentation layout: `docs/agents/domain.md`
