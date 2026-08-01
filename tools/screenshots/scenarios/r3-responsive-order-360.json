@@ -11,17 +11,20 @@
       "text": "Прайс"
     },
     {
-      "selector": "[data-pricing-summary]",
-      "text": "80 г/м²"
+      "selector": "[data-pricing-summary]"
     }
   ],
   "beforeScreenshot": [
     {
       "action": "wait",
-      "timeoutMs": 1000
+      "timeoutMs": 1200
     }
   ],
   "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-pricing-summary]",
+      "text": "80 г/м²"
+    },
     {
       "selector": "[data-txt-import-controls]",
       "text": "Тест: 20 файлов · 1+1"

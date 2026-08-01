@@ -2,7 +2,7 @@ import { renderSchemePairs } from "../src/scheme-renderer.js";
 
 let rendering = false;
 let refreshQueued = false;
-let layoutSignature = null;
+let allFormsSignature = null;
 
 function snapshot() {
   return window.__uimpositionR3?.getSnapshot?.() ?? null;
@@ -30,12 +30,12 @@ function injectStyles() {
     .product-row__details[open] > summary { background:#315efb; color:#fff; }
     .product-row__details .details-grid { gap:6px!important; }
     .field-error:empty { display:none; }
-    .layout-sheet--all-forms { display:block!important; width:100%!important; min-width:0!important; max-width:100%!important; padding:0!important; border:0!important; background:transparent!important; box-shadow:none!important; aspect-ratio:auto!important; overflow:visible!important; }
-    .layout-sheet--all-forms::after { display:none!important; }
-    .layout-sheet--all-forms .scheme-pairs { width:100%; min-width:0; max-height:72vh; margin:0; padding-right:4px; gap:14px; overflow:auto; overscroll-behavior:contain; }
-    .layout-sheet--all-forms .scheme-pair { min-width:0; gap:10px; }
-    .layout-sheet--all-forms .scheme-card { min-width:0; padding:10px; border-radius:10px; }
-    .layout-sheet--all-forms .scheme-cell { min-height:42px; padding:4px 2px; font-size:clamp(.58rem,1.15vw,.82rem); }
+    .all-generated-forms-panel { margin-top:14px; padding:12px; }
+    .all-generated-forms-panel[hidden] { display:none!important; }
+    .all-generated-forms-panel .scheme-pairs { width:100%; min-width:0; max-height:72vh; margin:0; padding-right:4px; gap:14px; overflow:auto; overscroll-behavior:contain; }
+    .all-generated-forms-panel .scheme-pair { min-width:0; gap:10px; }
+    .all-generated-forms-panel .scheme-card { min-width:0; padding:10px; border-radius:10px; }
+    .all-generated-forms-panel .scheme-cell { min-height:42px; padding:4px 2px; font-size:clamp(.58rem,1.15vw,.82rem); }
     .all-selected-forms-intro { margin:0 0 12px; padding:10px 12px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; border:1px solid #9ab2f4; border-radius:9px; background:#f4f7ff; }
     .all-selected-forms-intro strong { display:block; }
     .all-selected-forms-intro__turn { font-weight:850; white-space:nowrap; }
@@ -47,10 +47,11 @@ function injectStyles() {
       .product-row__actions { gap:1px!important; }
       .product-row__actions .icon-button { width:23px!important; min-width:23px!important; }
       .product-row__details > summary { right:76px; width:24px; }
-      .layout-sheet--all-forms .scheme-pairs { max-height:68vh; }
-      .layout-sheet--all-forms .scheme-pair { grid-template-columns:1fr; }
-      .layout-sheet--all-forms .scheme-card { padding:7px; }
-      .layout-sheet--all-forms .scheme-cell { min-height:38px; font-size:clamp(.56rem,2.25vw,.72rem); }
+      .all-generated-forms-panel { padding:8px; }
+      .all-generated-forms-panel .scheme-pairs { max-height:68vh; }
+      .all-generated-forms-panel .scheme-pair { grid-template-columns:1fr; }
+      .all-generated-forms-panel .scheme-card { padding:7px; }
+      .all-generated-forms-panel .scheme-cell { min-height:38px; font-size:clamp(.56rem,2.25vw,.72rem); }
     }
     @media (max-width:340px) {
       .product-row { padding-inline:4px!important; }
@@ -101,26 +102,42 @@ function selectedGeneratedPlan() {
   return result.planSet.plans.find(({ id }) => id === result.selectedPlanId) ?? null;
 }
 
-function restoreSinglePreviewClass() {
-  const host = document.querySelector("#layoutSheet");
-  host?.classList.remove("layout-sheet--all-forms");
+function ensureAllFormsHost() {
+  const screen = document.querySelector(".screen--layout");
+  const workspace = screen?.querySelector(".layout-workspace");
+  if (!screen || !workspace) return null;
+  let host = screen.querySelector("[data-all-generated-forms-host]");
+  if (host) return host;
+  host = document.createElement("section");
+  host.className = "all-generated-forms-panel panel";
+  host.dataset.allGeneratedFormsHost = "true";
+  host.hidden = true;
+  workspace.after(host);
+  return host;
+}
+
+function hideAllSelectedForms() {
+  const host = document.querySelector("[data-all-generated-forms-host]");
+  if (host) host.hidden = true;
 }
 
 function renderAllSelectedForms() {
-  if (rendering || currentLayoutMode() !== "both") return;
+  const host = ensureAllFormsHost();
   const data = snapshot()?.lastValidResult;
   const plan = selectedGeneratedPlan();
-  const host = document.querySelector("#layoutSheet");
-  if (!data || !plan?.impositions?.length || !host) return;
+  if (!host || currentLayoutMode() !== "both" || !data || !plan?.impositions?.length) {
+    hideAllSelectedForms();
+    return;
+  }
 
   const signature = `${data.revision}|${plan.id}|${plan.impositions.length}`;
-  if (layoutSignature === signature && host.querySelector(".all-generated-forms")) return;
+  host.hidden = false;
+  if (allFormsSignature === signature && host.querySelector(".all-generated-forms")) return;
 
   rendering = true;
   try {
     const wrapper = document.createElement("div");
     wrapper.className = "all-generated-forms";
-    wrapper.dataset.layoutRenderedView = "both";
     wrapper.dataset.generatedImpositionCount = String(plan.impositions.length);
 
     const intro = document.createElement("div");
@@ -134,13 +151,8 @@ function renderAllSelectedForms() {
     pairs.className = "scheme-pairs";
     renderSchemePairs(pairs, plan.impositions, { language: "ru" });
     wrapper.append(intro, pairs);
-
     host.replaceChildren(wrapper);
-    host.classList.add("layout-sheet--all-forms");
-    host.style.gridTemplateColumns = "";
-    host.style.gridTemplateRows = "";
-    host.style.aspectRatio = "auto";
-    layoutSignature = signature;
+    allFormsSignature = signature;
   } finally {
     rendering = false;
   }
@@ -160,15 +172,12 @@ function attachEvents() {
   document.addEventListener("click", (event) => {
     const mode = event.target.closest(".screen--layout .segmented button");
     if (mode) {
-      layoutSignature = null;
-      if ((mode.dataset.acceptanceLayout ?? mode.dataset.layoutSide) !== "both") {
-        restoreSinglePreviewClass();
-      }
+      if ((mode.dataset.acceptanceLayout ?? mode.dataset.layoutSide) !== "both") hideAllSelectedForms();
       setTimeout(scheduleRefresh, 0);
       return;
     }
     if (event.target.closest("[data-select-plan]")) {
-      layoutSignature = null;
+      allFormsSignature = null;
       setTimeout(scheduleRefresh, 0);
     }
   }, true);
@@ -179,6 +188,7 @@ function boot() {
   injectStyles();
   attachEvents();
   compactProductRows();
+  ensureAllFormsHost();
   const shell = document.querySelector("#appShell");
   if (shell) {
     const observer = new MutationObserver(() => {
