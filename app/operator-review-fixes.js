@@ -1,40 +1,11 @@
-import { createApplicationStateRepository } from "../src/local-state-repository.js";
-import { createPricingProfile } from "../src/production-cost.js";
-import { buildM3ControlReference } from "../src/control-reference.js";
 import { renderSchemePairs } from "../src/scheme-renderer.js";
 
-const repository = createApplicationStateRepository({ storage: window.localStorage });
-const CONTROL_REFERENCE_KEY = "uImposition.controlReference.active.2026-08-01";
-
-let controlReference = null;
-let controlReferenceActive = false;
 let rendering = false;
 let refreshQueued = false;
 let layoutSignature = null;
 
 function snapshot() {
   return window.__uimpositionR3?.getSnapshot?.() ?? null;
-}
-
-function formatNumber(value, digits = 0) {
-  if (value === null || value === undefined || !Number.isFinite(Number(value))) return "—";
-  return Number(value).toLocaleString("ru-RU", { maximumFractionDigits: digits });
-}
-
-function formatCost(metrics) {
-  if (metrics?.estimatedTotalCost === null || metrics?.estimatedTotalCost === undefined) {
-    return "без прайса";
-  }
-  return `${formatNumber(metrics.estimatedTotalCost, 2)} ${metrics.currency}`;
-}
-
-function ensureOldSchemeStyles() {
-  if (document.querySelector("link[data-m3-control-styles]")) return;
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = "../m3.css";
-  link.dataset.m3ControlStyles = "true";
-  document.head.append(link);
 }
 
 function injectStyles() {
@@ -59,19 +30,16 @@ function injectStyles() {
     .product-row__details[open] > summary { background:#315efb; color:#fff; }
     .product-row__details .details-grid { gap:6px!important; }
     .field-error:empty { display:none; }
-    .control-reference-card { border-color:#9ab2f4!important; background:#f4f7ff!important; }
-    .control-reference-card .alternative-card__badges::after { content:"Старый проверенный эталон"; display:inline-flex; min-height:23px; align-items:center; padding:2px 8px; border-radius:999px; background:#e6edff; color:#2446a8; font-size:11px; font-weight:800; }
-    .control-reference-switch { white-space:nowrap; }
-    .layout-sheet--old-renderer { display:block!important; width:100%!important; min-width:0!important; max-width:100%!important; padding:0!important; border:0!important; background:transparent!important; box-shadow:none!important; aspect-ratio:auto!important; overflow:visible!important; }
-    .layout-sheet--old-renderer::after { display:none!important; }
-    .layout-sheet--old-renderer .scheme-pairs { width:100%; min-width:0; margin:0; gap:14px; }
-    .layout-sheet--old-renderer .scheme-pair { min-width:0; gap:10px; }
-    .layout-sheet--old-renderer .scheme-card { min-width:0; padding:10px; border-radius:10px; }
-    .layout-sheet--old-renderer .scheme-cell { min-height:42px; padding:4px 2px; font-size:clamp(.58rem,1.15vw,.82rem); }
-    .control-reference-intro { margin:0 0 12px; padding:10px 12px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; border:1px solid #9ab2f4; border-radius:9px; background:#f4f7ff; }
-    .control-reference-intro strong { display:block; }
-    .control-reference-turn { font-weight:850; white-space:nowrap; }
-    .control-reference-turn b { color:#315efb; font-size:18px; }
+    .layout-sheet--all-forms { display:block!important; width:100%!important; min-width:0!important; max-width:100%!important; padding:0!important; border:0!important; background:transparent!important; box-shadow:none!important; aspect-ratio:auto!important; overflow:visible!important; }
+    .layout-sheet--all-forms::after { display:none!important; }
+    .layout-sheet--all-forms .scheme-pairs { width:100%; min-width:0; max-height:72vh; margin:0; padding-right:4px; gap:14px; overflow:auto; overscroll-behavior:contain; }
+    .layout-sheet--all-forms .scheme-pair { min-width:0; gap:10px; }
+    .layout-sheet--all-forms .scheme-card { min-width:0; padding:10px; border-radius:10px; }
+    .layout-sheet--all-forms .scheme-cell { min-height:42px; padding:4px 2px; font-size:clamp(.58rem,1.15vw,.82rem); }
+    .all-selected-forms-intro { margin:0 0 12px; padding:10px 12px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; border:1px solid #9ab2f4; border-radius:9px; background:#f4f7ff; }
+    .all-selected-forms-intro strong { display:block; }
+    .all-selected-forms-intro__turn { font-weight:850; white-space:nowrap; }
+    .all-selected-forms-intro__turn b { color:#315efb; font-size:18px; }
     @media (max-width:760px) {
       .product-row__main { grid-template-columns:minmax(82px,1.35fr) minmax(54px,.68fr) 39px 33px 33px auto!important; gap:3px!important; }
       .product-row__main .field span { font-size:7px!important; }
@@ -79,9 +47,10 @@ function injectStyles() {
       .product-row__actions { gap:1px!important; }
       .product-row__actions .icon-button { width:23px!important; min-width:23px!important; }
       .product-row__details > summary { right:76px; width:24px; }
-      .layout-sheet--old-renderer .scheme-pair { grid-template-columns:1fr; }
-      .layout-sheet--old-renderer .scheme-card { padding:7px; }
-      .layout-sheet--old-renderer .scheme-cell { min-height:38px; font-size:clamp(.56rem,2.25vw,.72rem); }
+      .layout-sheet--all-forms .scheme-pairs { max-height:68vh; }
+      .layout-sheet--all-forms .scheme-pair { grid-template-columns:1fr; }
+      .layout-sheet--all-forms .scheme-card { padding:7px; }
+      .layout-sheet--all-forms .scheme-cell { min-height:38px; font-size:clamp(.56rem,2.25vw,.72rem); }
     }
     @media (max-width:340px) {
       .product-row { padding-inline:4px!important; }
@@ -91,6 +60,15 @@ function injectStyles() {
     }
   `;
   document.head.append(style);
+}
+
+function ensureSchemeStyles() {
+  if (document.querySelector("link[data-generated-scheme-styles]")) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "../m3.css";
+  link.dataset.generatedSchemeStyles = "true";
+  document.head.append(link);
 }
 
 function compactProductRows() {
@@ -112,76 +90,53 @@ function compactProductRows() {
   });
 }
 
-async function fetchJson(path) {
-  const response = await fetch(path, { cache: "no-store" });
-  if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
-  return response.json();
+function currentLayoutMode() {
+  const active = document.querySelector(".screen--layout .segmented button.is-active");
+  return active?.dataset.acceptanceLayout ?? active?.dataset.layoutSide ?? "front";
 }
 
-function normalizeFileName(value) {
-  return String(value ?? "").replace(/^Листовка\s+/iu, "").trim();
+function selectedGeneratedPlan() {
+  const result = snapshot()?.lastValidResult;
+  if (!result?.planSet?.plans?.length || !result.selectedPlanId) return null;
+  return result.planSet.plans.find(({ id }) => id === result.selectedPlanId) ?? null;
 }
 
-function currentMatchesControlCase(controlCase) {
-  const rows = snapshot()?.state?.input?.products?.filter((row) => row.enabled !== false) ?? [];
-  if (rows.length !== controlCase.orders.length) return false;
-  return controlCase.orders.every((order, index) => {
-    const row = rows[index];
-    return normalizeFileName(row?.name) === String(order.file)
-      && Number(row?.quantityPerVariant) === Number(order.quantity)
-      && Number(row?.pages) === Number(order.pages)
-      && Number(row?.print?.frontColors) === 1
-      && Number(row?.print?.backColors) === 1
-      && row?.print?.duplexPreference === "separateFrontBackForms";
-  });
-}
-
-function pricingProfileFromState() {
-  const pricing = snapshot()?.state?.input?.pricing;
-  if (!pricing || pricing.grammageGsm === null || pricing.paperPricePerKg === null || pricing.colorPlatePrice === null) {
-    return null;
-  }
-  return createPricingProfile(pricing);
-}
-
-async function prepareControlReference() {
-  if (window.localStorage.getItem(CONTROL_REFERENCE_KEY) !== "1") return null;
-  const [controlCase, controlLayout] = await Promise.all([
-    fetchJson("../data/control-case.json"),
-    fetchJson("../data/control-layout-m3.json"),
-  ]);
-  if (!currentMatchesControlCase(controlCase)) return null;
-  return buildM3ControlReference({
-    controlCase,
-    controlLayout,
-    pricing: pricingProfileFromState(),
-  });
-}
-
-function renderControlLayout() {
-  if (!controlReferenceActive || !controlReference || rendering) return;
+function restoreSinglePreviewClass() {
   const host = document.querySelector("#layoutSheet");
-  if (!host) return;
-  const signature = `${controlReference.id}|${controlReference.records.length}`;
-  if (layoutSignature === signature && host.querySelector(".scheme-pairs")) return;
+  host?.classList.remove("layout-sheet--all-forms");
+}
+
+function renderAllSelectedForms() {
+  if (rendering || currentLayoutMode() !== "both") return;
+  const data = snapshot()?.lastValidResult;
+  const plan = selectedGeneratedPlan();
+  const host = document.querySelector("#layoutSheet");
+  if (!data || !plan?.impositions?.length || !host) return;
+
+  const signature = `${data.revision}|${plan.id}|${plan.impositions.length}`;
+  if (layoutSignature === signature && host.querySelector(".all-generated-forms")) return;
 
   rendering = true;
   try {
     const wrapper = document.createElement("div");
-    wrapper.className = "control-reference-render";
+    wrapper.className = "all-generated-forms";
     wrapper.dataset.layoutRenderedView = "both";
+    wrapper.dataset.generatedImpositionCount = String(plan.impositions.length);
+
     const intro = document.createElement("div");
-    intro.className = "control-reference-intro";
+    intro.className = "all-selected-forms-intro";
     intro.innerHTML = `
-      <div><strong>Старый контрольный эталон</strong><span>Точный набор из data/control-layout-m3.json · 4 лица + 4 оборота = 8 форм</span></div>
-      <div class="control-reference-turn"><b>→</b> лицо · <b>←</b> оборот · через короткую сторону слева направо</div>
+      <div><strong>Все формы выбранного рассчитанного варианта</strong><span>${plan.label} · ${plan.impositions.length} монтажей · найдено программой из текущих тиражей</span></div>
+      <div class="all-selected-forms-intro__turn"><b>→</b> лицо · <b>←</b> оборот</div>
     `;
+
     const pairs = document.createElement("div");
     pairs.className = "scheme-pairs";
-    renderSchemePairs(pairs, controlReference.records, { language: "ru" });
+    renderSchemePairs(pairs, plan.impositions, { language: "ru" });
     wrapper.append(intro, pairs);
+
     host.replaceChildren(wrapper);
-    host.classList.add("layout-sheet--old-renderer");
+    host.classList.add("layout-sheet--all-forms");
     host.style.gridTemplateColumns = "";
     host.style.gridTemplateRows = "";
     host.style.aspectRatio = "auto";
@@ -191,138 +146,39 @@ function renderControlLayout() {
   }
 }
 
-function renderReferenceCard() {
-  const list = document.querySelector("#alternativesList");
-  if (!list || !controlReference) return;
-  let card = list.querySelector("[data-control-reference-card]");
-  if (!card) {
-    card = document.createElement("article");
-    card.className = "alternative-card control-reference-card";
-    card.dataset.controlReferenceCard = "true";
-    list.append(card);
-  }
-  const metrics = controlReference.metrics;
-  const signature = JSON.stringify({
-    active: controlReferenceActive,
-    sheets: metrics.physicalSheets,
-    passes: metrics.pressPasses,
-    cost: metrics.estimatedTotalCost,
-  });
-  if (card.dataset.signature === signature) return;
-  card.dataset.signature = signature;
-  card.classList.toggle("is-selected", controlReferenceActive);
-  card.innerHTML = `
-    <div class="alternative-cell alternative-cell--title">
-      <div class="alternative-card__badges"></div>
-      <strong>Контрольная ручная раскладка M3 · 90° · 4×4</strong>
-      <span>Точный эталон из data/control-layout-m3.json</span>
-    </div>
-    <div class="alternative-cell"><span>Листы</span><strong>${formatNumber(metrics.physicalSheets)}</strong></div>
-    <div class="alternative-cell"><span>Формы</span><strong>8</strong></div>
-    <div class="alternative-cell"><span>Пластины 1+1</span><strong>8</strong></div>
-    <div class="alternative-cell"><span>Прогоны</span><strong>${formatNumber(metrics.pressPasses)}</strong></div>
-    <div class="alternative-cell"><span>Стоимость</span><strong>${formatCost(metrics)}</strong></div>
-    <div class="alternative-action"><button class="button ${controlReferenceActive ? "" : "button--primary"}" type="button" data-control-reference-select>${controlReferenceActive ? "Показан" : "Показать 4+4"}</button></div>
-  `;
-}
-
-function renderReferenceSwitch() {
-  const actions = document.querySelector(".screen--layout .screen-heading__actions");
-  if (!actions || !controlReference) return;
-  let button = actions.querySelector("[data-control-reference-switch]");
-  if (!button) {
-    button = document.createElement("button");
-    button.type = "button";
-    button.className = "button control-reference-switch";
-    button.dataset.controlReferenceSwitch = "true";
-    actions.append(button);
-  }
-  const text = controlReferenceActive ? "Вернуться к расчёту" : "Эталон 4 лица + 4 оборота";
-  if (button.textContent !== text) button.textContent = text;
-}
-
-function renderReferenceNote() {
-  const details = document.querySelector("#layoutDetails");
-  if (!details || !controlReference) return;
-  let note = details.querySelector("[data-control-reference-note]");
-  if (!note) {
-    note = document.createElement("div");
-    note.className = "work-and-turn-note";
-    note.dataset.controlReferenceNote = "true";
-    details.prepend(note);
-  }
-  const signature = controlReferenceActive ? "active" : "available";
-  if (note.dataset.signature === signature) return;
-  note.dataset.signature = signature;
-  note.innerHTML = controlReferenceActive
-    ? "<strong>Показан точный прежний эталон.</strong><br>20 файлов A6, 1+1, 4 монтажа: 4 формы лица + 4 зеркальные формы оборота = 8 форм. Стрелка направления сохранена в каждой ячейке."
-    : "<strong>Старый эталон доступен для сравнения.</strong><br>Он берётся напрямую из data/control-case.json и data/control-layout-m3.json.";
-}
-
-function restoreCalculatedLayout() {
-  layoutSignature = null;
-  const host = document.querySelector("#layoutSheet");
-  host?.classList.remove("layout-sheet--old-renderer");
-  window.__uimpositionAcceptanceControls?.renderLayout?.();
-}
-
 function scheduleRefresh() {
   if (refreshQueued) return;
   refreshQueued = true;
   queueMicrotask(() => {
     refreshQueued = false;
     compactProductRows();
-    renderReferenceCard();
-    renderReferenceSwitch();
-    renderReferenceNote();
-    renderControlLayout();
+    renderAllSelectedForms();
   });
 }
 
 function attachEvents() {
   document.addEventListener("click", (event) => {
-    if (event.target.closest("[data-control-reference-select]")) {
-      controlReferenceActive = true;
+    const mode = event.target.closest(".screen--layout .segmented button");
+    if (mode) {
       layoutSignature = null;
-      window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
-      window.__uimpositionR3?.openScreen?.("layout");
+      if ((mode.dataset.acceptanceLayout ?? mode.dataset.layoutSide) !== "both") {
+        restoreSinglePreviewClass();
+      }
       setTimeout(scheduleRefresh, 0);
       return;
     }
-    if (event.target.closest("[data-control-reference-switch]")) {
-      controlReferenceActive = !controlReferenceActive;
-      if (controlReferenceActive) {
-        window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
-        layoutSignature = null;
-        setTimeout(scheduleRefresh, 0);
-      } else {
-        restoreCalculatedLayout();
-        setTimeout(scheduleRefresh, 0);
-      }
-      return;
-    }
-    if (event.target.closest("[data-select-plan], .screen--layout .segmented button")) {
-      if (controlReferenceActive) {
-        controlReferenceActive = false;
-        restoreCalculatedLayout();
-      }
+    if (event.target.closest("[data-select-plan]")) {
+      layoutSignature = null;
       setTimeout(scheduleRefresh, 0);
     }
   }, true);
 }
 
-async function boot() {
-  ensureOldSchemeStyles();
+function boot() {
+  ensureSchemeStyles();
   injectStyles();
   attachEvents();
   compactProductRows();
-  try {
-    controlReference = await prepareControlReference();
-    controlReferenceActive = Boolean(controlReference);
-    if (controlReferenceActive) window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
-  } catch (error) {
-    console.error("M3 control reference was not prepared", error);
-  }
   const shell = document.querySelector("#appShell");
   if (shell) {
     const observer = new MutationObserver(() => {
@@ -341,16 +197,6 @@ const waitForWorkspace = setInterval(() => {
 setTimeout(() => clearInterval(waitForWorkspace), 10000);
 
 window.__uimpositionOperatorReview = Object.freeze({
-  getControlReference: () => controlReference,
-  setControlReferenceActive(value) {
-    controlReferenceActive = Boolean(value && controlReference);
-    if (controlReferenceActive) {
-      window.__uimpositionAcceptanceControls?.setLayoutView?.("both");
-      layoutSignature = null;
-    } else {
-      restoreCalculatedLayout();
-    }
-    scheduleRefresh();
-  },
   render: scheduleRefresh,
+  getSelectedGeneratedPlan: selectedGeneratedPlan,
 });

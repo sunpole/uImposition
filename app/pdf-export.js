@@ -2,7 +2,6 @@ import "./responsive-actions.js";
 import "./acceptance-controls.js";
 import "./txt-import.js";
 import "./operator-review-fixes.js";
-import "./control-reference-details.js";
 
 import {
   OPERATOR_WORKSPACE_EXPORT_TYPES,

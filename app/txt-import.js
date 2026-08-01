@@ -14,7 +14,8 @@ import {
 const addButton = document.querySelector("#addProductButton");
 const heading = addButton?.parentElement ?? null;
 const repository = createApplicationStateRepository({ storage: window.localStorage });
-const CONTROL_REFERENCE_KEY = "uImposition.controlReference.active.2026-08-01";
+
+window.localStorage.removeItem("uImposition.controlReference.active.2026-08-01");
 
 function downloadText(text, fileName) {
   const blob = new Blob([`\uFEFF${text}`], { type: "text/plain;charset=utf-8" });
@@ -84,11 +85,6 @@ function buildImportedState(rows, {
 
 function applyRows(rows, status, message, options = {}) {
   repository.save(buildImportedState(rows, options));
-  if (options.controlReference) {
-    window.localStorage.setItem(CONTROL_REFERENCE_KEY, "1");
-  } else {
-    window.localStorage.removeItem(CONTROL_REFERENCE_KEY);
-  }
   status.hidden = false;
   status.textContent = `${message} Обновляем рабочий экран…`;
   window.setTimeout(() => window.location.reload(), 80);
@@ -141,7 +137,7 @@ function controlCaseRows(controlCase) {
       ? { mode: "commonCut", gapMm: 0 }
       : { mode: "separated", gapMm: 0 },
     rotationPolicy: "auto",
-    notes: "Старый контрольный заказ M3 · чёрно-белый 1+1",
+    notes: "Контрольный заказ M3 · чёрно-белый 1+1",
   }));
 }
 
@@ -171,18 +167,21 @@ function controlCaseInput(controlCase) {
   };
 }
 
+async function fetchControlCase() {
+  const response = await fetch("../data/control-case.json", { cache: "no-store" });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+
 async function loadControlCase(status) {
   status.hidden = false;
-  status.textContent = "Загружаем старый контрольный заказ 1+1…";
+  status.textContent = "Загружаем контрольный заказ 1+1…";
   try {
-    const response = await fetch("../data/control-case.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const controlCase = await response.json();
+    const controlCase = await fetchControlCase();
     const rows = controlCaseRows(controlCase);
-    applyRows(rows, status, "Загружен точный старый пример: 20 файлов A6, 1+1, эталон 4 лица + 4 оборота.", {
+    applyRows(rows, status, "Загружены исходные данные: 20 файлов A6, 1+1. Все варианты рассчитываются программой заново.", {
       inputPatch: controlCaseInput(controlCase),
       activeScreen: "layout",
-      controlReference: true,
     });
   } catch (error) {
     status.textContent = `Пример не загружен: ${error.message}`;
@@ -200,7 +199,7 @@ function installControls() {
   exampleButton.type = "button";
   exampleButton.className = "button button--quiet";
   exampleButton.textContent = "Тест: 20 файлов · 1+1";
-  exampleButton.title = "Точный старый контрольный заказ из data/control-case.json и data/control-layout-m3.json";
+  exampleButton.title = "Загрузить только исходные данные старого контрольного заказа и пересчитать их текущим оптимизатором";
 
   const templateButton = document.createElement("button");
   templateButton.type = "button";
@@ -243,19 +242,15 @@ window.__uimpositionR3TxtImport = Object.freeze({
     const result = parseImportText(text);
     if (!result.valid) return result;
     repository.save(buildImportedState(result.rows));
-    window.localStorage.removeItem(CONTROL_REFERENCE_KEY);
     return result;
   },
-  loadControlCase: async () => {
-    const response = await fetch("../data/control-case.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const controlCase = await response.json();
+  async loadControlCase() {
+    const controlCase = await fetchControlCase();
     const rows = controlCaseRows(controlCase);
     repository.save(buildImportedState(rows, {
       inputPatch: controlCaseInput(controlCase),
       activeScreen: "layout",
     }));
-    window.localStorage.setItem(CONTROL_REFERENCE_KEY, "1");
     return rows;
   },
 });

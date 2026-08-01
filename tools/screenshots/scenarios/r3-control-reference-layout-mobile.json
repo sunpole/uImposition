@@ -1,5 +1,5 @@
 {
-  "id": "r3-control-reference-layout-mobile",
+  "id": "r3-generated-control-plan-layout-mobile",
   "path": "/app/",
   "viewport": {
     "width": 390,
@@ -18,21 +18,29 @@
     },
     {
       "action": "wait",
-      "timeoutMs": 2200
+      "timeoutMs": 3000
+    },
+    {
+      "action": "click",
+      "selector": ".screen--layout .segmented [data-acceptance-layout='both']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 650
     }
   ],
   "beforeScreenshotAssertions": [
     {
-      "selector": "[data-control-reference-note]",
-      "text": "4 формы лица + 4 зеркальные формы оборота = 8 форм"
+      "selector": ".all-selected-forms-intro",
+      "text": "Все формы выбранного рассчитанного варианта"
     },
     {
-      "selector": ".scheme-pair:nth-child(4)",
-      "text": "ЛИСТ-4_ЛИЦО"
+      "selector": ".all-selected-forms-intro",
+      "text": "56 монтажей"
     },
     {
-      "selector": ".scheme-pair:nth-child(4)",
-      "text": "ЛИСТ-4_ОБОРОТ"
+      "selector": "[data-generated-imposition-count='56'] .scheme-pair:nth-child(56)",
+      "text": "ОБОРОТ"
     },
     {
       "selector": ".scheme-pair:first-child .scheme-card:first-child .scheme-cell:first-child",
@@ -41,15 +49,11 @@
     {
       "selector": ".scheme-pair:first-child .scheme-card:nth-child(2) .scheme-cell:first-child",
       "text": "←"
-    },
-    {
-      "selector": ".control-reference-turn",
-      "text": "через короткую сторону слева направо"
     }
   ],
   "pageAssertions": {
     "noHorizontalOverflow": true
   },
   "screenshotSelector": ".screen--layout",
-  "screenshot": "uimposition-r3-control-reference-layout-mobile.png"
+  "screenshot": "uimposition-r3-generated-control-plan-layout-mobile.png"
 }
