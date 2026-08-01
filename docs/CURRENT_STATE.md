@@ -110,11 +110,11 @@ E — explanation, export and case memory
 
 Нельзя решать большие заказы простым увеличением static candidate limits.
 
-## 6. Статус draft PR #85
+## 6. Статус PR #85
 
-PR `#85` остаётся черновым и не является будущим large-order solver.
+PR `#85` закрыт без merge как superseded после research PR `#86` и canonical-docs PR `#87`.
 
-Полезные части:
+Его ветка и полезные идеи сохранены:
 
 - BigInt candidate count;
 - deterministic candidate signatures;
@@ -125,7 +125,7 @@ PR `#85` остаётся черновым и не является будущи
 
 - переработанный exhaustive oracle для малых задач R0.
 
-Перед merge PR должен быть пересобран на актуальном `main` и соответствовать новой G/P/R архитектуре.
+Код нельзя сливать в прежнем виде. Нужен новый PR от актуального `main`, использующий слои G/P/R и не претендующий на large-order completeness.
 
 ## 7. Честная граница текущего production solver
 
