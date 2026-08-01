@@ -120,12 +120,13 @@ export function createUniformGridPatternSet({
     rotation,
     idPrefix,
   })));
-  const best = [...patterns].sort(comparePatterns)[0];
+  const bestCandidate = [...patterns].sort(comparePatterns)[0];
+  const best = bestCandidate.capacity > 0 ? bestCandidate : null;
   return Object.freeze({
     family: "uniformGrid",
     patterns,
     best,
-    fits: best.capacity > 0,
+    fits: best !== null,
     coverage: Object.freeze({
       scope: `uniformGrid:${uniqueRotations.join(",")}`,
       status: "completeWithinPatternFamily",
