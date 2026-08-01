@@ -1,84 +1,109 @@
 # Скриншоты и PDF-доказательства / Screenshot and PDF evidence
 
-## Цель / Goal
+## Цель
 
-Каждый пользовательский релиз получает фактическое доказательство точного commit. Для PDF одного скриншота недостаточно: документ скачивается, структурно проверяется и полностью рендерится.
-
-Every user-visible release receives evidence from the exact commit. A PDF screenshot alone is insufficient: the document is downloaded, structurally checked, and fully rendered.
+Каждый пользовательский runtime/release PR получает фактическое доказательство exact commit. Для PDF одного DOM assertion недостаточно: документ скачивается, структурно проверяется и полностью рендерится.
 
 ## Workflow
 
 ```text
 .github/workflows/capture-screenshots.yml
+tools/screenshots/capture.spec.mjs
+tools/screenshots/scenarios/
 ```
 
 Workflow:
 
-- имеет только `contents: read`;
-- устанавливает закреплённый Playwright/Chromium;
-- запускает точный checkout через локальный HTTP-сервер;
-- выполняет desktop/mobile assertions;
-- скачивает PDF через настоящий браузер;
+- использует exact checkout;
+- поднимает локальный HTTP server;
+- запускает реальный Chromium;
+- проверяет desktop/mobile assertions;
+- проверяет отсутствие горизонтального overflow;
+- скачивает PDF через browser download;
 - проверяет `%PDF`, `%%EOF`, имя и число Page-объектов;
-- запускает `pdfinfo`;
-- рендерит каждую страницу через Poppler `pdftoppm`;
-- сравнивает количество PDF-страниц и PNG;
-- сохраняет PNG, PDF, `pdfinfo`, manifest и diagnostics в artifact.
+- запускает `pdfinfo` и Poppler;
+- сохраняет PNG, PDF, logs и manifest в artifact.
 
-## Сценарии M5 / M5 scenarios
+## Активные и исторические сценарии
+
+После root cutover актуальным пользовательским runtime является `/app/`.
+
+По умолчанию `capture.spec.mjs` запускает только сценарии, у которых:
 
 ```text
-tools/screenshots/scenarios/m5-pdf-export-desktop.json
-tools/screenshots/scenarios/m5-report-pdf-export-desktop.json
-tools/screenshots/scenarios/m5-pdf-export-mobile.json
+path начинается с /app/
 ```
 
-### PDF схем
+Это текущая release/regression матрица.
 
-- версия `0.5.0-alpha`;
-- файл `uImposition-schemes.pdf`;
-- ровно `8` страниц;
-- одна схема на страницу;
-- A4 и сохранение пропорций;
-- порядок лицо/оборот;
-- после скачивания статус «PDF схем создан: 8 страниц».
+Исторические M5–M7 и UX-сценарии сохранены в `tools/screenshots/scenarios/`, но не входят в default run после удаления legacy root shell. Их можно запустить:
 
-### PDF отчёта
+```bash
+INCLUDE_HISTORICAL_SCREENSHOTS=1 npx playwright test -c tools/screenshots/playwright.config.mjs
+```
 
-- файл `uImposition-production-report.pdf`;
-- ровно `6` страниц A4;
-- сводка, 2 страницы файлов, 3 страницы пар;
-- после скачивания статус «PDF отчёта создан: 6 страниц».
+Или выбрать отдельный сценарий независимо от его lifecycle:
 
-### Mobile
+```bash
+SCREENSHOT_SCENARIOS=m6-paper-minimum-desktop npx playwright test -c tools/screenshots/playwright.config.mjs
+```
 
-Мобильный сценарий подтверждает видимость обеих кнопок, статуса готовности и адаптивную компоновку панели экспорта.
+Полное pre-cutover состояние также находится в:
 
-## Ручная проверка / Manual review
+```text
+archive/pre-universal-solver-rebuild-2026-08-01
+```
 
-Обязательно открыть PNG всех страниц и проверить:
+## Текущая `/app/` матрица
+
+Проверяются:
+
+- order workspace desktop/mobile;
+- 320/360/390/tablet widths;
+- no horizontal page overflow;
+- compact rows and control order;
+- pricing dialog;
+- alternatives and selection;
+- front, mirrored back and combined layout;
+- odd technical blank;
+- work-and-turn shared plate;
+- all generated impositions for selected plan;
+- scheme PDF and production report PDF;
+- downloaded file names and page counts.
+
+## Root entrypoint
+
+Корневой `index.html` проверяется Node-тестом:
+
+```text
+tests/root-entrypoint.test.js
+```
+
+Тест подтверждает переход в `/app/` и отсутствие подключений legacy root stylesheet/scripts.
+
+## Ручная проверка artifacts
+
+После зелёного workflow открыть focused PNG/PDF и проверить:
 
 - отсутствие обрезки;
-- отсутствие пересечений заголовков и номеров страниц;
-- читаемую кириллицу и стрелки;
+- отсутствие горизонтальной прокрутки страницы;
+- читаемость mobile controls;
+- правильные номера страниц;
+- `1 2 3 4 → 4 3 2 1` для заявленного зеркального оборота;
+- корректную техническую пустую сторону;
+- соответствие selected plan, scheme, report и PDF;
 - отсутствие чёрных квадратов и сломанных глифов;
-- читаемость таблиц и вкладов монтажей;
-- корректный порядок страниц;
-- отдельность PDF схем и PDF отчёта.
+- отсутствие secrets, cookies и приватных путей.
 
-## Перед публикацией / Before publishing
+## Release evidence
 
-1. Проверить exact commit в `manifest.json`.
-2. Открыть desktop и mobile PNG интерфейса.
-3. Открыть `pdfinfo` обоих документов.
-4. Просмотреть все 14 PNG PDF-страниц.
-5. Убедиться в отсутствии secrets, cookies, приватных путей и старого кеша.
-6. Скопировать только новый релизный PNG в `news/`.
-7. Выполнить Quality checks и dry-run uNews.
+Version/release gate отдельно проверяет:
 
-## Имена / Naming
+1. exact commit в manifest;
+2. focused desktop/mobile screenshots;
+3. `pdfinfo`;
+4. все Poppler PNG;
+5. evidence archive и SHA-256;
+6. recovery branch, immutable tag и GitHub Release assets.
 
-```text
-news/YYYY-MM-DD-uimposition-vX-Y-Z-short-title.md
-news/YYYY-MM-DD-uimposition-vX-Y-Z-short-title.png
-```
+Pure solver PR без runtime/export изменений может ограничиться Quality. Любое изменение `app/`, root routing, PDF или scenario harness требует Chromium/PDF workflow.
