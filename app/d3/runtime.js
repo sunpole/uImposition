@@ -39,7 +39,44 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const storage = window.localStorage;
 const applicationRepository = createApplicationStateRepository({ storage });
 const presetRepository = createSheetPressPresetRepository({ storage });
-const builtInPresets = createBuiltInSheetPressPresets();
+
+function supplementalD3Preset(id, width, height) {
+  return {
+    schemaVersion: 1,
+    id: `builtin:${id}`,
+    kind: "builtIn",
+    name: `${width} × ${height}`,
+    sheet: {
+      width,
+      height,
+      sizeStage: "afterTrim",
+      trim: {
+        enabled: false,
+        mode: "uniform",
+        uniformMm: CONFIG.defaults.trimUniformMm,
+        sidesMm: {
+          left: CONFIG.defaults.trimUniformMm,
+          right: CONFIG.defaults.trimUniformMm,
+          top: CONFIG.defaults.trimUniformMm,
+          bottom: CONFIG.defaults.trimUniformMm,
+        },
+      },
+    },
+    press: { marginsMm: { ...CONFIG.defaults.pressMarginsMm } },
+    metadata: {
+      favorite: false,
+      createdAt: null,
+      updatedAt: null,
+      lastUsedAt: null,
+    },
+  };
+}
+
+const builtInPresets = [
+  ...createBuiltInSheetPressPresets(),
+  supplementalD3Preset("500x350", 500, 350),
+  supplementalD3Preset("450x320", 450, 320),
+];
 
 const D3_DRAFT_KEY = "uImposition.d3Draft.v1";
 const D3_UI_KEY = "uImposition.d3Ui.v1";
