@@ -1,5 +1,27 @@
 "use strict";
 
+function configureD3Choices() {
+  const format = $("#draftFormat");
+  format.innerHTML = '<option value="">Не выбран</option>';
+  Object.entries(D3_STANDARD_FORMATS).forEach(([id, size]) => {
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = `${id} · ${formatD3Decimal(size.widthMm)}×${formatD3Decimal(size.heightMm)}`;
+    format.append(option);
+  });
+  const custom = document.createElement("option");
+  custom.value = "custom";
+  custom.textContent = "Произвольный";
+  format.append(custom);
+
+  $("#colorfulnessOptions").innerHTML = CONFIG.d3StartPage.colorfulnessPresets
+    .map((value) => `<option value="${escapeHtml(value)}"></option>`)
+    .join("");
+  $("#bleedOptions").innerHTML = CONFIG.bleedPresetsMm
+    .map((value) => `<option value="${escapeHtml(formatD3Decimal(value, CONFIG.d3StartPage.bleedDecimals))}"></option>`)
+    .join("");
+}
+
 function handleRowAction(action, rowId) {
   if (action === "copy") copyRow(rowId);
   if (action === "delete") deleteRow(rowId);
@@ -146,6 +168,7 @@ function attachEvents() {
   });
 }
 
+configureD3Choices();
 state = initialiseState();
 initialiseD3State();
 attachEvents();
