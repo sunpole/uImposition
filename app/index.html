@@ -1,82 +1,114 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-ui="d3">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#172033">
-  <title>uImposition — рабочий расчёт монтажа</title>
-  <meta name="description" content="Быстрый расчёт офсетных монтажей: пресеты листов, виды продукции, варианты по бумаге, формам и стоимости.">
+  <meta name="theme-color" content="#111827">
+  <title>uImposition — D3 рабочий расчёт</title>
+  <meta name="description" content="Компактный операторский расчёт офсетных монтажей: лист, заказы, варианты, схема и PDF.">
   <link rel="stylesheet" href="./app.css">
 </head>
 <body>
   <div class="app-shell" id="appShell">
     <header class="topbar">
-      <a class="brand" href="../" aria-label="uImposition — главная">
-        <span class="brand__mark">uI</span>
-        <span><strong>uImposition</strong><small>рабочий маршрут R3</small></span>
-      </a>
-      <div class="save-status" id="saveStatus" aria-live="polite">
-        <span class="save-status__dot"></span>
-        <span id="saveStatusText">Загрузка проекта…</span>
+      <button class="sheet-preset-button" id="currentPresetButton" type="button" data-surface-toggle="presetSurface" aria-expanded="false">
+        <span id="currentPresetText">616×446</span><span class="disclosure-marker" aria-hidden="true"></span>
+      </button>
+
+      <div class="live-counters" aria-label="Живой итог">
+        <div class="live-counter"><strong id="liveJobs">0</strong><span>ЗАДАНИЯ</span></div>
+        <div class="live-counter"><strong id="livePlates">—</strong><span>ПЛАСТИНЫ</span></div>
+        <div class="live-counter"><strong id="liveSheets">—</strong><span>ЛИСТЫ</span></div>
       </div>
+
+      <div class="save-status" id="saveStatus" aria-live="polite">
+        <span class="save-status__dot"></span><span id="saveStatusText">Загрузка…</span>
+      </div>
+
       <div class="topbar__actions">
-        <button class="button button--quiet" type="button" id="pricingButton">Прайс</button>
-        <button class="button button--primary" type="button" data-open-screen="layout">Открыть схему</button>
+        <button class="top-action top-action--add" id="commitDraftButton" type="button" title="Добавить заказ" aria-label="Добавить заказ" disabled>+</button>
+        <button class="top-action" type="button" data-surface-toggle="txtSurface" aria-expanded="false" title="TXT">
+          <span>TXT</span><span class="disclosure-marker" aria-hidden="true"></span>
+        </button>
+        <button class="top-action" type="button" data-surface-toggle="settingsSurface" aria-expanded="false" title="Настройки" aria-label="Настройки">
+          <span>⚙</span><span class="disclosure-marker" aria-hidden="true"></span>
+        </button>
       </div>
     </header>
+
+    <div class="top-surface preset-surface" id="presetSurface" hidden>
+      <div class="preset-list" id="presetList" aria-label="Пресеты печатного листа"></div>
+      <button class="surface-action" type="button" id="customPresetSurfaceButton">Свой формат</button>
+      <div class="sheet-facts" id="sheetFacts"></div>
+    </div>
+
+    <div class="top-surface txt-surface" id="txtSurface" hidden>
+      <div id="txtImportHost">
+        <button class="button" type="button" id="addProductButton">Перейти к новой строке</button>
+      </div>
+    </div>
+
+    <div class="top-surface settings-surface" id="settingsSurface" hidden>
+      <button class="surface-action" type="button" id="createPresetButton">Новый пресет листа</button>
+      <button class="surface-action" type="button" id="pricingButton">Рабочий прайс</button>
+      <span class="settings-status" id="settingsSaveStatus">Сохраняется локально</span>
+    </div>
 
     <div class="global-message" id="globalMessage" hidden></div>
 
     <main class="workspace">
       <section class="screen screen--order is-active" data-screen="order" aria-labelledby="orderTitle">
-        <div class="preset-panel panel">
-          <div class="panel-heading panel-heading--inline">
-            <div>
-              <p class="kicker">Лист и печатная машина</p>
-              <h1 id="orderTitle">Выберите рабочий пресет</h1>
-            </div>
-            <button class="button button--dashed" type="button" id="createPresetButton">＋ Новый пресет</button>
-          </div>
-          <div class="preset-list" id="presetList" aria-label="Пресеты листа и машины"></div>
-          <div class="sheet-facts" id="sheetFacts"></div>
+        <h1 class="visually-hidden" id="orderTitle">Заказы D3</h1>
+
+        <div class="calculation-message calculation-message--working" id="calculationWorking" hidden>
+          Пересчитываем варианты. Последний корректный результат остаётся доступным.
         </div>
+        <div class="calculation-message calculation-message--error" id="calculationError" hidden></div>
 
-        <div class="order-grid">
-          <section class="products-panel panel" aria-labelledby="productsTitle">
-            <div class="panel-heading panel-heading--inline">
-              <div>
-                <p class="kicker">Что печатаем</p>
-                <h2 id="productsTitle">Виды продукции</h2>
-                <p class="muted">Главные поля находятся в строке. Выпуск, рез и оборот — в дополнительных параметрах.</p>
-              </div>
-              <button class="button" type="button" id="addProductButton">＋ Добавить вид</button>
-            </div>
-            <div class="calculation-message calculation-message--working" id="calculationWorking" hidden>
-              Пересчитываем варианты. Последний корректный результат остаётся видимым.
-            </div>
-            <div class="calculation-message calculation-message--error" id="calculationError" hidden></div>
-            <div class="product-list" id="productList"></div>
-          </section>
+        <section class="order-console" aria-label="Таблица заказов">
+          <div class="order-grid-row order-grid-head" aria-hidden="true">
+            <div>Название</div><div>Формат</div><div>Ширина</div><div></div><div>Высота</div>
+            <div>Красочность</div><div>Выпуск</div><div>Страниц</div><div>Тираж</div><div></div><div></div>
+          </div>
 
+          <div class="order-grid-row order-row order-row--draft is-active" id="draftRow" data-draft-row>
+            <div class="order-cell order-cell--name"><input id="draftName" data-draft-field="name" autocomplete="off" placeholder="Название"></div>
+            <div class="order-cell">
+              <select id="draftFormat" data-draft-field="format" aria-label="Формат">
+                <option value="">Не выбран</option>
+                <option value="A4">A4 · 210×297</option>
+                <option value="A5">A5 · 148×210</option>
+                <option value="A6">A6 · 105×148</option>
+                <option value="A7">A7 · 74×105</option>
+                <option value="custom">Произвольный</option>
+              </select>
+            </div>
+            <div class="order-cell"><input id="draftWidth" data-draft-field="widthMm" inputmode="decimal" aria-label="Ширина"></div>
+            <button class="order-cell order-action order-action--swap" type="button" id="draftSwap" title="Поменять ширину и высоту" aria-label="Поменять ширину и высоту">↔</button>
+            <div class="order-cell"><input id="draftHeight" data-draft-field="heightMm" inputmode="decimal" aria-label="Высота"></div>
+            <div class="order-cell"><input id="draftColorfulness" data-draft-field="colorfulness" list="colorfulnessOptions" inputmode="text" aria-label="Красочность"></div>
+            <div class="order-cell"><input id="draftBleed" data-draft-field="bleedMm" list="bleedOptions" inputmode="decimal" aria-label="Выпуск"></div>
+            <div class="order-cell"><input id="draftPages" data-draft-field="pages" inputmode="numeric" aria-label="Страниц"></div>
+            <div class="order-cell"><input id="draftQuantity" data-draft-field="quantity" inputmode="numeric" aria-label="Тираж"></div>
+            <div class="order-cell order-action-placeholder" aria-hidden="true"></div>
+            <div class="order-cell order-action-placeholder" aria-hidden="true"></div>
+          </div>
+
+          <div class="product-list" id="productList"></div>
+        </section>
+
+        <div class="draft-message" id="draftMessage" aria-live="polite"></div>
+
+        <section class="result-bridge" aria-hidden="true">
           <aside class="summary-panel panel" aria-labelledby="summaryTitle">
-            <div class="panel-heading">
-              <p class="kicker">Живой итог</p>
-              <h2 id="summaryTitle">Текущий выбор</h2>
-              <p class="muted" id="summaryContext">Введите корректный заказ.</p>
-            </div>
+            <h2 id="summaryTitle">Текущий выбор</h2>
+            <p id="summaryContext">Введите корректный заказ.</p>
             <div id="summaryContent" class="summary-content"></div>
           </aside>
-        </div>
-
-        <section class="quick-comparison panel" aria-labelledby="quickComparisonTitle">
-          <div class="panel-heading panel-heading--inline">
-            <div>
-              <p class="kicker">Варианты монтажа</p>
-              <h2 id="quickComparisonTitle">Бумага, формы и стоимость</h2>
-            </div>
-            <button class="button button--quiet" type="button" data-open-screen="alternatives">Полное сравнение →</button>
-          </div>
-          <div id="quickComparisonContent"></div>
+          <section class="quick-comparison panel" aria-labelledby="quickComparisonTitle">
+            <h2 id="quickComparisonTitle">Бумага, формы и стоимость</h2>
+            <div id="quickComparisonContent"></div>
+          </section>
         </section>
       </section>
 
@@ -85,7 +117,7 @@
           <div>
             <p class="kicker">Все допустимые планы текущей области</p>
             <h1 id="alternativesTitle">Сравнение вариантов</h1>
-            <p class="muted">Рекомендация помогает начать сравнение, но окончательный выбор всегда остаётся за оператором.</p>
+            <p class="muted">Рекомендация помогает начать сравнение, но окончательный выбор остаётся за оператором.</p>
           </div>
           <button class="button" type="button" data-open-screen="order">← Вернуться к заказу</button>
         </div>
@@ -109,9 +141,7 @@
           </div>
         </div>
         <div class="layout-workspace">
-          <div class="layout-canvas panel">
-            <div class="layout-sheet" id="layoutSheet"></div>
-          </div>
+          <div class="layout-canvas panel"><div class="layout-sheet" id="layoutSheet"></div></div>
           <aside class="layout-details panel" id="layoutDetails"></aside>
         </div>
       </section>
@@ -122,6 +152,10 @@
       <button type="button" data-mobile-screen="alternatives"><span>2</span>Варианты</button>
       <button type="button" data-mobile-screen="layout"><span>3</span>Схема</button>
     </nav>
+
+    <div class="undo-bar" id="undoBar" hidden>
+      <span>Заказ удалён</span><button type="button" id="undoDeleteButton">Вернуть</button>
+    </div>
   </div>
 
   <dialog class="dialog" id="presetDialog">
@@ -155,12 +189,12 @@
         <div><p class="kicker">Себестоимость</p><h2>Рабочий прайс</h2></div>
         <button class="icon-button" value="cancel" aria-label="Закрыть">×</button>
       </div>
-      <p class="muted">Пока цена не заполнена полностью, варианты считаются без денег — отсутствие цены не превращается в ноль.</p>
+      <p class="muted">Пока цена заполнена не полностью, отсутствие стоимости не превращается в ноль.</p>
       <div class="form-grid">
         <label class="field"><span>Плотность бумаги, г/м²</span><input name="grammageGsm" type="number" min="1" step="0.1"></label>
         <label class="field"><span>Цена бумаги за кг, BYN</span><input name="paperPricePerKg" type="number" min="0" step="0.01"></label>
         <label class="field"><span>Одна цветовая пластина, BYN</span><input name="colorPlatePrice" type="number" min="0" step="0.01"></label>
-        <label class="field"><span>Подготовка одной layout-формы, BYN</span><input name="layoutFormPreparationPrice" type="number" min="0" step="0.01"></label>
+        <label class="field"><span>Подготовка layout-формы, BYN</span><input name="layoutFormPreparationPrice" type="number" min="0" step="0.01"></label>
       </div>
       <div class="dialog-actions">
         <button class="button" type="button" id="clearPricingButton">Очистить прайс</button>
@@ -169,39 +203,12 @@
     </form>
   </dialog>
 
-  <template id="productRowTemplate">
-    <article class="product-row" data-product-row>
-      <div class="product-row__main">
-        <label class="field field--name" data-field-wrap="name"><span>Название / файл</span><input data-product-field="name" autocomplete="off"></label>
-        <label class="field" data-field-wrap="finished.widthMm"><span>Ширина, мм</span><input data-product-field="finished.widthMm" type="number" step="0.1" inputmode="decimal"></label>
-        <label class="field" data-field-wrap="finished.heightMm"><span>Высота, мм</span><input data-product-field="finished.heightMm" type="number" step="0.1" inputmode="decimal"></label>
-        <label class="field" data-field-wrap="quantityPerVariant"><span>Тираж вида</span><input data-product-field="quantityPerVariant" type="number" step="1" inputmode="numeric"></label>
-        <label class="field" data-field-wrap="variantCount"><span>Видов</span><input data-product-field="variantCount" type="number" step="1" inputmode="numeric"></label>
-        <label class="field" data-field-wrap="pages"><span>Страниц</span><input data-product-field="pages" type="number" step="1" inputmode="numeric"></label>
-        <label class="field field--colors" data-field-wrap="print.frontColors"><span>Лицо</span><input data-product-field="print.frontColors" type="number" min="0" max="16" step="1"></label>
-        <label class="field field--colors" data-field-wrap="print.backColors"><span>Оборот</span><input data-product-field="print.backColors" type="number" min="0" max="16" step="1"></label>
-        <div class="product-row__actions">
-          <button class="icon-button" type="button" data-row-action="duplicate" title="Дублировать">⧉</button>
-          <button class="icon-button" type="button" data-row-action="toggle" title="Отключить строку">✓</button>
-          <button class="icon-button icon-button--danger" type="button" data-row-action="remove" title="Удалить">×</button>
-        </div>
-      </div>
-      <div class="field-error" data-row-error></div>
-      <details class="product-row__details">
-        <summary>Дополнительно: выпуск, рез, оборот и поворот</summary>
-        <div class="details-grid">
-          <label class="field" data-field-wrap="print.mode"><span>Режим печати</span><select data-product-field="print.mode"><option value="duplex">Двусторонняя</option><option value="simplex">Односторонняя</option></select></label>
-          <label class="field" data-field-wrap="print.duplexPreference"><span>Технология оборота</span><select data-product-field="print.duplexPreference"><option value="auto">Автоматически</option><option value="separateFrontBackForms">Раздельные лицо/оборот</option><option value="workAndTurn">Свой оборот</option></select></label>
-          <label class="field" data-field-wrap="bleed.mode"><span>Режим выпуска</span><select data-product-field="bleed.mode"><option value="uniform">Одинаково</option><option value="sides">По сторонам</option></select></label>
-          <label class="field" data-field-wrap="bleed.uniformMm"><span>Выпуск, мм</span><input data-product-field="bleed.uniformMm" type="number" min="0" step="0.1"></label>
-          <label class="field" data-field-wrap="cut.mode"><span>Рез</span><select data-product-field="cut.mode"><option value="commonCut">Общий</option><option value="separated">Раздельный</option></select></label>
-          <label class="field" data-field-wrap="cut.gapMm"><span>Зазор, мм</span><input data-product-field="cut.gapMm" type="number" min="0" step="0.1"></label>
-          <label class="field" data-field-wrap="rotationPolicy"><span>Поворот</span><select data-product-field="rotationPolicy"><option value="auto">Автоматически 0°/90°</option><option value="0">Только 0°</option><option value="90">Только 90°</option></select></label>
-          <label class="field field--wide" data-field-wrap="notes"><span>Заметка</span><input data-product-field="notes" autocomplete="off"></label>
-        </div>
-      </details>
-    </article>
-  </template>
+  <datalist id="colorfulnessOptions">
+    <option value="1+0"><option value="1+1"><option value="4+0"><option value="4+1"><option value="4+4">
+  </datalist>
+  <datalist id="bleedOptions">
+    <option value="0"><option value="2"><option value="3"><option value="5">
+  </datalist>
 
   <script type="module" src="./app.js"></script>
   <script type="module" src="./pdf-export.js"></script>
