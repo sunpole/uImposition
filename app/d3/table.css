@@ -1,0 +1,178 @@
+.workspace {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 0 42px;
+}
+.screen { display: none; }
+.screen.is-active { display: block; }
+.screen--order { min-height: calc(100vh - 26px); }
+
+.calculation-message {
+  margin: 2px 3px;
+  padding: 3px 5px;
+  border-radius: 3px;
+  font-size: 6px;
+  line-height: 1.2;
+}
+.calculation-message--working { color: var(--cyan); background: #102631; }
+.calculation-message--error { color: #ff8e9b; background: #331922; }
+
+.order-console {
+  width: 100%;
+  min-width: 0;
+  border-top: 1px solid #29323e;
+  border-bottom: 1px solid #29323e;
+  background: #121821;
+  overflow: hidden;
+}
+.order-grid-row {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: var(--table-columns);
+  align-items: stretch;
+}
+.order-grid-head {
+  height: 6px;
+  color: #6f7b8d;
+  background: #1b222c;
+  border-bottom: 1px solid #303a47;
+  font-size: 4px;
+  font-weight: 800;
+  line-height: 5px;
+  overflow: hidden;
+}
+.order-grid-head > div {
+  min-width: 0;
+  padding: 0 1px;
+  border-right: 1px solid #28313d;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+.order-row {
+  position: relative;
+  height: 8px;
+  min-height: 8px;
+  color: #93a0b2;
+  background: #151b24;
+  border-bottom: 1px solid #252e3a;
+  font-size: 5px;
+  line-height: 7px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.order-row:nth-child(even) { background: #171e27; }
+.order-row:hover { background: #202833; }
+.order-row.is-active {
+  height: 16px;
+  min-height: 16px;
+  color: #fff;
+  background: var(--black);
+  font-size: 7px;
+  line-height: 15px;
+  cursor: default;
+}
+.order-row.is-disabled { opacity: .55; }
+.order-cell {
+  min-width: 0;
+  height: 100%;
+  padding: 0 1px;
+  border-right: 1px solid #242d38;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.order-cell--name { padding-left: 2px; }
+.order-cell small {
+  display: block;
+  color: #697588;
+  font-size: 4px;
+  line-height: 4px;
+}
+.order-row.is-active .order-cell small { color: #808b9a; font-size: 5px; line-height: 6px; }
+.order-row input,
+.order-row select {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  display: block;
+  padding: 0 1px;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  color: inherit;
+  background: transparent;
+  font-size: inherit;
+  line-height: inherit;
+  appearance: none;
+}
+.order-row select { padding-right: 0; }
+.order-row input::placeholder { color: #566171; opacity: 1; }
+.order-row input:focus,
+.order-row select:focus { background: #10151c; box-shadow: inset 0 -1px 0 var(--yellow); }
+.order-row [aria-invalid="true"] { color: #ff8492; box-shadow: inset 0 -1px 0 var(--danger); }
+.order-action {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid #242d38;
+  color: #6f7a8a;
+  background: transparent;
+  font-size: 6px;
+  line-height: 1;
+}
+.order-action:hover { color: #fff; background: #303a48; }
+.order-row.is-active .order-action { color: #dce3ec; font-size: 9px; }
+.order-action--danger:hover { color: #fff; background: #762635; }
+.order-action--copy:hover { color: var(--cyan); }
+.order-action--swap { color: #9da8b7; }
+.order-action-placeholder { opacity: .2; }
+
+.draft-message {
+  min-height: 12px;
+  padding: 2px 4px;
+  color: #738094;
+  font-size: 6px;
+  line-height: 8px;
+}
+.draft-message.is-error { color: #ff7c8a; }
+.draft-message.is-ready { color: var(--good); }
+
+.result-bridge { display: none !important; }
+html[data-ui="d3"] .priority-panel { display: none !important; }
+
+.undo-bar {
+  position: fixed;
+  z-index: 90;
+  left: 50%;
+  bottom: 42px;
+  transform: translateX(-50%);
+  min-width: 180px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 8px;
+  border: 1px solid #3f4b5c;
+  border-radius: 5px;
+  color: #dfe6ef;
+  background: #111820;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  font-size: 8px;
+}
+.undo-bar button {
+  height: 20px;
+  padding: 0 7px;
+  border: 1px solid #6c5a1e;
+  border-radius: 3px;
+  color: var(--yellow);
+  background: #2a2517;
+  font-size: 8px;
+  font-weight: 800;
+}
