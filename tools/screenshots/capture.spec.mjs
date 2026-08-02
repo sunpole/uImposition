@@ -22,7 +22,7 @@ const scenarios = [];
 for (const fileName of scenarioFiles) {
   const scenario = JSON.parse(await readFile(path.join(scenarioDir, fileName), "utf8"));
   const explicitlySelected = scenarioFilter.has(scenario.id);
-  const belongsToCurrentApplication = String(scenario.path || "").startsWith("/app/");
+  const belongsToCurrentApplication = String(scenario.id || "").startsWith("d3-");
   const selectedByRequest = scenarioFilter.size === 0 || explicitlySelected;
   const selectedByLifecycle = includeHistoricalScenarios || explicitlySelected || belongsToCurrentApplication;
   if (selectedByRequest && selectedByLifecycle) scenarios.push(scenario);
