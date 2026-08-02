@@ -38,6 +38,23 @@ function rounded(value, digits) {
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
+function parsedDimension(value) {
+  if (typeof value === "number") {
+    return { value: Number.isFinite(value) ? value : null, precisionExceeded: false };
+  }
+  if (typeof value !== "string") return { value: null, precisionExceeded: false };
+  const normalized = value.trim().replace(",", ".");
+  if (normalized === "") return { value: null, precisionExceeded: false };
+  const match = /^[+-]?(?:\d+(?:\.(\d*))?|\.([0-9]+))$/.exec(normalized);
+  if (!match) return { value: null, precisionExceeded: false };
+  const fraction = match[1] ?? match[2] ?? "";
+  if (fraction.length > CONFIG.d3StartPage.dimensionDecimals) {
+    return { value: Number(normalized), precisionExceeded: true };
+  }
+  const numeric = Number(normalized);
+  return { value: Number.isFinite(numeric) ? numeric : null, precisionExceeded: false };
+}
+
 export function emptyD3Draft() {
   return {
     schemaVersion: D3_DRAFT_SCHEMA_VERSION,
@@ -116,11 +133,6 @@ function normalizeBleed(value) {
   return rounded(clamped, CONFIG.d3StartPage.bleedDecimals);
 }
 
-function normalizeDimension(value) {
-  const numeric = finiteNumber(value);
-  return numeric === null ? null : rounded(numeric, CONFIG.d3StartPage.dimensionDecimals);
-}
-
 function fitsPrintableArea(widthMm, heightMm, bleedMm, printable) {
   const printableWidth = finiteNumber(printable?.width);
   const printableHeight = finiteNumber(printable?.height);
@@ -142,8 +154,10 @@ function fitsPrintableArea(widthMm, heightMm, bleedMm, printable) {
 export function validateD3Draft(draft, printable) {
   const source = { ...emptyD3Draft(), ...(draft ?? {}) };
   const issues = [];
-  const widthMm = normalizeDimension(source.widthMm);
-  const heightMm = normalizeDimension(source.heightMm);
+  const width = parsedDimension(source.widthMm);
+  const height = parsedDimension(source.heightMm);
+  const widthMm = width.value;
+  const heightMm = height.value;
   const colorfulness = normalizeColorfulness(String(source.colorfulness ?? ""));
   const bleedMm = normalizeBleed(source.bleedMm);
   const pages = positiveInteger(source.pages);
@@ -151,9 +165,11 @@ export function validateD3Draft(draft, printable) {
   const minimumDimension = CONFIG.limits.minProductDimensionMm;
 
   if (!source.format && (widthMm === null || heightMm === null)) issues.push(issue("format", "required"));
-  if (widthMm === null) issues.push(issue("widthMm", "invalidNumber"));
+  if (width.precisionExceeded) issues.push(issue("widthMm", "precisionExceeded"));
+  else if (widthMm === null) issues.push(issue("widthMm", "invalidNumber"));
   else if (widthMm < minimumDimension) issues.push(issue("widthMm", "outOfRange"));
-  if (heightMm === null) issues.push(issue("heightMm", "invalidNumber"));
+  if (height.precisionExceeded) issues.push(issue("heightMm", "precisionExceeded"));
+  else if (heightMm === null) issues.push(issue("heightMm", "invalidNumber"));
   else if (heightMm < minimumDimension) issues.push(issue("heightMm", "outOfRange"));
   if (!colorfulness) issues.push(issue("colorfulness", "outOfRange"));
   if (bleedMm === null) issues.push(issue("bleedMm", "invalidNumber"));
@@ -162,7 +178,9 @@ export function validateD3Draft(draft, printable) {
 
   let fit = null;
   if (
-    widthMm !== null
+    !width.precisionExceeded
+    && !height.precisionExceeded
+    && widthMm !== null
     && heightMm !== null
     && widthMm >= minimumDimension
     && heightMm >= minimumDimension
@@ -172,7 +190,7 @@ export function validateD3Draft(draft, printable) {
     if (!fit) issues.push(issue("size", "doesNotFit"));
   }
 
-  const format = widthMm !== null && heightMm !== null
+  const format = widthMm !== null && heightMm !== null && !width.precisionExceeded && !height.precisionExceeded
     ? recognizeD3Format(widthMm, heightMm)
     : String(source.format ?? "");
 
@@ -215,7 +233,7 @@ export function createD3ProductInput(validation, { fallbackName } = {}) {
     variantCount: 1,
     pages: value.pages,
     print: {
-      mode: "duplex",
+      mode: value.backColors === 0 ? "simplex" : "duplex",
       frontColors: value.frontColors,
       backColors: value.backColors,
       duplexPreference: "auto",
