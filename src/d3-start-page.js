@@ -77,7 +77,9 @@ export function formatD3Decimal(value, digits = 2) {
 export function formatD3Integer(value) {
   const numeric = positiveInteger(value);
   if (numeric === null) return "";
-  return numeric.toLocaleString("ru-RU", { maximumFractionDigits: 0 });
+  return numeric
+    .toLocaleString("ru-RU", { maximumFractionDigits: 0 })
+    .replace(/[\u00a0\u202f]/g, " ");
 }
 
 function normalizeColorfulness(value) {
