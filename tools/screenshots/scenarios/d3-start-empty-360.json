@@ -35,7 +35,21 @@
     }
   ],
   "pageAssertions": {
-    "noHorizontalOverflow": true
+    "noHorizontalOverflow": true,
+    "elementMetrics": [
+      {
+        "selector": ".topbar",
+        "height": 26
+      },
+      {
+        "selector": ".order-grid-head",
+        "height": 6
+      },
+      {
+        "selector": "#draftRow",
+        "height": 16
+      }
+    ]
   },
   "screenshot": "uimposition-d3-start-empty-360.png"
 }
