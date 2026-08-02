@@ -9,13 +9,11 @@ function rowColorfulness(row) {
 }
 
 function activeFormatOptions(selected) {
-  const options = [
-    ["A4", "A4 · 210×297"],
-    ["A5", "A5 · 148×210"],
-    ["A6", "A6 · 105×148"],
-    ["A7", "A7 · 74×105"],
-    ["custom", "Произвольный"],
-  ];
+  const options = Object.entries(D3_STANDARD_FORMATS).map(([id, size]) => [
+    id,
+    `${id} · ${formatD3Decimal(size.widthMm)}×${formatD3Decimal(size.heightMm)}`,
+  ]);
+  options.push(["custom", "Произвольный"]);
   return options.map(([value, label]) => (
     `<option value="${value}"${value === selected ? " selected" : ""}>${label}</option>`
   )).join("");
@@ -33,7 +31,7 @@ function activeRowMarkup(row) {
     <button class="order-cell order-action order-action--swap" type="button" data-row-action="swap" title="Поменять ширину и высоту">↔</button>
     <div class="order-cell"><input data-existing-field="heightMm" value="${escapeHtml(formatD3Decimal(row.finished.heightMm))}" inputmode="decimal" aria-label="Высота"></div>
     <div class="order-cell"><input data-existing-field="colorfulness" value="${escapeHtml(rowColorfulness(row))}" list="colorfulnessOptions" aria-label="Красочность"></div>
-    <div class="order-cell"><input data-existing-field="bleedMm" value="${escapeHtml(formatD3Decimal(row.bleed.uniformMm, 1))}" list="bleedOptions" inputmode="decimal" aria-label="Выпуск"></div>
+    <div class="order-cell"><input data-existing-field="bleedMm" value="${escapeHtml(formatD3Decimal(row.bleed.uniformMm, CONFIG.d3StartPage.bleedDecimals))}" list="bleedOptions" inputmode="decimal" aria-label="Выпуск"></div>
     <div class="order-cell"><input data-existing-field="pages" value="${escapeHtml(row.pages)}" inputmode="numeric" aria-label="Страниц"></div>
     <div class="order-cell"><input data-existing-field="quantity" value="${escapeHtml(formatD3Integer(row.quantityPerVariant))}" inputmode="numeric" aria-label="Тираж"></div>
     <button class="order-cell order-action order-action--copy" type="button" data-row-action="copy" title="Копировать">⧉</button>
@@ -56,7 +54,7 @@ function ordinaryRowMarkup(row) {
     <div class="order-cell">↔</div>
     <div class="order-cell">${escapeHtml(formatD3Decimal(row.finished.heightMm))}</div>
     <div class="order-cell">${escapeHtml(rowColorfulness(row))}</div>
-    <div class="order-cell">${escapeHtml(formatD3Decimal(row.bleed.uniformMm, 1))}</div>
+    <div class="order-cell">${escapeHtml(formatD3Decimal(row.bleed.uniformMm, CONFIG.d3StartPage.bleedDecimals))}</div>
     <div class="order-cell">${escapeHtml(row.pages)}</div>
     <div class="order-cell">${escapeHtml(formatD3Integer(row.quantityPerVariant))}</div>
     <button class="order-cell order-action order-action--copy" type="button" data-row-action="copy" title="Копировать">⧉</button>
