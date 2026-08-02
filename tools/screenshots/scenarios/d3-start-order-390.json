@@ -65,7 +65,21 @@
     }
   ],
   "pageAssertions": {
-    "noHorizontalOverflow": true
+    "noHorizontalOverflow": true,
+    "elementMetrics": [
+      {
+        "selector": ".topbar",
+        "height": 26
+      },
+      {
+        "selector": "#draftRow",
+        "height": 16
+      },
+      {
+        "selector": "[data-product-row]",
+        "height": 8
+      }
+    ]
   },
   "screenshot": "uimposition-d3-start-order-390.png"
 }
