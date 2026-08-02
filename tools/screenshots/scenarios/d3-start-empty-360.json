@@ -1,0 +1,41 @@
+{
+  "id": "d3-start-empty-360",
+  "path": "/app/",
+  "viewport": {
+    "width": 360,
+    "height": 800
+  },
+  "assertions": [
+    {
+      "selector": "#currentPresetButton",
+      "text": "616×446"
+    },
+    {
+      "selector": "#draftRow"
+    },
+    {
+      "selector": "[data-mobile-screen='order']",
+      "text": "Заказ"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 500
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#liveJobs",
+      "text": "0"
+    },
+    {
+      "selector": "#draftFormat",
+      "value": ""
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshot": "uimposition-d3-start-empty-360.png"
+}
