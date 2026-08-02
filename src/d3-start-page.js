@@ -1,11 +1,13 @@
+import { CONFIG } from "./config.js";
+
 export const D3_DRAFT_SCHEMA_VERSION = 1;
 
-export const D3_STANDARD_FORMATS = Object.freeze({
-  A4: Object.freeze({ widthMm: 210, heightMm: 297 }),
-  A5: Object.freeze({ widthMm: 148, heightMm: 210 }),
-  A6: Object.freeze({ widthMm: 105, heightMm: 148 }),
-  A7: Object.freeze({ widthMm: 74, heightMm: 105 }),
-});
+export const D3_STANDARD_FORMATS = Object.freeze(Object.fromEntries(
+  CONFIG.productPresets.map((preset) => [
+    preset.id,
+    Object.freeze({ widthMm: preset.width, heightMm: preset.height }),
+  ]),
+));
 
 function finiteNumber(value) {
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
@@ -31,8 +33,9 @@ function issue(field, code) {
   return Object.freeze({ field, code });
 }
 
-function roundedTenth(value) {
-  return Math.round((value + Number.EPSILON) * 10) / 10;
+function rounded(value, digits) {
+  const factor = 10 ** digits;
+  return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
 export function emptyD3Draft() {
@@ -64,7 +67,7 @@ export function recognizeD3Format(widthMm, heightMm) {
   return "custom";
 }
 
-export function formatD3Decimal(value, digits = 2) {
+export function formatD3Decimal(value, digits = CONFIG.d3StartPage.dimensionDecimals) {
   const numeric = finiteNumber(value);
   if (numeric === null) return "";
   return numeric.toLocaleString("ru-RU", {
@@ -93,9 +96,9 @@ function normalizeColorfulness(value) {
     !Number.isInteger(frontColors)
     || !Number.isInteger(backColors)
     || frontColors < 1
-    || frontColors > 20
+    || frontColors > CONFIG.limits.maxColorUnits
     || backColors < 0
-    || backColors > 20
+    || backColors > CONFIG.limits.maxColorUnits
   ) {
     return null;
   }
@@ -109,7 +112,13 @@ function normalizeColorfulness(value) {
 function normalizeBleed(value) {
   const numeric = finiteNumber(value);
   if (numeric === null) return null;
-  return roundedTenth(Math.max(0, Math.min(20, numeric)));
+  const clamped = Math.max(CONFIG.limits.minBleedMm, Math.min(CONFIG.limits.maxBleedMm, numeric));
+  return rounded(clamped, CONFIG.d3StartPage.bleedDecimals);
+}
+
+function normalizeDimension(value) {
+  const numeric = finiteNumber(value);
+  return numeric === null ? null : rounded(numeric, CONFIG.d3StartPage.dimensionDecimals);
 }
 
 function fitsPrintableArea(widthMm, heightMm, bleedMm, printable) {
@@ -133,18 +142,19 @@ function fitsPrintableArea(widthMm, heightMm, bleedMm, printable) {
 export function validateD3Draft(draft, printable) {
   const source = { ...emptyD3Draft(), ...(draft ?? {}) };
   const issues = [];
-  const widthMm = finiteNumber(source.widthMm);
-  const heightMm = finiteNumber(source.heightMm);
+  const widthMm = normalizeDimension(source.widthMm);
+  const heightMm = normalizeDimension(source.heightMm);
   const colorfulness = normalizeColorfulness(String(source.colorfulness ?? ""));
   const bleedMm = normalizeBleed(source.bleedMm);
   const pages = positiveInteger(source.pages);
   const quantity = positiveInteger(source.quantity);
+  const minimumDimension = CONFIG.limits.minProductDimensionMm;
 
   if (!source.format && (widthMm === null || heightMm === null)) issues.push(issue("format", "required"));
   if (widthMm === null) issues.push(issue("widthMm", "invalidNumber"));
-  else if (widthMm < 0.01) issues.push(issue("widthMm", "outOfRange"));
+  else if (widthMm < minimumDimension) issues.push(issue("widthMm", "outOfRange"));
   if (heightMm === null) issues.push(issue("heightMm", "invalidNumber"));
-  else if (heightMm < 0.01) issues.push(issue("heightMm", "outOfRange"));
+  else if (heightMm < minimumDimension) issues.push(issue("heightMm", "outOfRange"));
   if (!colorfulness) issues.push(issue("colorfulness", "outOfRange"));
   if (bleedMm === null) issues.push(issue("bleedMm", "invalidNumber"));
   if (pages === null) issues.push(issue("pages", "integerRequired"));
@@ -154,8 +164,8 @@ export function validateD3Draft(draft, printable) {
   if (
     widthMm !== null
     && heightMm !== null
-    && widthMm >= 0.01
-    && heightMm >= 0.01
+    && widthMm >= minimumDimension
+    && heightMm >= minimumDimension
     && bleedMm !== null
   ) {
     fit = fitsPrintableArea(widthMm, heightMm, bleedMm, printable);
