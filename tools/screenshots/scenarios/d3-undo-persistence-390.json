@@ -1,0 +1,109 @@
+{
+  "id": "d3-undo-persistence-390",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Буклет"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A6"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "0"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "2000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row] [data-row-action='copy']"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row].is-active [data-row-action='delete']"
+    },
+    {
+      "action": "click",
+      "selector": "#undoDeleteButton"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Незавершённый"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 300
+    },
+    {
+      "action": "reload"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 700
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-product-row]",
+      "count": 2
+    },
+    {
+      "selector": "[data-product-row]",
+      "text": "Буклет"
+    },
+    {
+      "selector": "#draftName",
+      "value": "Незавершённый"
+    },
+    {
+      "selector": "#liveJobs",
+      "text": "2"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "elementMetrics": [
+      {
+        "selector": "#draftRow",
+        "height": 16
+      },
+      {
+        "selector": "[data-product-row]",
+        "height": 8
+      }
+    ]
+  },
+  "screenshot": "uimposition-d3-undo-persistence-390.png"
+}
