@@ -86,7 +86,7 @@ export const CONFIG = Object.freeze({
     maxTrimMm: 50,
     minPressMarginMm: 0,
     maxPressMarginMm: 100,
-    minProductDimensionMm: 1,
+    minProductDimensionMm: 0.01,
     maxProductDimensionMm: 1000,
     minBleedMm: 0,
     maxBleedMm: 20,
