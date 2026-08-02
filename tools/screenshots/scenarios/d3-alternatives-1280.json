@@ -1,0 +1,73 @@
+{
+  "id": "d3-alternatives-1280",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Листовка А6"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A6"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "0"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "1000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 900
+    },
+    {
+      "action": "click",
+      "selector": "[data-mobile-screen='alternatives']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 250
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#alternativesTitle",
+      "text": "Сравнение вариантов"
+    },
+    {
+      "selector": "#alternativesList .alternative-card",
+      "text": "Листы"
+    }
+  ],
+  "screenshotSelector": "[data-screen='alternatives']",
+  "screenshot": "uimposition-d3-alternatives-1280.png"
+}
