@@ -1,0 +1,86 @@
+{
+  "id": "d3-select-clears-draft-390",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Этикетка"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A7"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "3000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Временный черновик"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row]"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 250
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#draftName",
+      "value": ""
+    },
+    {
+      "selector": "[data-product-row].is-active",
+      "text": "Этикетка"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "elementMetrics": [
+      {
+        "selector": "#draftRow",
+        "height": 8
+      },
+      {
+        "selector": "[data-product-row].is-active",
+        "height": 16
+      }
+    ]
+  },
+  "screenshot": "uimposition-d3-selected-row-390.png"
+}
