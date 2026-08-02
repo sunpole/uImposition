@@ -62,13 +62,17 @@ test("D3 accepts decimal comma and renders no unnecessary trailing zeros", () =>
   assert.equal(formatD3Decimal(90.05), "90,05");
 });
 
-test("D3 rounds product dimensions to 0.01 mm and accepts the minimum", () => {
-  const rounded = validateD3Draft(validDraft({ widthMm: "90,006", heightMm: "0,01" }), printable);
-  assert.equal(rounded.valid, true);
-  assert.equal(rounded.normalized.widthMm, 90.01);
-  assert.equal(rounded.normalized.heightMm, 0.01);
+test("D3 accepts product dimensions down to 0.01 mm and rejects excess precision", () => {
+  const minimum = validateD3Draft(validDraft({ widthMm: "90,01", heightMm: "0,01" }), printable);
+  assert.equal(minimum.valid, true);
+  assert.equal(minimum.normalized.widthMm, 90.01);
+  assert.equal(minimum.normalized.heightMm, 0.01);
 
-  const belowMinimum = validateD3Draft(validDraft({ heightMm: "0,004" }), printable);
+  const excessPrecision = validateD3Draft(validDraft({ widthMm: "90,006" }), printable);
+  assert.equal(excessPrecision.valid, false);
+  assert.ok(excessPrecision.issues.some(({ field, code }) => field === "widthMm" && code === "precisionExceeded"));
+
+  const belowMinimum = validateD3Draft(validDraft({ heightMm: "0,00" }), printable);
   assert.equal(belowMinimum.valid, false);
   assert.ok(belowMinimum.issues.some(({ field, code }) => field === "heightMm" && code === "outOfRange"));
 });
@@ -131,7 +135,7 @@ test("D3 requires positive integer pages and quantity and formats grouped quanti
   assert.equal(validateD3Draft(validDraft({ quantity: "10,5" }), printable).valid, false);
 });
 
-test("D3 builds the existing product-row input and generates a fallback name", () => {
+test("D3 builds the existing duplex product-row input and generates a fallback name", () => {
   const result = validateD3Draft(validDraft({ name: "" }), printable);
   const product = createD3ProductInput(result, { fallbackName: "Заказ 7" });
 
@@ -153,6 +157,19 @@ test("D3 builds the existing product-row input and generates a fallback name", (
     cut: { mode: "separated", gapMm: 0 },
     rotationPolicy: "auto",
     notes: "",
+  });
+});
+
+test("D3 converts 1+0 and 4+0 into honest simplex product rows", () => {
+  const oneColor = validateD3Draft(validDraft({ colorfulness: "1+0" }), printable);
+  const fourColor = validateD3Draft(validDraft({ colorfulness: "4+0" }), printable);
+
+  assert.equal(createD3ProductInput(oneColor, { fallbackName: "Односторонний" }).print.mode, "simplex");
+  assert.deepEqual(createD3ProductInput(fourColor, { fallbackName: "Односторонний" }).print, {
+    mode: "simplex",
+    frontColors: 4,
+    backColors: 0,
+    duplexPreference: "auto",
   });
 });
 
