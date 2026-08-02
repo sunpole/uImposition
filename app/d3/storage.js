@@ -104,7 +104,7 @@ function flushDraftSave() {
 
 function scheduleDraftSave() {
   clearTimeout(draftSaveTimer);
-  draftSaveTimer = setTimeout(flushDraftSave, 150);
+  draftSaveTimer = setTimeout(flushDraftSave, CONFIG.d3StartPage.draftSaveDebounceMs);
 }
 
 function nextAutomaticName() {
