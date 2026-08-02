@@ -1,7 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { CONFIG } from "../src/config.js";
 import {
+  D3_STANDARD_FORMATS,
   createD3CopyName,
   createD3ProductInput,
   emptyD3Draft,
@@ -28,6 +30,17 @@ function validDraft(overrides = {}) {
   };
 }
 
+test("D3 uses the approved sheet, product, bleed and color configuration", () => {
+  assert.deepEqual(CONFIG.sheetPresets.map(({ id }) => id), [
+    "616x446", "616x466", "636x448", "646x466", "650x313",
+    "716x326", "716x336", "716x516", "500x350", "450x320",
+  ]);
+  assert.deepEqual(Object.keys(D3_STANDARD_FORMATS), ["A4", "A5", "A6", "A7"]);
+  assert.deepEqual(CONFIG.bleedPresetsMm, [0, 2, 3, 5]);
+  assert.equal(CONFIG.limits.maxColorUnits, 20);
+  assert.equal(CONFIG.limits.minProductDimensionMm, 0.01);
+});
+
 test("D3 recognizes standard formats only by exact dimensions in either orientation", () => {
   assert.equal(recognizeD3Format(210, 297), "A4");
   assert.equal(recognizeD3Format(297, 210), "A4");
@@ -49,16 +62,34 @@ test("D3 accepts decimal comma and renders no unnecessary trailing zeros", () =>
   assert.equal(formatD3Decimal(90.05), "90,05");
 });
 
-test("D3 normalizes colorfulness and rejects a zero first side", () => {
+test("D3 rounds product dimensions to 0.01 mm and accepts the minimum", () => {
+  const rounded = validateD3Draft(validDraft({ widthMm: "90,006", heightMm: "0,01" }), printable);
+  assert.equal(rounded.valid, true);
+  assert.equal(rounded.normalized.widthMm, 90.01);
+  assert.equal(rounded.normalized.heightMm, 0.01);
+
+  const belowMinimum = validateD3Draft(validDraft({ heightMm: "0,004" }), printable);
+  assert.equal(belowMinimum.valid, false);
+  assert.ok(belowMinimum.issues.some(({ field, code }) => field === "heightMm" && code === "outOfRange"));
+});
+
+test("D3 normalizes colorfulness, supports 20+20 and rejects a zero first side", () => {
   const normalized = validateD3Draft(validDraft({ colorfulness: " 04 + 01 " }), printable);
   assert.equal(normalized.valid, true);
   assert.equal(normalized.normalized.colorfulness, "4+1");
   assert.equal(normalized.normalized.frontColors, 4);
   assert.equal(normalized.normalized.backColors, 1);
 
-  const invalid = validateD3Draft(validDraft({ colorfulness: "0+4" }), printable);
-  assert.equal(invalid.valid, false);
-  assert.ok(invalid.issues.some(({ field, code }) => field === "colorfulness" && code === "outOfRange"));
+  const maximum = validateD3Draft(validDraft({ colorfulness: "20+20" }), printable);
+  assert.equal(maximum.valid, true);
+  assert.equal(maximum.normalized.colorfulness, "20+20");
+
+  const zeroFront = validateD3Draft(validDraft({ colorfulness: "0+4" }), printable);
+  assert.equal(zeroFront.valid, false);
+  assert.ok(zeroFront.issues.some(({ field, code }) => field === "colorfulness" && code === "outOfRange"));
+
+  const overMaximum = validateD3Draft(validDraft({ colorfulness: "21+0" }), printable);
+  assert.equal(overMaximum.valid, false);
 });
 
 test("D3 rounds bleed to one decimal and clamps it to the supported range", () => {
