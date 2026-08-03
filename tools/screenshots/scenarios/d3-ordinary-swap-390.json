@@ -1,0 +1,76 @@
+{
+  "id": "d3-ordinary-swap-390",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Карточка"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A7"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "1000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row] [data-row-action='swap']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 300
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-product-row].is-active",
+      "count": 0
+    },
+    {
+      "selector": "[data-product-row]",
+      "text": "105"
+    },
+    {
+      "selector": "[data-product-row]",
+      "text": "74"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": "[data-screen='order']",
+  "screenshot": "uimposition-d3-ordinary-swap-390.png"
+}
