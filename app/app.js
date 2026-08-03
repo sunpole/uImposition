@@ -31,6 +31,7 @@ import {
   resolveOperatorWorkspaceCalculation,
 } from "../src/operator-workspace-calculation.js";
 import { calculateSheetGeometry } from "../src/geometry.js";
+import { createD3PrintInput } from "../src/d3-print-input.js";
 import {
   D3_STANDARD_FORMATS,
   createD3CopyName,
@@ -66,6 +67,7 @@ window.__uimpositionD3Deps = Object.freeze({
   createOperatorWorkspaceCalculationRequest,
   resolveOperatorWorkspaceCalculation,
   calculateSheetGeometry,
+  createD3PrintInput,
   D3_STANDARD_FORMATS,
   createD3CopyName,
   createD3ProductInput,
