@@ -1,0 +1,77 @@
+{
+  "id": "d3-edit-colorfulness-390",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Односторонняя"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A7"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "1000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row]"
+    },
+    {
+      "action": "fill",
+      "selector": "[data-existing-field='colorfulness']",
+      "value": "4+0"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 600
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-existing-field='colorfulness']",
+      "value": "4+0"
+    },
+    {
+      "selector": "#calculationError",
+      "text": "Текущий расчёт поддерживает только двусторонние работы."
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": "[data-screen='order']",
+  "screenshot": "uimposition-d3-edit-colorfulness-390.png"
+}
