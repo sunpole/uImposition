@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { createD3PrintInput } from "../src/d3-start-page.js";
+import { createD3PrintInput } from "../src/d3-print-input.js";
 
 test("D3 print input switches between simplex and duplex from back colors", () => {
   assert.deepEqual(createD3PrintInput(4, 0), {
