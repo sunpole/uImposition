@@ -57,10 +57,11 @@ function updateExistingControl(control, { final = false } = {}) {
     }
     control.value = validation.normalized.colorfulness;
     updateRow(row.id, {
-      print: {
-        frontColors: validation.normalized.frontColors,
-        backColors: validation.normalized.backColors,
-      },
+      print: createD3PrintInput(
+        validation.normalized.frontColors,
+        validation.normalized.backColors,
+        { duplexPreference: row.print.duplexPreference },
+      ),
     });
     return;
   }
