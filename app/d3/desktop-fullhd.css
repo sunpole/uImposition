@@ -2,155 +2,238 @@
    Mobile and compact tablet metrics remain unchanged below this boundary. */
 @media (min-width: 1600px) and (min-height: 900px) {
   :root {
+    --desktop-topbar-height: 44px;
     --table-columns:
-      minmax(300px, 1.65fr)
-      minmax(150px, .8fr)
-      minmax(100px, .55fr)
-      42px
-      minmax(100px, .55fr)
-      minmax(140px, .75fr)
-      minmax(110px, .6fr)
-      minmax(90px, .48fr)
-      minmax(150px, .8fr)
-      44px
-      44px;
+      minmax(360px, 1.7fr)
+      minmax(180px, .9fr)
+      minmax(120px, .6fr)
+      52px
+      minmax(120px, .6fr)
+      minmax(160px, .8fr)
+      minmax(130px, .65fr)
+      minmax(110px, .55fr)
+      minmax(170px, .85fr)
+      52px
+      52px;
   }
 
   body {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, .018), transparent 180px),
+      linear-gradient(180deg, rgba(255, 255, 255, .018), transparent 220px),
       var(--canvas);
   }
 
-  .sheet-preset-button {
-    min-width: 126px;
-    padding: 0 20px 0 13px;
-    font-size: 10px;
+  html[data-ui="d3"] .topbar {
+    height: var(--desktop-topbar-height) !important;
+    min-height: var(--desktop-topbar-height) !important;
+    border-bottom-color: #34404e;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, .4);
   }
 
-  .live-counter { width: 82px; }
-  .live-counter strong { font-size: 12px; line-height: 14px; }
-  .live-counter span { font-size: 5px; line-height: 6px; letter-spacing: .08em; }
+  .sheet-preset-button {
+    min-width: 170px;
+    height: var(--desktop-topbar-height);
+    padding: 0 28px 0 18px;
+    font-size: 14px;
+    line-height: var(--desktop-topbar-height);
+  }
+
+  .disclosure-marker {
+    top: 8px;
+    right: 8px;
+    width: 3px;
+    height: 3px;
+  }
+
+  .live-counters {
+    height: var(--desktop-topbar-height);
+  }
+  .live-counter {
+    width: 108px;
+    grid-template-rows: 24px 13px;
+  }
+  .live-counter strong {
+    font-size: 18px;
+    line-height: 23px;
+  }
+  .live-counter span {
+    font-size: 8px;
+    line-height: 11px;
+    letter-spacing: .09em;
+  }
 
   .save-status {
-    gap: 7px;
-    padding: 0 12px;
-    font-size: 8px;
+    height: var(--desktop-topbar-height);
+    gap: 9px;
+    padding: 0 16px;
+    font-size: 12px;
   }
-  .save-status__dot { width: 4px; height: 4px; }
+  .save-status__dot {
+    width: 6px;
+    height: 6px;
+  }
 
-  .top-action {
-    width: 44px;
-    font-size: 9px;
+  html[data-ui="d3"] .topbar__actions {
+    height: var(--desktop-topbar-height);
   }
-  .top-action--add { font-size: 18px; }
+  .top-action {
+    width: 58px;
+    height: var(--desktop-topbar-height);
+    min-height: var(--desktop-topbar-height);
+    font-size: 13px;
+  }
+  .top-action--add {
+    font-size: 26px;
+  }
 
   .top-surface {
-    left: 24px;
-    right: 24px;
-    max-height: min(58vh, 440px);
-    padding: 12px;
+    top: var(--desktop-topbar-height);
+    left: 28px;
+    right: 28px;
+    max-height: min(62vh, 520px);
+    padding: 16px;
     border: 1px solid #3a4554;
     border-top: 0;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 10px 10px;
   }
-  .preset-surface { gap: 10px; }
-  .preset-list { gap: 7px; }
+  .preset-surface {
+    gap: 14px;
+  }
+  .preset-list {
+    gap: 9px;
+  }
   .preset-button,
   .surface-action {
-    min-height: 30px;
-    padding: 5px 11px;
+    min-height: 38px;
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+  .preset-button.is-local::after {
     font-size: 10px;
   }
-  .sheet-facts { gap: 4px; padding-top: 8px; }
-  .sheet-fact { flex-basis: 210px; padding: 7px 9px; }
-  .sheet-fact span { font-size: 7px; }
-  .sheet-fact strong { font-size: 10px; }
+  .sheet-facts {
+    gap: 6px;
+    padding-top: 12px;
+  }
+  .sheet-fact {
+    flex-basis: 230px;
+    padding: 10px 12px;
+  }
+  .sheet-fact span {
+    font-size: 10px;
+  }
+  .sheet-fact strong {
+    margin-top: 3px;
+    font-size: 14px;
+  }
 
   .txt-surface,
   .settings-surface {
     left: auto;
-    right: 24px;
-    width: min(760px, calc(100% - 48px));
+    right: 28px;
+    width: min(860px, calc(100% - 56px));
   }
-  .settings-surface { gap: 9px; }
-  .settings-status { font-size: 9px; }
+  .settings-surface {
+    gap: 12px;
+  }
+  .settings-status {
+    font-size: 12px;
+  }
   .product-import-actions .button {
-    min-height: 32px !important;
-    padding: 6px 10px !important;
-    font-size: 10px !important;
+    min-height: 40px !important;
+    padding: 8px 13px !important;
+    font-size: 13px !important;
+  }
+  .txt-import-status {
+    max-height: 200px;
+    font-size: 12px;
+  }
+
+  .global-message {
+    margin: 8px 28px;
+    padding: 9px 12px;
+    font-size: 12px;
   }
 
   .workspace {
-    min-height: calc(100vh - 26px);
-    padding: 18px 24px 64px;
+    min-height: calc(100vh - var(--desktop-topbar-height));
+    padding: 24px 28px 82px;
   }
   .screen--order {
     width: 100%;
-    min-height: calc(100vh - 108px);
+    min-height: calc(100vh - 150px);
     margin: 0 auto;
   }
 
   .calculation-message {
-    margin: 0 0 8px;
-    padding: 7px 10px;
-    border-radius: 5px;
-    font-size: 10px;
-    line-height: 1.35;
+    margin: 0 0 12px;
+    padding: 10px 13px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   .order-console {
-    border: 1px solid #303a47;
-    border-radius: 7px;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, .26);
+    border: 1px solid #354150;
+    border-radius: 9px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .28);
   }
   .order-grid-head {
-    height: 24px;
-    font-size: 10px;
-    line-height: 23px;
+    height: 34px;
+    font-size: 13px;
+    line-height: 33px;
   }
   .order-grid-head > div {
-    padding: 0 8px;
+    padding: 0 10px;
     text-overflow: ellipsis;
   }
 
   .order-row {
-    height: 24px;
-    min-height: 24px;
-    font-size: 11px;
-    line-height: 23px;
+    height: 32px;
+    min-height: 32px;
+    font-size: 13px;
+    line-height: 31px;
   }
   .order-row.is-active {
-    height: 38px;
-    min-height: 38px;
-    font-size: 13px;
-    line-height: 37px;
+    height: 48px;
+    min-height: 48px;
+    font-size: 15px;
+    line-height: 47px;
   }
-  .order-cell { padding: 0 8px; }
+  .order-cell {
+    padding: 0 10px;
+  }
   .order-cell--name {
-    padding-left: 12px;
+    padding-left: 15px;
     font-weight: 650;
   }
   .order-cell small {
     display: inline;
-    margin-left: 7px;
-    font-size: 9px;
+    margin-left: 9px;
+    font-size: 11px;
     line-height: inherit;
   }
   .order-row.is-active .order-cell small {
-    font-size: 10px;
+    font-size: 12px;
     line-height: inherit;
   }
   .order-row input,
-  .order-row select { padding: 0 8px; }
-  .order-action { font-size: 13px; }
-  .order-row.is-active .order-action { font-size: 17px; }
+  .order-row select {
+    padding: 0 10px;
+    font-size: inherit;
+  }
+  .order-action {
+    font-size: 17px;
+  }
+  .order-row.is-active .order-action {
+    font-size: 22px;
+  }
 
   .draft-message {
-    min-height: 30px;
-    padding: 7px 9px;
-    font-size: 10px;
-    line-height: 16px;
+    min-height: 40px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 19px;
   }
 
   .screen--alternatives,
@@ -158,88 +241,133 @@
     width: 100%;
     max-width: 1920px;
     margin: 0 auto;
-    padding: 28px 32px 72px;
+    padding: 32px 36px 88px;
   }
-  .screen-heading { gap: 24px; margin-bottom: 18px; }
-  .screen-heading__actions { gap: 10px; }
+  .screen-heading {
+    gap: 28px;
+    margin-bottom: 22px;
+  }
+  .screen-heading h2 {
+    font-size: 24px;
+  }
+  .screen-heading__actions {
+    gap: 12px;
+  }
+  .screen-heading__actions .button {
+    min-height: 42px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
   .scope-note {
-    margin-bottom: 14px;
-    padding: 11px 13px;
-    font-size: 12px;
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    font-size: 14px;
   }
-  .alternatives-list { gap: 10px; }
+  .alternatives-list {
+    gap: 13px;
+  }
   .alternative-card {
-    grid-template-columns: minmax(320px, 1.5fr) repeat(5, minmax(120px, .7fr)) 132px;
+    grid-template-columns: minmax(360px, 1.5fr) repeat(5, minmax(135px, .7fr)) 150px;
   }
-  .alternative-cell { padding: 14px; }
-  .alternative-cell span { font-size: 9px; }
-  .alternative-cell strong { font-size: 15px; }
-  .alternative-action { min-width: 132px; padding: 10px; }
+  .alternative-cell {
+    padding: 17px;
+  }
+  .alternative-cell span {
+    font-size: 11px;
+  }
+  .alternative-cell strong {
+    font-size: 18px;
+  }
+  .alternative-action {
+    min-width: 150px;
+    padding: 12px;
+    font-size: 13px;
+  }
 
   .layout-workspace {
-    grid-template-columns: minmax(0, 1fr) 400px;
-    gap: 20px;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    gap: 24px;
   }
   .layout-canvas {
-    min-height: calc(100vh - 176px);
-    padding: 32px;
+    min-height: calc(100vh - 210px);
+    padding: 38px;
   }
   .layout-sheet {
     width: min(100%, 1320px);
     min-width: 760px;
-    padding: 22px 22px 36px;
+    padding: 26px 26px 42px;
   }
-  .layout-cell { font-size: 11px; }
-  .layout-cell small { font-size: 9px; }
+  .layout-cell {
+    font-size: 13px;
+  }
+  .layout-cell small {
+    font-size: 11px;
+  }
   .layout-details {
-    top: 44px;
-    padding: 20px;
+    top: 58px;
+    padding: 24px;
+  }
+  .layout-details h3 {
+    font-size: 18px;
   }
   .metric-list li {
-    padding: 9px 0;
-    font-size: 12px;
+    padding: 11px 0;
+    font-size: 14px;
   }
 
   .mobile-nav {
     left: 50%;
     right: auto;
-    width: 450px;
-    height: 40px;
+    width: 560px;
+    height: 52px;
     transform: translateX(-50%);
     border-right: 1px solid #2e3743;
     border-left: 1px solid #2e3743;
-    border-radius: 8px 8px 0 0;
+    border-radius: 10px 10px 0 0;
   }
   .mobile-nav button {
-    min-height: 40px;
-    font-size: 9px;
+    min-height: 52px;
+    font-size: 12px;
   }
   .mobile-nav button span {
-    width: 17px;
-    height: 17px;
-    font-size: 8px;
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
   }
 
   .undo-bar {
-    bottom: 52px;
-    min-width: 260px;
-    height: 36px;
-    padding: 0 11px;
-    font-size: 10px;
+    bottom: 66px;
+    min-width: 320px;
+    height: 44px;
+    padding: 0 14px;
+    font-size: 13px;
   }
   .undo-bar button {
-    height: 26px;
-    padding: 0 10px;
-    font-size: 10px;
+    height: 32px;
+    padding: 0 13px;
+    font-size: 13px;
   }
 
-  .dialog { width: min(720px, calc(100% - 48px)); }
-  .dialog form { padding: 22px; }
-  .form-grid { gap: 12px; margin-top: 18px; }
-  .field > span { font-size: 10px; }
+  .dialog {
+    width: min(780px, calc(100% - 56px));
+  }
+  .dialog form {
+    padding: 26px;
+  }
+  .dialog h2 {
+    font-size: 22px;
+  }
+  .form-grid {
+    gap: 15px;
+    margin-top: 22px;
+  }
+  .field > span {
+    font-size: 13px;
+  }
   .field input,
   .field select {
-    min-height: 40px;
-    padding: 8px 10px;
+    min-height: 46px;
+    padding: 10px 12px;
+    font-size: 14px;
   }
 }
