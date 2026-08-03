@@ -24,6 +24,7 @@ const {
   createOperatorWorkspaceCalculationRequest,
   resolveOperatorWorkspaceCalculation,
   calculateSheetGeometry,
+  createD3PrintInput,
   D3_STANDARD_FORMATS,
   createD3CopyName,
   createD3ProductInput,
@@ -105,6 +106,7 @@ const ISSUE_TEXT = Object.freeze({
 const DRAFT_ISSUE_TEXT = Object.freeze({
   required: "Выберите формат и заполните обязательные поля.",
   invalidNumber: "Проверьте размеры и выпуск.",
+  precisionExceeded: "Размеры — не более двух знаков после запятой.",
   integerRequired: "Страницы и тираж должны быть целыми числами от 1.",
   outOfRange: "Красочность: 1–20 + 0–20; размеры должны быть положительными.",
   doesNotFit: "Изделие вместе с выпуском не помещается в печатную область.",
