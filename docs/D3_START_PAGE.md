@@ -23,7 +23,7 @@ D3 не содержит production formulas и не переписывает so
 
 ### Верхняя панель
 
-- высота строго `26 px`;
+- высота строго `26 px` на всех разрешениях;
 - выбранный лист — оранжевая кнопка слева;
 - живые счётчики: задания, пластины, листы;
 - справа: `+`, TXT, настройки;
@@ -40,13 +40,23 @@ D3 не содержит production formulas и не переписывает so
 Название | Формат | Ширина | ↔ | Высота | Красочность | Выпуск | Страниц | Тираж | Копия | Удаление
 ```
 
-Размеры:
+Компактный режим для телефона и небольшого экрана:
 
 ```text
 column header = 6 px
 ordinary row  = 8 px
 active row    = 16 px
 ```
+
+Full HD desktop-режим включается при ширине от `1600 px` и высоте от `900 px`:
+
+```text
+column header = 24 px
+ordinary row  = 24 px
+active row    = 38 px
+```
+
+Desktop-режим не масштабирует мобильную таблицу целиком. Он задаёт отдельные ширины колонок, увеличивает шрифт и рабочие зоны, добавляет поля по краям, расширяет overlay-поверхности и использует пространство экрана на страницах вариантов и схемы.
 
 Одновременно чёрная только одна строка. Когда существующая строка не выбрана, активна верхняя строка нового заказа.
 
@@ -111,7 +121,7 @@ Stale response не может заменить более новый input. П�
 - реальный current uniform calculation;
 - существующие alternatives/layout/PDF;
 - pure unit tests;
-- Chromium evidence на `360`, `390`, `1024`, `1280`, `1440`;
+- Chromium evidence на `360`, `390`, `1024`, `1280`, `1440` и `1920×1080`;
 - PDF download verification.
 
 Не входят:
@@ -138,8 +148,9 @@ Node seam:
 
 Chromium seam:
 
-- exact heights `26/6/8/16 px`;
-- widths `360/390/1024/1440`;
+- mobile exact heights `26/6/8/16 px`;
+- Full HD exact heights `26/24/24/38 px`;
+- widths `360/390/1024/1440/1920`;
 - no full-page horizontal overflow;
 - add/copy/delete/undo;
 - draft and application persistence;
@@ -150,4 +161,4 @@ Chromium seam:
 
 ## English summary
 
-D3 is the compact table-first start page for `/app/`. It connects an empty, versioned top draft and inline order rows to the existing R2 application state, product-row actions, uniform calculation adapter, operator selection, layout preview and PDF export. Production values come from `src/config.js`; formulas and solver scope are unchanged.
+D3 is the compact table-first start page for `/app/`. It connects an empty, versioned top draft and inline order rows to the existing R2 application state, product-row actions, uniform calculation adapter, operator selection, layout preview and PDF export. Mobile keeps the approved compact metrics, while Full HD workstations receive a dedicated desktop composition. Production values come from `src/config.js`; formulas and solver scope are unchanged.
