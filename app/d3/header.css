@@ -17,6 +17,35 @@ html[data-ui="d3"] .topbar {
   box-shadow: 0 2px 10px rgba(0, 0, 0, .35);
 }
 
+.app-brand {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f8faff;
+  background: #111720;
+  border-right: 1px solid #2b3440;
+  text-decoration: none;
+  overflow: hidden;
+}
+.app-brand__mark {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  color: #111720;
+  background: #fff;
+  font-size: 7px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.app-brand__name { display: none; }
+.app-brand:hover .app-brand__mark { background: #f1f4f8; }
+
 .sheet-preset-button {
   position: relative;
   flex: 0 0 auto;
