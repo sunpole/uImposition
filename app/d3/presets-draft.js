@@ -71,7 +71,7 @@ function currentDraftValidation() {
 
 function renderTopSummary() {
   const rows = getApplicationProductRows(state).rows;
-  ui.liveJobs.textContent = String(rows.filter(({ enabled }) => enabled !== false).length);
+  ui.liveJobs.textContent = String(rows.length);
   const currentPlan = isCurrentResult() ? lastValidResult?.selectedPlan : null;
   ui.livePlates.textContent = currentPlan ? number(currentPlan.metrics.colorPlates, 0) : "—";
   ui.liveSheets.textContent = currentPlan ? number(currentPlan.metrics.physicalSheets, 0) : "—";
