@@ -7,6 +7,13 @@
   },
   "assertions": [
     {
+      "selector": "#appBrand"
+    },
+    {
+      "selector": ".app-brand__mark",
+      "text": "uI"
+    },
+    {
       "selector": "#currentPresetButton",
       "text": "616×446"
     },
@@ -39,6 +46,11 @@
     "elementMetrics": [
       {
         "selector": ".topbar",
+        "height": 26
+      },
+      {
+        "selector": "#appBrand",
+        "width": 26,
         "height": 26
       },
       {
