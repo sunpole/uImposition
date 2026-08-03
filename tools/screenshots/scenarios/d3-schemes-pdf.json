@@ -62,7 +62,7 @@
     "selector": "[data-workspace-pdf='schemes']",
     "fileNamePattern": "^uImposition-uniform-r(0|90)-(paper-minimum|dedicated-pairs|work-and-turn-dedicated-pairs)-schemes\\.pdf$",
     "artifact": "uimposition-d3-schemes.pdf",
-    "expectedPages": 2
+    "expectedPages": 1
   },
   "afterDownloadAssertions": [
     {
