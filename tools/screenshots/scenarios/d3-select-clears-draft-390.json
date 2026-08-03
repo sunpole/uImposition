@@ -65,8 +65,8 @@
       "value": ""
     },
     {
-      "selector": "[data-product-row].is-active",
-      "text": "Этикетка"
+      "selector": "[data-product-row].is-active [data-existing-field='name']",
+      "value": "Этикетка"
     }
   ],
   "pageAssertions": {
