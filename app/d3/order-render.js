@@ -51,7 +51,7 @@ function ordinaryRowMarkup(row) {
     <div class="order-cell order-cell--name">${escapeHtml(row.name)}${row.enabled === false ? " · ОТКЛ" : ""}</div>
     <div class="order-cell">${escapeHtml(formatLabel)}<small>${escapeHtml(formatSmall)}</small></div>
     <div class="order-cell">${escapeHtml(formatD3Decimal(row.finished.widthMm))}</div>
-    <div class="order-cell">↔</div>
+    <button class="order-cell order-action order-action--swap" type="button" data-row-action="swap" title="Поменять ширину и высоту">↔</button>
     <div class="order-cell">${escapeHtml(formatD3Decimal(row.finished.heightMm))}</div>
     <div class="order-cell">${escapeHtml(rowColorfulness(row))}</div>
     <div class="order-cell">${escapeHtml(formatD3Decimal(row.bleed.uniformMm, CONFIG.d3StartPage.bleedDecimals))}</div>
