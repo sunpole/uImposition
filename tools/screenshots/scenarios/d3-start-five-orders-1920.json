@@ -7,6 +7,13 @@
   },
   "assertions": [
     {
+      "selector": "#appBrand"
+    },
+    {
+      "selector": ".app-brand__name",
+      "text": "uImposition"
+    },
+    {
       "selector": "#draftRow"
     }
   ],
@@ -86,6 +93,16 @@
       {
         "selector": ".topbar",
         "height": 44
+      },
+      {
+        "selector": "#appBrand",
+        "width": 190,
+        "height": 44
+      },
+      {
+        "selector": ".app-brand__mark",
+        "width": 34,
+        "height": 34
       },
       {
         "selector": ".order-grid-head",
