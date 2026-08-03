@@ -1,0 +1,67 @@
+{
+  "id": "d3-start-empty-360",
+  "path": "/app/",
+  "viewport": {
+    "width": 360,
+    "height": 800
+  },
+  "assertions": [
+    {
+      "selector": "#appBrand"
+    },
+    {
+      "selector": ".app-brand__mark",
+      "text": "uI"
+    },
+    {
+      "selector": "#currentPresetButton",
+      "text": "616×446"
+    },
+    {
+      "selector": "#draftRow"
+    },
+    {
+      "selector": "[data-mobile-screen='order']",
+      "text": "Заказ"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "wait",
+      "timeoutMs": 500
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#liveJobs",
+      "text": "0"
+    },
+    {
+      "selector": "#draftFormat",
+      "value": ""
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "elementMetrics": [
+      {
+        "selector": ".topbar",
+        "height": 26
+      },
+      {
+        "selector": "#appBrand",
+        "width": 26,
+        "height": 26
+      },
+      {
+        "selector": ".order-grid-head",
+        "height": 6
+      },
+      {
+        "selector": "#draftRow",
+        "height": 16
+      }
+    ]
+  },
+  "screenshot": "uimposition-d3-start-empty-360.png"
+}

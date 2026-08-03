@@ -1,0 +1,41 @@
+{
+  "id": "d3-preset-overlay-1440",
+  "path": "/app/",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#currentPresetButton",
+      "text": "616×446"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "click",
+      "selector": "#currentPresetButton"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 250
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#presetSurface"
+    },
+    {
+      "selector": "#presetList",
+      "text": "716×516"
+    },
+    {
+      "selector": "#customPresetSurfaceButton",
+      "text": "Свой формат"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshot": "uimposition-d3-preset-overlay-1440.png"
+}

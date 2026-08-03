@@ -1,0 +1,58 @@
+:root {
+  color-scheme: dark;
+  --ink: #e8edf5;
+  --muted: #8e99a9;
+  --line: #303947;
+  --line-strong: #465160;
+  --surface: #171d26;
+  --surface-soft: #202733;
+  --canvas: #0d1118;
+  --panel: #141a22;
+  --black: #020305;
+  --yellow: #f3bf2d;
+  --yellow-ink: #17120a;
+  --cyan: #62d8ff;
+  --good: #38d486;
+  --danger: #ff6576;
+  --danger-soft: #351820;
+  --warn: #ff9f43;
+  --primary: #f3bf2d;
+  --primary-hover: #ffd45c;
+  --primary-soft: #332b16;
+  --radius: 7px;
+  --table-columns:
+    minmax(48px, 1fr)
+    minmax(34px, max-content)
+    minmax(28px, max-content)
+    10px
+    minmax(28px, max-content)
+    minmax(38px, max-content)
+    minmax(28px, max-content)
+    minmax(24px, max-content)
+    minmax(42px, max-content)
+    14px
+    14px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; min-height: 100%; background: var(--canvas); }
+body { margin: 0; min-width: 320px; min-height: 100%; color: var(--ink); background: var(--canvas); }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+[hidden] { display: none !important; }
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.app-shell { min-height: 100vh; max-width: 100%; overflow-x: clip; }

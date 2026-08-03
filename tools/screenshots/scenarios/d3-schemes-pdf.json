@@ -1,0 +1,81 @@
+{
+  "id": "d3-schemes-pdf",
+  "path": "/app/",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeDownload": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Листовка А6"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A6"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "0"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "1000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 1000
+    },
+    {
+      "action": "click",
+      "selector": "[data-mobile-screen='layout']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 500
+    }
+  ],
+  "download": {
+    "selector": "[data-workspace-pdf='schemes']",
+    "fileNamePattern": "^uImposition-uniform-r(0|90)-(paper-minimum|dedicated-pairs|work-and-turn-dedicated-pairs)-schemes\\.pdf$",
+    "artifact": "uimposition-d3-schemes.pdf",
+    "expectedPages": 1
+  },
+  "afterDownloadAssertions": [
+    {
+      "selector": "[data-workspace-export-status]",
+      "text": "Скачан"
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-workspace-pdf='schemes']",
+      "text": "Схемы PDF"
+    }
+  ],
+  "screenshotSelector": ".screen--layout .screen-heading__actions",
+  "screenshot": "uimposition-d3-schemes-download.png"
+}

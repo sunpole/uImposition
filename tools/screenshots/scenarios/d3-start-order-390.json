@@ -1,0 +1,85 @@
+{
+  "id": "d3-start-order-390",
+  "path": "/app/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Листовка А6"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A6"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "0"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "1000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 900
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "[data-product-row]",
+      "text": "Листовка А6"
+    },
+    {
+      "selector": "#liveJobs",
+      "text": "1"
+    },
+    {
+      "selector": "[data-mobile-screen='alternatives']",
+      "text": "Варианты"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true,
+    "elementMetrics": [
+      {
+        "selector": ".topbar",
+        "height": 26
+      },
+      {
+        "selector": "#draftRow",
+        "height": 16
+      },
+      {
+        "selector": "[data-product-row]",
+        "height": 8
+      }
+    ]
+  },
+  "screenshot": "uimposition-d3-start-order-390.png"
+}

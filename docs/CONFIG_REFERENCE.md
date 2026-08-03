@@ -11,9 +11,11 @@ All editable production, export, and search parameters live in `src/config.js` o
 | Группа | Назначение / Purpose |
 |---|---|
 | `app` | название, язык, единицы / name, language, units |
-| `sheetPresets` | размеры после зачистки / post-trim sizes |
-| `productPresets` | A4, A5, A6 / finished sizes |
+| `sheetPresets` | 10 утверждённых размеров после зачистки / ten approved post-trim sizes |
+| `productPresets` | A4, A5, A6, A7 / finished sizes |
+| `bleedPresetsMm` | быстрые значения выпуска D3 / D3 bleed shortcuts |
 | `productRows` | defaults реального вида продукции / real product-row defaults |
+| `d3StartPage` | точность, задержки UI и быстрые значения D3 |
 | `defaults` | первый запуск legacy UI / legacy initial state |
 | `limits` | допустимые диапазоны / allowed ranges |
 | `storage` | versioned browser storage keys |
@@ -40,6 +42,22 @@ press passes = 2 × physical sheets
 
 `afterTrim` не уменьшается повторно. Недопечатка блокирует производственную готовность.
 
+## D3: утверждённые быстрые значения
+
+```text
+sheet presets:
+616×446, 616×466, 636×448, 646×466, 650×313,
+716×326, 716×336, 716×516, 500×350, 450×320
+
+product presets: A4, A5, A6, A7
+bleed presets:   0, 2, 3, 5 mm
+colors:          1+0, 1+1, 4+0, 4+1, 4+4, manual 1..20 + 0..20
+product size:    minimum 0.01 mm, normalized to 0.01 mm
+bleed:           0..20 mm, normalized to 0.1 mm
+```
+
+`CONFIG.d3StartPage` также хранит задержку сохранения черновика `150 ms` и окно отмены удаления `5000 ms`. Эти значения не спрятаны в контроллере интерфейса.
+
 ## Operator-first sheet/press storage
 
 ```text
@@ -49,6 +67,8 @@ CONFIG.storage.projectKey             = "uImposition.m2.project"  // legacy reco
 ```
 
 Новые ключи принадлежат versioned R2 state. Старый `projectKey` не переиспользуется молча и сохраняется для явной migration/recovery.
+
+D3 дополнительно использует отдельные versioned browser envelopes для незавершённой верхней строки и монотонных UI-последовательностей. Они не заменяют основной `applicationState` и не содержат результата solver.
 
 ## Product row defaults
 
@@ -69,25 +89,26 @@ CONFIG.productRows.defaults.gapMm                = 0
 CONFIG.productRows.defaults.rotationPolicy       = "auto"
 ```
 
-Эти значения создают новый черновик будущего UI. `quantityPerVariant = null` намеренно требует явного тиража оператора.
+Эти значения остаются defaults чистой product-row модели и migration. Они не заполняют верхнюю D3-строку автоматически: видимый D3 draft начинается полностью пустым, кроме `schemaVersion`, и требует явных значений оператора.
 
-`productRows.defaults` не является набором скрытых производственных решений. Он только задаёт начальные значения поля формы; validation и solver получают явный normalized product row.
+`productRows.defaults` не является набором скрытых производственных решений. Он задаёт нормализацию модели; validation и solver получают явный normalized product row.
 
 ## Product row limits
 
 ```text
+CONFIG.limits.minProductDimensionMm           = 0.01
 CONFIG.limits.maxProductVariants              = 1000
-CONFIG.limits.maxTotalProductQuantity          = 100000000
-CONFIG.limits.maxColorUnits                    = 12
-CONFIG.limits.maxProductNameLength             = 160
-CONFIG.limits.maxProductSourceFileNameLength   = 240
-CONFIG.limits.maxProductNotesLength            = 2000
+CONFIG.limits.maxTotalProductQuantity         = 100000000
+CONFIG.limits.maxColorUnits                   = 20
+CONFIG.limits.maxProductNameLength            = 160
+CONFIG.limits.maxProductSourceFileNameLength  = 240
+CONFIG.limits.maxProductNotesLength           = 2000
 ```
 
 Дополнительно переиспользуются:
 
 ```text
-min/maxProductDimensionMm
+maxProductDimensionMm
 min/maxBleedMm
 min/maxGapMm
 maxPagesPerFile
@@ -258,7 +279,7 @@ color plates = 24
 - PDF схем: A4;
 - пространство M6: полные кандидаты с 1–2 различными парами, максимум `10000` кандидатов.
 
-### New operator-first product draft
+### Pure product-row model
 
 - finished format: A6 `105 × 148`;
 - тираж: незаполнен;
@@ -270,8 +291,18 @@ color plates = 24
 - cut: `commonCut`;
 - rotation: `auto`.
 
+### D3 visible draft
+
+- название: пусто и необязательно;
+- формат: не выбран;
+- ширина/высота: пусто;
+- красочность: не выбрана;
+- выпуск: не выбран;
+- страницы/тираж: пусто;
+- кнопка `+`: disabled до полного валидного ввода.
+
 ---
 
 ## English summary
 
-Configuration now separates legacy first-run defaults from the new operator-first product-row defaults. A draft product starts as A6 duplex 4+4 with one variant and an explicit missing run length. Product limits cover dimensions, variants, total run, color units and text sizes. The general product schema can preserve simplex, forced rotations and mixed specifications, while a separate compatibility validator restricts the existing uniform solver to its documented supported subset.
+Configuration separates legacy defaults, pure product-row normalization, and the visible D3 draft. D3 exposes ten approved post-trim sheet presets, A4–A7 product formats, 0/2/3/5 mm bleed shortcuts, 0.01 mm product precision, 0.1 mm bleed normalization and manual color counts up to 20+20. The visible D3 draft starts empty and is converted into the existing versioned product-row model only after validation. The existing uniform solver remains restricted by its documented compatibility boundary.

@@ -22,7 +22,7 @@ const scenarios = [];
 for (const fileName of scenarioFiles) {
   const scenario = JSON.parse(await readFile(path.join(scenarioDir, fileName), "utf8"));
   const explicitlySelected = scenarioFilter.has(scenario.id);
-  const belongsToCurrentApplication = String(scenario.path || "").startsWith("/app/");
+  const belongsToCurrentApplication = String(scenario.id || "").startsWith("d3-");
   const selectedByRequest = scenarioFilter.size === 0 || explicitlySelected;
   const selectedByLifecycle = includeHistoricalScenarios || explicitlySelected || belongsToCurrentApplication;
   if (selectedByRequest && selectedByLifecycle) scenarios.push(scenario);
@@ -39,11 +39,16 @@ function countPdfPages(bytes) {
 
 async function runAssertions(page, assertions = []) {
   for (const assertion of assertions) {
-    const locator = page.locator(assertion.selector).first();
+    const collection = page.locator(assertion.selector);
+    if (Object.hasOwn(assertion, "count")) {
+      await expect(collection).toHaveCount(Number(assertion.count));
+    }
+    const locator = collection.first();
     if (assertion.hidden) {
       await expect(locator).toBeHidden();
       continue;
     }
+    if (assertion.count === 0) continue;
     await expect(locator).toBeVisible();
     if (Object.hasOwn(assertion, "value")) {
       await expect(locator).toHaveValue(String(assertion.value));
@@ -63,6 +68,20 @@ async function runPageAssertions(page, assertions = {}) {
     }));
     expect(metrics.documentScrollWidth).toBeLessThanOrEqual(metrics.viewportWidth + 1);
     expect(metrics.bodyScrollWidth).toBeLessThanOrEqual(metrics.viewportWidth + 1);
+  }
+
+  for (const metric of assertions.elementMetrics ?? []) {
+    const measured = await page.locator(metric.selector).first().evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    });
+    const tolerance = Number(metric.tolerance ?? 0.25);
+    if (Object.hasOwn(metric, "width")) {
+      expect(Math.abs(measured.width - Number(metric.width))).toBeLessThanOrEqual(tolerance);
+    }
+    if (Object.hasOwn(metric, "height")) {
+      expect(Math.abs(measured.height - Number(metric.height))).toBeLessThanOrEqual(tolerance);
+    }
   }
 
   if (assertions.layoutFitsCanvas) {
@@ -115,6 +134,10 @@ async function runBeforeScreenshotActions(page, actions = []) {
       const locator = page.locator(action.selector).first();
       await expect(locator).toBeVisible();
       await locator.selectOption(String(action.value ?? ""));
+      continue;
+    }
+    if (action.action === "reload") {
+      await page.reload({ waitUntil: "networkidle" });
       continue;
     }
     if (action.action === "hide") {

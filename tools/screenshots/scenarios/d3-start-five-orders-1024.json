@@ -1,0 +1,88 @@
+{
+  "id": "d3-start-five-orders-1024",
+  "path": "/app/",
+  "viewport": {
+    "width": 1024,
+    "height": 768
+  },
+  "assertions": [
+    {
+      "selector": "#draftRow"
+    }
+  ],
+  "beforeScreenshot": [
+    {
+      "action": "fill",
+      "selector": "#draftName",
+      "value": "Визитка"
+    },
+    {
+      "action": "select",
+      "selector": "#draftFormat",
+      "value": "A7"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftColorfulness",
+      "value": "4+4"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftBleed",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftPages",
+      "value": "2"
+    },
+    {
+      "action": "fill",
+      "selector": "#draftQuantity",
+      "value": "5000"
+    },
+    {
+      "action": "click",
+      "selector": "#commitDraftButton"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row] [data-row-action='copy']"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row] [data-row-action='copy']"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row] [data-row-action='copy']"
+    },
+    {
+      "action": "click",
+      "selector": "[data-product-row] [data-row-action='copy']"
+    },
+    {
+      "action": "wait",
+      "timeoutMs": 1000
+    }
+  ],
+  "beforeScreenshotAssertions": [
+    {
+      "selector": "#liveJobs",
+      "text": "5"
+    },
+    {
+      "selector": "[data-product-row].is-active [data-existing-field='name']",
+      "value": "Визитка 5"
+    },
+    {
+      "selector": "#saveStatus",
+      "text": "результат актуален"
+    }
+  ],
+  "pageAssertions": {
+    "noHorizontalOverflow": true
+  },
+  "screenshotSelector": "[data-screen='order']",
+  "screenshot": "uimposition-d3-five-orders-1024.png"
+}

@@ -20,15 +20,18 @@ export const CONFIG = Object.freeze({
     { id: "716x326", label: "716 × 326", width: 716, height: 326, sizeStage: "afterTrim" },
     { id: "716x336", label: "716 × 336", width: 716, height: 336, sizeStage: "afterTrim" },
     { id: "716x516", label: "716 × 516", width: 716, height: 516, sizeStage: "afterTrim" },
+    { id: "500x350", label: "500 × 350", width: 500, height: 350, sizeStage: "afterTrim" },
+    { id: "450x320", label: "450 × 320", width: 450, height: 320, sizeStage: "afterTrim" },
   ],
 
   productPresets: [
     { id: "A4", label: "A4 — 210 × 297", width: 210, height: 297 },
     { id: "A5", label: "A5 — 148 × 210", width: 148, height: 210 },
     { id: "A6", label: "A6 — 105 × 148", width: 105, height: 148 },
+    { id: "A7", label: "A7 — 74 × 105", width: 74, height: 105 },
   ],
 
-  bleedPresetsMm: [0, 2, 5],
+  bleedPresetsMm: [0, 2, 3, 5],
 
   productRows: {
     defaults: {
@@ -47,6 +50,14 @@ export const CONFIG = Object.freeze({
       gapMm: 0,
       rotationPolicy: "auto",
     },
+  },
+
+  d3StartPage: {
+    dimensionDecimals: 2,
+    bleedDecimals: 1,
+    draftSaveDebounceMs: 150,
+    undoWindowMs: 5000,
+    colorfulnessPresets: ["1+0", "1+1", "4+0", "4+1", "4+4"],
   },
 
   defaults: {
@@ -75,7 +86,7 @@ export const CONFIG = Object.freeze({
     maxTrimMm: 50,
     minPressMarginMm: 0,
     maxPressMarginMm: 100,
-    minProductDimensionMm: 1,
+    minProductDimensionMm: 0.01,
     maxProductDimensionMm: 1000,
     minBleedMm: 0,
     maxBleedMm: 20,
@@ -86,7 +97,7 @@ export const CONFIG = Object.freeze({
     maxQuantity: 100000000,
     maxProductVariants: 1000,
     maxTotalProductQuantity: 100000000,
-    maxColorUnits: 12,
+    maxColorUnits: 20,
     maxProductNameLength: 160,
     maxProductSourceFileNameLength: 240,
     maxProductNotesLength: 2000,
