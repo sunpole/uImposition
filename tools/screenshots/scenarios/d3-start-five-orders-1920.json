@@ -85,23 +85,23 @@
     "elementMetrics": [
       {
         "selector": ".topbar",
-        "height": 26
+        "height": 44
       },
       {
         "selector": ".order-grid-head",
-        "height": 24
+        "height": 34
       },
       {
         "selector": "#draftRow",
-        "height": 24
+        "height": 32
       },
       {
         "selector": "[data-product-row]:not(.is-active)",
-        "height": 24
+        "height": 32
       },
       {
         "selector": "[data-product-row].is-active",
-        "height": 38
+        "height": 48
       }
     ]
   },
