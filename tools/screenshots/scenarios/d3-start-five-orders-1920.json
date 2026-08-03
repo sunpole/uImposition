@@ -93,7 +93,7 @@
       },
       {
         "selector": "#draftRow",
-        "height": 38
+        "height": 24
       },
       {
         "selector": "[data-product-row]:not(.is-active)",
